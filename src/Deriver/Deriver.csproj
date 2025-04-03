@@ -4,8 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyName>Defra.TradeImportsDecisionDeriver.Api</AssemblyName>
-    <RootNamespace>Defra.TradeImportsDecisionDeriver.Api</RootNamespace>
+    <AssemblyName>Defra.TradeImportsDecisionDeriver.Deriver</AssemblyName>
+    <RootNamespace>Defra.TradeImportsDecisionDeriver.Deriver</RootNamespace>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1591</NoWarn>
@@ -27,8 +27,6 @@
     <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="7.2.0" />
   </ItemGroup>
 
 </Project>

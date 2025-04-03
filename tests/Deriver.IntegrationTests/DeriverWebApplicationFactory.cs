@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Hosting;
 
-namespace Defra.TradeImportsDecisionDeriver.Api.IntegrationTests;
+namespace Defra.TradeImportsDecisionDeriver.Deriver.IntegrationTests;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class ApiWebApplicationFactory : TestWebApplicationFactory<Program>
+public class DeriverWebApplicationFactory : TestWebApplicationFactory<Program>
 {
     private static readonly Lock s_lock = new();
 

@@ -1,10 +1,6 @@
-using System.Reflection;
-using Defra.TradeImportsDecisionDeriver.Api.Endpoints.Gmrs;
-using Defra.TradeImportsDecisionDeriver.Api.Services;
-using Defra.TradeImportsDecisionDeriver.Api.Utils;
-using Defra.TradeImportsDecisionDeriver.Api.Utils.Logging;
+using Defra.TradeImportsDecisionDeriver.Deriver.Utils;
+using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.OpenApi.Models;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
@@ -36,13 +32,11 @@ static WebApplication CreateWebApplication(string[] args)
 
 static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args)
 {
-    var generatingOpenApiFromCli = Assembly.GetEntryAssembly()?.GetName().Name == "dotnet-swagger";
     var integrationTest = args.Contains("--integrationTest=true");
-    var cdpAppSettingsOptional = generatingOpenApiFromCli || integrationTest;
 
     builder.Configuration.AddJsonFile(
         $"appsettings.cdp.{Environment.GetEnvironmentVariable("ENVIRONMENT")?.ToLower()}.json",
-        cdpAppSettingsOptional
+        integrationTest
     );
     builder.Configuration.AddEnvironmentVariables();
 
@@ -61,37 +55,6 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
     builder.Services.ConfigureHttpClientDefaults(options => options.AddStandardResilienceHandler());
     builder.Services.AddProblemDetails();
     builder.Services.AddHealthChecks();
-    builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen(c =>
-    {
-        c.AddServer(
-            new OpenApiServer
-            {
-                Url = "https://" + (builder.Configuration.GetValue<string>("OpenApi:Host") ?? "localhost"),
-            }
-        );
-        c.IncludeXmlComments(Assembly.GetExecutingAssembly());
-        c.UseAllOfToExtendReferenceSchemas();
-        c.SwaggerDoc(
-            "v1",
-            new OpenApiInfo
-            {
-                Description = "TBC",
-                Contact = new OpenApiContact
-                {
-                    Email = "tbc@defra.gov.uk",
-                    Name = "DEFRA",
-                    Url = new Uri(
-#pragma warning disable S1075
-                        "https://www.gov.uk/government/organisations/department-for-environment-food-rural-affairs"
-#pragma warning restore S1075
-                    ),
-                },
-                Title = "Trade Imports Data API",
-                Version = "v1",
-            }
-        );
-    });
     builder.Services.AddHttpClient();
     builder.Services.AddHeaderPropagation(options =>
     {
@@ -99,8 +62,6 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
         if (!string.IsNullOrWhiteSpace(traceHeader))
             options.Headers.Add(traceHeader);
     });
-
-    builder.Services.AddTransient<IGmrService, GmrService>();
 }
 
 static WebApplication BuildWebApplication(WebApplicationBuilder builder)
@@ -109,19 +70,6 @@ static WebApplication BuildWebApplication(WebApplicationBuilder builder)
 
     app.UseHeaderPropagation();
     app.MapHealthChecks("/health");
-    app.MapGmrEndpoints();
-
-    app.UseSwagger(options =>
-    {
-        options.RouteTemplate = "/.well-known/openapi/{documentName}/openapi.json";
-    });
-    app.UseReDoc(options =>
-    {
-        options.ConfigObject.ExpandResponses = "200";
-        options.DocumentTitle = "Trade Import Data API";
-        options.RoutePrefix = "redoc";
-        options.SpecUrl = "/.well-known/openapi/v1/openapi.json";
-    });
 
     app.UseStatusCodePages();
     app.UseExceptionHandler(
@@ -158,7 +106,7 @@ static WebApplication BuildWebApplication(WebApplicationBuilder builder)
 }
 
 #pragma warning disable S2094
-namespace Defra.TradeImportsDecisionDeriver.Api
+namespace Defra.TradeImportsDecisionDeriver.Deriver
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class Program;

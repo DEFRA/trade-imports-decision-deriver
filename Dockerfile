@@ -14,49 +14,37 @@ RUN apt update && \
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 
-ARG VACUUM_VERSION=0.14.2
-WORKDIR /tmp/vacuum
-RUN wget --secure-protocol=TLSv1_2 "https://github.com/daveshanley/vacuum/releases/download/v${VACUUM_VERSION}/vacuum_${VACUUM_VERSION}_linux_x86_64.tar.gz" -q -O vacuum.tar.gz && \
-    tar zxvf "vacuum.tar.gz" && \
-    mv vacuum /usr/bin/vacuum
-
 WORKDIR /src
-
-ENV PATH="$PATH:/root/.dotnet/tools"
-RUN dotnet tool install -g --allow-roll-forward csharpier
 
 COPY .config/dotnet-tools.json .config/dotnet-tools.json
 COPY .csharpierrc .csharpierrc
-COPY .vacuum.yml .vacuum.yml
 
 RUN dotnet tool restore
 
-COPY src/Api/Api.csproj src/Api/Api.csproj
+COPY src/Deriver/Deriver.csproj src/Deriver/Deriver.csproj
 COPY tests/Testing/Testing.csproj tests/Testing/Testing.csproj
-COPY tests/Api.Tests/Api.Tests.csproj tests/Api.Tests/Api.Tests.csproj
-COPY tests/Api.IntegrationTests/Api.IntegrationTests.csproj tests/Api.IntegrationTests/Api.IntegrationTests.csproj
+COPY tests/Deriver.Tests/Deriver.Tests.csproj tests/Deriver.Tests/Deriver.Tests.csproj
+COPY tests/Deriver.IntegrationTests/Deriver.IntegrationTests.csproj tests/Deriver.IntegrationTests/Deriver.IntegrationTests.csproj
 COPY Defra.TradeImportsDecisionDeriver.sln Defra.TradeImportsDecisionDeriver.sln
 COPY Directory.Build.props Directory.Build.props
 
 RUN dotnet restore
 
-COPY src/Api src/Api
+COPY src/Deriver src/Deriver
 COPY tests/Testing tests/Testing
-COPY tests/Api.Tests tests/Api.Tests
-COPY tests/Api.IntegrationTests tests/Api.IntegrationTests
+COPY tests/Deriver.Tests tests/Deriver.Tests
+COPY tests/Deriver.IntegrationTests tests/Deriver.IntegrationTests
 
 RUN dotnet csharpier --check .
 
-RUN dotnet build src/Api/Api.csproj --no-restore -c Release
-RUN dotnet swagger tofile --output openapi.json ./src/Api/bin/Release/net9.0/Defra.TradeImportsDecisionDeriver.Api.dll v1
-RUN vacuum lint -d -r .vacuum.yml openapi.json
+RUN dotnet build src/Deriver/Deriver.csproj --no-restore -c Release
 
-RUN dotnet test --no-restore tests/Api.Tests
-RUN dotnet test --no-restore tests/Api.IntegrationTests
+RUN dotnet test --no-restore tests/Deriver.Tests
+RUN dotnet test --no-restore tests/Deriver.IntegrationTests
 
 FROM build AS publish
 
-RUN dotnet publish src/Api -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish src/Deriver -c Release -o /app/publish /p:UseAppHost=false
 
 ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
 
@@ -67,4 +55,4 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 EXPOSE 8085
-ENTRYPOINT ["dotnet", "Defra.TradeImportsDecisionDeriver.Api.dll"]
+ENTRYPOINT ["dotnet", "Defra.TradeImportsDecisionDeriver.Deriver.dll"]

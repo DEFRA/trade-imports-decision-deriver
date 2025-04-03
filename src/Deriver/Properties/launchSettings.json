@@ -1,6 +1,6 @@
 ﻿{
   "profiles": {
-    "TradeImportsDecisionDeriverApi": {
+    "TradeImportsDecisionDeriver": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,

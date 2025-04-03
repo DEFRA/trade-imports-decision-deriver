@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-namespace Defra.TradeImportsDecisionDeriver.Api.Utils;
+namespace Defra.TradeImportsDecisionDeriver.Deriver.Utils;
 
 [ExcludeFromCodeCoverage]
 public static class TrustStore

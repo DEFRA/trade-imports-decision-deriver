@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "src\Api\Api.csproj", "{7D935959-D3BE-4EDC-BAEC-541C72741633}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deriver", "src\Deriver\Deriver.csproj", "{7D935959-D3BE-4EDC-BAEC-541C72741633}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.Tests", "tests\Api.Tests\Api.Tests.csproj", "{5CB86A4A-162D-4A20-9403-5BB89D671BF6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deriver.Tests", "tests\Deriver.Tests\Deriver.Tests.csproj", "{5CB86A4A-162D-4A20-9403-5BB89D671BF6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{30577215-A7B4-4DBB-9F6B-38D2AA88E7E2}"
 EndProject
@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{92349C3B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing", "tests\Testing\Testing.csproj", "{E16FD742-0BC3-49D3-9344-393E8631063D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.IntegrationTests", "tests\Api.IntegrationTests\Api.IntegrationTests.csproj", "{7B45D389-C533-43D5-8E04-ADC17FADC4D4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deriver.IntegrationTests", "tests\Deriver.IntegrationTests\Deriver.IntegrationTests.csproj", "{7B45D389-C533-43D5-8E04-ADC17FADC4D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

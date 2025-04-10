@@ -25,11 +25,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Xunit"/>
+    <Using Include="Xunit" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Deriver\Deriver.csproj" />
+    <ProjectReference Include="..\TestFixtures\TestFixtures.csproj" />
     <ProjectReference Include="..\Testing\Testing.csproj" />
   </ItemGroup>
 

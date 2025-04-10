@@ -28,6 +28,9 @@ COPY tests/Deriver.IntegrationTests/Deriver.IntegrationTests.csproj tests/Derive
 COPY Defra.TradeImportsDecisionDeriver.sln Defra.TradeImportsDecisionDeriver.sln
 COPY Directory.Build.props Directory.Build.props
 
+COPY NuGet.config NuGet.config
+ARG DEFRA_NUGET_PAT
+
 RUN dotnet restore
 
 COPY src/Deriver src/Deriver

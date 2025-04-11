@@ -15,4 +15,16 @@ export AWS_SECRET_ACCESS_KEY=test
 # aws --endpoint-url=http://localhost:4566 sqs create-queue --queue-name my-queue
 
 # SQS queues
-aws --endpoint-url=$ENDPOINT_URL sqs create-queue --queue-name data_events
+aws --endpoint-url=http://localhost:4566 sqs create-queue --queue-name data_events
+
+function is_ready() {
+    aws --endpoint-url=http://localhost:4566 sqs get-queue-url --queue-name data_events || return 1
+    return 0
+}
+
+while ! is_ready; do
+    echo "Waiting until ready"
+    sleep 1
+done
+
+touch /tmp/ready

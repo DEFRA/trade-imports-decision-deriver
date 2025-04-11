@@ -56,6 +56,7 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
 
         var listQueuesResponse = await _sender.ListQueuesAsync(new ListQueuesRequest());
         _factory.OutputHelper?.WriteLine("Listing Queues");
+        listQueuesResponse.QueueUrls.Count.Should().BeGreaterThan(0);
         foreach (var url in listQueuesResponse.QueueUrls)
         {
             _factory.OutputHelper?.WriteLine(url);
@@ -77,6 +78,6 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
         ////}
 
         ////response.HttpStatusCode.Should().Be(HttpStatusCode.OK);
-        Assert.True(true);
+        Assert.Fail(string.Join(", ", listQueuesResponse.QueueUrls));
     }
 }

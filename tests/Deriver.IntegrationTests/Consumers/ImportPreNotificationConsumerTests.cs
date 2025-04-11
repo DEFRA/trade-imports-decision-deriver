@@ -52,32 +52,23 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
     [Fact]
     public async Task OnHandle_ReturnsTaskCompleted()
     {
-        ////var importNotification = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
+        var importNotification = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
 
-        var listQueuesResponse = await _sender.ListQueuesAsync(new ListQueuesRequest());
-        _factory.OutputHelper?.WriteLine("Listing Queues");
-        listQueuesResponse.QueueUrls.Count.Should().BeGreaterThan(0);
-        foreach (var url in listQueuesResponse.QueueUrls)
+        var queueUrl = await _sender.GetQueueUrlAsync("data_events");
+        var response = await _sender.SendMessageAsync(
+            new SendMessageRequest(queueUrl.QueueUrl, JsonSerializer.Serialize(importNotification))
+        );
+
+        int queueSize = 1;
+
+        //This just makes sure the message is taking off the queue, its a rather simple, crud test for the moment
+        while (queueSize > 0)
         {
-            _factory.OutputHelper?.WriteLine(url);
+            await Task.Delay(TimeSpan.FromSeconds(1));
+            var attributeResponse = await _sender.GetQueueAttributesAsync(queueUrl.QueueUrl, ["All"]);
+            queueSize = attributeResponse.ApproximateNumberOfMessages;
         }
 
-        ////var queueUrl = await _sender.GetQueueUrlAsync("data_events");
-        ////var response = await _sender.SendMessageAsync(
-        ////    new SendMessageRequest(queueUrl.QueueUrl, JsonSerializer.Serialize(importNotification))
-        ////);
-
-        ////int queueSize = 1;
-
-        //////This just makes sure the message is taking off the queue, its a rather simple, crud test for the moment
-        ////while (queueSize > 0)
-        ////{
-        ////    await Task.Delay(TimeSpan.FromSeconds(1));
-        ////    var attributeResponse = await _sender.GetQueueAttributesAsync(queueUrl.QueueUrl, ["All"]);
-        ////    queueSize = attributeResponse.ApproximateNumberOfMessages;
-        ////}
-
-        ////response.HttpStatusCode.Should().Be(HttpStatusCode.OK);
-        Assert.Fail(string.Join(", ", listQueuesResponse.QueueUrls));
+        response.HttpStatusCode.Should().Be(HttpStatusCode.OK);
     }
 }

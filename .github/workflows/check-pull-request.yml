@@ -25,7 +25,7 @@ jobs:
           compose-file: "compose.yml"
           
       - name: Wait for Localstack
-        run: ./trade-imports-decision-deriver/wait-for-docker-logs.sh sns-sqs-emulator "Ready." 60
+        run: chmod +x ./wait-for-docker-logs.sh sns-sqs-emulator "Ready." 60        
           
       - name: Setup dotnet
         uses: actions/setup-dotnet@v4

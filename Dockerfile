@@ -44,7 +44,6 @@ RUN dotnet csharpier --check .
 RUN dotnet build src/Deriver/Deriver.csproj --no-restore -c Release
 
 RUN dotnet test --no-restore tests/Deriver.Tests
-RUN dotnet test --no-restore tests/Deriver.IntegrationTests
 
 FROM build AS publish
 

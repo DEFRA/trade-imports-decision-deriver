@@ -6,11 +6,7 @@ public static class ServiceCollectionExtensions
     {
         services
             .AddHealthChecks()
-            .AddSqs(
-                configuration,
-                timeout: TimeSpan.FromSeconds(10),
-                tags: [WebApplicationExtensions.Extended]
-            );
+            .AddSqs(configuration, timeout: TimeSpan.FromSeconds(10), tags: [WebApplicationExtensions.Extended]);
 
         return services;
     }

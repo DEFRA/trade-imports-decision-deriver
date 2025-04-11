@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Defra.TradeImportsDataApi.Domain.CustomsDeclaration.ClearanceRequest;
+using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
@@ -10,6 +10,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 public class ConsumerMediator(ILoggerFactory loggerFactory) : IConsumer<JsonElement>, IConsumerWithContext
 {
     private readonly ILogger<ConsumerMediator> _logger = loggerFactory.CreateLogger<ConsumerMediator>();
+
     public Task OnHandle(JsonElement message, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Received notification: {Message}", JsonSerializer.Serialize(message));
@@ -17,23 +18,25 @@ public class ConsumerMediator(ILoggerFactory loggerFactory) : IConsumer<JsonElem
         switch (Context.GetResourceType())
         {
             case ResourceTypes.ClearanceRequest:
+            {
+                var consumer = new ClearanceRequestConsumer(loggerFactory.CreateLogger<ClearanceRequestConsumer>())
                 {
-                    var consumer = new ClearanceRequestConsumer(loggerFactory.CreateLogger<ClearanceRequestConsumer>())
-                    {
-                        Context = Context
-                    };
-                    var @event = message.Deserialize<ResourceEvent<ClearanceRequest>>();
-                    return consumer.OnHandle(@event!, cancellationToken);
-                }
+                    Context = Context,
+                };
+                var @event = message.Deserialize<ResourceEvent<ClearanceRequest>>();
+                return consumer.OnHandle(@event!, cancellationToken);
+            }
             case ResourceTypes.ImportNotification:
+            {
+                var consumer = new ImportPreNotificationConsumer(
+                    loggerFactory.CreateLogger<ImportPreNotificationConsumer>()
+                )
                 {
-                    var consumer = new ImportPreNotificationConsumer(loggerFactory.CreateLogger<ImportPreNotificationConsumer>())
-                    {
-                        Context = Context
-                    };
-                    var @event = message.Deserialize<ResourceEvent<ImportNotification>>();
-                    return consumer.OnHandle(@event!, cancellationToken);
-                }
+                    Context = Context,
+                };
+                var @event = message.Deserialize<ResourceEvent<ImportPreNotification>>();
+                return consumer.OnHandle(@event!, cancellationToken);
+            }
         }
 
         _logger.LogWarning("No Consumer for Resource Type: {ResourceType}", Context.GetResourceType());

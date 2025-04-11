@@ -4,7 +4,8 @@ using SlimMessageBus.Host.Interceptor;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Interceptors;
 
-public class TracingInterceptor<TMessage>(IConfiguration configuration, ILogger<TracingInterceptor<TMessage>> logger) : IConsumerInterceptor<TMessage>
+public class TracingInterceptor<TMessage>(IConfiguration configuration, ILogger<TracingInterceptor<TMessage>> logger)
+    : IConsumerInterceptor<TMessage>
 {
     public async Task<object> OnHandle(TMessage message, Func<Task<object>> next, IConsumerContext context)
     {
@@ -26,7 +27,10 @@ public class TracingInterceptor<TMessage>(IConfiguration configuration, ILogger<
             }
         }
 
-        logger.LogInformation("No CorrelationId found on Message Header to {Headers}", string.Join(Environment.NewLine, context.Headers));
+        logger.LogInformation(
+            "No CorrelationId found on Message Header to {Headers}",
+            string.Join(Environment.NewLine, context.Headers)
+        );
 
         return await next();
     }

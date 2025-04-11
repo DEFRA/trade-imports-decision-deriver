@@ -20,8 +20,6 @@ services:
       interval: 5s
       start_period: 5s
       retries: 3
-    networks:
-      - cdp-tenant
 
   # redis:
   #   image: redis:7.2.3-alpine3.18
@@ -66,32 +64,26 @@ services:
   #   networks:
   #     - cdp-tenant
 
-  # your-backend:
-  #   build: ./
-  #   ports:
-  #     - '8080:8080'
-  #   links:
-  #     - 'localstack:localstack'
-  #     - 'mongodb:mongodb'
-  #   depends_on:
-  #     localstack:
-  #       condition: service_healthy
-  #     mongodb:
-  #       condition: service_started
-  #   env_file:
-  #     - 'compose/aws.env'
-  #   environment:
-  #     PORT: 8080
-  #     LOCALSTACK_ENDPOINT: http://localstack:4566
-  #     MONGO_URI: mongodb://mongodb:27017/
-  #   networks:
-  #     - cdp-tenant
+  decision-deriver:
+    build:
+      args:
+        DEFRA_NUGET_PAT: ${DEFRA_NUGET_PAT}
+    command: ["--integrationTest=true"]
+    ports:
+      - '8080:8080'   
+    depends_on:
+      localstack:
+        condition: service_healthy
+    env_file:
+      - 'compose/aws.env'
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      PORT: 8080
+      SQS_Endpoint: http://sqs.eu-west-2.localhost.localstack.cloud:4566
+    
 
 ################################################################################
 
 volumes:
   mongodb-data:
 
-networks:
-  cdp-tenant:
-    driver: bridge

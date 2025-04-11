@@ -18,22 +18,20 @@ public static class ServiceCollectionExtensions
         {
             var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");
 
-            mbb.AddServicesFromAssemblyContaining<ConsumerMediator>(
-                consumerLifetime: ServiceLifetime.Scoped).PerMessageScopeEnabled();
+            mbb.AddServicesFromAssemblyContaining<ConsumerMediator>(consumerLifetime: ServiceLifetime.Scoped)
+                .PerMessageScopeEnabled();
 
             mbb.WithProviderAmazonSQS(cfg =>
             {
                 cfg.TopologyProvisioning.Enabled = false;
-                cfg.ClientProviderFactory = (provider => new CdpCredentialsSqsClientProvider(cfg.SqsClientConfig, configuration));
+                cfg.ClientProviderFactory = (
+                    provider => new CdpCredentialsSqsClientProvider(cfg.SqsClientConfig, configuration)
+                );
             });
-            
-            mbb.Consume<JsonElement>(x => x
-                .WithConsumer<ConsumerMediator>()
-                .Queue(queueName));
+
+            mbb.Consume<JsonElement>(x => x.WithConsumer<ConsumerMediator>().Queue(queueName));
 
             mbb.AddJsonSerializer();
-
-
         });
 
         return services;

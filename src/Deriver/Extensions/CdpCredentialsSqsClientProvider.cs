@@ -18,17 +18,19 @@ public class CdpCredentialsSqsClientProvider : ISqsClientProvider, IDisposable
 
         if (!string.IsNullOrEmpty(clientSecret) && !string.IsNullOrEmpty(clientId))
         {
-            _client = new AmazonSQSClient(new BasicAWSCredentials(clientId, clientSecret), new AmazonSQSConfig
-            {
-                RegionEndpoint = RegionEndpoint.GetBySystemName(configuration.GetValue<string>("AWS_REGION")),
-                ServiceURL = configuration.GetValue<string>("SQS_Endpoint")
-            });
+            _client = new AmazonSQSClient(
+                new BasicAWSCredentials(clientId, clientSecret),
+                new AmazonSQSConfig
+                {
+                    RegionEndpoint = RegionEndpoint.GetBySystemName(configuration.GetValue<string>("AWS_REGION")),
+                    ServiceURL = configuration.GetValue<string>("SQS_Endpoint"),
+                }
+            );
         }
         else
         {
             _client = new AmazonSQSClient(sqsConfig);
         }
-        
     }
 
     #region ISqsClientProvider

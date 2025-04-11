@@ -1,4 +1,4 @@
-﻿# Base dotnet image
+# Base dotnet image
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
 EXPOSE 80
@@ -23,6 +23,7 @@ RUN dotnet tool restore
 
 COPY src/Deriver/Deriver.csproj src/Deriver/Deriver.csproj
 COPY tests/Testing/Testing.csproj tests/Testing/Testing.csproj
+COPY tests/TestFixtures/TestFixtures.csproj tests/TestFixtures/TestFixtures.csproj
 COPY tests/Deriver.Tests/Deriver.Tests.csproj tests/Deriver.Tests/Deriver.Tests.csproj
 COPY tests/Deriver.IntegrationTests/Deriver.IntegrationTests.csproj tests/Deriver.IntegrationTests/Deriver.IntegrationTests.csproj
 COPY Defra.TradeImportsDecisionDeriver.sln Defra.TradeImportsDecisionDeriver.sln
@@ -35,8 +36,8 @@ RUN dotnet restore
 
 COPY src/Deriver src/Deriver
 COPY tests/Testing tests/Testing
+COPY tests/TestFixtures tests/TestFixtures
 COPY tests/Deriver.Tests tests/Deriver.Tests
-COPY tests/Deriver.IntegrationTests tests/Deriver.IntegrationTests
 
 RUN dotnet csharpier --check .
 

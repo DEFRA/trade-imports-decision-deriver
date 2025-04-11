@@ -10,14 +10,18 @@ public static class SqsHealthCheckBuilderExtensions
         this IHealthChecksBuilder builder,
         IConfiguration configuration,
         IEnumerable<string>? tags = default,
-        TimeSpan? timeout = default)
+        TimeSpan? timeout = default
+    )
     {
-        builder.Add(new HealthCheckRegistration(
-            Name,
-            sp => new SqsHealthCheck(configuration),
-            HealthStatus.Unhealthy,
-            tags,
-            timeout));
+        builder.Add(
+            new HealthCheckRegistration(
+                Name,
+                sp => new SqsHealthCheck(configuration),
+                HealthStatus.Unhealthy,
+                tags,
+                timeout
+            )
+        );
 
         return builder;
     }

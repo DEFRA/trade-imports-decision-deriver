@@ -5,9 +5,11 @@ using SlimMessageBus;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 
-public class ImportPreNotificationConsumer(ILogger<ImportPreNotificationConsumer> logger) : IConsumer<ResourceEvent<ImportNotification>>, IConsumerWithContext
+public class ImportPreNotificationConsumer(ILogger<ImportPreNotificationConsumer> logger)
+    : IConsumer<ResourceEvent<ImportPreNotification>>,
+        IConsumerWithContext
 {
-    public Task OnHandle(ResourceEvent<ImportNotification> message, CancellationToken cancellationToken)
+    public Task OnHandle(ResourceEvent<ImportPreNotification> message, CancellationToken cancellationToken)
     {
         logger.LogInformation("Received notification: {Message}", JsonSerializer.Serialize(message));
 

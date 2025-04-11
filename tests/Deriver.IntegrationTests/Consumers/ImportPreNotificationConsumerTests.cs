@@ -22,25 +22,31 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
         _factory.OutputHelper = outputHelper;
         _factory.ConfigureHostConfiguration = config =>
         {
-            config.AddInMemoryCollection([new KeyValuePair<string, string?>("AWS_REGION", "eu-west-2"),
-                new KeyValuePair<string, string?>("AWS_DEFAULT_REGION", "eu-west-2"),
-                new KeyValuePair<string, string?>("AWS_ACCESS_KEY_ID", "test"),
-                new KeyValuePair<string, string?>("AWS_SECRET_ACCESS_KEY", "test"),
-            new KeyValuePair<string, string?>("SQS_Endpoint", "http://sqs.eu-west-2.localhost.localstack.cloud:4566"),
-            new KeyValuePair<string, string?>("DATA_EVENTS_QUEUE_NAME", "data_events")]);
-        
+            config.AddInMemoryCollection(
+                [
+                    new KeyValuePair<string, string?>("AWS_REGION", "eu-west-2"),
+                    new KeyValuePair<string, string?>("AWS_DEFAULT_REGION", "eu-west-2"),
+                    new KeyValuePair<string, string?>("AWS_ACCESS_KEY_ID", "test"),
+                    new KeyValuePair<string, string?>("AWS_SECRET_ACCESS_KEY", "test"),
+                    new KeyValuePair<string, string?>(
+                        "SQS_Endpoint",
+                        "http://sqs.eu-west-2.localhost.localstack.cloud:4566"
+                    ),
+                    new KeyValuePair<string, string?>("DATA_EVENTS_QUEUE_NAME", "data_events"),
+                ]
+            );
         };
-       
 
-        _sender = new AmazonSQSClient(new BasicAWSCredentials("test", "test"),
+        _sender = new AmazonSQSClient(
+            new BasicAWSCredentials("test", "test"),
             new AmazonSQSConfig
             {
                 RegionEndpoint = RegionEndpoint.GetBySystemName("eu-west-2"),
-                ServiceURL = "http://sqs.eu-west-2.localhost.localstack.cloud:4566"
-            });
+                ServiceURL = "http://sqs.eu-west-2.localhost.localstack.cloud:4566",
+            }
+        );
 
         _factory.CreateClient();
-
     }
 
     [Fact]
@@ -49,7 +55,9 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
         var importNotification = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
 
         var queueUrl = await _sender.GetQueueUrlAsync("data_events");
-        var response = await _sender.SendMessageAsync(new SendMessageRequest(queueUrl.QueueUrl, JsonSerializer.Serialize(importNotification)));
+        var response = await _sender.SendMessageAsync(
+            new SendMessageRequest(queueUrl.QueueUrl, JsonSerializer.Serialize(importNotification))
+        );
 
         int queueSize = 1;
 
@@ -63,6 +71,4 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
 
         response.HttpStatusCode.Should().Be(HttpStatusCode.OK);
     }
-
-  
 }

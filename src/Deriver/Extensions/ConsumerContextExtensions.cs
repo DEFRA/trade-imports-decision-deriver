@@ -36,6 +36,4 @@ public static class ConsumerContextExtensions
 
         return string.Empty;
     }
-
-   
 }

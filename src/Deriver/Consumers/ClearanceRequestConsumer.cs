@@ -1,11 +1,13 @@
 using System.Text.Json;
-using Defra.TradeImportsDataApi.Domain.CustomsDeclaration.ClearanceRequest;
+using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
 using SlimMessageBus;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 
-public class ClearanceRequestConsumer(ILogger<ClearanceRequestConsumer> logger) : IConsumer<ResourceEvent<ClearanceRequest>>, IConsumerWithContext
+public class ClearanceRequestConsumer(ILogger<ClearanceRequestConsumer> logger)
+    : IConsumer<ResourceEvent<ClearanceRequest>>,
+        IConsumerWithContext
 {
     public Task OnHandle(ResourceEvent<ClearanceRequest> message, CancellationToken cancellationToken)
     {

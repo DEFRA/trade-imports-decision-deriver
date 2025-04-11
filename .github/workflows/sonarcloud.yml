@@ -6,7 +6,8 @@ on:
 permissions:
   id-token: write
   contents: read
-  pull-requests: write
+  pull-requests: write  
+  packages: read
 
 jobs:
   build:

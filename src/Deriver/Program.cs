@@ -1,3 +1,5 @@
+using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Health;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 using Microsoft.AspNetCore.Diagnostics;
@@ -54,7 +56,7 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
     // This adds default rate limiter, total request timeout, retries, circuit breaker and timeout per attempt
     builder.Services.ConfigureHttpClientDefaults(options => options.AddStandardResilienceHandler());
     builder.Services.AddProblemDetails();
-    builder.Services.AddHealthChecks();
+    builder.Services.AddHealth(builder.Configuration);
     builder.Services.AddHttpClient();
     builder.Services.AddHeaderPropagation(options =>
     {
@@ -62,6 +64,8 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
         if (!string.IsNullOrWhiteSpace(traceHeader))
             options.Headers.Add(traceHeader);
     });
+
+    builder.Services.AddConsumers(builder.Configuration);
 }
 
 static WebApplication BuildWebApplication(WebApplicationBuilder builder)
@@ -69,7 +73,7 @@ static WebApplication BuildWebApplication(WebApplicationBuilder builder)
     var app = builder.Build();
 
     app.UseHeaderPropagation();
-    app.MapHealthChecks("/health");
+    app.MapHealth();
 
     app.UseStatusCodePages();
     app.UseExceptionHandler(

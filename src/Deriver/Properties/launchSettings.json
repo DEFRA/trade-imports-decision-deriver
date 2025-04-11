@@ -1,4 +1,4 @@
-﻿{
+{
   "profiles": {
     "TradeImportsDecisionDeriver": {
       "commandName": "Project",
@@ -7,7 +7,12 @@
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ENVIRONMENT": "local"
+        "ENVIRONMENT": "local",
+        "AWS_REGION": "eu-west-2",
+        "AWS_DEFAULT_REGION": "eu-west-2",
+        "AWS_ACCESS_KEY_ID": "test",
+        "AWS_SECRET_ACCESS_KEY": "test",
+        "SQS_Endpoint": "http://sqs.eu-west-2.localhost.localstack.cloud:4566"
       }
     }
   }

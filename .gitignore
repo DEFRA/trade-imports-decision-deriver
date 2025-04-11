@@ -271,3 +271,4 @@ library.db
 openapi.json
 
 *.received.*
+/src/Deriver/Properties/.env.local

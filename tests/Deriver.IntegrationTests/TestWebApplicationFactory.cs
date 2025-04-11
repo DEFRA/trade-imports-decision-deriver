@@ -26,7 +26,6 @@ public class TestWebApplicationFactory<T> : WebApplicationFactory<T>, ITestOutpu
         {
             ConfigureHostConfiguration(config);
         });
-
         return base.CreateHost(builder);
     }
 

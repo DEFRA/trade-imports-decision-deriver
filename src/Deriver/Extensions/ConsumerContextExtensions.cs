@@ -1,0 +1,39 @@
+using Amazon.SQS.Model;
+using SlimMessageBus;
+
+namespace Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
+
+public static class MessageBusHeaders
+{
+    public const string ResourceType = "resourceType";
+    public const string SqsBusMessage = "Sqs_Message";
+}
+
+public static class ResourceTypes
+{
+    public const string ImportNotification = nameof(ImportNotification);
+    public const string ClearanceRequest = nameof(ClearanceRequest);
+}
+
+public static class ConsumerContextExtensions
+{
+    public static string GetMessageId(this IConsumerContext consumerContext)
+    {
+        if (consumerContext.Properties.TryGetValue(MessageBusHeaders.SqsBusMessage, out var sqsMessage))
+        {
+            return ((Message)sqsMessage).MessageId;
+        }
+
+        return string.Empty;
+    }
+
+    public static string GetResourceType(this IConsumerContext consumerContext)
+    {
+        if (consumerContext.Headers.TryGetValue(MessageBusHeaders.ResourceType, out var value))
+        {
+            return value.ToString()!;
+        }
+
+        return string.Empty;
+    }
+}

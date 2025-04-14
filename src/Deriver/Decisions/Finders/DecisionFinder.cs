@@ -63,7 +63,7 @@ public abstract class DecisionFinder : IDecisionFinder
         return false;
     }
 
-    public static DecisionFinderResult HandleNullNotAcceptableAction(
+    protected static DecisionFinderResult HandleNullNotAcceptableAction(
         ImportPreNotification notification,
         CheckCode? checkCode
     )

@@ -20,16 +20,16 @@ public class ClearanceRequestConsumer(
     {
         logger.LogInformation("Received notification: {Message}", JsonSerializer.Serialize(message));
 
-        var apiResponse = await apiClient.GetCustomsDeclarationWithImportPreNotification(
+        var apiResponse = await apiClient.GetImportPreNotificationsByMrn(
             message.ResourceId,
             cancellationToken
         );
 
         var preNotifications = new List<ImportPreNotification>();
 
-        if (apiResponse?.ImportPreNotifications is not null)
+        if (apiResponse is not null)
         {
-            preNotifications = apiResponse.ImportPreNotifications.Select(x => x.ImportPreNotification).ToList();
+            preNotifications = apiResponse.Select(x => x.ImportPreNotification).ToList();
         }
 
         var decisionContext = new DecisionContext(

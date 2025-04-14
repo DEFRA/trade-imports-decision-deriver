@@ -9,7 +9,11 @@ public class ImportPreNotificationConsumerTests
     [Fact]
     public void OnHandle_ReturnsTaskCompleted()
     {
-        var consumer = new ImportPreNotificationConsumer(NullLogger<ImportPreNotificationConsumer>.Instance);
+        var consumer = new ImportPreNotificationConsumer(
+            NullLogger<ImportPreNotificationConsumer>.Instance,
+            null!,
+            null!
+        );
 
         var importNotification = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
 

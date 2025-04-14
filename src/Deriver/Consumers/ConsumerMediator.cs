@@ -1,13 +1,20 @@
 using System.Text.Json;
+using Btms.Business.Services.Decisions;
+using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using SlimMessageBus;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 
-public class ConsumerMediator(ILoggerFactory loggerFactory) : IConsumer<JsonElement>, IConsumerWithContext
+public class ConsumerMediator(
+    ILoggerFactory loggerFactory,
+    IDecisionService decisionService,
+    ITradeImportsDataApiClient apiClient
+) : IConsumer<JsonElement>, IConsumerWithContext
 {
     private readonly ILogger<ConsumerMediator> _logger = loggerFactory.CreateLogger<ConsumerMediator>();
 
@@ -19,7 +26,11 @@ public class ConsumerMediator(ILoggerFactory loggerFactory) : IConsumer<JsonElem
         {
             case ResourceTypes.ClearanceRequest:
             {
-                var consumer = new ClearanceRequestConsumer(loggerFactory.CreateLogger<ClearanceRequestConsumer>())
+                var consumer = new ClearanceRequestConsumer(
+                    loggerFactory.CreateLogger<ClearanceRequestConsumer>(),
+                    decisionService,
+                    apiClient
+                )
                 {
                     Context = Context,
                 };
@@ -29,7 +40,9 @@ public class ConsumerMediator(ILoggerFactory loggerFactory) : IConsumer<JsonElem
             case ResourceTypes.ImportNotification:
             {
                 var consumer = new ImportPreNotificationConsumer(
-                    loggerFactory.CreateLogger<ImportPreNotificationConsumer>()
+                    loggerFactory.CreateLogger<ImportPreNotificationConsumer>(),
+                    decisionService,
+                    apiClient
                 )
                 {
                     Context = Context,

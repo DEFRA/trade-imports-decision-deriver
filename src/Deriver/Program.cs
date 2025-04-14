@@ -1,8 +1,14 @@
+using System.Net;
+using System.Net.Http.Headers;
+using Defra.TradeImportsDataApi.Api.Client;
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Health;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.Extensions.Http.Resilience;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
@@ -66,6 +72,32 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
     });
 
     builder.Services.AddConsumers(builder.Configuration);
+    builder
+        .Services.AddOptions<DataApiOptions>()
+        .BindConfiguration(DataApiOptions.SectionName)
+        .ValidateDataAnnotations();
+    builder
+        .Services.AddTradeImportsDataApiClient()
+        .ConfigureHttpClient(
+            (sp, c) =>
+            {
+                var options = sp.GetRequiredService<IOptions<DataApiOptions>>().Value;
+                c.BaseAddress = new Uri(options.BaseAddress);
+
+                if (options.BasicAuthCredential != null)
+                    c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                        "Basic",
+                        options.BasicAuthCredential
+                    );
+
+                if (c.BaseAddress.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase))
+                    c.DefaultRequestVersion = HttpVersion.Version20;
+            }
+        )
+        .AddStandardResilienceHandler(o =>
+        {
+            o.Retry.DisableForUnsafeHttpMethods();
+        });
 }
 
 static WebApplication BuildWebApplication(WebApplicationBuilder builder)

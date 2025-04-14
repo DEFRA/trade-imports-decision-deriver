@@ -18,10 +18,7 @@ public class ImportPreNotificationConsumer(
     public async Task OnHandle(ResourceEvent<ImportPreNotification> message, CancellationToken cancellationToken)
     {
         logger.LogInformation("Received notification: {Message}", JsonSerializer.Serialize(message));
-        var apiResponse = await apiClient.GetCustomsDeclarationsByChedId(
-            message.ResourceId,
-            cancellationToken
-        );
+        var apiResponse = await apiClient.GetCustomsDeclarationsByChedId(message.ResourceId, cancellationToken);
         var clearanceRequests = apiResponse
             ?.Where(x => x.ClearanceRequest is not null)
             .Select(x => new ClearanceRequestWrapper(x.MovementReferenceNumber, x.ClearanceRequest!))

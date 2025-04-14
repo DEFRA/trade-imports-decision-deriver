@@ -20,10 +20,7 @@ public class ClearanceRequestConsumer(
     {
         logger.LogInformation("Received notification: {Message}", JsonSerializer.Serialize(message));
 
-        var apiResponse = await apiClient.GetImportPreNotificationsByMrn(
-            message.ResourceId,
-            cancellationToken
-        );
+        var apiResponse = await apiClient.GetImportPreNotificationsByMrn(message.ResourceId, cancellationToken);
 
         var preNotifications = new List<ImportPreNotification>();
 

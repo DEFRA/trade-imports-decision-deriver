@@ -1,6 +1,5 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 

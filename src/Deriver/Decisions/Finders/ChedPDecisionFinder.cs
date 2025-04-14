@@ -88,7 +88,8 @@ public class ChedPDecisionFinder : DecisionFinder
             acceptable = consignmentAcceptable.Value;
             return true;
         }
-        else if (notification.PartTwo != null && notification.PartTwo.AutoClearedOn.HasValue)
+
+        if (notification.PartTwo != null && notification.PartTwo.AutoClearedOn.HasValue)
         {
             acceptable = true;
             return true;

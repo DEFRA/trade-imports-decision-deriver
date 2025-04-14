@@ -1,6 +1,7 @@
 using Btms.Business.Services.Decisions;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using Microsoft.Extensions.Logging.Abstractions;
 

@@ -4,8 +4,8 @@ using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
-using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using SlimMessageBus;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;

@@ -1,9 +1,7 @@
 using AutoFixture;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
-using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Matching;
 

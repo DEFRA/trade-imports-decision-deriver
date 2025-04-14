@@ -30,7 +30,7 @@ public abstract class DecisionFinder : IDecisionFinder
         return FindDecisionInternal(notification, checkCode);
     }
 
-    public static bool TryGetHoldDecision(ImportPreNotification notification, out DecisionCode? decisionCode)
+    protected static bool TryGetHoldDecision(ImportPreNotification notification, out DecisionCode? decisionCode)
     {
         if (notification.Status is ImportNotificationStatus.Submitted or ImportNotificationStatus.InProgress)
         {

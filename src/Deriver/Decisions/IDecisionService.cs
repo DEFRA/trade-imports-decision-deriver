@@ -1,6 +1,4 @@
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
-
-namespace Btms.Business.Services.Decisions;
+namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
 public interface IDecisionService
 {

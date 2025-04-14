@@ -4,11 +4,8 @@ using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
-using SlimMessageBus;
 
 // ReSharper disable InconsistentNaming
 

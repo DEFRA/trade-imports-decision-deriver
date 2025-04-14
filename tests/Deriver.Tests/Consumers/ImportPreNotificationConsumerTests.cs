@@ -15,7 +15,9 @@ public class ImportPreNotificationConsumerTests
         var decisionService = NSubstitute.Substitute.For<IDecisionService>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
-            decisionService, apiClient);
+            decisionService,
+            apiClient
+        );
 
         var importNotification = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
 

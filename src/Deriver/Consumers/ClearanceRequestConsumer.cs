@@ -41,7 +41,7 @@ public class ClearanceRequestConsumer(
             preNotifications,
             [new ClearanceRequestWrapper(message.ResourceId, clearanceRequest!.ClearanceRequest!)]
         );
-        var decisionResult = await decisionService.Process(decisionContext, Context.CancellationToken);
+        var decisionResult = await decisionService.Process(decisionContext, cancellationToken);
 
         logger.LogInformation("Decision Derived: {Decision}", JsonSerializer.Serialize(decisionResult));
     }

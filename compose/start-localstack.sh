@@ -15,10 +15,10 @@ export AWS_SECRET_ACCESS_KEY=test
 # aws --endpoint-url=http://localhost:4566 sqs create-queue --queue-name my-queue
 
 # SQS queues
-aws --endpoint-url=http://localhost:4566 sqs create-queue --queue-name data_events
+aws --endpoint-url=http://localhost:4566 sqs create-queue --queue-name trade_imports_data_import_declaration_upserts
 
 function is_ready() {
-    aws --endpoint-url=http://localhost:4566 sqs get-queue-url --queue-name data_events || return 1
+    aws --endpoint-url=http://localhost:4566 sqs get-queue-url --queue-name trade_imports_data_import_declaration_upserts || return 1
     return 0
 }
 

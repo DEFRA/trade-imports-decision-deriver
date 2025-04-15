@@ -17,6 +17,15 @@ public static class ImportPreNotificationFixtures
             .With(i => i.Operation, "Created")
             .With(i => i.ResourceType, ResourceTypes.ImportNotification)
             .With(i => i.ResourceId, "CHEDP.GB.2025.1234567")
+            .With(i => i.Resource, ImportPreNotificationFixture("CHEDP.GB.2025.1234567"))
             .Create();
+    }
+
+    public static ImportPreNotification ImportPreNotificationFixture(string chedId)
+    {
+        var fixture = new Fixture();
+        fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
+
+        return fixture.Build<ImportPreNotification>().With(i => i.ReferenceNumber, chedId).Create();
     }
 }

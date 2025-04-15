@@ -13,7 +13,7 @@ public class MessageScopeEnricher(string headerKey) : ILogEventEnricher
     /// <inheritdoc/>
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
-        var consumeContext = MessageScope.Current.GetService<IConsumerContext>();
+        var consumeContext = MessageScope.Current?.GetService<IConsumerContext>();
 
         if (consumeContext == null)
             return;

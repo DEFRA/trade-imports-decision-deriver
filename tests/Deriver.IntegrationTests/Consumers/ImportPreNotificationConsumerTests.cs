@@ -4,9 +4,12 @@ using Amazon;
 using Amazon.Runtime;
 using Amazon.SQS;
 using Amazon.SQS.Model;
+using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 using Xunit.Abstractions;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.IntegrationTests.Consumers;
@@ -15,6 +18,7 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
 {
     private readonly DeriverWebApplicationFactory _factory;
     private readonly AmazonSQSClient _sender;
+    private readonly TradeImportsDataApi.Api.Client.ITradeImportsDataApiClient _apiClient;
 
     public ImportPreNotificationConsumerTests(DeriverWebApplicationFactory factory, ITestOutputHelper outputHelper)
     {
@@ -49,6 +53,12 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
             }
         );
 
+        _apiClient = NSubstitute.Substitute.For<TradeImportsDataApi.Api.Client.ITradeImportsDataApiClient>();
+        _factory.ConfigureTestServices = services =>
+        {
+            services.AddSingleton(_apiClient);
+        };
+
         _factory.CreateClient();
     }
 
@@ -57,9 +67,31 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
     {
         var importNotification = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
 
+        _apiClient
+            .GetCustomsDeclarationsByChedId(importNotification.Resource.ReferenceNumber!, Arg.Any<CancellationToken>())
+            .Returns([]);
+
         var queueUrl = await _sender.GetQueueUrlAsync("trade_imports_data_import_declaration_upserts");
+        await _sender.PurgeQueueAsync(queueUrl.QueueUrl, CancellationToken.None);
         var response = await _sender.SendMessageAsync(
             new SendMessageRequest(queueUrl.QueueUrl, JsonSerializer.Serialize(importNotification))
+            {
+                MessageAttributes = new Dictionary<string, MessageAttributeValue>()
+                {
+                    {
+                        "x-cdp-request-id",
+                        new MessageAttributeValue() { StringValue = Guid.NewGuid().ToString(), DataType = "String" }
+                    },
+                    {
+                        MessageBusHeaders.ResourceType,
+                        new MessageAttributeValue()
+                        {
+                            StringValue = ResourceTypes.ImportNotification,
+                            DataType = "String",
+                        }
+                    },
+                },
+            }
         );
 
         int queueSize = 1;
@@ -73,5 +105,8 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
         }
 
         response.HttpStatusCode.Should().Be(HttpStatusCode.OK);
+        await _apiClient
+            .Received(1)
+            .GetCustomsDeclarationsByChedId(importNotification.Resource.ReferenceNumber!, Arg.Any<CancellationToken>());
     }
 }

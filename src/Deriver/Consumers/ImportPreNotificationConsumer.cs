@@ -16,7 +16,11 @@ public class ImportPreNotificationConsumer(
 {
     public async Task OnHandle(ResourceEvent<ImportPreNotification> message, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Received notification: {ResourceType}:{ResourceId}", message.ResourceType, message.ResourceId);
+        logger.LogInformation(
+            "Received notification: {ResourceType}:{ResourceId}",
+            message.ResourceType,
+            message.ResourceId
+        );
         var clearanceRequests = await GetClearanceRequests(message.ResourceId, cancellationToken);
 
         if (!clearanceRequests.Any())
@@ -28,15 +32,19 @@ public class ImportPreNotificationConsumer(
             return;
         }
 
-        var notifications =
-            await GetNotifications(clearanceRequests.Select(x => x.MovementReferenceNumber).Distinct().ToArray());
+        var notifications = await GetNotifications(
+            clearanceRequests.Select(x => x.MovementReferenceNumber).Distinct().ToArray()
+        );
 
         var decisionContext = new DecisionContext(notifications, clearanceRequests);
         var decisionResult = await decisionService.Process(decisionContext, Context.CancellationToken);
         logger.LogInformation("Decision Derived: {Decision}", JsonSerializer.Serialize(decisionResult));
     }
 
-    private async Task<List<ClearanceRequestWrapper>> GetClearanceRequests(string chedId, CancellationToken cancellationToken)
+    private async Task<List<ClearanceRequestWrapper>> GetClearanceRequests(
+        string chedId,
+        CancellationToken cancellationToken
+    )
     {
         var customsDeclarations = await apiClient.GetCustomsDeclarationsByChedId(chedId, cancellationToken);
 
@@ -54,19 +62,26 @@ public class ImportPreNotificationConsumer(
     private async Task<List<ImportPreNotification>> GetNotifications(string[] mrns)
     {
         var notifications = new List<ImportPreNotification>();
-        await Parallel.ForEachAsync(mrns, async (mrn, cancellationToken) =>
-        {
-            var apiResponse = await apiClient.GetImportPreNotificationsByMrn(mrn, cancellationToken);
-            if (apiResponse != null)
+        await Parallel.ForEachAsync(
+            mrns,
+            async (mrn, cancellationToken) =>
             {
-                foreach (var notificationResponse in apiResponse.Where(notificationResponse => !notifications.Exists(x =>
-                             x.ReferenceNumber ==
-                             notificationResponse.ImportPreNotification.ReferenceNumber)))
+                var apiResponse = await apiClient.GetImportPreNotificationsByMrn(mrn, cancellationToken);
+                if (apiResponse != null)
                 {
-                    notifications.Add(notificationResponse.ImportPreNotification);
+                    foreach (
+                        var notificationResponse in apiResponse.Where(notificationResponse =>
+                            !notifications.Exists(x =>
+                                x.ReferenceNumber == notificationResponse.ImportPreNotification.ReferenceNumber
+                            )
+                        )
+                    )
+                    {
+                        notifications.Add(notificationResponse.ImportPreNotification);
+                    }
                 }
             }
-        });
+        );
         return notifications;
     }
 

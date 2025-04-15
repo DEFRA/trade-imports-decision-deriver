@@ -17,11 +17,18 @@ public class ClearanceRequestConsumer(
 {
     public async Task OnHandle(ResourceEvent<ClearanceRequest> message, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Received notification: {ResourceType}:{ResourceId}", message.ResourceType, message.ResourceId);
+        logger.LogInformation(
+            "Received notification: {ResourceType}:{ResourceId}",
+            message.ResourceType,
+            message.ResourceId
+        );
 
         var clearanceRequest = await apiClient.GetCustomsDeclaration(message.ResourceId, cancellationToken);
 
-        var notificationResponses = await apiClient.GetImportPreNotificationsByMrn(message.ResourceId, cancellationToken);
+        var notificationResponses = await apiClient.GetImportPreNotificationsByMrn(
+            message.ResourceId,
+            cancellationToken
+        );
 
         var preNotifications = new List<ImportPreNotification>();
 

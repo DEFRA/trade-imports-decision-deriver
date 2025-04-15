@@ -66,7 +66,6 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
     public async Task OnHandle_ReturnsTaskCompleted()
     {
         var importNotification = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
-        //// var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
 
         _apiClient
             .GetCustomsDeclarationsByChedId(importNotification.Resource.ReferenceNumber!, Arg.Any<CancellationToken>())

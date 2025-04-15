@@ -1,6 +1,9 @@
 using System.Text.Json;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 using Defra.TradeImportsDecisionDeriver.Deriver.Interceptors;
+using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using SlimMessageBus.Host;
 using SlimMessageBus.Host.AmazonSQS;
 using SlimMessageBus.Host.Interceptor;
@@ -12,6 +15,15 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddConsumers(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddScoped<IDecisionService, DecisionService>();
+        services.AddScoped<IMatchingService, MatchingService>();
+
+        services.AddScoped<IDecisionFinder, ChedADecisionFinder>();
+        services.AddScoped<IDecisionFinder, ChedDDecisionFinder>();
+        services.AddScoped<IDecisionFinder, ChedPDecisionFinder>();
+        services.AddScoped<IDecisionFinder, ChedPPDecisionFinder>();
+        services.AddScoped<IDecisionFinder, IuuDecisionFinder>();
+
         services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(TracingInterceptor<>));
         services.AddSlimMessageBus(mbb =>
         {

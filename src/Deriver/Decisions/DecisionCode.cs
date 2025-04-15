@@ -1,4 +1,4 @@
-namespace Btms.Business.Services.Decisions;
+namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
 public enum DecisionCode
 {

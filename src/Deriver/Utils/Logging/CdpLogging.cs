@@ -22,6 +22,7 @@ public static class CdpLogging
         if (traceIdHeader != null)
         {
             config.Enrich.WithCorrelationId(traceIdHeader);
+            config.Enrich.With(new MessageScopeEnricher(traceIdHeader));
         }
     }
 }

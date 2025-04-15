@@ -59,11 +59,13 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
         // within an integration test
         builder.Host.UseSerilog(CdpLogging.Configuration);
 
+    builder.Services.AddScoped<CdpTracingHandler>();
+
     // This adds default rate limiter, total request timeout, retries, circuit breaker and timeout per attempt
     builder.Services.ConfigureHttpClientDefaults(options => options.AddStandardResilienceHandler());
     builder.Services.AddProblemDetails();
     builder.Services.AddHealth(builder.Configuration);
-    builder.Services.AddHttpClient();
+    builder.Services.AddHttpClient(Options.DefaultName).AddHttpMessageHandler<CdpTracingHandler>();
     builder.Services.AddHeaderPropagation(options =>
     {
         var traceHeader = builder.Configuration.GetValue<string>("TraceHeader");

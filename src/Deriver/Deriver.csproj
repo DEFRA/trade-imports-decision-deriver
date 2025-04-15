@@ -29,8 +29,8 @@
     <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
     <PackageReference Include="SlimMessageBus" Version="3.0.0" />
-    <PackageReference Include="SlimMessageBus.Host.AmazonSQS" Version="3.1.0" />
-    <PackageReference Include="SlimMessageBus.Host.Serialization.SystemTextJson" Version="3.1.0" />
+    <PackageReference Include="SlimMessageBus.Host.AmazonSQS" Version="3.1.2-rc100" />
+    <PackageReference Include="SlimMessageBus.Host.Serialization.SystemTextJson" Version="3.1.2-rc100" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,5 +39,9 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Utils\CdpTracing\" />
   </ItemGroup>
 </Project>

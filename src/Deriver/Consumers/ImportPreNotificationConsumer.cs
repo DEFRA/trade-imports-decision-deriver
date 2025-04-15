@@ -1,19 +1,88 @@
 using System.Text.Json;
+using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using SlimMessageBus;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 
-public class ImportPreNotificationConsumer(ILogger<ImportPreNotificationConsumer> logger)
-    : IConsumer<ResourceEvent<ImportPreNotification>>,
-        IConsumerWithContext
+public class ImportPreNotificationConsumer(
+    ILogger<ImportPreNotificationConsumer> logger,
+    IDecisionService decisionService,
+    ITradeImportsDataApiClient apiClient
+) : IConsumer<ResourceEvent<ImportPreNotification>>, IConsumerWithContext
 {
-    public Task OnHandle(ResourceEvent<ImportPreNotification> message, CancellationToken cancellationToken)
+    public async Task OnHandle(ResourceEvent<ImportPreNotification> message, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Received notification: {Message}", JsonSerializer.Serialize(message));
+        logger.LogInformation(
+            "Received notification: {ResourceType}:{ResourceId}",
+            message.ResourceType,
+            message.ResourceId
+        );
+        var clearanceRequests = await GetClearanceRequests(message.ResourceId, cancellationToken);
 
-        return Task.CompletedTask;
+        if (!clearanceRequests.Any())
+        {
+            logger.LogInformation(
+                "No Decision Derived, because no Customs Declaration found for {ChedId}",
+                message.ResourceId
+            );
+            return;
+        }
+
+        var notifications = await GetNotifications(
+            clearanceRequests.Select(x => x.MovementReferenceNumber).Distinct().ToArray()
+        );
+
+        var decisionContext = new DecisionContext(notifications, clearanceRequests);
+        var decisionResult = await decisionService.Process(decisionContext, Context.CancellationToken);
+        logger.LogInformation("Decision Derived: {Decision}", JsonSerializer.Serialize(decisionResult));
+    }
+
+    private async Task<List<ClearanceRequestWrapper>> GetClearanceRequests(
+        string chedId,
+        CancellationToken cancellationToken
+    )
+    {
+        var customsDeclarations = await apiClient.GetCustomsDeclarationsByChedId(chedId, cancellationToken);
+
+        if (customsDeclarations == null)
+        {
+            return [];
+        }
+
+        return customsDeclarations
+            .Where(x => x.ClearanceRequest is not null)
+            .Select(x => new ClearanceRequestWrapper(x.MovementReferenceNumber, x.ClearanceRequest!))
+            .ToList();
+    }
+
+    private async Task<List<ImportPreNotification>> GetNotifications(string[] mrns)
+    {
+        var notifications = new List<ImportPreNotification>();
+        await Parallel.ForEachAsync(
+            mrns,
+            async (mrn, cancellationToken) =>
+            {
+                var apiResponse = await apiClient.GetImportPreNotificationsByMrn(mrn, cancellationToken);
+                if (apiResponse != null)
+                {
+                    foreach (
+                        var notificationResponse in apiResponse.Where(notificationResponse =>
+                            !notifications.Exists(x =>
+                                x.ReferenceNumber == notificationResponse.ImportPreNotification.ReferenceNumber
+                            )
+                        )
+                    )
+                    {
+                        notifications.Add(notificationResponse.ImportPreNotification);
+                    }
+                }
+            }
+        );
+        return notifications;
     }
 
     public IConsumerContext Context { get; set; } = null!;

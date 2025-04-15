@@ -32,7 +32,10 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
                         "SQS_Endpoint",
                         "http://sqs.eu-west-2.localhost.localstack.cloud:4566"
                     ),
-                    new KeyValuePair<string, string?>("DATA_EVENTS_QUEUE_NAME", "data_events"),
+                    new KeyValuePair<string, string?>(
+                        "DATA_EVENTS_QUEUE_NAME",
+                        "trade_imports_data_import_declaration_upserts"
+                    ),
                 ]
             );
         };
@@ -54,7 +57,7 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
     {
         var importNotification = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
 
-        var queueUrl = await _sender.GetQueueUrlAsync("data_events");
+        var queueUrl = await _sender.GetQueueUrlAsync("trade_imports_data_import_declaration_upserts");
         var response = await _sender.SendMessageAsync(
             new SendMessageRequest(queueUrl.QueueUrl, JsonSerializer.Serialize(importNotification))
         );

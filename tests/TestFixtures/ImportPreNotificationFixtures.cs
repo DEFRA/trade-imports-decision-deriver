@@ -15,7 +15,7 @@ public static class ImportPreNotificationFixtures
         return fixture
             .Build<ResourceEvent<ImportPreNotification>>()
             .With(i => i.Operation, "Created")
-            .With(i => i.ResourceType, ResourceTypes.ImportNotification)
+            .With(i => i.ResourceType, ResourceEventResourceTypes.ImportPreNotification)
             .With(i => i.ResourceId, "CHEDP.GB.2025.1234567")
             .With(i => i.Resource, ImportPreNotificationFixture("CHEDP.GB.2025.1234567"))
             .Create();

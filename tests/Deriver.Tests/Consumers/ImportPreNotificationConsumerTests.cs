@@ -59,7 +59,7 @@ public class ImportPreNotificationConsumerTests
 
         apiClient
             .GetImportPreNotificationsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
-            .Returns([new ImportPreNotificationResponse(createdEvent.Resource, DateTime.Now, DateTime.Now)]);
+            .Returns([new ImportPreNotificationResponse(createdEvent.Resource!, DateTime.Now, DateTime.Now)]);
 
         var decisionResult = new DecisionResult();
         decisionResult.AddDecision("mrn", 1, "docref", "checkCode", DecisionCode.C03);

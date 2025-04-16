@@ -4,6 +4,7 @@ using Amazon;
 using Amazon.Runtime;
 using Amazon.SQS;
 using Amazon.SQS.Model;
+using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using FluentAssertions;
@@ -68,7 +69,7 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
         var importNotification = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
 
         _apiClient
-            .GetCustomsDeclarationsByChedId(importNotification.Resource.ReferenceNumber!, Arg.Any<CancellationToken>())
+            .GetCustomsDeclarationsByChedId(importNotification.Resource!.ReferenceNumber!, Arg.Any<CancellationToken>())
             .Returns([]);
 
         var queueUrl = await _sender.GetQueueUrlAsync("trade_imports_data_import_declaration_upserts");
@@ -86,7 +87,7 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
                         MessageBusHeaders.ResourceType,
                         new MessageAttributeValue()
                         {
-                            StringValue = ResourceTypes.ImportNotification,
+                            StringValue = ResourceEventResourceTypes.ImportPreNotification,
                             DataType = "String",
                         }
                     },

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Amazon;
 using Amazon.Runtime;
 using Amazon.SQS;
@@ -5,6 +6,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Health;
 
+[ExcludeFromCodeCoverage]
 public class SqsHealthCheck(IConfiguration configuration) : IHealthCheck
 {
     /// <inheritdoc />

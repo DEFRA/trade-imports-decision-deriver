@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDecisionFinder, IuuDecisionFinder>();
 
         services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(TracingInterceptor<>));
+        services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(LoggingInterceptor<>));
         services.AddSlimMessageBus(mbb =>
         {
             var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");

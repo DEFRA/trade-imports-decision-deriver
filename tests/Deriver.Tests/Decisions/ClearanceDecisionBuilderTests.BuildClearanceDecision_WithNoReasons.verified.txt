@@ -1,0 +1,33 @@
+﻿{
+  ExternalVersionNumber: 22,
+  DecisionNumber: 1,
+  Items: [
+    {
+      ItemNumber: 1,
+      Checks: [
+        {
+          CheckCode: 9115,
+          DecisionCode: C03
+        }
+      ]
+    },
+    {
+      ItemNumber: 2,
+      Checks: [
+        {
+          CheckCode: 9115,
+          DecisionCode: C03
+        }
+      ]
+    },
+    {
+      ItemNumber: 3,
+      Checks: [
+        {
+          CheckCode: 9115,
+          DecisionCode: C03
+        }
+      ]
+    }
+  ]
+}

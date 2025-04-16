@@ -23,6 +23,15 @@ public class ClearanceRequestConsumer(
             message.ResourceId
         );
 
+        if (
+            message.Operation == ResourceEventOperations.Updated
+            && !message.ChangeSet.Exists(x => x.Path.Contains("/ClearanceRequest"))
+        )
+        {
+            logger.LogInformation("Skipping Updated Event as ClearanceRequest hasn't changed");
+            return;
+        }
+
         var clearanceRequest = await apiClient.GetCustomsDeclaration(message.ResourceId, cancellationToken);
 
         var notificationResponses = await apiClient.GetImportPreNotificationsByMrn(
@@ -44,6 +53,33 @@ public class ClearanceRequestConsumer(
         var decisionResult = await decisionService.Process(decisionContext, cancellationToken);
 
         logger.LogInformation("Decision Derived: {Decision}", JsonSerializer.Serialize(decisionResult));
+        await PersistDecision(cancellationToken, clearanceRequest, decisionResult);
+    }
+
+    private async Task PersistDecision(
+        CancellationToken cancellationToken,
+        CustomsDeclarationResponse clearanceRequest,
+        DecisionResult decisionResult
+    )
+    {
+        var customsDeclaration = new CustomsDeclaration()
+        {
+            ClearanceDecision = clearanceRequest.ClearanceDecision,
+            Finalisation = clearanceRequest.Finalisation,
+            ClearanceRequest = clearanceRequest.ClearanceRequest,
+        };
+
+        customsDeclaration.ClearanceDecision = decisionResult.BuildClearanceDecision(
+            clearanceRequest.MovementReferenceNumber,
+            customsDeclaration
+        );
+
+        await apiClient.PutCustomsDeclaration(
+            clearanceRequest.MovementReferenceNumber,
+            customsDeclaration,
+            clearanceRequest.ETag,
+            cancellationToken
+        );
     }
 
     public IConsumerContext Context { get; set; } = null!;

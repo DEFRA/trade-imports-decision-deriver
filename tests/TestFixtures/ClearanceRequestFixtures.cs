@@ -11,7 +11,21 @@ public static class ClearanceRequestFixtures
         var fixture = new Fixture();
         fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
 
-        return fixture.Build<ResourceEvent<ClearanceRequest>>().Create();
+        return fixture
+            .Build<ResourceEvent<ClearanceRequest>>()
+            .With(x => x.Operation, ResourceEventOperations.Created)
+            .Create();
+    }
+
+    public static ResourceEvent<ClearanceRequest> ClearanceRequestUpdatedFixture()
+    {
+        var fixture = new Fixture();
+        fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
+
+        return fixture
+            .Build<ResourceEvent<ClearanceRequest>>()
+            .With(x => x.Operation, ResourceEventOperations.Updated)
+            .Create();
     }
 
     public static ClearanceRequest ClearanceRequestFixture()

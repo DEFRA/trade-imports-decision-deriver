@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Serilog.Core;
 using Serilog.Events;
 using SlimMessageBus;
@@ -5,6 +6,7 @@ using SlimMessageBus.Host.Consumer;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 
+[ExcludeFromCodeCoverage]
 public class MessageScopeEnricher(string headerKey) : ILogEventEnricher
 {
     private const string CorrelationIdItemKey = "Serilog_CorrelationId";

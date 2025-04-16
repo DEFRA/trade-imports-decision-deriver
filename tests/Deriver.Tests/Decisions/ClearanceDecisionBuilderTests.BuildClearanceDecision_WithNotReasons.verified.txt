@@ -1,0 +1,44 @@
+﻿{
+  externalCorrelationId: cf16956d-9c68-4502-b78b-0b3e0d9ca72a,
+  timestamp: 2025-04-16T07:50:28.7871474Z,
+  externalVersionNumber: 90,
+  decisionNumber: 1,
+  items: [
+    {
+      itemNumber: 209,
+      checks: [
+        {
+          checkCode: CheckCodee747b352-0ab8-4717-8b32-d6ea0e58b724,
+          departmentCode: null,
+          decisionCode: C03,
+          decisionsValidUntil: null,
+          decisionInternalFurtherDetail: null
+        }
+      ]
+    },
+    {
+      itemNumber: 102,
+      checks: [
+        {
+          checkCode: CheckCode7d5f31d3-c994-499e-8949-7e95e6faf33d,
+          departmentCode: null,
+          decisionCode: C03,
+          decisionsValidUntil: null,
+          decisionInternalFurtherDetail: null
+        }
+      ]
+    },
+    {
+      itemNumber: 226,
+      checks: [
+        {
+          checkCode: CheckCode9287cb87-2edf-473d-9619-bdb48e4cff6f,
+          departmentCode: null,
+          decisionCode: C03,
+          decisionsValidUntil: null,
+          decisionInternalFurtherDetail: null
+        }
+      ]
+    }
+  ]
+}

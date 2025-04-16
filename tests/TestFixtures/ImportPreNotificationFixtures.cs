@@ -7,13 +7,13 @@ namespace Defra.TradeImportsDecisionDeriver.TestFixtures;
 
 public static class ImportPreNotificationFixtures
 {
-    public static ResourceEvent<ImportPreNotification> ImportPreNotificationCreatedFixture()
+    public static ResourceEvent<object> ImportPreNotificationCreatedFixture()
     {
         var fixture = new Fixture();
         fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
 
         return fixture
-            .Build<ResourceEvent<ImportPreNotification>>()
+            .Build<ResourceEvent<object>>()
             .With(i => i.Operation, "Created")
             .With(i => i.ResourceType, ResourceEventResourceTypes.ImportPreNotification)
             .With(i => i.ResourceId, "CHEDP.GB.2025.1234567")

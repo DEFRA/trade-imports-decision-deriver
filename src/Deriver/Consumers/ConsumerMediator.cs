@@ -33,7 +33,7 @@ public class ConsumerMediator(
                 {
                     Context = Context,
                 };
-                var @event = message.Deserialize<ResourceEvent<ClearanceRequest>>();
+                var @event = message.Deserialize<ResourceEvent<object>>();
                 return consumer.OnHandle(@event!, cancellationToken);
             }
             case ResourceEventResourceTypes.ImportPreNotification:
@@ -46,7 +46,7 @@ public class ConsumerMediator(
                 {
                     Context = Context,
                 };
-                var @event = message.Deserialize<ResourceEvent<ImportPreNotification>>();
+                var @event = message.Deserialize<ResourceEvent<object>>();
                 return consumer.OnHandle(@event!, cancellationToken);
             }
         }

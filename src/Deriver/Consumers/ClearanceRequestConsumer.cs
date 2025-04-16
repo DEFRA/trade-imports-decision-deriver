@@ -13,9 +13,9 @@ public class ClearanceRequestConsumer(
     ILogger<ClearanceRequestConsumer> logger,
     IDecisionService decisionService,
     ITradeImportsDataApiClient apiClient
-) : IConsumer<ResourceEvent<ClearanceRequest>>, IConsumerWithContext
+) : IConsumer<ResourceEvent<object>>, IConsumerWithContext
 {
-    public async Task OnHandle(ResourceEvent<ClearanceRequest> message, CancellationToken cancellationToken)
+    public async Task OnHandle(ResourceEvent<object> message, CancellationToken cancellationToken)
     {
         logger.LogInformation(
             "Received notification: {ResourceType}:{ResourceId}",

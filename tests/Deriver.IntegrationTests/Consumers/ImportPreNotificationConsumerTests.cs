@@ -68,9 +68,7 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
     {
         var importNotification = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
 
-        _apiClient
-            .GetCustomsDeclarationsByChedId(importNotification.Resource!.ReferenceNumber!, Arg.Any<CancellationToken>())
-            .Returns([]);
+        _apiClient.GetCustomsDeclarationsByChedId(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns([]);
 
         var queueUrl = await _sender.GetQueueUrlAsync("trade_imports_data_import_declaration_upserts");
         await _sender.PurgeQueueAsync(queueUrl.QueueUrl, CancellationToken.None);
@@ -106,8 +104,6 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
         }
 
         response.HttpStatusCode.Should().Be(HttpStatusCode.OK);
-        await _apiClient
-            .Received(1)
-            .GetCustomsDeclarationsByChedId(importNotification.Resource.ReferenceNumber!, Arg.Any<CancellationToken>());
+        await _apiClient.Received(1).GetCustomsDeclarationsByChedId(Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 }

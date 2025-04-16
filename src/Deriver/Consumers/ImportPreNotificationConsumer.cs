@@ -13,9 +13,9 @@ public class ImportPreNotificationConsumer(
     ILogger<ImportPreNotificationConsumer> logger,
     IDecisionService decisionService,
     ITradeImportsDataApiClient apiClient
-) : IConsumer<ResourceEvent<ImportPreNotification>>, IConsumerWithContext
+) : IConsumer<ResourceEvent<object>>, IConsumerWithContext
 {
-    public async Task OnHandle(ResourceEvent<ImportPreNotification> message, CancellationToken cancellationToken)
+    public async Task OnHandle(ResourceEvent<object> message, CancellationToken cancellationToken)
     {
         logger.LogInformation(
             "Received notification: {ResourceType}:{ResourceId}",

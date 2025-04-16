@@ -4,6 +4,7 @@ using Amazon;
 using Amazon.Runtime;
 using Amazon.SQS;
 using Amazon.SQS.Model;
+using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using FluentAssertions;
@@ -67,9 +68,7 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
     {
         var importNotification = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
 
-        _apiClient
-            .GetCustomsDeclarationsByChedId(importNotification.Resource.ReferenceNumber!, Arg.Any<CancellationToken>())
-            .Returns([]);
+        _apiClient.GetCustomsDeclarationsByChedId(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns([]);
 
         var queueUrl = await _sender.GetQueueUrlAsync("trade_imports_data_import_declaration_upserts");
         await _sender.PurgeQueueAsync(queueUrl.QueueUrl, CancellationToken.None);
@@ -86,7 +85,7 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
                         MessageBusHeaders.ResourceType,
                         new MessageAttributeValue()
                         {
-                            StringValue = ResourceTypes.ImportNotification,
+                            StringValue = ResourceEventResourceTypes.ImportPreNotification,
                             DataType = "String",
                         }
                     },
@@ -105,8 +104,6 @@ public class ImportPreNotificationConsumerTests : IClassFixture<DeriverWebApplic
         }
 
         response.HttpStatusCode.Should().Be(HttpStatusCode.OK);
-        await _apiClient
-            .Received(1)
-            .GetCustomsDeclarationsByChedId(importNotification.Resource.ReferenceNumber!, Arg.Any<CancellationToken>());
+        await _apiClient.Received(1).GetCustomsDeclarationsByChedId(Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 }

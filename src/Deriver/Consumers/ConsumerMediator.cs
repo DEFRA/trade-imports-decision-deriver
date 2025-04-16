@@ -23,7 +23,7 @@ public class ConsumerMediator(
 
         switch (Context.GetResourceType())
         {
-            case ResourceTypes.ClearanceRequest:
+            case ResourceEventResourceTypes.CustomsDeclaration:
             {
                 var consumer = new ClearanceRequestConsumer(
                     loggerFactory.CreateLogger<ClearanceRequestConsumer>(),
@@ -33,10 +33,10 @@ public class ConsumerMediator(
                 {
                     Context = Context,
                 };
-                var @event = message.Deserialize<ResourceEvent<ClearanceRequest>>();
+                var @event = message.Deserialize<ResourceEvent<object>>();
                 return consumer.OnHandle(@event!, cancellationToken);
             }
-            case ResourceTypes.ImportNotification:
+            case ResourceEventResourceTypes.ImportPreNotification:
             {
                 var consumer = new ImportPreNotificationConsumer(
                     loggerFactory.CreateLogger<ImportPreNotificationConsumer>(),
@@ -46,7 +46,7 @@ public class ConsumerMediator(
                 {
                     Context = Context,
                 };
-                var @event = message.Deserialize<ResourceEvent<ImportPreNotification>>();
+                var @event = message.Deserialize<ResourceEvent<object>>();
                 return consumer.OnHandle(@event!, cancellationToken);
             }
         }

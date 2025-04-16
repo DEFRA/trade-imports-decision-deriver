@@ -4,16 +4,40 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using SlimMessageBus.Host;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Consumers;
 
 public class ClearanceRequestConsumerTests
 {
     [Fact]
-    public void OnHandle_ReturnsTaskCompleted()
+    public void GivenAnUpdateEvent_AndClearanceRequestHasNotChange_ThenMessageShouldBeSkipped()
     {
-        var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = Substitute.For<IDecisionService>();
+        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var consumer = new ClearanceRequestConsumer(
+            NullLogger<ClearanceRequestConsumer>.Instance,
+            decisionService,
+            apiClient
+        )
+        {
+            Context = new ConsumerContext(),
+        };
+
+        var createdEvent = ClearanceRequestFixtures.ClearanceRequestUpdatedFixture();
+
+        var result = consumer.OnHandle(createdEvent, CancellationToken.None);
+        result.Should().Be(Task.CompletedTask);
+
+        apiClient.ReceivedCalls().Count().Should().Be(0);
+    }
+
+    [Fact]
+    public async Task GivenACreatedEvent_AndNotImportPreNotificationsExist_ThenDecisionShouldBeCreated()
+    {
+        // ARRANGE
+        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             decisionService,
@@ -21,18 +45,21 @@ public class ClearanceRequestConsumerTests
         );
 
         var createdEvent = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();
-        var apiResponse = new CustomsDeclarationResponse(
-            createdEvent.ResourceId,
-            ClearanceRequestFixtures.ClearanceRequestFixture(),
-            null,
-            null,
-            DateTime.Now,
-            DateTime.Now
-        );
 
-        _ = apiClient.GetCustomsDeclaration(createdEvent.ResourceId, CancellationToken.None).Returns(apiResponse);
+        apiClient
+            .GetCustomsDeclaration(createdEvent.ResourceId, Arg.Any<CancellationToken>())
+            .Returns(CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture());
 
-        var result = consumer.OnHandle(createdEvent, CancellationToken.None);
-        Assert.Equal(Task.CompletedTask, result);
+        apiClient.GetImportPreNotificationsByMrn(createdEvent.ResourceId, Arg.Any<CancellationToken>()).Returns([]);
+
+        var decisionResult = new DecisionResult();
+        decisionResult.AddDecision("mrn", 1, "docref", "checkCode", DecisionCode.C03);
+        decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
+
+        // ACT
+        await consumer.OnHandle(createdEvent, CancellationToken.None);
+
+        // ASSERT
+        apiClient.ReceivedCalls().Count().Should().Be(3);
     }
 }

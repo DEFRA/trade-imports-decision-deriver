@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using SlimMessageBus;
 using SlimMessageBus.Host.Consumer;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 
+[ExcludeFromCodeCoverage]
 public class CdpTracingHandler(IMessageScopeAccessor? messageScopeAccessor, IConfiguration configuration)
     : DelegatingHandler
 {

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Defra.TradeImportsDataApi.Api.Client;
+using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
@@ -12,9 +13,9 @@ public class ImportPreNotificationConsumer(
     ILogger<ImportPreNotificationConsumer> logger,
     IDecisionService decisionService,
     ITradeImportsDataApiClient apiClient
-) : IConsumer<ResourceEvent<ImportPreNotification>>, IConsumerWithContext
+) : IConsumer<ResourceEvent<object>>, IConsumerWithContext
 {
-    public async Task OnHandle(ResourceEvent<ImportPreNotification> message, CancellationToken cancellationToken)
+    public async Task OnHandle(ResourceEvent<object> message, CancellationToken cancellationToken)
     {
         logger.LogInformation(
             "Received notification: {ResourceType}:{ResourceId}",
@@ -37,8 +38,32 @@ public class ImportPreNotificationConsumer(
         );
 
         var decisionContext = new DecisionContext(notifications, clearanceRequests);
-        var decisionResult = await decisionService.Process(decisionContext, Context.CancellationToken);
+        var decisionResult = await decisionService.Process(decisionContext, cancellationToken);
         logger.LogInformation("Decision Derived: {Decision}", JsonSerializer.Serialize(decisionResult));
+        await PersistDecisions(cancellationToken, clearanceRequests, decisionResult);
+    }
+
+    private async Task PersistDecisions(
+        CancellationToken cancellationToken,
+        List<ClearanceRequestWrapper> clearanceRequests,
+        DecisionResult decisionResult
+    )
+    {
+        foreach (var mrn in clearanceRequests.Select(x => x.MovementReferenceNumber))
+        {
+            var clearanceRequest = await apiClient.GetCustomsDeclaration(mrn, cancellationToken);
+
+            var customsDeclaration = new CustomsDeclaration()
+            {
+                ClearanceDecision = clearanceRequest?.ClearanceDecision,
+                Finalisation = clearanceRequest?.Finalisation,
+                ClearanceRequest = clearanceRequest?.ClearanceRequest,
+            };
+
+            customsDeclaration.ClearanceDecision = decisionResult.BuildClearanceDecision(mrn, customsDeclaration);
+
+            await apiClient.PutCustomsDeclaration(mrn, customsDeclaration, clearanceRequest?.ETag, cancellationToken);
+        }
     }
 
     private async Task<List<ClearanceRequestWrapper>> GetClearanceRequests(

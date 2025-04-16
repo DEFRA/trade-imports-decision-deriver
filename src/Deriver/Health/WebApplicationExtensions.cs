@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Health;
 
+[ExcludeFromCodeCoverage]
 public static class WebApplicationExtensions
 {
     private static readonly JsonSerializerOptions s_options = new();

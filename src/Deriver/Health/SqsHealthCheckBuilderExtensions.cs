@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Health;
 
+[ExcludeFromCodeCoverage]
 public static class SqsHealthCheckBuilderExtensions
 {
     private const string Name = "aws sqs";

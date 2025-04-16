@@ -13,15 +13,24 @@ public class ClearanceRequestConsumer(
     ILogger<ClearanceRequestConsumer> logger,
     IDecisionService decisionService,
     ITradeImportsDataApiClient apiClient
-) : IConsumer<ResourceEvent<ClearanceRequest>>, IConsumerWithContext
+) : IConsumer<ResourceEvent<object>>, IConsumerWithContext
 {
-    public async Task OnHandle(ResourceEvent<ClearanceRequest> message, CancellationToken cancellationToken)
+    public async Task OnHandle(ResourceEvent<object> message, CancellationToken cancellationToken)
     {
         logger.LogInformation(
             "Received notification: {ResourceType}:{ResourceId}",
             message.ResourceType,
             message.ResourceId
         );
+
+        if (
+            message.Operation == ResourceEventOperations.Updated
+            && !message.ChangeSet.Exists(x => x.Path.Contains("/ClearanceRequest"))
+        )
+        {
+            logger.LogInformation("Skipping Updated Event as ClearanceRequest hasn't changed");
+            return;
+        }
 
         var clearanceRequest = await apiClient.GetCustomsDeclaration(message.ResourceId, cancellationToken);
 
@@ -44,6 +53,33 @@ public class ClearanceRequestConsumer(
         var decisionResult = await decisionService.Process(decisionContext, cancellationToken);
 
         logger.LogInformation("Decision Derived: {Decision}", JsonSerializer.Serialize(decisionResult));
+        await PersistDecision(cancellationToken, clearanceRequest, decisionResult);
+    }
+
+    private async Task PersistDecision(
+        CancellationToken cancellationToken,
+        CustomsDeclarationResponse clearanceRequest,
+        DecisionResult decisionResult
+    )
+    {
+        var customsDeclaration = new CustomsDeclaration()
+        {
+            ClearanceDecision = clearanceRequest.ClearanceDecision,
+            Finalisation = clearanceRequest.Finalisation,
+            ClearanceRequest = clearanceRequest.ClearanceRequest,
+        };
+
+        customsDeclaration.ClearanceDecision = decisionResult.BuildClearanceDecision(
+            clearanceRequest.MovementReferenceNumber,
+            customsDeclaration
+        );
+
+        await apiClient.PutCustomsDeclaration(
+            clearanceRequest.MovementReferenceNumber,
+            customsDeclaration,
+            clearanceRequest.ETag,
+            cancellationToken
+        );
     }
 
     public IConsumerContext Context { get; set; } = null!;

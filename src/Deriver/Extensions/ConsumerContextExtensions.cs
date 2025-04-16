@@ -9,12 +9,6 @@ public static class MessageBusHeaders
     public const string SqsBusMessage = "Sqs_Message";
 }
 
-public static class ResourceTypes
-{
-    public const string ImportNotification = nameof(ImportNotification);
-    public const string ClearanceRequest = nameof(ClearanceRequest);
-}
-
 public static class ConsumerContextExtensions
 {
     public static string GetMessageId(this IConsumerContext consumerContext)

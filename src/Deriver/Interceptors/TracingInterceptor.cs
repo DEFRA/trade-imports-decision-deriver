@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using Serilog.Context;
 using SlimMessageBus;
 using SlimMessageBus.Host.Interceptor;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Interceptors;
 
+[ExcludeFromCodeCoverage]
 public class TracingInterceptor<TMessage>(IConfiguration configuration, ILogger<TracingInterceptor<TMessage>> logger)
     : IConsumerInterceptor<TMessage>
 {

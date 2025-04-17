@@ -1,5 +1,11 @@
 version: 2
 
+registries:
+  defra:
+    type: nuget-feed
+    url: https://nuget.pkg.github.com/DEFRA/index.json
+    token: ${{ secrets.DEPENDABOT_PAT }}
+
 updates:
   - package-ecosystem: nuget
     directory: /
@@ -19,6 +25,7 @@ updates:
           - "minor"
     allow:
       - dependency-type: direct
+    registries: "*"
 
   - package-ecosystem: github-actions
     directory: /

@@ -51,21 +51,12 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
     // Load certificates into Trust Store - Note must happen before Mongo and Http client connections
     builder.Services.AddCustomTrustStore();
 
-    // Configure logging to use the CDP Platform standards.
-    builder.Services.AddHttpContextAccessor();
-    if (!integrationTest)
-        // Configuring Serilog below wipes out the framework logging
-        // so we don't execute the following when the host is running
-        // within an integration test
-        builder.Host.UseSerilog(CdpLogging.Configuration);
-
-    builder.Services.AddScoped<CdpTracingHandler>();
-
-    // This adds default rate limiter, total request timeout, retries, circuit breaker and timeout per attempt
-    builder.Services.ConfigureHttpClientDefaults(options => options.AddStandardResilienceHandler());
+    builder.ConfigureLoggingAndTracing();
     builder.Services.AddProblemDetails();
     builder.Services.AddHealth(builder.Configuration);
-    builder.Services.AddHttpClient(Options.DefaultName).AddHttpMessageHandler<CdpTracingHandler>();
+    builder.Services.AddProcessorConfiguration(builder.Configuration);
+    builder.Services.AddDataApiHttpClient();
+
     builder.Services.AddHeaderPropagation(options =>
     {
         var traceHeader = builder.Configuration.GetValue<string>("TraceHeader");
@@ -78,28 +69,6 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
         .Services.AddOptions<DataApiOptions>()
         .BindConfiguration(DataApiOptions.SectionName)
         .ValidateDataAnnotations();
-    builder
-        .Services.AddTradeImportsDataApiClient()
-        .ConfigureHttpClient(
-            (sp, c) =>
-            {
-                var options = sp.GetRequiredService<IOptions<DataApiOptions>>().Value;
-                c.BaseAddress = new Uri(options.BaseAddress);
-
-                if (options.BasicAuthCredential != null)
-                    c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                        "Basic",
-                        options.BasicAuthCredential
-                    );
-
-                if (c.BaseAddress.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase))
-                    c.DefaultRequestVersion = HttpVersion.Version20;
-            }
-        )
-        .AddStandardResilienceHandler(o =>
-        {
-            o.Retry.DisableForUnsafeHttpMethods();
-        });
 }
 
 static WebApplication BuildWebApplication(WebApplicationBuilder builder)

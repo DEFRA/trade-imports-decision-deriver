@@ -14,7 +14,7 @@ public class DecisionService(
     public async Task<DecisionResult> Process(DecisionContext decisionContext, CancellationToken cancellationToken)
     {
         var matchResult = await matchingService.Process(
-            new MatchingContext(new List<ImportPreNotification>(), new List<ClearanceRequestWrapper>()),
+            new MatchingContext(decisionContext.Notifications, decisionContext.ClearanceRequests),
             cancellationToken
         );
         var decisionResult = await DeriveDecision(decisionContext, matchResult);

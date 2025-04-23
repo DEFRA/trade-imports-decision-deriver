@@ -33,10 +33,7 @@ public class SqsTestBase(ITestOutputHelper output)
         );
     }
 
-    protected async Task SendMessage(
-        string body,
-        Dictionary<string, MessageAttributeValue>? messageAttributes = null
-    )
+    protected async Task SendMessage(string body, Dictionary<string, MessageAttributeValue>? messageAttributes = null)
     {
         var request = new SendMessageRequest
         {

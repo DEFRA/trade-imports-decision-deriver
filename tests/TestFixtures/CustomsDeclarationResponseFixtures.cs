@@ -10,9 +10,7 @@ public static class CustomsDeclarationResponseFixtures
         var fixture = new Fixture();
         fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
 
-        var response = fixture.Build<CustomsDeclarationResponse>()
-            .With(x => x.MovementReferenceNumber, mrn)
-            .Create();
+        var response = fixture.Build<CustomsDeclarationResponse>().With(x => x.MovementReferenceNumber, mrn).Create();
 
         foreach (var commodity in response.ClearanceRequest?.Commodities!)
         {

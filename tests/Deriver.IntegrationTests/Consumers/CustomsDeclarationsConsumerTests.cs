@@ -2,9 +2,6 @@ using System.Net;
 using Amazon.SQS.Model;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
-using FluentAssertions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using RestEase;
 using WireMock.Admin.Mappings;
 using WireMock.Client;
@@ -45,17 +42,27 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output) : SqsTes
 
         mappingBuilder.Given(m =>
             m.WithRequest(req => req.UsingGet().WithPath(createPath))
-                .WithResponse(rsp => rsp.WithBody(JsonSerializer.Serialize(CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture(customsDeclaration.ResourceId))).WithStatusCode(HttpStatusCode.OK))
+                .WithResponse(rsp =>
+                    rsp.WithBody(
+                            JsonSerializer.Serialize(
+                                CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture(
+                                    customsDeclaration.ResourceId
+                                )
+                            )
+                        )
+                        .WithStatusCode(HttpStatusCode.OK)
+                )
         );
 
         mappingBuilder.Given(m =>
             m.WithRequest(req =>
                     req.UsingGet()
-                        .WithPath(
-                            $"/customs-declarations/{customsDeclaration.ResourceId}/import-pre-notifications"
-                        )
+                        .WithPath($"/customs-declarations/{customsDeclaration.ResourceId}/import-pre-notifications")
                 )
-                .WithResponse(rsp => rsp.WithBody(JsonSerializer.Serialize(new[] { importNotification })).WithStatusCode(HttpStatusCode.OK))
+                .WithResponse(rsp =>
+                    rsp.WithBody(JsonSerializer.Serialize(new[] { importNotification }))
+                        .WithStatusCode(HttpStatusCode.OK)
+                )
         );
 
         mappingBuilder.Given(m =>

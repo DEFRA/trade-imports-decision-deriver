@@ -29,11 +29,16 @@ public static class ImportPreNotificationFixtures
         return fixture.Build<ImportPreNotification>().With(i => i.ReferenceNumber, chedId).Create();
     }
 
-    public static ImportPreNotificationResponse ImportPreNotificationResponseFixture(string chedId = "CHEDP.GB.2025.1234567")
+    public static ImportPreNotificationResponse ImportPreNotificationResponseFixture(
+        string chedId = "CHEDP.GB.2025.1234567"
+    )
     {
         var fixture = new Fixture();
         fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
 
-        return fixture.Build<ImportPreNotificationResponse>().With(i => i.ImportPreNotification, ImportPreNotificationFixture("CHEDP.GB.2025.1234567")).Create();
+        return fixture
+            .Build<ImportPreNotificationResponse>()
+            .With(i => i.ImportPreNotification, ImportPreNotificationFixture("CHEDP.GB.2025.1234567"))
+            .Create();
     }
 }

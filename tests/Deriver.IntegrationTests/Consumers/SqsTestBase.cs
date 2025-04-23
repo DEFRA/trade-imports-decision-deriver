@@ -15,6 +15,11 @@ public class SqsTestBase(ITestOutputHelper output)
         new AmazonSQSConfig { AuthenticationRegion = "eu-west-2", ServiceURL = "http://localhost:4566" }
     );
 
+    protected Task PurgeQueue()
+    {
+        return _sqsClient.PurgeQueueAsync(QueueUrl, CancellationToken.None);
+    }
+
     protected Task<ReceiveMessageResponse> ReceiveMessage()
     {
         return _sqsClient.ReceiveMessageAsync(QueueUrl, CancellationToken.None);
@@ -29,7 +34,6 @@ public class SqsTestBase(ITestOutputHelper output)
     }
 
     protected async Task SendMessage(
-        string messageGroupId,
         string body,
         Dictionary<string, MessageAttributeValue>? messageAttributes = null
     )

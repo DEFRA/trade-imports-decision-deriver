@@ -1,14 +1,16 @@
 using System.Net;
-using System.Text.Json;
 using Amazon.SQS.Model;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using FluentAssertions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using RestEase;
 using WireMock.Admin.Mappings;
 using WireMock.Client;
 using WireMock.Client.Extensions;
 using Xunit.Abstractions;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.IntegrationTests.Consumers;
 
@@ -21,7 +23,7 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output) : SqsTes
         return new Dictionary<string, MessageAttributeValue>
         {
             {
-                "InboundHmrcMessageType",
+                "resourceType",
                 new MessageAttributeValue { DataType = "String", StringValue = messageType }
             },
         };
@@ -30,32 +32,30 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output) : SqsTes
     [Fact]
     public async Task WhenClearanceRequestSent_ThenClearanceRequestIsProcessedAndSentToTheDataApi()
     {
-        var response = await new HttpClient().GetAsync("http://localhost:8080/health/all");
-        response.IsSuccessStatusCode.Should().BeTrue(await response.Content.ReadAsStringAsync());
+        await PurgeQueue();
+        var importNotification = ImportPreNotificationFixtures.ImportPreNotificationResponseFixture();
 
-        var importNotification = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
-
-        var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
+        var customsDeclaration = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();
 
         await _wireMockAdminApi.ResetMappingsAsync();
         await _wireMockAdminApi.ResetRequestsAsync();
 
-        var createPath = $"/customs-declarations/{customsDeclaration.MovementReferenceNumber}";
+        var createPath = $"/customs-declarations/{customsDeclaration.ResourceId}";
         var mappingBuilder = _wireMockAdminApi.GetMappingBuilder();
 
         mappingBuilder.Given(m =>
             m.WithRequest(req => req.UsingGet().WithPath(createPath))
-                .WithResponse(rsp => rsp.WithBodyAsJson(customsDeclaration).WithStatusCode(HttpStatusCode.OK))
+                .WithResponse(rsp => rsp.WithBody(JsonSerializer.Serialize(CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture(customsDeclaration.ResourceId))).WithStatusCode(HttpStatusCode.OK))
         );
 
         mappingBuilder.Given(m =>
             m.WithRequest(req =>
                     req.UsingGet()
                         .WithPath(
-                            $"/customs-declarations/{customsDeclaration.MovementReferenceNumber}/import-pre-notifications"
+                            $"/customs-declarations/{customsDeclaration.ResourceId}/import-pre-notifications"
                         )
                 )
-                .WithResponse(rsp => rsp.WithBodyAsJson(new[] { importNotification }).WithStatusCode(HttpStatusCode.OK))
+                .WithResponse(rsp => rsp.WithBody(JsonSerializer.Serialize(new[] { importNotification })).WithStatusCode(HttpStatusCode.OK))
         );
 
         mappingBuilder.Given(m =>
@@ -66,7 +66,6 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output) : SqsTes
         Assert.NotNull(status);
 
         await SendMessage(
-            customsDeclaration.MovementReferenceNumber,
             JsonSerializer.Serialize(customsDeclaration),
             WithInboundHmrcMessageType(ResourceEventResourceTypes.CustomsDeclaration)
         );

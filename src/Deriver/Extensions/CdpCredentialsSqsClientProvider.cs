@@ -7,6 +7,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
 public class CdpCredentialsSqsClientProvider : ISqsClientProvider, IDisposable
 {
+    private const string DefaultRegion = "eu-west-2";
     private bool _disposedValue;
 
     private readonly AmazonSQSClient _client;
@@ -18,11 +19,15 @@ public class CdpCredentialsSqsClientProvider : ISqsClientProvider, IDisposable
 
         if (!string.IsNullOrEmpty(clientSecret) && !string.IsNullOrEmpty(clientId))
         {
+            var region = configuration.GetValue<string>("AWS_REGION") ?? DefaultRegion;
+            var regionEndpoint = RegionEndpoint.GetBySystemName(region);
+
             _client = new AmazonSQSClient(
                 new BasicAWSCredentials(clientId, clientSecret),
                 new AmazonSQSConfig
                 {
-                    RegionEndpoint = RegionEndpoint.GetBySystemName(configuration.GetValue<string>("AWS_REGION")),
+                    AuthenticationRegion = region,
+                    RegionEndpoint = regionEndpoint,
                     ServiceURL = configuration.GetValue<string>("SQS_Endpoint"),
                 }
             );

@@ -3,6 +3,7 @@ using System.Text.Json;
 using Amazon.SQS.Model;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
+using FluentAssertions;
 using RestEase;
 using WireMock.Admin.Mappings;
 using WireMock.Client;
@@ -29,6 +30,9 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output) : SqsTes
     [Fact]
     public async Task WhenClearanceRequestSent_ThenClearanceRequestIsProcessedAndSentToTheDataApi()
     {
+        var response = await new HttpClient().GetAsync("http://localhost:8080/health/all");
+        response.IsSuccessStatusCode.Should().BeTrue(await response.Content.ReadAsStringAsync());
+
         var importNotification = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
 
         var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();

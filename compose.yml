@@ -21,8 +21,6 @@ services:
       start_period: 5s
       retries: 10
 
-  ################################################################################
-
   decision-deriver:
     build:
       args:
@@ -41,7 +39,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       DataApi__BaseAddress: "http://wiremock"
       PORT: 8080
-      SQS_Endpoint: http://sqs.eu-west-2.localhost.localstack.cloud:4566
+      SQS_Endpoint: http://localstack:4566
   
   wiremock:
     environment:

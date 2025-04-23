@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Amazon;
 using Amazon.Runtime;
 using Amazon.SQS;
@@ -5,6 +6,7 @@ using SlimMessageBus.Host.AmazonSQS;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
+[ExcludeFromCodeCoverage]
 public class CdpCredentialsSqsClientProvider : ISqsClientProvider, IDisposable
 {
     private const string DefaultRegion = "eu-west-2";

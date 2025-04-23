@@ -198,4 +198,37 @@ public class ChedADecisionFinderTests
         result.InternalDecisionCode.Should().Be(expectedFurtherDetail);
         result.CheckCode.Should().BeNull();
     }
+
+    [Fact]
+    public void WhenInspectionNotRequired_DecisionShouldBeHold()
+    {
+        var notification = new DecisionImportPreNotification
+        {
+            Id = "TEst",
+            Status = ImportNotificationStatus.InProgress,
+            InspectionRequired = InspectionRequired.NotRequired
+        };
+        var sut = new ChedADecisionFinder();
+
+        var result = sut.FindDecision(notification, null);
+
+        result.DecisionCode.Should().Be(DecisionCode.H01);
+    }
+
+    [Fact]
+    public void WhenInspectionRequired_DecisionShouldBeHold()
+    {
+        var notification = new DecisionImportPreNotification
+        {
+            Id = "TEst",
+            Status = ImportNotificationStatus.InProgress,
+            InspectionRequired = InspectionRequired.Required,
+            Commodities = [new DecisionCommodityComplement() {HmiDecision = CommodityRiskResultHmiDecision.Required}]
+        };
+        var sut = new ChedADecisionFinder();
+
+        var result = sut.FindDecision(notification, null);
+
+        result.DecisionCode.Should().Be(DecisionCode.H02);
+    }
 }

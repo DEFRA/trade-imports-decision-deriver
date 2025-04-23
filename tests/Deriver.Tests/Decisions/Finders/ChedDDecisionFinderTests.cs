@@ -27,11 +27,12 @@ public class ChedDDecisionFinderTests
         bool expectedResult
     )
     {
-        var notification = new ImportPreNotification
+        var notification = new DecisionImportPreNotification
         {
+            Id = "Test",
             Status = notificationStatus,
             ImportNotificationType = importNotificationType,
-            PartTwo = new PartTwo { ControlAuthority = new ControlAuthority { IuuCheckRequired = iuuCheckRequired } },
+            IuuCheckRequired = iuuCheckRequired,
         };
         var sut = new ChedDDecisionFinder();
 
@@ -202,18 +203,13 @@ public class ChedDDecisionFinderTests
         DecisionInternalFurtherDetail? expectedFurtherDetail = null
     )
     {
-        var notification = new ImportPreNotification
+        var notification = new DecisionImportPreNotification
         {
-            PartTwo = new PartTwo
-            {
-                Decision = new Decision
-                {
-                    ConsignmentAcceptable = consignmentAcceptable,
-                    ConsignmentDecision = decision,
-                    NotAcceptableAction = notAcceptableAction,
-                    NotAcceptableReasons = notAcceptableReasons,
-                },
-            },
+            Id = "Test",
+            ConsignmentAcceptable = consignmentAcceptable,
+            ConsignmentDecision = decision,
+            NotAcceptableAction = notAcceptableAction,
+            NotAcceptableReasons = notAcceptableReasons,
         };
         var sut = new ChedDDecisionFinder();
 

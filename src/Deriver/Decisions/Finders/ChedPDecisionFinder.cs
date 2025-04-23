@@ -4,7 +4,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 
 public class ChedPDecisionFinder : DecisionFinder
 {
-    public override bool CanFindDecision(ImportPreNotification notification, CheckCode? checkCode) =>
+    public override bool CanFindDecision(DecisionImportPreNotification notification, CheckCode? checkCode) =>
         notification.ImportNotificationType == ImportNotificationType.Cvedp
         && (
             (checkCode is null)
@@ -12,7 +12,7 @@ public class ChedPDecisionFinder : DecisionFinder
         );
 
     protected override DecisionFinderResult FindDecisionInternal(
-        ImportPreNotification notification,
+        DecisionImportPreNotification notification,
         CheckCode? checkCode
     )
     {
@@ -35,7 +35,7 @@ public class ChedPDecisionFinder : DecisionFinder
 
         return consignmentAcceptable switch
         {
-            true => notification.PartTwo?.Decision?.ConsignmentDecision switch
+            true => notification.ConsignmentDecision switch
             {
                 ConsignmentDecision.AcceptableForTranshipment
                 or ConsignmentDecision.AcceptableForTransit
@@ -54,7 +54,7 @@ public class ChedPDecisionFinder : DecisionFinder
                     InternalDecisionCode: DecisionInternalFurtherDetail.E96
                 ),
             },
-            false => notification.PartTwo?.Decision?.NotAcceptableAction switch
+            false => notification.NotAcceptableAction switch
             {
                 DecisionNotAcceptableAction.Destruction => new DecisionFinderResult(DecisionCode.N02, checkCode),
                 DecisionNotAcceptableAction.Reexport => new DecisionFinderResult(DecisionCode.N04, checkCode),
@@ -71,13 +71,13 @@ public class ChedPDecisionFinder : DecisionFinder
     }
 
     private static bool TryGetConsignmentAcceptable(
-        ImportPreNotification notification,
+        DecisionImportPreNotification notification,
         out bool acceptable,
         out DecisionCode? decisionCode,
         out DecisionInternalFurtherDetail? internalDecisionCode
     )
     {
-        var consignmentAcceptable = notification.PartTwo?.Decision?.ConsignmentAcceptable;
+        var consignmentAcceptable = notification.ConsignmentAcceptable;
         decisionCode = null;
         internalDecisionCode = null;
         acceptable = false;
@@ -88,7 +88,7 @@ public class ChedPDecisionFinder : DecisionFinder
             return true;
         }
 
-        if (notification.PartTwo != null && notification.PartTwo.AutoClearedOn.HasValue)
+        if (notification.AutoClearedOn.HasValue)
         {
             acceptable = true;
             return true;

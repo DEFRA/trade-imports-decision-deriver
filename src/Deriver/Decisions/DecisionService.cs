@@ -1,5 +1,4 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
-using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 
@@ -70,9 +69,7 @@ public class DecisionService(
 
         foreach (var match in matches)
         {
-            var notification = decisionContext.Notifications.First(x =>
-                x.ReferenceNumber == match.ImportPreNotificationId
-            );
+            var notification = decisionContext.Notifications.First(x => x.Id == match.ImportPreNotificationId);
 
             var decisionCodes = GetDecisions(notification, checkCodes);
             foreach (var decisionCode in decisionCodes)
@@ -166,7 +163,7 @@ public class DecisionService(
         }
     }
 
-    private DecisionFinderResult[] GetDecisions(ImportPreNotification notification, CheckCode[]? checkCodes)
+    private DecisionFinderResult[] GetDecisions(DecisionImportPreNotification notification, CheckCode[]? checkCodes)
     {
         var results = new List<DecisionFinderResult>();
         if (checkCodes == null)
@@ -183,7 +180,7 @@ public class DecisionService(
                 {
                     logger.LogWarning(
                         "No Decision Finder count for ImportNotification {Id} and Check code {CheckCode}",
-                        notification.ReferenceNumber,
+                        notification.Id,
                         checkCode
                     );
                     results.Add(
@@ -210,18 +207,18 @@ public class DecisionService(
                 "Decision finder result {ItemNum} of {NumItems} for Notification {Id} Decision {Decision} - ConsignmentAcceptable {ConsignmentAcceptable}: DecisionEnum {DecisionEnum}: NotAcceptableAction {NotAcceptableAction}",
                 item++,
                 results.Count,
-                notification.ReferenceNumber,
+                notification.Id,
                 result.DecisionCode.ToString(),
-                notification.PartTwo?.Decision?.ConsignmentAcceptable,
-                notification.PartTwo?.Decision?.ConsignmentDecision.ToString(),
-                notification.PartTwo?.Decision?.NotAcceptableAction?.ToString()
+                notification.ConsignmentAcceptable,
+                notification.ConsignmentDecision.ToString(),
+                notification.NotAcceptableAction?.ToString()
             );
 
         return results.ToArray();
     }
 
     private static IEnumerable<DecisionFinderResult> GetDecisionsForCheckCode(
-        ImportPreNotification notification,
+        DecisionImportPreNotification notification,
         CheckCode? checkCode,
         IEnumerable<IDecisionFinder> decisionFinders
     )
@@ -235,7 +232,7 @@ public class DecisionService(
     }
 
     private IEnumerable<IDecisionFinder> GetDecisionsFindersForCheckCodes(
-        ImportPreNotification notification,
+        DecisionImportPreNotification notification,
         CheckCode[] checkCodes
     )
     {

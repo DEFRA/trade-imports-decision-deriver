@@ -4,13 +4,13 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 
 public class ChedDDecisionFinder : DecisionFinder
 {
-    public override bool CanFindDecision(ImportPreNotification notification, CheckCode? checkCode) =>
+    public override bool CanFindDecision(DecisionImportPreNotification notification, CheckCode? checkCode) =>
         notification.ImportNotificationType == ImportNotificationType.Ced
-        && notification.PartTwo?.ControlAuthority?.IuuCheckRequired != true
+        && notification.IuuCheckRequired != true
         && checkCode?.GetImportNotificationType() == ImportNotificationType.Ced;
 
     protected override DecisionFinderResult FindDecisionInternal(
-        ImportPreNotification notification,
+        DecisionImportPreNotification notification,
         CheckCode? checkCode
     )
     {
@@ -19,10 +19,10 @@ public class ChedDDecisionFinder : DecisionFinder
             return new DecisionFinderResult(code!.Value, checkCode);
         }
 
-        var consignmentAcceptable = notification.PartTwo?.Decision?.ConsignmentAcceptable;
+        var consignmentAcceptable = notification.ConsignmentAcceptable;
         return consignmentAcceptable switch
         {
-            true => notification.PartTwo?.Decision?.ConsignmentDecision switch
+            true => notification.ConsignmentDecision switch
             {
                 ConsignmentDecision.AcceptableForInternalMarket => new DecisionFinderResult(
                     DecisionCode.C03,
@@ -34,7 +34,7 @@ public class ChedDDecisionFinder : DecisionFinder
                     InternalDecisionCode: DecisionInternalFurtherDetail.E96
                 ),
             },
-            false => notification.PartTwo?.Decision?.NotAcceptableAction switch
+            false => notification.NotAcceptableAction switch
             {
                 DecisionNotAcceptableAction.Destruction => new DecisionFinderResult(DecisionCode.N02, checkCode),
                 DecisionNotAcceptableAction.Redispatching => new DecisionFinderResult(DecisionCode.N04, checkCode),

@@ -61,16 +61,11 @@ public class DecisionServiceTests
     {
         return new DecisionContext(
             [
-                new ImportPreNotification
+                new DecisionImportPreNotification()
                 {
-                    ReferenceNumber = "notification-1",
+                    Id = "notification-1",
                     ImportNotificationType = importNotificationType,
-                    Version = 1,
-                    UpdatedSource = DateTime.Now,
-                    PartTwo = new PartTwo
-                    {
-                        ControlAuthority = new ControlAuthority { IuuCheckRequired = iuuCheckRequired },
-                    },
+                    IuuCheckRequired = iuuCheckRequired,
                 },
             ],
             [

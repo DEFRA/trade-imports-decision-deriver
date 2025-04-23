@@ -52,7 +52,7 @@ public class MatchingService : IMatchingService
             return;
 
         var notification = matchingContext.Notifications.Find(x =>
-            new ImportDocumentReference(x.ReferenceNumber!).GetIdentifier() == documentGroup.GetIdentifier()
+            new ImportDocumentReference(x.Id!).GetIdentifier() == documentGroup.GetIdentifier()
         );
 
         if (notification is null)
@@ -66,7 +66,7 @@ public class MatchingService : IMatchingService
         else
         {
             matchingResult.AddMatch(
-                notification.ReferenceNumber!,
+                notification.Id!,
                 wrapper.MovementReferenceNumber,
                 item.ItemNumber!.Value,
                 documentGroup.Value

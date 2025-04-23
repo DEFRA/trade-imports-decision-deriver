@@ -1,5 +1,4 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
-using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
@@ -43,7 +42,7 @@ public class NoMatchDecisionsTest
 
         // Act
         var decisionResult = await sut.Process(
-            new DecisionContext(new List<ImportPreNotification>(), [new ClearanceRequestWrapper("123", cr)]),
+            new DecisionContext(new List<DecisionImportPreNotification>(), [new ClearanceRequestWrapper("123", cr)]),
             CancellationToken.None
         );
 
@@ -90,7 +89,7 @@ public class NoMatchDecisionsTest
 
         // Act
         var decisionResult = await sut.Process(
-            new DecisionContext(new List<ImportPreNotification>(), [new ClearanceRequestWrapper("123", cr)]),
+            new DecisionContext(new List<DecisionImportPreNotification>(), [new ClearanceRequestWrapper("123", cr)]),
             CancellationToken.None
         );
 
@@ -128,7 +127,7 @@ public class NoMatchDecisionsTest
 
         // Act
         var decisionResult = await sut.Process(
-            new DecisionContext(new List<ImportPreNotification>(), [new ClearanceRequestWrapper("123", cr)]),
+            new DecisionContext(new List<DecisionImportPreNotification>(), [new ClearanceRequestWrapper("123", cr)]),
             CancellationToken.None
         );
 
@@ -139,39 +138,4 @@ public class NoMatchDecisionsTest
 
         await Task.CompletedTask;
     }
-
-    // CrNoMatchNoChecksScenarioGenerator
-    // CrNoMatchScenarioGenerator
-    ////private static List<Movement> GenerateMovements(bool hasChecks)
-    ////{
-    ////    ScenarioGenerator generator = hasChecks
-    ////        ? new CrNoMatchScenarioGenerator(NullLogger<CrNoMatchScenarioGenerator>.Instance)
-    ////        : new CrNoMatchNoChecksScenarioGenerator(NullLogger<CrNoMatchNoChecksScenarioGenerator>.Instance);
-
-    ////    var config = ScenarioFactory.CreateScenarioConfig(generator, 1, 1);
-
-    ////    var movementBuilderFactory = new MovementBuilderFactory(new DecisionStatusFinder(), NullLogger<MovementBuilder>.Instance);
-    ////    var generatorResult = generator
-    ////        .Generate(1, 1, DateTime.UtcNow, config)
-    ////        .First(x => x is AlvsClearanceRequest);
-
-    ////    var internalClearanceRequest = AlvsClearanceRequestMapper.Map((AlvsClearanceRequest)generatorResult);
-    ////    var movement = movementBuilderFactory
-    ////        .From(internalClearanceRequest)
-    ////        .Build();
-
-    ////    return [movement];
-    ////}
-
-    ////private static Movement GenerateMovementWithH220Checks()
-    ////{
-    ////    var movement = GenerateMovements(true)[0];
-
-    ////    foreach (var item in movement.Items)
-    ////    {
-    ////        if (item.Checks != null) item.Checks[0].CheckCode = "H220";
-    ////    }
-
-    ////    return movement;
-    ////}
 }

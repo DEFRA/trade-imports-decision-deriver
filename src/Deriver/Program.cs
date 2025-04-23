@@ -1,14 +1,9 @@
-using System.Net;
-using System.Net.Http.Headers;
-using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Health;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.Extensions.Http.Resilience;
-using Microsoft.Extensions.Options;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
@@ -51,7 +46,7 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
     // Load certificates into Trust Store - Note must happen before Mongo and Http client connections
     builder.Services.AddCustomTrustStore();
 
-    builder.ConfigureLoggingAndTracing();
+    builder.ConfigureLoggingAndTracing(integrationTest);
     builder.Services.AddProblemDetails();
     builder.Services.AddHealth(builder.Configuration);
     builder.Services.AddProcessorConfiguration(builder.Configuration);

@@ -1,6 +1,7 @@
 using AutoFixture;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Matching;
@@ -21,7 +22,7 @@ public class MatchingServiceTests
             }
         }
         var sut = new MatchingService();
-        var context = new MatchingContext(new List<ImportPreNotification>(), [clearanceRequestWrappers]);
+        var context = new MatchingContext(new List<DecisionImportPreNotification>(), [clearanceRequestWrappers]);
 
         // Act
         var matchResult = await sut.Process(context, CancellationToken.None);
@@ -46,7 +47,7 @@ public class MatchingServiceTests
         }
 
         var sut = new MatchingService();
-        var context = new MatchingContext(new List<ImportPreNotification>(), [clearanceRequestWrapper]);
+        var context = new MatchingContext(new List<DecisionImportPreNotification>(), [clearanceRequestWrapper]);
 
         // Act
         var matchResult = await sut.Process(context, CancellationToken.None);
@@ -72,7 +73,7 @@ public class MatchingServiceTests
 
         var notification = GenerateImportPreNotification("CHEDP.GB.2025.1234567", ImportNotificationStatus.InProgress);
         var sut = new MatchingService();
-        var context = new MatchingContext([notification], [clearanceRequestWrapper]);
+        var context = new MatchingContext([notification.ToDecisionImportPreNotification()], [clearanceRequestWrapper]);
 
         // Act
         var matchResult = await sut.Process(context, CancellationToken.None);

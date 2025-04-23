@@ -47,10 +47,20 @@ public class ClearanceRequestConsumer(
         }
 
         var decisionContext = new DecisionContext(
-            preNotifications,
+            preNotifications.Select(x => x.ToDecisionImportPreNotification()).ToList(),
             [new ClearanceRequestWrapper(message.ResourceId, clearanceRequest!.ClearanceRequest!)]
         );
         var decisionResult = await decisionService.Process(decisionContext, cancellationToken);
+
+        if (!decisionResult.Decisions.Any())
+        {
+            logger.LogInformation(
+                "No Decision Derived: {ResourceType}:{ResourceId}",
+                message.ResourceType,
+                message.ResourceId
+            );
+            return;
+        }
 
         logger.LogInformation("Decision Derived: {Decision}", JsonSerializer.Serialize(decisionResult));
         await PersistDecision(cancellationToken, clearanceRequest, decisionResult);

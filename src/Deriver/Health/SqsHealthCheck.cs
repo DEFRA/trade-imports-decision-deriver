@@ -15,17 +15,20 @@ public class SqsHealthCheck(IConfiguration configuration) : IHealthCheck
         CancellationToken cancellationToken = default
     )
     {
+        var serverUrl = configuration.GetValue<string>("SQS_Endpoint");
+        var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");
         try
         {
             using var client = CreateSqsClient();
-            _ = await client
-                .GetQueueUrlAsync(configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME"), cancellationToken)
-                .ConfigureAwait(false);
+            _ = await client.GetQueueUrlAsync(queueName, cancellationToken).ConfigureAwait(false);
             return HealthCheckResult.Healthy();
         }
         catch (Exception ex)
         {
-            return new HealthCheckResult(context.Registration.FailureStatus, exception: ex);
+            return new HealthCheckResult(
+                context.Registration.FailureStatus,
+                exception: new Exception($"Failed to connect server: {serverUrl} and queue: {queueName}", ex)
+            );
         }
     }
 

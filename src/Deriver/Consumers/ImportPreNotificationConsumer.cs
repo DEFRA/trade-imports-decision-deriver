@@ -39,6 +39,17 @@ public class ImportPreNotificationConsumer(
 
         var decisionContext = new DecisionContext(notifications, clearanceRequests);
         var decisionResult = await decisionService.Process(decisionContext, cancellationToken);
+
+        if (!decisionResult.Decisions.Any())
+        {
+            logger.LogInformation(
+                "No Decision Derived: {ResourceType}:{ResourceId}",
+                message.ResourceType,
+                message.ResourceId
+            );
+            return;
+        }
+
         logger.LogInformation("Decision Derived: {Decision}", JsonSerializer.Serialize(decisionResult));
         await PersistDecisions(cancellationToken, clearanceRequests, decisionResult);
     }
@@ -84,7 +95,7 @@ public class ImportPreNotificationConsumer(
             .ToList();
     }
 
-    private async Task<List<ImportPreNotification>> GetNotifications(string[] mrns)
+    private async Task<List<DecisionImportPreNotification>> GetNotifications(string[] mrns)
     {
         var notifications = new List<ImportPreNotification>();
         await Parallel.ForEachAsync(
@@ -107,7 +118,7 @@ public class ImportPreNotificationConsumer(
                 }
             }
         );
-        return notifications;
+        return notifications.Select(x => x.ToDecisionImportPreNotification()).ToList();
     }
 
     public IConsumerContext Context { get; set; } = null!;

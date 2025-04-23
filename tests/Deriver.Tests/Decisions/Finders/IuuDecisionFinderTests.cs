@@ -28,8 +28,9 @@ public class IuuDecisionFinderTests
         string? checkCode
     )
     {
-        var notification = new ImportPreNotification
+        var notification = new DecisionImportPreNotification
         {
+            Id = "Test",
             Status = notificationStatus,
             ImportNotificationType = importNotificationType,
         };
@@ -70,12 +71,11 @@ public class IuuDecisionFinderTests
         string? expectedDecisionReason = null
     )
     {
-        var notification = new ImportPreNotification
+        var notification = new DecisionImportPreNotification
         {
-            PartTwo = new PartTwo
-            {
-                ControlAuthority = new ControlAuthority { IuuCheckRequired = iuuCheckRequired, IuuOption = iuuOption },
-            },
+            Id = "Test",
+            IuuCheckRequired = iuuCheckRequired,
+            IuuOption = iuuOption,
         };
         var sut = new IuuDecisionFinder();
 

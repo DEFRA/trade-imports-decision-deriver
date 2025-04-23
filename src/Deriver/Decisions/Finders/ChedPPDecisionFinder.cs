@@ -5,14 +5,14 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 // ReSharper disable once InconsistentNaming
 public class ChedPPDecisionFinder : DecisionFinder
 {
-    public override bool CanFindDecision(ImportPreNotification notification, CheckCode? checkCode) =>
+    public override bool CanFindDecision(DecisionImportPreNotification notification, CheckCode? checkCode) =>
         notification.ImportNotificationType == ImportNotificationType.Chedpp
         && notification.Status != ImportNotificationStatus.Cancelled
         && notification.Status != ImportNotificationStatus.Replaced
         && checkCode?.GetImportNotificationType() == ImportNotificationType.Chedpp;
 
     protected override DecisionFinderResult FindDecisionInternal(
-        ImportPreNotification notification,
+        DecisionImportPreNotification notification,
         CheckCode? checkCode
     )
     {

@@ -27,8 +27,9 @@ public class ChedPDecisionFinderTests
         string? checkCode
     )
     {
-        var notification = new ImportPreNotification
+        var notification = new DecisionImportPreNotification
         {
+            Id = "Test",
             Status = notificationStatus,
             ImportNotificationType = importNotificationType,
         };
@@ -176,18 +177,13 @@ public class ChedPDecisionFinderTests
         DecisionInternalFurtherDetail? expectedFurtherDetail = null
     )
     {
-        var notification = new ImportPreNotification
+        var notification = new DecisionImportPreNotification
         {
-            PartTwo = new PartTwo
-            {
-                Decision = new Decision
-                {
-                    ConsignmentAcceptable = consignmentAcceptable,
-                    ConsignmentDecision = decision,
-                    NotAcceptableAction = notAcceptableAction,
-                    NotAcceptableReasons = notAcceptableReasons,
-                },
-            },
+            Id = "Test",
+            ConsignmentAcceptable = consignmentAcceptable,
+            ConsignmentDecision = decision,
+            NotAcceptableAction = notAcceptableAction,
+            NotAcceptableReasons = notAcceptableReasons,
         };
         var sut = new ChedPDecisionFinder();
 

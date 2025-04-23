@@ -4,17 +4,17 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 
 public class IuuDecisionFinder : DecisionFinder
 {
-    public override bool CanFindDecision(ImportPreNotification notification, CheckCode? checkCode) =>
+    public override bool CanFindDecision(DecisionImportPreNotification notification, CheckCode? checkCode) =>
         notification.ImportNotificationType == ImportNotificationType.Cvedp && checkCode != null && checkCode.IsIuu();
 
     protected override DecisionFinderResult FindDecisionInternal(
-        ImportPreNotification notification,
+        DecisionImportPreNotification notification,
         CheckCode? checkCode
     )
     {
-        return (notification.PartTwo?.ControlAuthority?.IuuCheckRequired == true) switch
+        return (notification.IuuCheckRequired == true) switch
         {
-            true => notification.PartTwo?.ControlAuthority?.IuuOption switch
+            true => notification.IuuOption switch
             {
                 ControlAuthorityIuuOption.Iuuok => new DecisionFinderResult(
                     DecisionCode.C07,

@@ -27,11 +27,12 @@ public class ChedADecisionFinderTests
         bool expectedResult
     )
     {
-        var notification = new ImportPreNotification
+        var notification = new DecisionImportPreNotification
         {
+            Id = "TEst",
             Status = notificationStatus,
             ImportNotificationType = importNotificationType,
-            PartTwo = new PartTwo { ControlAuthority = new ControlAuthority { IuuCheckRequired = iuuCheckRequired } },
+            IuuCheckRequired = iuuCheckRequired,
         };
         var sut = new ChedADecisionFinder();
 
@@ -181,18 +182,13 @@ public class ChedADecisionFinderTests
         DecisionInternalFurtherDetail? expectedFurtherDetail = null
     )
     {
-        var notification = new ImportPreNotification
+        var notification = new DecisionImportPreNotification
         {
-            PartTwo = new PartTwo
-            {
-                Decision = new Decision
-                {
-                    ConsignmentAcceptable = consignmentAcceptable,
-                    ConsignmentDecision = decision,
-                    NotAcceptableAction = notAcceptableAction,
-                    NotAcceptableReasons = notAcceptableReasons,
-                },
-            },
+            Id = "TEst",
+            ConsignmentAcceptable = consignmentAcceptable,
+            ConsignmentDecision = decision,
+            NotAcceptableAction = notAcceptableAction,
+            NotAcceptableReasons = notAcceptableReasons,
         };
         var sut = new ChedADecisionFinder();
 
@@ -201,5 +197,38 @@ public class ChedADecisionFinderTests
         result.DecisionCode.Should().Be(expectedCode);
         result.InternalDecisionCode.Should().Be(expectedFurtherDetail);
         result.CheckCode.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenInspectionNotRequired_DecisionShouldBeHold()
+    {
+        var notification = new DecisionImportPreNotification
+        {
+            Id = "TEst",
+            Status = ImportNotificationStatus.InProgress,
+            InspectionRequired = InspectionRequired.NotRequired,
+        };
+        var sut = new ChedADecisionFinder();
+
+        var result = sut.FindDecision(notification, null);
+
+        result.DecisionCode.Should().Be(DecisionCode.H01);
+    }
+
+    [Fact]
+    public void WhenInspectionRequired_DecisionShouldBeHold()
+    {
+        var notification = new DecisionImportPreNotification
+        {
+            Id = "TEst",
+            Status = ImportNotificationStatus.InProgress,
+            InspectionRequired = InspectionRequired.Required,
+            Commodities = [new DecisionCommodityComplement() { HmiDecision = CommodityRiskResultHmiDecision.Required }],
+        };
+        var sut = new ChedADecisionFinder();
+
+        var result = sut.FindDecision(notification, null);
+
+        result.DecisionCode.Should().Be(DecisionCode.H02);
     }
 }

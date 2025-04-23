@@ -4,12 +4,11 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 
 public class ChedADecisionFinder : DecisionFinder
 {
-    public override bool CanFindDecision(ImportPreNotification notification, CheckCode? checkCode) =>
-        notification.ImportNotificationType == ImportNotificationType.Cveda
-        && notification.PartTwo?.ControlAuthority?.IuuCheckRequired != true;
+    public override bool CanFindDecision(DecisionImportPreNotification notification, CheckCode? checkCode) =>
+        notification.ImportNotificationType == ImportNotificationType.Cveda && notification.IuuCheckRequired != true;
 
     protected override DecisionFinderResult FindDecisionInternal(
-        ImportPreNotification notification,
+        DecisionImportPreNotification notification,
         CheckCode? checkCode
     )
     {
@@ -18,10 +17,10 @@ public class ChedADecisionFinder : DecisionFinder
             return new DecisionFinderResult(code!.Value, checkCode);
         }
 
-        var consignmentAcceptable = notification.PartTwo?.Decision?.ConsignmentAcceptable;
+        var consignmentAcceptable = notification.ConsignmentAcceptable;
         return consignmentAcceptable switch
         {
-            true => notification.PartTwo?.Decision?.ConsignmentDecision switch
+            true => notification.ConsignmentDecision switch
             {
                 ConsignmentDecision.AcceptableForTranshipment or ConsignmentDecision.AcceptableForTransit =>
                     new DecisionFinderResult(DecisionCode.E03, checkCode),
@@ -40,7 +39,7 @@ public class ChedADecisionFinder : DecisionFinder
                     InternalDecisionCode: DecisionInternalFurtherDetail.E96
                 ),
             },
-            false => notification.PartTwo?.Decision?.NotAcceptableAction switch
+            false => notification.NotAcceptableAction switch
             {
                 DecisionNotAcceptableAction.Euthanasia or DecisionNotAcceptableAction.Slaughter =>
                     new DecisionFinderResult(DecisionCode.N02, checkCode),

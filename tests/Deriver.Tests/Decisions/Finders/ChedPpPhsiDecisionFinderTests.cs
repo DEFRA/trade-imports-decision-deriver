@@ -29,8 +29,9 @@ public class ChedPpPhsiDecisionFinderTests
         string? checkCode
     )
     {
-        var notification = new ImportPreNotification
+        var notification = new DecisionImportPreNotification
         {
+            Id = "Test",
             Status = notificationStatus,
             ImportNotificationType = importNotificationType,
         };
@@ -62,7 +63,7 @@ public class ChedPpPhsiDecisionFinderTests
         DecisionInternalFurtherDetail? expectedFurtherDetail = null
     )
     {
-        var notification = new ImportPreNotification { Status = status };
+        var notification = new DecisionImportPreNotification { Id = "Test", Status = status };
         var sut = new ChedPPDecisionFinder();
 
         var result = sut.FindDecision(notification, null);

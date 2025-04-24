@@ -71,10 +71,18 @@ public class ImportPreNotificationConsumer(
                 ClearanceRequest = clearanceRequest?.ClearanceRequest,
             };
 
-            ////This is where the decision identifier would be checked to decision if a PUT request is needed
-            customsDeclaration.ClearanceDecision = decisionResult.BuildClearanceDecision(mrn, customsDeclaration);
+            var newDecision = decisionResult.BuildClearanceDecision(mrn, customsDeclaration);
 
-            await apiClient.PutCustomsDeclaration(mrn, customsDeclaration, clearanceRequest?.ETag, cancellationToken);
+            if (newDecision.SourceVersion != customsDeclaration.ClearanceDecision?.SourceVersion)
+            {
+                customsDeclaration.ClearanceDecision = newDecision;
+                await apiClient.PutCustomsDeclaration(
+                    mrn,
+                    customsDeclaration,
+                    clearanceRequest?.ETag,
+                    cancellationToken
+                );
+            }
         }
     }
 

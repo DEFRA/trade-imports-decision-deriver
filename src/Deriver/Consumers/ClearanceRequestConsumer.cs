@@ -79,18 +79,22 @@ public class ClearanceRequestConsumer(
             ClearanceRequest = clearanceRequest.ClearanceRequest,
         };
 
-        ////This is where the decision identifier would be checked to decision if a PUT request is needed
-        customsDeclaration.ClearanceDecision = decisionResult.BuildClearanceDecision(
+        var newDecision = decisionResult.BuildClearanceDecision(
             clearanceRequest.MovementReferenceNumber,
             customsDeclaration
         );
 
-        await apiClient.PutCustomsDeclaration(
-            clearanceRequest.MovementReferenceNumber,
-            customsDeclaration,
-            clearanceRequest.ETag,
-            cancellationToken
-        );
+        if (newDecision.SourceVersion != customsDeclaration.ClearanceDecision?.SourceVersion)
+        {
+            customsDeclaration.ClearanceDecision = newDecision;
+
+            await apiClient.PutCustomsDeclaration(
+                clearanceRequest.MovementReferenceNumber,
+                customsDeclaration,
+                clearanceRequest.ETag,
+                cancellationToken
+            );
+        }
     }
 
     public IConsumerContext Context { get; set; } = null!;

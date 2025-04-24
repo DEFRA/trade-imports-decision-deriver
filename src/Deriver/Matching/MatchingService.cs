@@ -36,7 +36,7 @@ public class MatchingService : IMatchingService
 
         return Task.FromResult(matchingResult);
     }
-    
+
     private static void ProcessDocument(
         MatchingContext matchingContext,
         ImportDocumentReference? documentGroup,
@@ -50,7 +50,8 @@ public class MatchingService : IMatchingService
             return;
 
         var notification = matchingContext.Notifications.Find(x =>
-            new ImportDocumentReference(x.Id!).GetIdentifier(documentCode!) == documentGroup.GetIdentifier(documentCode!)
+            new ImportDocumentReference(x.Id!).GetIdentifier(documentCode!)
+            == documentGroup.GetIdentifier(documentCode!)
         );
 
         if (notification is null)

@@ -79,6 +79,7 @@ public class ClearanceRequestConsumer(
             ClearanceRequest = clearanceRequest.ClearanceRequest,
         };
 
+        ////This is where the decision identifier would be checked to decision if a PUT request is needed
         customsDeclaration.ClearanceDecision = decisionResult.BuildClearanceDecision(
             clearanceRequest.MovementReferenceNumber,
             customsDeclaration

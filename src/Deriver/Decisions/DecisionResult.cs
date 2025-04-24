@@ -12,12 +12,14 @@ public record DecisionResult
         string documentReference,
         string? checkCode,
         DecisionCode decisionCode,
+        DecisionImportPreNotification? preNotification = null,
         string? decisionReason = null,
         DecisionInternalFurtherDetail? internalDecisionCode = null
     )
     {
         _results.Add(
             new DocumentDecisionResult(
+                preNotification,
                 mrn,
                 itemNumber,
                 documentReference,
@@ -33,6 +35,7 @@ public record DecisionResult
 }
 
 public record DocumentDecisionResult(
+    DecisionImportPreNotification? PreNotification,
     string Mrn,
     int ItemNumber,
     string DocumentReference,

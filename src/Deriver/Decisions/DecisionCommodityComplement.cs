@@ -22,6 +22,7 @@ public static class ImportPreNotificationExtensions
         return new DecisionImportPreNotification()
         {
             Id = notification.ReferenceNumber!,
+            UpdatedSource = notification.UpdatedSource,
             ImportNotificationType = notification.ImportNotificationType,
             Status = notification.Status,
             ConsignmentDecision = notification.PartTwo?.Decision?.ConsignmentDecision,

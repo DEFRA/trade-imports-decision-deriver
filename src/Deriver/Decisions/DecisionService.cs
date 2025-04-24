@@ -80,6 +80,7 @@ public class DecisionService(
                     match.DocumentReference,
                     decisionCode.CheckCode?.Value,
                     decisionCode.DecisionCode,
+                    notification,
                     decisionCode.DecisionReason,
                     decisionCode.InternalDecisionCode
                 );
@@ -126,7 +127,7 @@ public class DecisionService(
                     noMatch.DocumentReference,
                     checkCode,
                     DecisionCode.X00,
-                    reason
+                    decisionReason: reason
                 );
             }
         }

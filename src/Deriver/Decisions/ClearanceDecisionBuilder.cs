@@ -1,5 +1,5 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
-using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
+using Defra.TradeImportsDataApi.Domain.Ipaffs;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
@@ -12,12 +12,13 @@ public static class ClearanceDecisionBuilder
     )
     {
         var decisions = decisionResult.Decisions.Where(x => x.Mrn == mrn).ToList();
-
+        
         return new ClearanceDecision()
         {
             DecisionNumber = customsDeclaration.ClearanceDecision is { DecisionNumber: not null }
                 ? customsDeclaration.ClearanceDecision.DecisionNumber++
                 : 1,
+            ////Identifier = BuildDecisionIdentifier(decisionResult, customsDeclaration.ClearanceRequest?.ExternalVersion),
             Timestamp = DateTime.UtcNow,
             ExternalCorrelationId = customsDeclaration.ClearanceDecision?.ExternalCorrelationId,
             ExternalVersionNumber = customsDeclaration.ClearanceRequest?.ExternalVersion,
@@ -109,5 +110,13 @@ public static class ClearanceDecisionBuilder
         }
 
         return ct.ToString()!;
+    }
+
+    private static string BuildDecisionIdentifier(DecisionResult decisionResult, int? clearanceRequestVersion)
+    {
+        var notifications = decisionResult.Decisions.Where(x => x.PreNotification is not null)
+            .Select(x =>
+                $"{x.PreNotification?.Id}:{x.PreNotification?.UpdatedSource:ddMMyyhhmmss}");
+        return $"{string.Join('-', notifications)}:CR-VERSION-{clearanceRequestVersion}";
     }
 }

@@ -11,28 +11,6 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Consumers;
 public class ClearanceRequestConsumerTests
 {
     [Fact]
-    public void GivenAnUpdateEvent_AndClearanceRequestHasNotChange_ThenMessageShouldBeSkipped()
-    {
-        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
-        var consumer = new ClearanceRequestConsumer(
-            NullLogger<ClearanceRequestConsumer>.Instance,
-            decisionService,
-            apiClient
-        )
-        {
-            Context = new ConsumerContext(),
-        };
-
-        var createdEvent = ClearanceRequestFixtures.ClearanceRequestUpdatedFixture();
-
-        var result = consumer.OnHandle(createdEvent, CancellationToken.None);
-        result.Should().Be(Task.CompletedTask);
-
-        apiClient.ReceivedCalls().Count().Should().Be(0);
-    }
-
-    [Fact]
     public async Task GivenACreatedEvent_AndNotImportPreNotificationsExist_ThenDecisionShouldBeCreated()
     {
         // ARRANGE

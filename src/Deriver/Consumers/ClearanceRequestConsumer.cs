@@ -18,15 +18,12 @@ public class ClearanceRequestConsumer(
     public async Task OnHandle(ResourceEvent<object> message, CancellationToken cancellationToken)
     {
         logger.LogInformation(
-            "Received notification: {ResourceType}:{ResourceId}",
-            message.ResourceType,
+            "Received notification: {SubResourceType}:{ResourceId}",
+            message.SubResourceType,
             message.ResourceId
         );
 
-        if (
-            message.Operation == ResourceEventOperations.Updated
-            && !message.ChangeSet.Exists(x => x.Path.Contains("/ClearanceRequest"))
-        )
+        if (message.SubResourceType != ResourceEventSubResourceTypes.ClearanceRequest)
         {
             logger.LogInformation("Skipping Updated Event as ClearanceRequest hasn't changed");
             return;

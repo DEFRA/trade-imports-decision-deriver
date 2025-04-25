@@ -16,7 +16,10 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output) : SqsTes
 {
     private readonly IWireMockAdminApi _wireMockAdminApi = RestClient.For<IWireMockAdminApi>("http://localhost:9090");
 
-    private static Dictionary<string, MessageAttributeValue> WithInboundHmrcMessageType(string resourceType, string subResourceType)
+    private static Dictionary<string, MessageAttributeValue> WithInboundHmrcMessageType(
+        string resourceType,
+        string subResourceType
+    )
     {
         return new Dictionary<string, MessageAttributeValue>
         {
@@ -79,7 +82,10 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output) : SqsTes
 
         await SendMessage(
             JsonSerializer.Serialize(customsDeclaration),
-            WithInboundHmrcMessageType(ResourceEventResourceTypes.CustomsDeclaration, ResourceEventSubResourceTypes.ClearanceDecision)
+            WithInboundHmrcMessageType(
+                ResourceEventResourceTypes.CustomsDeclaration,
+                ResourceEventSubResourceTypes.ClearanceDecision
+            )
         );
 
         Assert.True(

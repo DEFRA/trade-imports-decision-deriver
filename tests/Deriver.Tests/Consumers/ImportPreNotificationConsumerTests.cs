@@ -79,4 +79,47 @@ public class ImportPreNotificationConsumerTests
         // ASSERT
         apiClient.ReceivedCalls().Count().Should().Be(4);
     }
+
+    [Fact]
+    public async Task GivenACreatedEvent_AndCustomsDeclarationsExist_AndDecisionAlreadyExists_ThenDecisionShouldNotBeSent()
+    {
+        // ARRANGE
+        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var consumer = new ImportPreNotificationConsumer(
+            NullLogger<ImportPreNotificationConsumer>.Instance,
+            decisionService,
+            apiClient
+        );
+
+        var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
+
+        var notification = ImportPreNotificationFixtures.ImportPreNotificationFixture("test");
+
+        var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
+        customsDeclaration.ClearanceDecision!.SourceVersion =
+            $"CR-VERSION-{customsDeclaration.ClearanceRequest?.ExternalVersion}";
+
+        apiClient
+            .GetCustomsDeclaration(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
+            .Returns(customsDeclaration);
+
+        apiClient
+            .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
+            .Returns([customsDeclaration]);
+
+        apiClient
+            .GetImportPreNotificationsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
+            .Returns([new ImportPreNotificationResponse(notification, DateTime.Now, DateTime.Now)]);
+
+        var decisionResult = new DecisionResult();
+        decisionResult.AddDecision("mrn", 1, "docref", "checkCode", DecisionCode.C03);
+        decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
+
+        // ACT
+        await consumer.OnHandle(createdEvent, CancellationToken.None);
+
+        // ASSERT
+        apiClient.ReceivedCalls().Count().Should().Be(3);
+    }
 }

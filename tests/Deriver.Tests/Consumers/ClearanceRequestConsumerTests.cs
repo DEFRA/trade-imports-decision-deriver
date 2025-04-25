@@ -40,4 +40,38 @@ public class ClearanceRequestConsumerTests
         // ASSERT
         apiClient.ReceivedCalls().Count().Should().Be(3);
     }
+
+    [Fact]
+    public async Task GivenACreatedEvent_AndNotImportPreNotificationsExist_AndDecisionAlreadyExists_ThenDecisionShouldBeSent()
+    {
+        // ARRANGE
+        var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
+        customsDeclaration.ClearanceDecision!.SourceVersion =
+            $"CR-VERSION-{customsDeclaration.ClearanceRequest?.ExternalVersion}";
+        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var consumer = new ClearanceRequestConsumer(
+            NullLogger<ClearanceRequestConsumer>.Instance,
+            decisionService,
+            apiClient
+        );
+
+        var createdEvent = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();
+
+        apiClient
+            .GetCustomsDeclaration(createdEvent.ResourceId, Arg.Any<CancellationToken>())
+            .Returns(customsDeclaration);
+
+        apiClient.GetImportPreNotificationsByMrn(createdEvent.ResourceId, Arg.Any<CancellationToken>()).Returns([]);
+
+        var decisionResult = new DecisionResult();
+        decisionResult.AddDecision("mrn", 1, "docref", "checkCode", DecisionCode.C03);
+        decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
+
+        // ACT
+        await consumer.OnHandle(createdEvent, CancellationToken.None);
+
+        // ASSERT
+        apiClient.ReceivedCalls().Count().Should().Be(2);
+    }
 }

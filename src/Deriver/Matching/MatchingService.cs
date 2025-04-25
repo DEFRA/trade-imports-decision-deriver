@@ -37,8 +37,6 @@ public class MatchingService : IMatchingService
         return Task.FromResult(matchingResult);
     }
 
-    private static string[] _validDocumentCodes = new[] { "C640", "C678", "N853", "N851", "9115", "C085", "N002" };
-
     private static void ProcessDocument(
         MatchingContext matchingContext,
         ImportDocumentReference? documentGroup,
@@ -48,11 +46,12 @@ public class MatchingService : IMatchingService
         MatchingResult matchingResult
     )
     {
-        if (!_validDocumentCodes.Contains(documentCode) || documentGroup == null || !documentGroup.IsValid())
+        if (documentGroup == null || !ImportDocumentReference.IsValid(documentCode!))
             return;
 
         var notification = matchingContext.Notifications.Find(x =>
-            new ImportDocumentReference(x.Id!).GetIdentifier() == documentGroup.GetIdentifier()
+            new ImportDocumentReference(x.Id!).GetIdentifier(documentCode!)
+            == documentGroup.GetIdentifier(documentCode!)
         );
 
         if (notification is null)

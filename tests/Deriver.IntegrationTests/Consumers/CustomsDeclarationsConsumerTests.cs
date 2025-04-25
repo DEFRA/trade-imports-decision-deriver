@@ -1,6 +1,7 @@
 using System.Net;
 using Amazon.SQS.Model;
 using Defra.TradeImportsDataApi.Domain.Events;
+using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using RestEase;
 using WireMock.Admin.Mappings;
@@ -15,13 +16,20 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output) : SqsTes
 {
     private readonly IWireMockAdminApi _wireMockAdminApi = RestClient.For<IWireMockAdminApi>("http://localhost:9090");
 
-    private static Dictionary<string, MessageAttributeValue> WithInboundHmrcMessageType(string messageType)
+    private static Dictionary<string, MessageAttributeValue> WithInboundHmrcMessageType(
+        string resourceType,
+        string subResourceType
+    )
     {
         return new Dictionary<string, MessageAttributeValue>
         {
             {
-                "resourceType",
-                new MessageAttributeValue { DataType = "String", StringValue = messageType }
+                MessageBusHeaders.ResourceType,
+                new MessageAttributeValue { DataType = "String", StringValue = resourceType }
+            },
+            {
+                MessageBusHeaders.SubResourceType,
+                new MessageAttributeValue { DataType = "String", StringValue = subResourceType }
             },
         };
     }
@@ -74,7 +82,10 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output) : SqsTes
 
         await SendMessage(
             JsonSerializer.Serialize(customsDeclaration),
-            WithInboundHmrcMessageType(ResourceEventResourceTypes.CustomsDeclaration)
+            WithInboundHmrcMessageType(
+                ResourceEventResourceTypes.CustomsDeclaration,
+                ResourceEventSubResourceTypes.ClearanceDecision
+            )
         );
 
         Assert.True(

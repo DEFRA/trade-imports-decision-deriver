@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
@@ -15,22 +16,19 @@ public class ClearanceRequestConsumer(
     ITradeImportsDataApiClient apiClient
 ) : IConsumer<ResourceEvent<object>>, IConsumerWithContext
 {
+    private static JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        WriteIndented = true,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
+    };
+
     public async Task OnHandle(ResourceEvent<object> message, CancellationToken cancellationToken)
     {
         logger.LogInformation(
-            "Received notification: {ResourceType}:{ResourceId}",
-            message.ResourceType,
+            "Received notification: {SubResourceType}:{ResourceId}",
+            message.SubResourceType,
             message.ResourceId
         );
-
-        if (
-            message.Operation == ResourceEventOperations.Updated
-            && !message.ChangeSet.Exists(x => x.Path.Contains("/ClearanceRequest"))
-        )
-        {
-            logger.LogInformation("Skipping Updated Event as ClearanceRequest hasn't changed");
-            return;
-        }
 
         var clearanceRequest = await apiClient.GetCustomsDeclaration(message.ResourceId, cancellationToken);
 
@@ -62,7 +60,11 @@ public class ClearanceRequestConsumer(
             return;
         }
 
-        logger.LogInformation("Decision Derived: {Decision}", JsonSerializer.Serialize(decisionResult));
+        logger.LogInformation(
+            "Decision Derived: {Decision} with {DecisionContext}",
+            JsonSerializer.Serialize(decisionResult, _jsonSerializerOptions),
+            JsonSerializer.Serialize(decisionContext, _jsonSerializerOptions)
+        );
         await PersistDecision(cancellationToken, clearanceRequest, decisionResult);
     }
 
@@ -79,17 +81,22 @@ public class ClearanceRequestConsumer(
             ClearanceRequest = clearanceRequest.ClearanceRequest,
         };
 
-        customsDeclaration.ClearanceDecision = decisionResult.BuildClearanceDecision(
+        var newDecision = decisionResult.BuildClearanceDecision(
             clearanceRequest.MovementReferenceNumber,
             customsDeclaration
         );
 
-        await apiClient.PutCustomsDeclaration(
-            clearanceRequest.MovementReferenceNumber,
-            customsDeclaration,
-            clearanceRequest.ETag,
-            cancellationToken
-        );
+        if (newDecision.SourceVersion != customsDeclaration.ClearanceDecision?.SourceVersion)
+        {
+            customsDeclaration.ClearanceDecision = newDecision;
+
+            await apiClient.PutCustomsDeclaration(
+                clearanceRequest.MovementReferenceNumber,
+                customsDeclaration,
+                clearanceRequest.ETag,
+                cancellationToken
+            );
+        }
     }
 
     public IConsumerContext Context { get; set; } = null!;

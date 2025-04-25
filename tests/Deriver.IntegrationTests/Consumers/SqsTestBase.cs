@@ -8,7 +8,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.IntegrationTests.Consumers;
 public class SqsTestBase(ITestOutputHelper output)
 {
     private const string QueueUrl =
-        "http://sqs.eu-west-2.127.0.0.1:4566/000000000000/trade_imports_data_import_declaration_upserts";
+        "http://sqs.eu-west-2.127.0.0.1:4566/000000000000/trade_imports_data_upserted_decision_deriver";
 
     private readonly AmazonSQSClient _sqsClient = new(
         new BasicAWSCredentials("test", "test"),

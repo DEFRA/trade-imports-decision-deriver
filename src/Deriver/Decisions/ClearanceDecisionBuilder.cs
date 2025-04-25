@@ -1,5 +1,5 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
-using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
+using Defra.TradeImportsDataApi.Domain.Ipaffs;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
@@ -18,6 +18,9 @@ public static class ClearanceDecisionBuilder
             DecisionNumber = customsDeclaration.ClearanceDecision is { DecisionNumber: not null }
                 ? customsDeclaration.ClearanceDecision.DecisionNumber++
                 : 1,
+            SourceVersion = decisionResult.BuildDecisionSourceVersion(
+                customsDeclaration.ClearanceRequest?.ExternalVersion
+            ),
             Timestamp = DateTime.UtcNow,
             ExternalCorrelationId = customsDeclaration.ClearanceDecision?.ExternalCorrelationId,
             ExternalVersionNumber = customsDeclaration.ClearanceRequest?.ExternalVersion,

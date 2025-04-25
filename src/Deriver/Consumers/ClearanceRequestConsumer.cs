@@ -30,12 +30,6 @@ public class ClearanceRequestConsumer(
             message.ResourceId
         );
 
-        if (message.SubResourceType != ResourceEventSubResourceTypes.ClearanceRequest)
-        {
-            logger.LogInformation("Skipping Updated Event as ClearanceRequest hasn't changed");
-            return;
-        }
-
         var clearanceRequest = await apiClient.GetCustomsDeclaration(message.ResourceId, cancellationToken);
 
         var notificationResponses = await apiClient.GetImportPreNotificationsByMrn(

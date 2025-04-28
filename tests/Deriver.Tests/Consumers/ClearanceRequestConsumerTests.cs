@@ -4,7 +4,6 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
-using SlimMessageBus.Host;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Consumers;
 
@@ -102,5 +101,6 @@ public class ClearanceRequestConsumerTests
 
         // ASSERT
         apiClient.ReceivedCalls().Count().Should().Be(1);
+        decisionService.ReceivedCalls().Count().Should().Be(0);
     }
 }

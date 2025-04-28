@@ -42,6 +42,11 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output) : SqsTes
 
         var customsDeclaration = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();
 
+        var customsDeclarationResponse = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture(
+            customsDeclaration.ResourceId
+        );
+        customsDeclarationResponse = customsDeclarationResponse with { Finalisation = null };
+
         await _wireMockAdminApi.ResetMappingsAsync();
         await _wireMockAdminApi.ResetRequestsAsync();
 
@@ -51,14 +56,7 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output) : SqsTes
         mappingBuilder.Given(m =>
             m.WithRequest(req => req.UsingGet().WithPath(createPath))
                 .WithResponse(rsp =>
-                    rsp.WithBody(
-                            JsonSerializer.Serialize(
-                                CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture(
-                                    customsDeclaration.ResourceId
-                                )
-                            )
-                        )
-                        .WithStatusCode(HttpStatusCode.OK)
+                    rsp.WithBody(JsonSerializer.Serialize(customsDeclarationResponse)).WithStatusCode(HttpStatusCode.OK)
                 )
         );
 

@@ -34,8 +34,11 @@ public class ClearanceRequestConsumer(
 
         if (clearanceRequest?.Finalisation is not null)
         {
-            logger.LogInformation("Skipping Event : {SubResourceType}:{ResourceId} as has been finalised", message.SubResourceType,
-                message.ResourceId);
+            logger.LogInformation(
+                "Skipping Event : {SubResourceType}:{ResourceId} as has been finalised",
+                message.SubResourceType,
+                message.ResourceId
+            );
             return;
         }
 

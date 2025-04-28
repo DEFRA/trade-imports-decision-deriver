@@ -58,10 +58,11 @@ public class MediatorConsumerTests
         };
 
         var createdEvent = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();
-
+        var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
+        customsDeclaration = customsDeclaration with { Finalisation = null };
         apiClient
             .GetCustomsDeclaration(createdEvent.ResourceId, Arg.Any<CancellationToken>())
-            .Returns(CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture());
+            .Returns(customsDeclaration);
 
         apiClient.GetImportPreNotificationsByMrn(createdEvent.ResourceId, Arg.Any<CancellationToken>()).Returns([]);
 
@@ -100,6 +101,7 @@ public class MediatorConsumerTests
         var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
 
         var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
+        customsDeclaration = customsDeclaration with { Finalisation = null };
         apiClient
             .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
             .Returns([customsDeclaration]);

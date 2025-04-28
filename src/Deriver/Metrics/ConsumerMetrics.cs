@@ -22,10 +22,26 @@ public class ConsumerMetrics
     public ConsumerMetrics(IMeterFactory meterFactory)
     {
         var meter = meterFactory.Create(MetricNames.MeterName);
-        consumeTotal = meter.CreateCounter<long>("messaging.consume", Unit.COUNT.ToString(), description: "Number of messages consumed");
-        consumeFaultTotal = meter.CreateCounter<long>("messaging.consume.errors", Unit.COUNT.ToString(), description: "Number of message consume faults");
-        consumerInProgress = meter.CreateCounter<long>("messaging.consume.active", Unit.COUNT.ToString(), description: "Number of consumers in progress");
-        consumeDuration = meter.CreateHistogram<double>("messaging.consume.duration", Unit.MILLISECONDS.ToString(), "Elapsed time spent consuming a message, in millis");
+        consumeTotal = meter.CreateCounter<long>(
+            "messaging.consume",
+            Unit.COUNT.ToString(),
+            description: "Number of messages consumed"
+        );
+        consumeFaultTotal = meter.CreateCounter<long>(
+            "messaging.consume.errors",
+            Unit.COUNT.ToString(),
+            description: "Number of message consume faults"
+        );
+        consumerInProgress = meter.CreateCounter<long>(
+            "messaging.consume.active",
+            Unit.COUNT.ToString(),
+            description: "Number of consumers in progress"
+        );
+        consumeDuration = meter.CreateHistogram<double>(
+            "messaging.consume.duration",
+            Unit.MILLISECONDS.ToString(),
+            "Elapsed time spent consuming a message, in millis"
+        );
     }
 
     public void Start(string path, string consumerName, string resourceType, string? subResourceType)
@@ -36,7 +52,13 @@ public class ConsumerMetrics
         consumerInProgress.Add(1, tagList);
     }
 
-    public void Faulted(string path, string consumerName, string resourceType, string? subResourceType, Exception exception)
+    public void Faulted(
+        string path,
+        string consumerName,
+        string resourceType,
+        string? subResourceType,
+        Exception exception
+    )
     {
         var tagList = BuildTags(path, consumerName, resourceType, subResourceType);
 
@@ -44,7 +66,13 @@ public class ConsumerMetrics
         consumeFaultTotal.Add(1, tagList);
     }
 
-    public void Complete(string path, string consumerName, double milliseconds, string resourceType, string? subResourceType)
+    public void Complete(
+        string path,
+        string consumerName,
+        double milliseconds,
+        string resourceType,
+        string? subResourceType
+    )
     {
         var tagList = BuildTags(path, consumerName, resourceType, subResourceType);
 
@@ -60,7 +88,7 @@ public class ConsumerMetrics
             { Constants.Tags.Destination, path },
             { Constants.Tags.ConsumerType, consumerName },
             { Constants.Tags.ResourceType, resourceType },
-            { Constants.Tags.SubResourceType, subResourceType }
+            { Constants.Tags.SubResourceType, subResourceType },
         };
     }
 

@@ -17,7 +17,10 @@ public static class EmfExportExtensions
         if (enabled)
         {
             var ns = config.GetValue<string>("AWS_EMF_NAMESPACE");
-            EmfExporter.Init(builder.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger("EmfExporter"), ns!);
+            EmfExporter.Init(
+                builder.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger("EmfExporter"),
+                ns!
+            );
         }
 
         return builder;
@@ -53,7 +56,8 @@ public static class EmfExporter
         Instrument instrument,
         T measurement,
         ReadOnlySpan<KeyValuePair<string, object?>> tags,
-        object? state)
+        object? state
+    )
     {
         try
         {
@@ -63,7 +67,8 @@ public static class EmfExporter
             var dimensionSet = new DimensionSet();
             foreach (var tag in tags)
             {
-                if (string.IsNullOrWhiteSpace(tag.Value?.ToString())) continue;
+                if (string.IsNullOrWhiteSpace(tag.Value?.ToString()))
+                    continue;
                 dimensionSet.AddDimension(tag.Key, tag.Value?.ToString());
             }
 

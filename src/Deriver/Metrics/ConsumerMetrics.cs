@@ -96,12 +96,12 @@ public class ConsumerMetrics
     {
         public static class Tags
         {
-            public const string QueueName = "messaging.queue_name";
-            public const string ConsumerType = "messaging.consumer_type";
-            public const string Service = "messaging.service";
-            public const string ExceptionType = "messaging.exception_type";
-            public const string ResourceType = "messaging.resource_type";
-            public const string SubResourceType = "messaging.sub_message_type";
+            public const string QueueName = "QueueName";
+            public const string ConsumerType = "ConsumerType";
+            public const string Service = "ServiceName";
+            public const string ExceptionType = "ExceptionType";
+            public const string ResourceType = "ResourceType";
+            public const string SubResourceType = "SubResourceType";
         }
     }
 }

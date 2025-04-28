@@ -1,6 +1,7 @@
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Health;
+using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 using Microsoft.AspNetCore.Diagnostics;
@@ -70,6 +71,7 @@ static WebApplication BuildWebApplication(WebApplicationBuilder builder)
 {
     var app = builder.Build();
 
+    app.UseEmfExporter();
     app.UseHeaderPropagation();
     app.MapHealth();
 

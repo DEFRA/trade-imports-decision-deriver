@@ -31,6 +31,8 @@
     <PackageReference Include="SlimMessageBus" Version="3.0.0" />
     <PackageReference Include="SlimMessageBus.Host.AmazonSQS" Version="3.1.2-rc100" />
     <PackageReference Include="SlimMessageBus.Host.Serialization.SystemTextJson" Version="3.1.2-rc100" />
+
+    <PackageReference Include="Amazon.CloudWatch.EMF" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>

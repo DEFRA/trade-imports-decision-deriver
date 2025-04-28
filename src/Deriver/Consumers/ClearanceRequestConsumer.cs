@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Amazon.SQS.Model;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
@@ -7,6 +8,7 @@ using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using SlimMessageBus;
+using SlimMessageBus.Host.Interceptor;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 
@@ -31,6 +33,12 @@ public class ClearanceRequestConsumer(
         );
 
         var clearanceRequest = await apiClient.GetCustomsDeclaration(message.ResourceId, cancellationToken);
+
+        if (clearanceRequest?.Finalisation is not null)
+        {
+            logger.LogInformation("Skipping Updated Event as has been finalised");
+            return;
+        }
 
         var notificationResponses = await apiClient.GetImportPreNotificationsByMrn(
             message.ResourceId,

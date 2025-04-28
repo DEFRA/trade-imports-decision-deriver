@@ -9,6 +9,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 using Defra.TradeImportsDecisionDeriver.Deriver.Interceptors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
+using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Options;
@@ -53,6 +54,8 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddConsumers(this IServiceCollection services, IConfiguration configuration)
     {
+
+        services.AddSingleton<ConsumerMetrics>();
         services.AddScoped<IDecisionService, DecisionService>();
         services.AddScoped<IMatchingService, MatchingService>();
 
@@ -62,6 +65,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDecisionFinder, ChedPPDecisionFinder>();
         services.AddScoped<IDecisionFinder, IuuDecisionFinder>();
 
+        services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(MetricsInterceptor<>));
         services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(TracingInterceptor<>));
         services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(LoggingInterceptor<>));
         services.AddSlimMessageBus(mbb =>

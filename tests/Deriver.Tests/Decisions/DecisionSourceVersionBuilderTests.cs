@@ -1,10 +1,4 @@
-using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
-using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
-using Defra.TradeImportsDecisionDeriver.TestFixtures;
-using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions;
 

@@ -53,6 +53,7 @@ public class ImportPreNotificationConsumerTests
         var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
 
         var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
+        customsDeclaration = customsDeclaration with { Finalisation = null };
         apiClient
             .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
             .Returns([customsDeclaration]);
@@ -97,6 +98,7 @@ public class ImportPreNotificationConsumerTests
         var notification = ImportPreNotificationFixtures.ImportPreNotificationFixture("test");
 
         var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
+        customsDeclaration = customsDeclaration with { Finalisation = null };
         customsDeclaration.ClearanceDecision!.SourceVersion =
             $"CR-VERSION-{customsDeclaration.ClearanceRequest?.ExternalVersion}";
 
@@ -121,5 +123,32 @@ public class ImportPreNotificationConsumerTests
 
         // ASSERT
         apiClient.ReceivedCalls().Count().Should().Be(3);
+    }
+
+    [Fact]
+    public async Task GivenACreatedEvent_AndCustomsDeclarationsExist_AndAlreadyFinalised_ThenDecisionShouldNotBeSent()
+    {
+        // ARRANGE
+        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var consumer = new ImportPreNotificationConsumer(
+            NullLogger<ImportPreNotificationConsumer>.Instance,
+            decisionService,
+            apiClient
+        );
+
+        var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
+
+        var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
+
+        apiClient
+            .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
+            .Returns([customsDeclaration]);
+
+        // ACT
+        await consumer.OnHandle(createdEvent, CancellationToken.None);
+
+        // ASSERT
+        apiClient.ReceivedCalls().Count().Should().Be(1);
     }
 }

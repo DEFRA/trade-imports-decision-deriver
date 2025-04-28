@@ -111,6 +111,7 @@ public class ImportPreNotificationConsumer(
 
         return customsDeclarations
             .Where(x => x.ClearanceRequest is not null)
+            .Where(x => x.Finalisation is null)
             .Select(x => new ClearanceRequestWrapper(x.MovementReferenceNumber, x.ClearanceRequest!))
             .ToList();
     }

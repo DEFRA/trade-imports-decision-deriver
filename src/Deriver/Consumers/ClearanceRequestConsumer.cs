@@ -32,6 +32,16 @@ public class ClearanceRequestConsumer(
 
         var clearanceRequest = await apiClient.GetCustomsDeclaration(message.ResourceId, cancellationToken);
 
+        if (clearanceRequest?.Finalisation is not null)
+        {
+            logger.LogInformation(
+                "Skipping Event : {SubResourceType}:{ResourceId} as has been finalised",
+                message.SubResourceType,
+                message.ResourceId
+            );
+            return;
+        }
+
         var notificationResponses = await apiClient.GetImportPreNotificationsByMrn(
             message.ResourceId,
             cancellationToken

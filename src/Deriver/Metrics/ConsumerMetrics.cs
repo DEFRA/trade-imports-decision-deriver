@@ -8,7 +8,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
 [ExcludeFromCodeCoverage]
 public static class MetricNames
 {
-    public const string MeterName = "TradeImports.DecisionDeriver";
+    public const string MeterName = "Defra.TradeImportsDecisionDeriver.Deriver";
 }
 
 [ExcludeFromCodeCoverage]
@@ -23,22 +23,22 @@ public class ConsumerMetrics
     {
         var meter = meterFactory.Create(MetricNames.MeterName);
         consumeTotal = meter.CreateCounter<long>(
-            "messaging.consume",
+            "MessagingConsume",
             Unit.COUNT.ToString(),
             description: "Number of messages consumed"
         );
         consumeFaultTotal = meter.CreateCounter<long>(
-            "messaging.consume.errors",
+            "MessagingConsumeErrors",
             Unit.COUNT.ToString(),
             description: "Number of message consume faults"
         );
         consumerInProgress = meter.CreateCounter<long>(
-            "messaging.consume.active",
+            "MessagingConsumeActive",
             Unit.COUNT.ToString(),
             description: "Number of consumers in progress"
         );
         consumeDuration = meter.CreateHistogram<double>(
-            "messaging.consume.duration",
+            "MessagingConsumeDuration",
             Unit.MILLISECONDS.ToString(),
             "Elapsed time spent consuming a message, in millis"
         );
@@ -53,28 +53,28 @@ public class ConsumerMetrics
     }
 
     public void Faulted(
-        string path,
+        string queueName,
         string consumerName,
         string resourceType,
         string? subResourceType,
         Exception exception
     )
     {
-        var tagList = BuildTags(path, consumerName, resourceType, subResourceType);
+        var tagList = BuildTags(queueName, consumerName, resourceType, subResourceType);
 
         tagList.Add(Constants.Tags.ExceptionType, exception.GetType().Name);
         consumeFaultTotal.Add(1, tagList);
     }
 
     public void Complete(
-        string path,
+        string queueName,
         string consumerName,
         double milliseconds,
         string resourceType,
         string? subResourceType
     )
     {
-        var tagList = BuildTags(path, consumerName, resourceType, subResourceType);
+        var tagList = BuildTags(queueName, consumerName, resourceType, subResourceType);
 
         consumerInProgress.Add(-1, tagList);
         consumeDuration.Record(milliseconds, tagList);
@@ -85,7 +85,7 @@ public class ConsumerMetrics
         return new TagList
         {
             { Constants.Tags.Service, Process.GetCurrentProcess().ProcessName },
-            { Constants.Tags.Destination, path },
+            { Constants.Tags.QueueName, path },
             { Constants.Tags.ConsumerType, consumerName },
             { Constants.Tags.ResourceType, resourceType },
             { Constants.Tags.SubResourceType, subResourceType },
@@ -96,7 +96,7 @@ public class ConsumerMetrics
     {
         public static class Tags
         {
-            public const string Destination = "messaging.destination";
+            public const string QueueName = "messaging.queue_name";
             public const string ConsumerType = "messaging.consumer_type";
             public const string Service = "messaging.service";
             public const string ExceptionType = "messaging.exception_type";

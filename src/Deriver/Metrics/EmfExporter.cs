@@ -18,10 +18,7 @@ public static class EmfExportExtensions
         if (enabled)
         {
             var ns = config.GetValue<string>("AWS_EMF_NAMESPACE");
-            EmfExporter.Init(
-                builder.ApplicationServices.GetRequiredService<ILoggerFactory>(),
-                ns!
-            );
+            EmfExporter.Init(builder.ApplicationServices.GetRequiredService<ILoggerFactory>(), ns!);
         }
 
         return builder;

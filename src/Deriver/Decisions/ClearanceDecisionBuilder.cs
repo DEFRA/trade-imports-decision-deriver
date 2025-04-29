@@ -89,7 +89,7 @@ public static class ClearanceDecisionBuilder
         if (maxDecisionResult.DecisionCode == DecisionCode.X00)
         {
             var chedType = MapToChedType(item.Documents?[0].DocumentCode!);
-            var chedNumbers = string.Join(',', item.Documents!.Select(x => x.DocumentReference));
+            var chedNumbers = string.Join(", ", item.Documents!.Select(x => x.DocumentReference?.Value));
 
             if (!reasons.Any())
             {

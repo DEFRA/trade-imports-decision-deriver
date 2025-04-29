@@ -55,7 +55,9 @@ public class ClearanceDecisionBuilderTests
     [Fact]
     public async Task BuildClearanceDecision_WithReasons()
     {
-        var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
+        var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture(
+            documentReferencePrefix: "fixed"
+        );
         customsDeclaration.ClearanceRequest!.ExternalCorrelationId = "correlationId";
         customsDeclaration.ClearanceRequest!.ExternalVersion = 22;
         var decisionResult = new DecisionResult();

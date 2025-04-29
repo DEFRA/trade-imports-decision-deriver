@@ -22,7 +22,7 @@
           CheckCode: 9115,
           DecisionCode: X00,
           DecisionReasons: [
-            A Customs Declaration has been submitted however no matching Chedpp(s) have been submitted to Port Health (for Chedpp number(s) Defra.TradeImportsDataApi.Domain.CustomsDeclaration.ImportDocumentReference,Defra.TradeImportsDataApi.Domain.CustomsDeclaration.ImportDocumentReference,Defra.TradeImportsDataApi.Domain.CustomsDeclaration.ImportDocumentReference). Please correct the Chedpp number(s) entered on your customs declaration.
+            A Customs Declaration has been submitted however no matching Chedpp(s) have been submitted to Port Health (for Chedpp number(s) fixed-4, fixed-5, fixed-6). Please correct the Chedpp number(s) entered on your customs declaration.
           ]
         }
       ]
@@ -34,7 +34,7 @@
           CheckCode: 9115,
           DecisionCode: X00,
           DecisionReasons: [
-            A Customs Declaration has been submitted however no matching Chedpp(s) have been submitted to Port Health (for Chedpp number(s) Defra.TradeImportsDataApi.Domain.CustomsDeclaration.ImportDocumentReference,Defra.TradeImportsDataApi.Domain.CustomsDeclaration.ImportDocumentReference,Defra.TradeImportsDataApi.Domain.CustomsDeclaration.ImportDocumentReference). Please correct the Chedpp number(s) entered on your customs declaration.
+            A Customs Declaration has been submitted however no matching Chedpp(s) have been submitted to Port Health (for Chedpp number(s) fixed-7, fixed-8, fixed-9). Please correct the Chedpp number(s) entered on your customs declaration.
           ]
         }
       ]

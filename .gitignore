@@ -272,3 +272,5 @@ openapi.json
 
 *.received.*
 /src/Deriver/Properties/.env.local
+
+.env

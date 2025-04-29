@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Metrics;
 using Amazon.CloudWatch.EMF.Logger;
 using Amazon.CloudWatch.EMF.Model;
+using Microsoft.Extensions.Logging.Abstractions;
 using Unit = Amazon.CloudWatch.EMF.Model.Unit;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
@@ -18,7 +19,7 @@ public static class EmfExportExtensions
         {
             var ns = config.GetValue<string>("AWS_EMF_NAMESPACE");
             EmfExporter.Init(
-                builder.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger("EmfExporter"),
+                builder.ApplicationServices.GetRequiredService<ILoggerFactory>(),
                 ns!
             );
         }
@@ -32,11 +33,13 @@ public static class EmfExporter
 {
     private static readonly MeterListener MeterListener = new();
     private static ILogger _logger = null!;
+    private static ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
     private static string? _awsNamespace;
 
-    public static void Init(ILogger logger, string? awsNamespace)
+    public static void Init(ILoggerFactory loggerFactory, string? awsNamespace)
     {
-        _logger = logger;
+        _logger = loggerFactory.CreateLogger(nameof(EmfExporter));
+        _loggerFactory = loggerFactory;
         _awsNamespace = awsNamespace;
         MeterListener.InstrumentPublished = (instrument, listener) =>
         {
@@ -61,7 +64,7 @@ public static class EmfExporter
     {
         try
         {
-            using var metricsLogger = new MetricsLogger();
+            using var metricsLogger = new MetricsLogger(_loggerFactory);
 
             metricsLogger.SetNamespace(_awsNamespace);
             var dimensionSet = new DimensionSet();

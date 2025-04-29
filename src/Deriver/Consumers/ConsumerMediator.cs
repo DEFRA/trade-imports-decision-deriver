@@ -17,8 +17,6 @@ public class ConsumerMediator(
 
     public Task OnHandle(JsonElement message, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Received notification: {Message}", JsonSerializer.Serialize(message));
-
         switch (Context.GetResourceType())
         {
             case ResourceEventResourceTypes.CustomsDeclaration:

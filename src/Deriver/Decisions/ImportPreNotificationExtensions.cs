@@ -6,7 +6,7 @@ public static class ImportPreNotificationExtensions
 {
     public static DecisionImportPreNotification ToDecisionImportPreNotification(this ImportPreNotification notification)
     {
-        return new DecisionImportPreNotification()
+        var decisionNotification = new DecisionImportPreNotification()
         {
             Id = notification.ReferenceNumber!,
             UpdatedSource = notification.UpdatedSource,
@@ -20,13 +20,19 @@ public static class ImportPreNotificationExtensions
             NotAcceptableReasons = notification.PartTwo?.Decision?.NotAcceptableReasons,
             AutoClearedOn = notification.PartTwo?.AutoClearedOn,
             InspectionRequired = notification.PartTwo?.InspectionRequired,
-            Commodities = notification
+        };
+
+        if (notification.Commodities is not null)
+        {
+            decisionNotification.Commodities = notification
                 .Commodities.Select(x => new DecisionCommodityComplement()
                 {
                     HmiDecision = x.RiskAssesment?.HmiDecision,
                     PhsiDecision = x.RiskAssesment?.PhsiDecision,
                 })
-                .ToArray(),
-        };
+                .ToArray();
+        }
+
+        return decisionNotification;
     }
 }

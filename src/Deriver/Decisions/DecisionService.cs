@@ -211,8 +211,8 @@ public class DecisionService(
                 notification.Id,
                 result.DecisionCode.ToString(),
                 notification.ConsignmentAcceptable,
-                notification.ConsignmentDecision.ToString(),
-                notification.NotAcceptableAction?.ToString()
+                notification.ConsignmentDecision,
+                notification.NotAcceptableAction
             );
 
         return results.ToArray();

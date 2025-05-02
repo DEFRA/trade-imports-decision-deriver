@@ -1,4 +1,4 @@
-using Defra.TradeImportsDataApi.Domain.Ipaffs;
+using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 
@@ -22,8 +22,8 @@ public class ChedDDecisionFinderTests
     [InlineData(true, ImportNotificationType.Ced, ImportNotificationStatus.Submitted, false)]
     public void CanFindDecisionTest(
         bool? iuuCheckRequired,
-        ImportNotificationType? importNotificationType,
-        ImportNotificationStatus notificationStatus,
+        string? importNotificationType,
+        string notificationStatus,
         bool expectedResult
     )
     {
@@ -196,8 +196,8 @@ public class ChedDDecisionFinderTests
     )]
     public void DecisionFinderTest(
         bool? consignmentAcceptable,
-        ConsignmentDecision? decision,
-        DecisionNotAcceptableAction? notAcceptableAction,
+        string? decision,
+        string? notAcceptableAction,
         String[]? notAcceptableReasons,
         DecisionCode expectedCode,
         DecisionInternalFurtherDetail? expectedFurtherDetail = null

@@ -1,4 +1,4 @@
-using Defra.TradeImportsDataApi.Domain.Ipaffs;
+using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 
@@ -33,14 +33,18 @@ public abstract class DecisionFinder : IDecisionFinder
     {
         if (notification.Status is ImportNotificationStatus.Submitted or ImportNotificationStatus.InProgress)
         {
-            if (notification.InspectionRequired is InspectionRequired.NotRequired or InspectionRequired.Inconclusive)
+            if (
+                notification.InspectionRequired
+                is PartTwoInspectionRequired.NotRequired
+                    or PartTwoInspectionRequired.Inconclusive
+            )
             {
                 decisionCode = DecisionCode.H01;
                 return true;
             }
 
             if (
-                notification.InspectionRequired == InspectionRequired.Required
+                notification.InspectionRequired == PartTwoInspectionRequired.Required
                 || notification.Commodities.Any(x => x.HmiDecision == CommodityRiskResultHmiDecision.Required)
                 || notification.Commodities.Any(x => x.PhsiDecision == CommodityRiskResultPhsiDecision.Required)
             )

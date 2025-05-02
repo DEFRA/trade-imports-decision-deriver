@@ -1,6 +1,7 @@
 using AutoFixture;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
+using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 
@@ -93,10 +94,7 @@ public class MatchingServiceTests
         return fixture.Build<ClearanceRequestWrapper>().With(i => i.MovementReferenceNumber, "Test123").Create();
     }
 
-    public static ImportPreNotification GenerateImportPreNotification(
-        string referenceNumber,
-        ImportNotificationStatus status
-    )
+    public static ImportPreNotification GenerateImportPreNotification(string referenceNumber, string status)
     {
         var fixture = new Fixture();
         fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));

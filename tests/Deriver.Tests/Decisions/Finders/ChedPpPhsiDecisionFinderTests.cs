@@ -1,4 +1,4 @@
-using Defra.TradeImportsDataApi.Domain.Ipaffs;
+using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 
@@ -23,8 +23,8 @@ public class ChedPpPhsiDecisionFinderTests
     [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H218")]
     [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, false, null)]
     public void CanFindDecisionTest(
-        ImportNotificationType? importNotificationType,
-        ImportNotificationStatus notificationStatus,
+        string? importNotificationType,
+        string notificationStatus,
         bool expectedResult,
         string? checkCode
     )
@@ -58,7 +58,7 @@ public class ChedPpPhsiDecisionFinderTests
     [InlineData(ImportNotificationStatus.Replaced, DecisionCode.X00, DecisionInternalFurtherDetail.E88)]
     [InlineData(ImportNotificationStatus.SplitConsignment, DecisionCode.X00, DecisionInternalFurtherDetail.E99)]
     public void DecisionFinderTest(
-        ImportNotificationStatus status,
+        string status,
         DecisionCode expectedCode,
         DecisionInternalFurtherDetail? expectedFurtherDetail = null
     )

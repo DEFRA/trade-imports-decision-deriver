@@ -1,4 +1,4 @@
-using Defra.TradeImportsDataApi.Domain.Ipaffs;
+using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 
@@ -22,8 +22,8 @@ public class ChedADecisionFinderTests
     [InlineData(true, ImportNotificationType.Cveda, ImportNotificationStatus.Submitted, false)]
     public void CanFindDecisionTest(
         bool? iuuCheckRequired,
-        ImportNotificationType? importNotificationType,
-        ImportNotificationStatus notificationStatus,
+        string? importNotificationType,
+        string notificationStatus,
         bool expectedResult
     )
     {
@@ -175,8 +175,8 @@ public class ChedADecisionFinderTests
     )]
     public void DecisionFinderTest(
         bool? consignmentAcceptable,
-        ConsignmentDecision? decision,
-        DecisionNotAcceptableAction? notAcceptableAction,
+        string? decision,
+        string? notAcceptableAction,
         String[]? notAcceptableReasons,
         DecisionCode expectedCode,
         DecisionInternalFurtherDetail? expectedFurtherDetail = null
@@ -206,7 +206,7 @@ public class ChedADecisionFinderTests
         {
             Id = "TEst",
             Status = ImportNotificationStatus.InProgress,
-            InspectionRequired = InspectionRequired.NotRequired,
+            InspectionRequired = PartTwoInspectionRequired.NotRequired,
         };
         var sut = new ChedADecisionFinder();
 
@@ -222,7 +222,7 @@ public class ChedADecisionFinderTests
         {
             Id = "TEst",
             Status = ImportNotificationStatus.InProgress,
-            InspectionRequired = InspectionRequired.Required,
+            InspectionRequired = PartTwoInspectionRequired.Required,
             Commodities = [new DecisionCommodityComplement() { HmiDecision = CommodityRiskResultHmiDecision.Required }],
         };
         var sut = new ChedADecisionFinder();

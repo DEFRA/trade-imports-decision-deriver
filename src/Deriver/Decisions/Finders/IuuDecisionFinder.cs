@@ -1,4 +1,4 @@
-using Defra.TradeImportsDataApi.Domain.Ipaffs;
+using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 
@@ -16,7 +16,7 @@ public class IuuDecisionFinder : DecisionFinder
         {
             true => notification.IuuOption switch
             {
-                ControlAuthorityIuuOption.Iuuok => new DecisionFinderResult(
+                ControlAuthorityIuuOption.IUUOK => new DecisionFinderResult(
                     DecisionCode.C07,
                     checkCode,
                     "IUU Compliant"
@@ -26,7 +26,7 @@ public class IuuDecisionFinder : DecisionFinder
                     checkCode,
                     "IUU Not compliant - Contact Port Health Authority (imports) or Marine Management Organisation (landings)."
                 ),
-                ControlAuthorityIuuOption.Iuuna => new DecisionFinderResult(
+                ControlAuthorityIuuOption.IUUNA => new DecisionFinderResult(
                     DecisionCode.C08,
                     checkCode,
                     "IUU Not applicable"

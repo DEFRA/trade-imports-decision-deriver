@@ -58,9 +58,8 @@ public class ImportPreNotificationConsumer(
         }
 
         logger.LogInformation(
-            "Decision Derived: {Decision} with {DecisionContext}",
-            JsonSerializer.Serialize(decisionResult, _jsonSerializerOptions),
-            JsonSerializer.Serialize(decisionContext, _jsonSerializerOptions)
+            "Decision Derived: {Decision}",
+            JsonSerializer.Serialize(decisionResult, _jsonSerializerOptions)
         );
         await PersistDecisions(cancellationToken, clearanceRequests, decisionResult);
     }

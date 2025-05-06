@@ -1,4 +1,4 @@
-using Defra.TradeImportsDataApi.Domain.Ipaffs;
+using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 

@@ -88,7 +88,7 @@ public static class ClearanceDecisionBuilder
 
         if (maxDecisionResult.DecisionCode == DecisionCode.X00)
         {
-            var chedType = MapToChedType(item.Documents?[0].DocumentCode!);
+            var chedType = MapToChedType(item.Documents?[0]);
             var chedNumbers = string.Join(", ", item.Documents!.Select(x => x.DocumentReference?.Value));
 
             if (!reasons.Any())
@@ -102,15 +102,15 @@ public static class ClearanceDecisionBuilder
         return reasons.ToArray();
     }
 
-    private static string MapToChedType(string documentCode)
+    private static string MapToChedType(ImportDocument? documentCode)
     {
-        var ct = documentCode.GetChedType();
+        var ct = documentCode?.GetChedType();
 
-        if (!ct.HasValue)
+        if (ct is null)
         {
             throw new ArgumentOutOfRangeException(nameof(documentCode), documentCode, null);
         }
 
-        return ct.ToString()!;
+        return ct;
     }
 }

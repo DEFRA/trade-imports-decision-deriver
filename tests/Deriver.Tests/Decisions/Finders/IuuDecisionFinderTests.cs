@@ -1,4 +1,4 @@
-using Defra.TradeImportsDataApi.Domain.Ipaffs;
+using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 
@@ -22,8 +22,8 @@ public class IuuDecisionFinderTests
     [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, false, "H224")]
     [InlineData(null, ImportNotificationStatus.Submitted, false, "H224")]
     public void CanFindDecisionTest(
-        ImportNotificationType? importNotificationType,
-        ImportNotificationStatus notificationStatus,
+        string? importNotificationType,
+        string notificationStatus,
         bool expectedResult,
         string? checkCode
     )
@@ -45,27 +45,21 @@ public class IuuDecisionFinderTests
     }
 
     [Theory]
-    [InlineData(true, ControlAuthorityIuuOption.Iuuok, DecisionCode.C07, null, "IUU Compliant")]
+    [InlineData(true, ControlAuthorityIuuOption.IUUOK, DecisionCode.C07, null, "IUU Compliant")]
     [InlineData(true, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00, null, "IUU Not compliant")]
-    [InlineData(true, ControlAuthorityIuuOption.Iuuna, DecisionCode.C08, null, "IUU Not applicable")]
+    [InlineData(true, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08, null, "IUU Not applicable")]
     [InlineData(true, null, DecisionCode.X00, null, "IUU Awaiting decision")]
-    [InlineData(
-        true,
-        (ControlAuthorityIuuOption)999,
-        DecisionCode.X00,
-        DecisionInternalFurtherDetail.E95,
-        "IUU Data error"
-    )]
+    [InlineData(true, "999", DecisionCode.X00, DecisionInternalFurtherDetail.E95, "IUU Data error")]
     [InlineData(
         false,
-        ControlAuthorityIuuOption.Iuuok,
+        ControlAuthorityIuuOption.IUUOK,
         DecisionCode.X00,
         DecisionInternalFurtherDetail.E94,
         "IUU Data error"
     )]
     public void FindDecisionTest(
         bool iuuCheckRequired,
-        ControlAuthorityIuuOption? iuuOption,
+        string? iuuOption,
         DecisionCode expectedDecisionCode,
         DecisionInternalFurtherDetail? expectedFurtherDetail = null,
         string? expectedDecisionReason = null

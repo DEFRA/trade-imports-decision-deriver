@@ -1,5 +1,5 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
-using Defra.TradeImportsDataApi.Domain.Ipaffs;
+using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
@@ -15,7 +15,7 @@ public class DecisionServiceTests
     [Theory]
     [InlineData(ImportNotificationType.Cveda, DecisionCode.C06, "H221")]
     public async Task When_processing_decisions_for_ched_type_notifications_not_requiring_iuu_check_Then_should_use_matching_ched_decision_finder_only(
-        ImportNotificationType targetImportNotificationType,
+        string targetImportNotificationType,
         DecisionCode expectedDecisionCode,
         params string[] checkCode
     )
@@ -54,7 +54,7 @@ public class DecisionServiceTests
     }
 
     private static DecisionContext CreateDecisionContext(
-        ImportNotificationType? importNotificationType,
+        string? importNotificationType,
         string[]? checkCodes,
         bool? iuuCheckRequired
     )

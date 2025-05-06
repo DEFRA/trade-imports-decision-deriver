@@ -1,4 +1,4 @@
-using Defra.TradeImportsDataApi.Domain.Ipaffs;
+using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 
@@ -8,7 +8,7 @@ public class CheckCode
 
     public required string Value { get; set; }
 
-    public ImportNotificationType? GetImportNotificationType()
+    public string? GetImportNotificationType()
     {
         //This is the mapping from https://eaflood.atlassian.net/wiki/spaces/ALVS/pages/5400920093/DocumentCode+CheckCode+Mapping
         return Value switch

@@ -82,7 +82,7 @@ public static class ServiceCollectionExtensions
                 );
             });
 
-            mbb.Consume<JsonElement>(x => x.WithConsumer<ConsumerMediator>().Queue(queueName));
+            mbb.Consume<JsonElement>(x => x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(20));
 
             mbb.AddJsonSerializer();
         });

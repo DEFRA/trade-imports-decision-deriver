@@ -16,7 +16,7 @@ public static class ClearanceDecisionBuilder
         return new ClearanceDecision()
         {
             DecisionNumber = customsDeclaration.ClearanceDecision is { DecisionNumber: not null }
-                ? customsDeclaration.ClearanceDecision.DecisionNumber++
+                ? customsDeclaration.ClearanceDecision.DecisionNumber + 1
                 : 1,
             SourceVersion = decisionResult.BuildDecisionSourceVersion(
                 customsDeclaration.ClearanceRequest?.ExternalVersion

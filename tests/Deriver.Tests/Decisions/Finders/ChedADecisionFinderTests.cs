@@ -206,7 +206,7 @@ public class ChedADecisionFinderTests
         {
             Id = "TEst",
             Status = ImportNotificationStatus.InProgress,
-            InspectionRequired = PartTwoInspectionRequired.NotRequired,
+            InspectionRequired = InspectionRequired.NotRequired,
         };
         var sut = new ChedADecisionFinder();
 
@@ -222,7 +222,7 @@ public class ChedADecisionFinderTests
         {
             Id = "TEst",
             Status = ImportNotificationStatus.InProgress,
-            InspectionRequired = PartTwoInspectionRequired.Required,
+            InspectionRequired = InspectionRequired.Required,
             Commodities = [new DecisionCommodityComplement() { HmiDecision = CommodityRiskResultHmiDecision.Required }],
         };
         var sut = new ChedADecisionFinder();

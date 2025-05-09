@@ -1,6 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Net;
-using System.Net.Http.Headers;
 using System.Text.Json;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
@@ -27,22 +25,7 @@ public static class ServiceCollectionExtensions
     {
         services
             .AddTradeImportsDataApiClient()
-            .ConfigureHttpClient(
-                (sp, c) =>
-                {
-                    var options = sp.GetRequiredService<IOptions<DataApiOptions>>().Value;
-                    c.BaseAddress = new Uri(options.BaseAddress);
-
-                    if (options.BasicAuthCredential != null)
-                        c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                            "Basic",
-                            options.BasicAuthCredential
-                        );
-
-                    if (c.BaseAddress.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase))
-                        c.DefaultRequestVersion = HttpVersion.Version20;
-                }
-            )
+            .ConfigureHttpClient((sp, c) => sp.GetRequiredService<IOptions<DataApiOptions>>().Value.Configure(c))
             .AddHeaderPropagation()
             .AddStandardResilienceHandler(o =>
             {
@@ -77,8 +60,9 @@ public static class ServiceCollectionExtensions
             mbb.WithProviderAmazonSQS(cfg =>
             {
                 cfg.TopologyProvisioning.Enabled = false;
-                cfg.ClientProviderFactory = (
-                    provider => new CdpCredentialsSqsClientProvider(cfg.SqsClientConfig, configuration)
+                cfg.ClientProviderFactory = _ => new CdpCredentialsSqsClientProvider(
+                    cfg.SqsClientConfig,
+                    configuration
                 );
             });
 

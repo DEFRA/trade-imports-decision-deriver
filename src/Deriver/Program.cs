@@ -52,14 +52,6 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
     builder.Services.AddHealth(builder.Configuration);
     builder.Services.AddProcessorConfiguration(builder.Configuration);
     builder.Services.AddDataApiHttpClient();
-
-    builder.Services.AddHeaderPropagation(options =>
-    {
-        var traceHeader = builder.Configuration.GetValue<string>("TraceHeader");
-        if (!string.IsNullOrWhiteSpace(traceHeader))
-            options.Headers.Add(traceHeader);
-    });
-
     builder.Services.AddConsumers(builder.Configuration);
     builder
         .Services.AddOptions<DataApiOptions>()

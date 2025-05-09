@@ -7,7 +7,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Health;
 
 [ExcludeFromCodeCoverage]
-public class SqsHealthCheck(IConfiguration configuration) : IHealthCheck
+public class SqsHealthCheck(IConfiguration configuration, string queueName) : IHealthCheck
 {
     /// <inheritdoc />
     public async Task<HealthCheckResult> CheckHealthAsync(
@@ -15,35 +15,42 @@ public class SqsHealthCheck(IConfiguration configuration) : IHealthCheck
         CancellationToken cancellationToken = default
     )
     {
-        var serverUrl = configuration.GetValue<string>("SQS_Endpoint");
-        var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");
         try
         {
             using var client = CreateSqsClient();
+
             _ = await client.GetQueueUrlAsync(queueName, cancellationToken).ConfigureAwait(false);
+
             return HealthCheckResult.Healthy();
         }
         catch (Exception ex)
         {
             return new HealthCheckResult(
                 context.Registration.FailureStatus,
-                exception: new Exception($"Failed to connect server: {serverUrl} and queue: {queueName}", ex)
+                exception: new Exception($"Failed to connect to AWS queue: {queueName}", ex)
             );
         }
     }
 
-    private IAmazonSQS CreateSqsClient()
+    private AmazonSQSClient CreateSqsClient()
     {
         var clientId = configuration.GetValue<string>("AWS_ACCESS_KEY_ID");
         var clientSecret = configuration.GetValue<string>("AWS_SECRET_ACCESS_KEY");
-        var region = configuration.GetValue<string>("AWS_REGION");
-        var serverUrl = configuration.GetValue<string>("SQS_Endpoint");
 
         if (!string.IsNullOrEmpty(clientSecret) && !string.IsNullOrEmpty(clientId))
         {
+            var region = configuration.GetValue<string>("AWS_REGION") ?? "eu-west-2";
+            var regionEndpoint = RegionEndpoint.GetBySystemName(region);
+
             return new AmazonSQSClient(
                 new BasicAWSCredentials(clientId, clientSecret),
-                new AmazonSQSConfig { RegionEndpoint = RegionEndpoint.GetBySystemName(region), ServiceURL = serverUrl }
+                new AmazonSQSConfig
+                {
+                    // https://github.com/aws/aws-sdk-net/issues/1781
+                    AuthenticationRegion = region,
+                    RegionEndpoint = regionEndpoint,
+                    ServiceURL = configuration.GetValue<string>("SQS_Endpoint"),
+                }
             );
         }
 

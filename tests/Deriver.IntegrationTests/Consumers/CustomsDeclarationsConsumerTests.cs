@@ -2,8 +2,8 @@ using System.Net;
 using Amazon.SQS.Model;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
+using Defra.TradeImportsDecisionDeriver.Deriver.IntegrationTests.Clients;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
-using RestEase;
 using WireMock.Admin.Mappings;
 using WireMock.Client;
 using WireMock.Client.Extensions;
@@ -12,9 +12,11 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.IntegrationTests.Consumers;
 
-public class CustomsDeclarationsConsumerTests(ITestOutputHelper output) : SqsTestBase(output)
+[Collection("UsesWireMockClient")]
+public class CustomsDeclarationsConsumerTests(ITestOutputHelper output, WireMockClient wireMockClient)
+    : SqsTestBase(output)
 {
-    private readonly IWireMockAdminApi _wireMockAdminApi = RestClient.For<IWireMockAdminApi>("http://localhost:9090");
+    private readonly IWireMockAdminApi _wireMockAdminApi = wireMockClient.WireMockAdminApi;
 
     private static Dictionary<string, MessageAttributeValue> WithInboundHmrcMessageType(
         string resourceType,

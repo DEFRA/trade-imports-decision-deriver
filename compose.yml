@@ -38,6 +38,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       DataApi__BaseAddress: "http://wiremock"
+      DataApi__Password: "secret"
       PORT: 8080
       SQS_Endpoint: http://localstack:4566
   

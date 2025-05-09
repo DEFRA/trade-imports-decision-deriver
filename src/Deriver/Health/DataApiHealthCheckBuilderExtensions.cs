@@ -1,24 +1,23 @@
 using System.Diagnostics.CodeAnalysis;
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Health;
 
 [ExcludeFromCodeCoverage]
-public static class SqsHealthCheckBuilderExtensions
+public static class DataApiHealthCheckBuilderExtensions
 {
-    public static IHealthChecksBuilder AddSqs(
+    public static IHealthChecksBuilder AddDataApi(
         this IHealthChecksBuilder builder,
-        IConfiguration configuration,
-        string name,
-        Func<IServiceProvider, string> queueNameFunc,
+        Func<IServiceProvider, DataApiOptions> optionsFunc,
         IEnumerable<string>? tags = null,
         TimeSpan? timeout = null
     )
     {
         builder.Add(
             new HealthCheckRegistration(
-                name,
-                sp => new SqsHealthCheck(configuration, queueNameFunc(sp)),
+                "Data API",
+                sp => new DataApiHealthCheck(optionsFunc(sp)),
                 HealthStatus.Unhealthy,
                 tags,
                 timeout

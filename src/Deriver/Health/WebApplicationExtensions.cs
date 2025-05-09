@@ -43,12 +43,12 @@ public static class WebApplicationExtensions
                             {
                                 jsonWriter.WriteStartObject(entry.Key);
                                 jsonWriter.WriteString("status", entry.Value.Status.ToString());
-                                jsonWriter.WriteString("description", entry.Value.Description);
+
+                                if (entry.Value.Description != null)
+                                    jsonWriter.WriteString("description", entry.Value.Description);
 
                                 if (entry.Value.Exception != null)
-                                {
                                     jsonWriter.WriteString("exception", entry.Value.Exception.Message);
-                                }
 
                                 if (entry.Value.Data.Any())
                                 {

@@ -80,6 +80,7 @@ public class ImportPreNotificationConsumer(
                 ClearanceDecision = clearanceRequest?.ClearanceDecision,
                 Finalisation = clearanceRequest?.Finalisation,
                 ClearanceRequest = clearanceRequest?.ClearanceRequest,
+                InboundError = clearanceRequest?.InboundError
             };
 
             var newDecision = decisionResult.BuildClearanceDecision(mrn, customsDeclaration);

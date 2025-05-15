@@ -32,7 +32,7 @@ public class ClearanceRequestConsumer(
 
         var clearanceRequest = await apiClient.GetCustomsDeclaration(message.ResourceId, cancellationToken);
 
-        if (clearanceRequest?.Finalisation is not null)
+        if (WasFinalisedBeforeClearanceRequest(clearanceRequest))
         {
             logger.LogInformation(
                 "Skipping Event : {SubResourceType}:{ResourceId} as has been finalised",
@@ -109,4 +109,10 @@ public class ClearanceRequestConsumer(
     }
 
     public IConsumerContext Context { get; set; } = null!;
+
+    private static bool WasFinalisedBeforeClearanceRequest(CustomsDeclarationResponse? customsDeclaration)
+    {
+        return customsDeclaration is { ClearanceRequest: not null, Finalisation: not null }
+            && customsDeclaration.ClearanceRequest.MessageSentAt > customsDeclaration.Finalisation.MessageSentAt;
+    }
 }

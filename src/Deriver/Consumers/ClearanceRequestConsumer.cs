@@ -5,6 +5,7 @@ using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using SlimMessageBus;
 
@@ -95,7 +96,7 @@ public class ClearanceRequestConsumer(
             customsDeclaration
         );
 
-        if (newDecision.SourceVersion != customsDeclaration.ClearanceDecision?.SourceVersion)
+        if (!ClearanceDecisionComparer.Default.Equals(newDecision, customsDeclaration.ClearanceDecision))
         {
             customsDeclaration.ClearanceDecision = newDecision;
 

@@ -5,15 +5,24 @@ namespace Defra.TradeImportsDecisionDeriver.TestFixtures;
 
 public static class CustomsDeclarationResponseFixtures
 {
+    private static Fixture GetFixture()
+    {
+        var fixture = new Fixture();
+        fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
+        return fixture;
+    }
+
     public static CustomsDeclarationResponse CustomsDeclarationResponseFixture(
         string mrn = "mrn123",
         string? documentReferencePrefix = null
     )
     {
-        var fixture = new Fixture();
-        fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
-
-        var response = fixture.Build<CustomsDeclarationResponse>().With(x => x.MovementReferenceNumber, mrn).Create();
+        var fixture = GetFixture();
+        var response = fixture
+            .Build<CustomsDeclarationResponse>()
+            .With(x => x.MovementReferenceNumber, mrn)
+            .With(x => x.ClearanceRequest)
+            .Create();
 
         int documentReferenceCount = 1;
 

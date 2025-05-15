@@ -82,6 +82,8 @@ public class ClearanceRequestConsumerTests
     {
         // ARRANGE
         var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
+        customsDeclaration.ClearanceRequest!.MessageSentAt = DateTime.UtcNow;
+        customsDeclaration.Finalisation!.MessageSentAt = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1));
         var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
         var decisionService = NSubstitute.Substitute.For<IDecisionService>();
         var consumer = new ClearanceRequestConsumer(
@@ -102,5 +104,39 @@ public class ClearanceRequestConsumerTests
         // ASSERT
         apiClient.ReceivedCalls().Count().Should().Be(1);
         decisionService.ReceivedCalls().Count().Should().Be(0);
+    }
+
+    [Fact]
+    public async Task GivenACreatedEvent_AndNotImportPreNotificationsExist_AndCustomsDeclarationAlreadyFinalised_ButClearanceRequestTimeBeforeFinalisation_ThenDecisionShouldBeSent()
+    {
+        // ARRANGE
+        var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
+        customsDeclaration.ClearanceRequest!.MessageSentAt = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1));
+        customsDeclaration.Finalisation!.MessageSentAt = DateTime.UtcNow;
+        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var consumer = new ClearanceRequestConsumer(
+            NullLogger<ClearanceRequestConsumer>.Instance,
+            decisionService,
+            apiClient
+        );
+
+        var createdEvent = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();
+
+        apiClient
+            .GetCustomsDeclaration(createdEvent.ResourceId, Arg.Any<CancellationToken>())
+            .Returns(customsDeclaration);
+
+        apiClient.GetImportPreNotificationsByMrn(createdEvent.ResourceId, Arg.Any<CancellationToken>()).Returns([]);
+
+        var decisionResult = new DecisionResult();
+        decisionResult.AddDecision("mrn", 1, "docref", "checkCode", DecisionCode.C03);
+        decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
+
+        // ACT
+        await consumer.OnHandle(createdEvent, CancellationToken.None);
+
+        // ASSERT
+        apiClient.ReceivedCalls().Count().Should().Be(3);
     }
 }

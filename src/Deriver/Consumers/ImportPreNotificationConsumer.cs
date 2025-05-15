@@ -5,6 +5,7 @@ using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using SlimMessageBus;
 
@@ -79,11 +80,12 @@ public class ImportPreNotificationConsumer(
                 ClearanceDecision = clearanceRequest?.ClearanceDecision,
                 Finalisation = clearanceRequest?.Finalisation,
                 ClearanceRequest = clearanceRequest?.ClearanceRequest,
+                InboundError = clearanceRequest?.InboundError,
             };
 
             var newDecision = decisionResult.BuildClearanceDecision(mrn, customsDeclaration);
 
-            if (newDecision.SourceVersion != customsDeclaration.ClearanceDecision?.SourceVersion)
+            if (!ClearanceDecisionComparer.Default.Equals(newDecision, customsDeclaration.ClearanceDecision))
             {
                 customsDeclaration.ClearanceDecision = newDecision;
                 await apiClient.PutCustomsDeclaration(

@@ -4,6 +4,7 @@ using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
+using Defra.TradeImportsDecisionDeriver.TestFixtures;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Matching;
 
@@ -72,7 +73,10 @@ public class MatchingServiceTests
             }
         }
 
-        var notification = GenerateImportPreNotification("CHEDP.GB.2025.1234567", ImportNotificationStatus.InProgress);
+        var notification = ImportPreNotificationFixtures.ImportPreNotificationFixture(
+            "CHEDP.GB.2025.1234567",
+            ImportNotificationStatus.InProgress
+        );
         var sut = new MatchingService();
         var context = new MatchingContext([notification.ToDecisionImportPreNotification()], [clearanceRequestWrapper]);
 
@@ -86,23 +90,11 @@ public class MatchingServiceTests
             .Be(clearanceRequestWrapper.ClearanceRequest.Commodities.Sum(x => x.Documents!.Length));
     }
 
-    public static ClearanceRequestWrapper GenerateSimpleClearanceRequestWrapper()
+    private static ClearanceRequestWrapper GenerateSimpleClearanceRequestWrapper()
     {
         var fixture = new Fixture();
         fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
 
         return fixture.Build<ClearanceRequestWrapper>().With(i => i.MovementReferenceNumber, "Test123").Create();
-    }
-
-    public static ImportPreNotification GenerateImportPreNotification(string referenceNumber, string status)
-    {
-        var fixture = new Fixture();
-        fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
-
-        return fixture
-            .Build<ImportPreNotification>()
-            .With(i => i.ReferenceNumber, referenceNumber)
-            .With(i => i.Status, status)
-            .Create();
     }
 }

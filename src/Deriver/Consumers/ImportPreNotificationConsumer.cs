@@ -32,7 +32,7 @@ public class ImportPreNotificationConsumer(
         );
         var clearanceRequests = await GetClearanceRequests(message.ResourceId, cancellationToken);
 
-        if (!clearanceRequests.Any())
+        if (clearanceRequests.Count == 0)
         {
             logger.LogInformation(
                 "No Decision Derived, because no Customs Declaration found for {ChedId}",
@@ -62,13 +62,13 @@ public class ImportPreNotificationConsumer(
             "Decision Derived: {Decision}",
             JsonSerializer.Serialize(decisionResult, _jsonSerializerOptions)
         );
-        await PersistDecisions(cancellationToken, clearanceRequests, decisionResult);
+        await PersistDecisions(clearanceRequests, decisionResult, cancellationToken);
     }
 
     private async Task PersistDecisions(
-        CancellationToken cancellationToken,
         List<ClearanceRequestWrapper> clearanceRequests,
-        DecisionResult decisionResult
+        DecisionResult decisionResult,
+        CancellationToken cancellationToken
     )
     {
         foreach (var mrn in clearanceRequests.Select(x => x.MovementReferenceNumber))

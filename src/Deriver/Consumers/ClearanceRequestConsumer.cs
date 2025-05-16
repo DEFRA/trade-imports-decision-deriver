@@ -75,13 +75,13 @@ public class ClearanceRequestConsumer(
             "Decision Derived: {Decision}",
             JsonSerializer.Serialize(decisionResult, _jsonSerializerOptions)
         );
-        await PersistDecision(cancellationToken, clearanceRequest, decisionResult);
+        await PersistDecision(clearanceRequest, decisionResult, cancellationToken);
     }
 
     private async Task PersistDecision(
-        CancellationToken cancellationToken,
         CustomsDeclarationResponse clearanceRequest,
-        DecisionResult decisionResult
+        DecisionResult decisionResult,
+        CancellationToken cancellationToken
     )
     {
         var customsDeclaration = new CustomsDeclaration()

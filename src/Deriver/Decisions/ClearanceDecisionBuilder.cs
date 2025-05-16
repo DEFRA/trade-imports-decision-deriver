@@ -91,7 +91,7 @@ public static class ClearanceDecisionBuilder
             var chedType = MapToChedType(item.Documents?[0]);
             var chedNumbers = string.Join(", ", item.Documents!.Select(x => x.DocumentReference?.Value));
 
-            if (!reasons.Any())
+            if (reasons.Count == 0)
             {
                 reasons.Add(
                     $"A Customs Declaration has been submitted however no matching {chedType}(s) have been submitted to Port Health (for {chedType} number(s) {chedNumbers}). Please correct the {chedType} number(s) entered on your customs declaration."

@@ -9,7 +9,7 @@ public static class DecisionSourceVersionBuilder
             .Select(x => $"{x.PreNotification?.Id}:{x.PreNotification?.UpdatedSource:ddMMyyhhmmss}")
             .ToList();
 
-        if (notifications.Any())
+        if (notifications.Count != 0)
         {
             return $"{string.Join('-', notifications)}:CR-VERSION-{clearanceRequestVersion}";
         }

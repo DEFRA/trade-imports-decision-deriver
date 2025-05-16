@@ -8,6 +8,8 @@ namespace Defra.TradeImportsDecisionDeriver.TestFixtures;
 
 public static class ImportPreNotificationFixtures
 {
+    private const string Ched = "CHEDP.GB.2025.1234567";
+
     public static ResourceEvent<object> ImportPreNotificationCreatedFixture()
     {
         var fixture = new Fixture();
@@ -17,8 +19,8 @@ public static class ImportPreNotificationFixtures
             .Build<ResourceEvent<object>>()
             .With(i => i.Operation, "Created")
             .With(i => i.ResourceType, ResourceEventResourceTypes.ImportPreNotification)
-            .With(i => i.ResourceId, "CHEDP.GB.2025.1234567")
-            .With(i => i.Resource, ImportPreNotificationFixture("CHEDP.GB.2025.1234567"))
+            .With(i => i.ResourceId, Ched)
+            .With(i => i.Resource, ImportPreNotificationFixture(Ched))
             .Create();
     }
 
@@ -77,16 +79,14 @@ public static class ImportPreNotificationFixtures
             .Create();
     }
 
-    public static ImportPreNotificationResponse ImportPreNotificationResponseFixture(
-        string chedId = "CHEDP.GB.2025.1234567"
-    )
+    public static ImportPreNotificationResponse ImportPreNotificationResponseFixture()
     {
         var fixture = new Fixture();
         fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
 
         return fixture
             .Build<ImportPreNotificationResponse>()
-            .With(i => i.ImportPreNotification, ImportPreNotificationFixture("CHEDP.GB.2025.1234567"))
+            .With(i => i.ImportPreNotification, ImportPreNotificationFixture(Ched))
             .Create();
     }
 }

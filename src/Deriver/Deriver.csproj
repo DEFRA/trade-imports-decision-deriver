@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -21,7 +21,7 @@
     <PackageReference Include="Defra.TradeImportsDataApi.Api.Client" Version="0.22.0" />
     <PackageReference Include="Elastic.CommonSchema.Serilog" Version="8.12.3" />
     <PackageReference Include="Elastic.Serilog.Enrichers.Web" Version="8.12.3" />
-    <PackageReference Include="Microsoft.AspNetCore.HeaderPropagation" Version="9.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.HeaderPropagation" Version="9.0.5" />
     <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.4.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Serilog.Enrichers.ClientInfo" Version="2.1.2" />

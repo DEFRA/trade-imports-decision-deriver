@@ -148,7 +148,7 @@ public class DecisionService(
         int itemNumber = item.ItemNumber!.Value;
         var decisions = decisionsResult.Decisions.Where(x => x.ItemNumber == itemNumber && x.Mrn == mrn).ToList();
 
-        if (!decisions.Any())
+        if (decisions.Count == 0)
         {
             foreach (var document in item.Documents!)
             {
@@ -175,7 +175,7 @@ public class DecisionService(
         {
             var finders = GetDecisionsFindersForCheckCodes(notification, checkCodes).ToList();
 
-            if (!finders.Any())
+            if (finders.Count == 0)
             {
                 foreach (var checkCode in checkCodes)
                 {
@@ -250,7 +250,7 @@ public class DecisionService(
         if (clearanceRequestCommodities != null)
         {
             var checks = clearanceRequestCommodities.First(x => x.ItemNumber == itemNumber).Checks;
-            return checks != null && checks.Any();
+            return checks != null && checks.Length != 0;
         }
 
         return false;

@@ -26,6 +26,9 @@ public class ImportPreNotificationConsumerTests
         };
 
         var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
+        apiClient
+            .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
+            .Returns(new CustomsDeclarationsResponse([]));
 
         var decisionResult = new DecisionResult();
         decisionResult.AddDecision("mrn", 1, "docref", "checkCode", DecisionCode.C03);
@@ -56,18 +59,20 @@ public class ImportPreNotificationConsumerTests
         customsDeclaration = customsDeclaration with { Finalisation = null };
         apiClient
             .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
-            .Returns([customsDeclaration]);
+            .Returns(new CustomsDeclarationsResponse([customsDeclaration]));
 
         apiClient
             .GetImportPreNotificationsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
             .Returns(
-                [
-                    new ImportPreNotificationResponse(
-                        ImportPreNotificationFixtures.ImportPreNotificationFixture("test")!,
-                        DateTime.Now,
-                        DateTime.Now
-                    ),
-                ]
+                new ImportPreNotificationsResponse(
+                    [
+                        new ImportPreNotificationResponse(
+                            ImportPreNotificationFixtures.ImportPreNotificationFixture("test")!,
+                            DateTime.Now,
+                            DateTime.Now
+                        ),
+                    ]
+                )
             );
 
         var decisionResult = new DecisionResult();
@@ -108,11 +113,15 @@ public class ImportPreNotificationConsumerTests
 
         apiClient
             .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
-            .Returns([customsDeclaration]);
+            .Returns(new CustomsDeclarationsResponse([customsDeclaration]));
 
         apiClient
             .GetImportPreNotificationsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
-            .Returns([new ImportPreNotificationResponse(notification, DateTime.Now, DateTime.Now)]);
+            .Returns(
+                new ImportPreNotificationsResponse(
+                    [new ImportPreNotificationResponse(notification, DateTime.Now, DateTime.Now)]
+                )
+            );
 
         var decisionResult = new DecisionResult();
         decisionResult.AddDecision("mrn", 1, "docref", "checkCode", DecisionCode.C03);
@@ -143,7 +152,7 @@ public class ImportPreNotificationConsumerTests
 
         apiClient
             .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
-            .Returns([customsDeclaration]);
+            .Returns(new CustomsDeclarationsResponse([customsDeclaration]));
 
         // ACT
         await consumer.OnHandle(createdEvent, CancellationToken.None);

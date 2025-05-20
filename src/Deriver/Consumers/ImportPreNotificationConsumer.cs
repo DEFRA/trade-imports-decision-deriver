@@ -105,13 +105,8 @@ public class ImportPreNotificationConsumer(
     {
         var customsDeclarations = await apiClient.GetCustomsDeclarationsByChedId(chedId, cancellationToken);
 
-        if (customsDeclarations == null)
-        {
-            return [];
-        }
-
         return customsDeclarations
-            .Where(x => x.ClearanceRequest is not null)
+            .CustomsDeclarations.Where(x => x.ClearanceRequest is not null)
             .Where(x => x.Finalisation is null)
             .Select(x => new ClearanceRequestWrapper(x.MovementReferenceNumber, x.ClearanceRequest!))
             .ToList();
@@ -125,18 +120,16 @@ public class ImportPreNotificationConsumer(
             async (mrn, cancellationToken) =>
             {
                 var apiResponse = await apiClient.GetImportPreNotificationsByMrn(mrn, cancellationToken);
-                if (apiResponse != null)
-                {
-                    foreach (
-                        var notificationResponse in apiResponse.Where(notificationResponse =>
-                            !notifications.Exists(x =>
-                                x.ReferenceNumber == notificationResponse.ImportPreNotification.ReferenceNumber
-                            )
+
+                foreach (
+                    var notificationResponse in apiResponse.ImportPreNotifications.Where(notificationResponse =>
+                        !notifications.Exists(x =>
+                            x.ReferenceNumber == notificationResponse.ImportPreNotification.ReferenceNumber
                         )
                     )
-                    {
-                        notifications.Add(notificationResponse.ImportPreNotification);
-                    }
+                )
+                {
+                    notifications.Add(notificationResponse.ImportPreNotification);
                 }
             }
         );

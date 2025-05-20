@@ -64,7 +64,9 @@ public class MediatorConsumerTests
             .GetCustomsDeclaration(createdEvent.ResourceId, Arg.Any<CancellationToken>())
             .Returns(customsDeclaration);
 
-        apiClient.GetImportPreNotificationsByMrn(createdEvent.ResourceId, Arg.Any<CancellationToken>()).Returns([]);
+        apiClient
+            .GetImportPreNotificationsByMrn(createdEvent.ResourceId, Arg.Any<CancellationToken>())
+            .Returns(new ImportPreNotificationsResponse([]));
 
         var decisionResult = new DecisionResult();
         decisionResult.AddDecision("mrn", 1, "docref", "checkCode", DecisionCode.C03);
@@ -104,18 +106,20 @@ public class MediatorConsumerTests
         customsDeclaration = customsDeclaration with { Finalisation = null };
         apiClient
             .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
-            .Returns([customsDeclaration]);
+            .Returns(new CustomsDeclarationsResponse([customsDeclaration]));
 
         apiClient
             .GetImportPreNotificationsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
             .Returns(
-                [
-                    new ImportPreNotificationResponse(
-                        ImportPreNotificationFixtures.ImportPreNotificationFixture("test")!,
-                        DateTime.Now,
-                        DateTime.Now
-                    ),
-                ]
+                new ImportPreNotificationsResponse(
+                    [
+                        new ImportPreNotificationResponse(
+                            ImportPreNotificationFixtures.ImportPreNotificationFixture("test")!,
+                            DateTime.Now,
+                            DateTime.Now
+                        ),
+                    ]
+                )
             );
 
         var decisionResult = new DecisionResult();

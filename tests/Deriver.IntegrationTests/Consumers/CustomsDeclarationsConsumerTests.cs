@@ -1,5 +1,6 @@
 using System.Net;
 using Amazon.SQS.Model;
+using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.IntegrationTests.Clients;
@@ -68,7 +69,7 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output, WireMock
                         .WithPath($"/customs-declarations/{customsDeclaration.ResourceId}/import-pre-notifications")
                 )
                 .WithResponse(rsp =>
-                    rsp.WithBody(JsonSerializer.Serialize(new[] { importNotification }))
+                    rsp.WithBody(JsonSerializer.Serialize(new ImportPreNotificationsResponse([importNotification])))
                         .WithStatusCode(HttpStatusCode.OK)
                 )
         );

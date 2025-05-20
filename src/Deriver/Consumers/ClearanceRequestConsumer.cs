@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
-using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
@@ -43,17 +42,14 @@ public class ClearanceRequestConsumer(
             return;
         }
 
-        var notificationResponses = await apiClient.GetImportPreNotificationsByMrn(
+        var notificationResponse = await apiClient.GetImportPreNotificationsByMrn(
             message.ResourceId,
             cancellationToken
         );
 
-        var preNotifications = new List<ImportPreNotification>();
-
-        if (notificationResponses is not null)
-        {
-            preNotifications = notificationResponses.Select(x => x.ImportPreNotification).ToList();
-        }
+        var preNotifications = notificationResponse
+            .ImportPreNotifications.Select(x => x.ImportPreNotification)
+            .ToList();
 
         var decisionContext = new DecisionContext(
             preNotifications.Select(x => x.ToDecisionImportPreNotification()).ToList(),

@@ -13,7 +13,7 @@ public static class ClearanceDecisionBuilder
     {
         var decisions = decisionResult.Decisions.Where(x => x.Mrn == mrn).ToList();
 
-        return new ClearanceDecision()
+        return new ClearanceDecision
         {
             DecisionNumber = customsDeclaration.ClearanceDecision is { DecisionNumber: not null }
                 ? customsDeclaration.ClearanceDecision.DecisionNumber + 1
@@ -22,7 +22,7 @@ public static class ClearanceDecisionBuilder
                 customsDeclaration.ClearanceRequest?.ExternalVersion
             ),
             Timestamp = DateTime.UtcNow,
-            ExternalCorrelationId = customsDeclaration.ClearanceDecision?.ExternalCorrelationId,
+            ExternalCorrelationId = customsDeclaration.ClearanceRequest?.ExternalCorrelationId,
             ExternalVersionNumber = customsDeclaration.ClearanceRequest?.ExternalVersion,
             Items = BuildItems(customsDeclaration.ClearanceRequest!, decisions).ToArray(),
         };

@@ -5,6 +5,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
 public static class MessageBusHeaders
 {
+    public const string ContentEncoding = "Content-Encoding";
     public const string ResourceType = nameof(ResourceType);
     public const string SubResourceType = nameof(SubResourceType);
     public const string SqsBusMessage = "Sqs_Message";

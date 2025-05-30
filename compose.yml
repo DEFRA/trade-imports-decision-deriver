@@ -10,7 +10,7 @@ services:
       DEBUG: ${DEBUG:-1}
       LS_LOG: WARN # Localstack DEBUG Level
       SERVICES: sqs
-      LOCALSTACK_HOST: 127.0.0.1
+      LOCALSTACK_HOST: 0.0.0.0
       TZ: Europe/London
     volumes:
       - '${TMPDIR:-/tmp}/localstack:/var/lib/localstack'

@@ -14,7 +14,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Consumers;
 public class MediatorConsumerTests
 {
     [Fact]
-    public async Task GivenACreatedEvent_WhenAUnkownResouceType_ThenShouldBeSkipped()
+    public async Task GivenACreatedEvent_WhenAUnknownResouceType_ThenShouldBeSkipped()
     {
         // ARRANGE
         var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
@@ -23,7 +23,7 @@ public class MediatorConsumerTests
         {
             Context = new ConsumerContext()
             {
-                Headers = new Dictionary<string, object>() { { MessageBusHeaders.ResourceType, "Unkown" } },
+                Headers = new Dictionary<string, object>() { { MessageBusHeaders.ResourceType, "Unknown" } },
             },
         };
 
@@ -31,10 +31,7 @@ public class MediatorConsumerTests
 
         // ACT
 
-        await consumer.OnHandle(
-            JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(createdEvent)),
-            CancellationToken.None
-        );
+        await consumer.OnHandle(JsonSerializer.Serialize(createdEvent), CancellationToken.None);
 
         // ASSERT
         apiClient.ReceivedCalls().Count().Should().Be(0);
@@ -74,10 +71,7 @@ public class MediatorConsumerTests
 
         // ACT
 
-        await consumer.OnHandle(
-            JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(createdEvent)),
-            CancellationToken.None
-        );
+        await consumer.OnHandle(JsonSerializer.Serialize(createdEvent), CancellationToken.None);
 
         // ASSERT
         apiClient.ReceivedCalls().Count().Should().Be(3);
@@ -127,10 +121,7 @@ public class MediatorConsumerTests
         decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
 
         // ACT
-        await consumer.OnHandle(
-            JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(createdEvent)),
-            CancellationToken.None
-        );
+        await consumer.OnHandle(JsonSerializer.Serialize(createdEvent), CancellationToken.None);
 
         // ASSERT
         apiClient.ReceivedCalls().Count().Should().Be(4);

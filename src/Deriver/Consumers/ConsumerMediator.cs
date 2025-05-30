@@ -3,6 +3,8 @@ using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Utils;
+using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 using SlimMessageBus;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
@@ -11,12 +13,14 @@ public class ConsumerMediator(
     ILoggerFactory loggerFactory,
     IDecisionService decisionService,
     ITradeImportsDataApiClient apiClient
-) : IConsumer<JsonElement>, IConsumerWithContext
+) : IConsumer<string>, IConsumerWithContext
 {
     private readonly ILogger<ConsumerMediator> _logger = loggerFactory.CreateLogger<ConsumerMediator>();
 
-    public Task OnHandle(JsonElement message, CancellationToken cancellationToken)
+    public Task OnHandle(string received, CancellationToken cancellationToken)
     {
+        var message = MessageDeserializer.Deserialize<JsonElement>(received, Context.Headers.GetContentEncoding());
+
         switch (Context.GetResourceType())
         {
             case ResourceEventResourceTypes.CustomsDeclaration:

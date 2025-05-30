@@ -8,12 +8,15 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 using Defra.TradeImportsDecisionDeriver.Deriver.Interceptors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
+using Defra.TradeImportsDecisionDeriver.Deriver.Serializers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Options;
 using SlimMessageBus.Host;
 using SlimMessageBus.Host.AmazonSQS;
 using SlimMessageBus.Host.Interceptor;
+using SlimMessageBus.Host.Serialization;
 using SlimMessageBus.Host.Serialization.SystemTextJson;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
@@ -54,6 +57,12 @@ public static class ServiceCollectionExtensions
         {
             var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");
 
+            mbb.RegisterSerializer<ToStringSerializer>(s =>
+            {
+                s.TryAddSingleton(_ => new ToStringSerializer());
+                s.TryAddSingleton<IMessageSerializer<string>>(svp => svp.GetRequiredService<ToStringSerializer>());
+            });
+
             mbb.AddServicesFromAssemblyContaining<ConsumerMediator>(consumerLifetime: ServiceLifetime.Scoped)
                 .PerMessageScopeEnabled();
 
@@ -66,9 +75,7 @@ public static class ServiceCollectionExtensions
                 );
             });
 
-            mbb.Consume<JsonElement>(x => x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(20));
-
-            mbb.AddJsonSerializer();
+            mbb.Consume<string>(x => x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(20));
         });
 
         return services;

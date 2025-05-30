@@ -1,4 +1,6 @@
+using System.IO.Compression;
 using System.Net;
+using System.Text;
 using Amazon.SQS.Model;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.Events;
@@ -50,9 +52,6 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output, WireMock
         );
         customsDeclarationResponse = customsDeclarationResponse with { Finalisation = null };
 
-        await _wireMockAdminApi.ResetMappingsAsync();
-        await _wireMockAdminApi.ResetRequestsAsync();
-
         var createPath = $"/customs-declarations/{customsDeclaration.ResourceId}";
         var mappingBuilder = _wireMockAdminApi.GetMappingBuilder();
 
@@ -88,6 +87,75 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output, WireMock
                 ResourceEventSubResourceTypes.ClearanceDecision
             )
         );
+
+        Assert.True(
+            await AsyncWaiter.WaitForAsync(async () =>
+            {
+                var requestsModel = new RequestModel { Methods = ["PUT"], Path = createPath };
+                var requests = await _wireMockAdminApi.FindRequestsAsync(requestsModel);
+                return requests.Count == 1;
+            })
+        );
+    }
+
+    [Fact]
+    public async Task WhenCompressedClearanceRequestSent_ThenClearanceRequestIsProcessedAndSentToTheDataApi()
+    {
+        await PurgeQueue();
+        var importNotification = ImportPreNotificationFixtures.ImportPreNotificationResponseFixture();
+
+        var customsDeclaration = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();
+
+        var customsDeclarationResponse = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture(
+            customsDeclaration.ResourceId
+        );
+        customsDeclarationResponse = customsDeclarationResponse with { Finalisation = null };
+
+        var createPath = $"/customs-declarations/{customsDeclaration.ResourceId}";
+        var mappingBuilder = _wireMockAdminApi.GetMappingBuilder();
+
+        mappingBuilder.Given(m =>
+            m.WithRequest(req => req.UsingGet().WithPath(createPath))
+                .WithResponse(rsp =>
+                    rsp.WithBody(JsonSerializer.Serialize(customsDeclarationResponse)).WithStatusCode(HttpStatusCode.OK)
+                )
+        );
+
+        mappingBuilder.Given(m =>
+            m.WithRequest(req =>
+                    req.UsingGet()
+                        .WithPath($"/customs-declarations/{customsDeclaration.ResourceId}/import-pre-notifications")
+                )
+                .WithResponse(rsp =>
+                    rsp.WithBody(JsonSerializer.Serialize(new ImportPreNotificationsResponse([importNotification])))
+                        .WithStatusCode(HttpStatusCode.OK)
+                )
+        );
+
+        mappingBuilder.Given(m =>
+            m.WithRequest(req => req.UsingPut().WithPath(createPath))
+                .WithResponse(rsp => rsp.WithStatusCode(HttpStatusCode.Created))
+        );
+        var status = await mappingBuilder.BuildAndPostAsync();
+        Assert.NotNull(status);
+
+        var buffer = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(customsDeclaration));
+        var memoryStream = new MemoryStream();
+        await using var gzipStream = new GZipStream(memoryStream, CompressionLevel.Optimal);
+        await gzipStream.WriteAsync(buffer);
+        await gzipStream.FlushAsync();
+        var message = Convert.ToBase64String(memoryStream.ToArray());
+
+        var headers = WithInboundHmrcMessageType(
+            ResourceEventResourceTypes.CustomsDeclaration,
+            ResourceEventSubResourceTypes.ClearanceDecision
+        );
+        headers.Add(
+            MessageBusHeaders.ContentEncoding,
+            new MessageAttributeValue { DataType = "String", StringValue = "gzip, base64" }
+        );
+
+        await SendMessage(message, headers);
 
         Assert.True(
             await AsyncWaiter.WaitForAsync(async () =>

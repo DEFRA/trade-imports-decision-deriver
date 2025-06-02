@@ -18,7 +18,7 @@ public class DataApiOptions
 
     public string? Password { get; init; }
 
-    public string? BasicAuthCredential =>
+    private string? BasicAuthCredential =>
         Username != null && Password != null
             ? Convert.ToBase64String(Encoding.UTF8.GetBytes($"{Username}:{Password}"))
             : null;

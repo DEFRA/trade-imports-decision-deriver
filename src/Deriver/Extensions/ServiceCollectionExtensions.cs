@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
@@ -17,7 +16,6 @@ using SlimMessageBus.Host;
 using SlimMessageBus.Host.AmazonSQS;
 using SlimMessageBus.Host.Interceptor;
 using SlimMessageBus.Host.Serialization;
-using SlimMessageBus.Host.Serialization.SystemTextJson;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 

@@ -54,6 +54,9 @@ public static class ServiceCollectionExtensions
         services.AddSlimMessageBus(mbb =>
         {
             var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");
+            var consumersPerHost = configuration.GetValue<int>("CONSUMERS_PER_HOST");
+            if (consumersPerHost <= 0)
+                consumersPerHost = 20;
 
             mbb.RegisterSerializer<ToStringSerializer>(s =>
             {
@@ -73,7 +76,7 @@ public static class ServiceCollectionExtensions
                 );
             });
 
-            mbb.Consume<string>(x => x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(20));
+            mbb.Consume<string>(x => x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(consumersPerHost));
         });
 
         return services;

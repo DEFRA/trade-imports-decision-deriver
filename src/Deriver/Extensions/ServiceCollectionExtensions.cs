@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
@@ -17,7 +16,6 @@ using SlimMessageBus.Host;
 using SlimMessageBus.Host.AmazonSQS;
 using SlimMessageBus.Host.Interceptor;
 using SlimMessageBus.Host.Serialization;
-using SlimMessageBus.Host.Serialization.SystemTextJson;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
@@ -56,6 +54,9 @@ public static class ServiceCollectionExtensions
         services.AddSlimMessageBus(mbb =>
         {
             var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");
+            var consumersPerHost = configuration.GetValue<int>("CONSUMERS_PER_HOST");
+            if (consumersPerHost <= 0)
+                consumersPerHost = 20;
 
             mbb.RegisterSerializer<ToStringSerializer>(s =>
             {
@@ -75,7 +76,7 @@ public static class ServiceCollectionExtensions
                 );
             });
 
-            mbb.Consume<string>(x => x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(20));
+            mbb.Consume<string>(x => x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(consumersPerHost));
         });
 
         return services;

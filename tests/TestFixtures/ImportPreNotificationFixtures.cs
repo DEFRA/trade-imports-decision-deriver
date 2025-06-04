@@ -37,7 +37,7 @@ public static class ImportPreNotificationFixtures
         var commodityComplements = uniqueIds
             .Select(id =>
                 fixture
-                    .Build<CommodityComplement>()
+                    .Build<CommodityComplements>()
                     .With(x => x.UniqueComplementId, id.ToString)
                     .With(x => x.ComplementId, id)
                     .Create()
@@ -47,7 +47,7 @@ public static class ImportPreNotificationFixtures
         var commodityParameterSets = uniqueIds
             .Select(id =>
                 fixture
-                    .Build<ComplementParameterSet>()
+                    .Build<ComplementParameterSets>()
                     .With(x => x.UniqueComplementId, id.ToString)
                     .With(x => x.ComplementId, id)
                     .Create()

@@ -24,7 +24,7 @@ public static class ImportPreNotificationExtensions
 
         var commodities = notification.PartOne?.Commodities;
 
-        var complementParameters = new Dictionary<int, ComplementParameterSet>();
+        var complementParameters = new Dictionary<int, ComplementParameterSets>();
         var complementRiskAssessments = new Dictionary<string, CommodityRiskResult>();
 
         if (commodities?.ComplementParameterSets != null)

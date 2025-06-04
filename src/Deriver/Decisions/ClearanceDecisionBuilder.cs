@@ -21,8 +21,9 @@ public static class ClearanceDecisionBuilder
             SourceVersion = decisionResult.BuildDecisionSourceVersion(
                 customsDeclaration.ClearanceRequest?.ExternalVersion
             ),
-            Timestamp = DateTime.UtcNow,
-            ExternalCorrelationId = customsDeclaration.ClearanceRequest?.ExternalCorrelationId,
+            Created = DateTime.UtcNow,
+            // logic to generate the correlation Id will need to be applied here when HMRC have confirmed the proposed approach
+            CorrelationId = customsDeclaration.ClearanceRequest?.ExternalCorrelationId,
             ExternalVersionNumber = customsDeclaration.ClearanceRequest?.ExternalVersion,
             Items = BuildItems(customsDeclaration.ClearanceRequest!, decisions).ToArray(),
         };

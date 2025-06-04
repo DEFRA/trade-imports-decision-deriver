@@ -75,21 +75,21 @@ public class ClearanceRequestConsumer(
     }
 
     private async Task PersistDecision(
-        CustomsDeclarationResponse clearanceRequest,
+        CustomsDeclarationResponse existingCustomsDeclaration,
         DecisionResult decisionResult,
         CancellationToken cancellationToken
     )
     {
         var customsDeclaration = new CustomsDeclaration()
         {
-            ClearanceDecision = clearanceRequest.ClearanceDecision,
-            Finalisation = clearanceRequest.Finalisation,
-            ClearanceRequest = clearanceRequest.ClearanceRequest,
-            InboundError = clearanceRequest.InboundError,
+            ClearanceDecision = existingCustomsDeclaration.ClearanceDecision,
+            Finalisation = existingCustomsDeclaration.Finalisation,
+            ClearanceRequest = existingCustomsDeclaration.ClearanceRequest,
+            ExternalErrors = existingCustomsDeclaration.ExternalErrors,
         };
 
         var newDecision = decisionResult.BuildClearanceDecision(
-            clearanceRequest.MovementReferenceNumber,
+            existingCustomsDeclaration.MovementReferenceNumber,
             customsDeclaration
         );
 
@@ -98,9 +98,9 @@ public class ClearanceRequestConsumer(
             customsDeclaration.ClearanceDecision = newDecision;
 
             await apiClient.PutCustomsDeclaration(
-                clearanceRequest.MovementReferenceNumber,
+                existingCustomsDeclaration.MovementReferenceNumber,
                 customsDeclaration,
-                clearanceRequest.ETag,
+                existingCustomsDeclaration.ETag,
                 cancellationToken
             );
         }

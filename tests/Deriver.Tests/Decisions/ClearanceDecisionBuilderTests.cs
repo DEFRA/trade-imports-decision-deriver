@@ -13,7 +13,7 @@ public class ClearanceDecisionBuilderTests
     public ClearanceDecisionBuilderTests()
     {
         _settings = new VerifySettings();
-        _settings.IgnoreMember<ClearanceDecision>(x => x.Timestamp);
+        _settings.IgnoreMember<ClearanceDecision>(x => x.Created);
         _settings.DontScrubDateTimes();
         _settings.DontScrubGuids();
     }
@@ -107,7 +107,7 @@ public class ClearanceDecisionBuilderTests
     {
         var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
         customsDeclaration.ClearanceRequest!.ExternalCorrelationId = "correlationId";
-        customsDeclaration.ClearanceDecision!.ExternalCorrelationId = "correlationId";
+        customsDeclaration.ClearanceDecision!.CorrelationId = "correlationId";
         customsDeclaration.ClearanceRequest!.ExternalVersion = 22;
         customsDeclaration.ClearanceDecision!.DecisionNumber = 4;
         var decisionResult = new DecisionResult();

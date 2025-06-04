@@ -73,14 +73,14 @@ public class ImportPreNotificationConsumer(
     {
         foreach (var mrn in clearanceRequests.Select(x => x.MovementReferenceNumber))
         {
-            var clearanceRequest = await apiClient.GetCustomsDeclaration(mrn, cancellationToken);
+            var existingCustomsDeclaration = await apiClient.GetCustomsDeclaration(mrn, cancellationToken);
 
             var customsDeclaration = new CustomsDeclaration()
             {
-                ClearanceDecision = clearanceRequest?.ClearanceDecision,
-                Finalisation = clearanceRequest?.Finalisation,
-                ClearanceRequest = clearanceRequest?.ClearanceRequest,
-                InboundError = clearanceRequest?.InboundError,
+                ClearanceDecision = existingCustomsDeclaration?.ClearanceDecision,
+                Finalisation = existingCustomsDeclaration?.Finalisation,
+                ClearanceRequest = existingCustomsDeclaration?.ClearanceRequest,
+                ExternalErrors = existingCustomsDeclaration?.ExternalErrors,
             };
 
             var newDecision = decisionResult.BuildClearanceDecision(mrn, customsDeclaration);
@@ -91,7 +91,7 @@ public class ImportPreNotificationConsumer(
                 await apiClient.PutCustomsDeclaration(
                     mrn,
                     customsDeclaration,
-                    clearanceRequest?.ETag,
+                    existingCustomsDeclaration?.ETag,
                     cancellationToken
                 );
             }

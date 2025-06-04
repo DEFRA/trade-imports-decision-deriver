@@ -1,5 +1,5 @@
 ﻿{
-  externalCorrelationId: cf16956d-9c68-4502-b78b-0b3e0d9ca72a,
+  correlationId: cf16956d-9c68-4502-b78b-0b3e0d9ca72a,
   timestamp: 2025-04-16T07:50:28.7871474Z,
   externalVersionNumber: 90,
   decisionNumber: 1,

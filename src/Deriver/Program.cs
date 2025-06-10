@@ -67,7 +67,6 @@ static WebApplication BuildWebApplication(WebApplicationBuilder builder)
     app.UseEmfExporter();
     app.UseHeaderPropagation();
     app.MapHealth();
-
     app.UseStatusCodePages();
     app.UseExceptionHandler(
         new ExceptionHandlerOptions

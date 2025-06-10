@@ -14,8 +14,8 @@ public class ImportPreNotificationConsumerTests
     public async Task GivenACreatedEvent_AndCustomsDeclarationsNotExists_ThenDecisionShouldNotBeCreated()
     {
         // ARRANGE
-        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var apiClient = Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = Substitute.For<IDecisionService>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             decisionService,
@@ -45,8 +45,8 @@ public class ImportPreNotificationConsumerTests
     public async Task GivenACreatedEvent_AndCustomsDeclarationsExist_ThenDecisionShouldBeCreated()
     {
         // ARRANGE
-        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var apiClient = Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = Substitute.For<IDecisionService>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             decisionService,
@@ -90,8 +90,8 @@ public class ImportPreNotificationConsumerTests
     public async Task GivenACreatedEvent_AndCustomsDeclarationsExist_AndDecisionAlreadyExists_ThenDecisionShouldNotBeSent()
     {
         // ARRANGE
-        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var apiClient = Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = Substitute.For<IDecisionService>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             decisionService,
@@ -138,8 +138,8 @@ public class ImportPreNotificationConsumerTests
     public async Task GivenACreatedEvent_AndCustomsDeclarationsExist_AndAlreadyFinalised_ThenDecisionShouldNotBeSent()
     {
         // ARRANGE
-        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var apiClient = Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = Substitute.For<IDecisionService>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             decisionService,

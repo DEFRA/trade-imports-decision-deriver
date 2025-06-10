@@ -37,7 +37,7 @@ public class ChedPDecisionFinderTests
 
         var result = sut.CanFindDecision(
             notification,
-            string.IsNullOrEmpty(checkCode) ? null : new CheckCode() { Value = checkCode }
+            string.IsNullOrEmpty(checkCode) ? null : new CheckCode { Value = checkCode }
         );
 
         result.Should().Be(expectedResult);

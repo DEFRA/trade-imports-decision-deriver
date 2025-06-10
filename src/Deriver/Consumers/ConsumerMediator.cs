@@ -25,34 +25,49 @@ public class ConsumerMediator(
         {
             case ResourceEventResourceTypes.CustomsDeclaration:
             {
-                var consumer = new ClearanceRequestConsumer(
-                    loggerFactory.CreateLogger<ClearanceRequestConsumer>(),
-                    decisionService,
-                    apiClient
-                )
-                {
-                    Context = Context,
-                };
-                var @event = message.Deserialize<ResourceEvent<object>>();
-                return consumer.OnHandle(@event!, cancellationToken);
+                return HandleCustomsDeclaration(message, cancellationToken);
             }
             case ResourceEventResourceTypes.ImportPreNotification:
             {
-                var consumer = new ImportPreNotificationConsumer(
-                    loggerFactory.CreateLogger<ImportPreNotificationConsumer>(),
-                    decisionService,
-                    apiClient
-                )
-                {
-                    Context = Context,
-                };
-                var @event = message.Deserialize<ResourceEvent<object>>();
-                return consumer.OnHandle(@event!, cancellationToken);
+                return HandleNotification(message, cancellationToken);
             }
         }
 
-        _logger.LogWarning("No Consumer for Resource Type: {ResourceType}", Context.GetResourceType());
+        _logger.LogWarning("No consumer for resource type {ResourceType}", Context.GetResourceType());
+
         return Task.CompletedTask;
+    }
+
+    private Task HandleNotification(JsonElement message, CancellationToken cancellationToken)
+    {
+        var consumer = new ImportPreNotificationConsumer(
+            loggerFactory.CreateLogger<ImportPreNotificationConsumer>(),
+            decisionService,
+            apiClient
+        )
+        {
+            Context = Context,
+        };
+
+        var @event = message.Deserialize<ResourceEvent<object>>();
+
+        return consumer.OnHandle(@event!, cancellationToken);
+    }
+
+    private Task HandleCustomsDeclaration(JsonElement message, CancellationToken cancellationToken)
+    {
+        var consumer = new ClearanceRequestConsumer(
+            loggerFactory.CreateLogger<ClearanceRequestConsumer>(),
+            decisionService,
+            apiClient
+        )
+        {
+            Context = Context,
+        };
+
+        var @event = message.Deserialize<ResourceEvent<object>>();
+
+        return consumer.OnHandle(@event!, cancellationToken);
     }
 
     public IConsumerContext Context { get; set; } = null!;

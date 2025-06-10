@@ -28,7 +28,7 @@ public class DecisionSourceVersionBuilderTests
             "documentRef",
             "checkCode",
             DecisionCode.C03,
-            new DecisionImportPreNotification()
+            new DecisionImportPreNotification
             {
                 Id = "TestId",
                 UpdatedSource = new DateTime(2025, 2, 2, 8, 6, 23, DateTimeKind.Local),
@@ -53,7 +53,7 @@ public class DecisionSourceVersionBuilderTests
             "documentRef",
             "checkCode",
             DecisionCode.C03,
-            new DecisionImportPreNotification()
+            new DecisionImportPreNotification
             {
                 Id = "TestId1",
                 UpdatedSource = new DateTime(2025, 2, 2, 8, 6, 23, DateTimeKind.Local),
@@ -65,7 +65,7 @@ public class DecisionSourceVersionBuilderTests
             "documentRef",
             "checkCode",
             DecisionCode.C03,
-            new DecisionImportPreNotification()
+            new DecisionImportPreNotification
             {
                 Id = "TestId2",
                 UpdatedSource = new DateTime(2025, 4, 5, 5, 7, 42, DateTimeKind.Local),

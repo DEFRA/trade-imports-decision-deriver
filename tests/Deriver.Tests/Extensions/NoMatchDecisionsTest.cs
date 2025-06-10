@@ -11,9 +11,9 @@ public class ConsumerContextExtensionsTests
     public void WhenResourceTypeExists_ThenResourceTypeShouldBeReturned()
     {
         // Arrange
-        var context = new ConsumerContext()
+        var context = new ConsumerContext
         {
-            Headers = new Dictionary<string, object>()
+            Headers = new Dictionary<string, object>
             {
                 { MessageBusHeaders.ResourceType, ResourceEventResourceTypes.CustomsDeclaration },
             },
@@ -30,7 +30,7 @@ public class ConsumerContextExtensionsTests
     public void WhenResourceTypeNotExists_ThenEmptyShouldBeReturned()
     {
         // Arrange
-        var context = new ConsumerContext() { Headers = new Dictionary<string, object>() };
+        var context = new ConsumerContext { Headers = new Dictionary<string, object>() };
 
         // Act
         var resourceType = context.GetResourceType();
@@ -43,9 +43,9 @@ public class ConsumerContextExtensionsTests
     public void WhenSubResourceTypeExists_ThenResourceTypeShouldBeReturned()
     {
         // Arrange
-        var context = new ConsumerContext()
+        var context = new ConsumerContext
         {
-            Headers = new Dictionary<string, object>()
+            Headers = new Dictionary<string, object>
             {
                 { MessageBusHeaders.SubResourceType, ResourceEventSubResourceTypes.ClearanceRequest },
             },
@@ -62,7 +62,7 @@ public class ConsumerContextExtensionsTests
     public void WhenSubResourceTypeNotExists_ThenEmptyShouldBeReturned()
     {
         // Arrange
-        var context = new ConsumerContext() { Headers = new Dictionary<string, object>() };
+        var context = new ConsumerContext { Headers = new Dictionary<string, object>() };
 
         // Act
         var resourceType = context.GetSubResourceType();
@@ -75,13 +75,13 @@ public class ConsumerContextExtensionsTests
     public void WhenMessageIdExists_ThenMessageIdShouldBeReturned()
     {
         // Arrange
-        var context = new ConsumerContext()
+        var context = new ConsumerContext
         {
-            Properties = new Dictionary<string, object>()
+            Properties = new Dictionary<string, object>
             {
                 {
                     MessageBusHeaders.SqsBusMessage,
-                    new Message() { MessageId = "TestMessageId" }
+                    new Message { MessageId = "TestMessageId" }
                 },
             },
         };
@@ -97,7 +97,7 @@ public class ConsumerContextExtensionsTests
     public void WhenMessageIdNotExists_ThenEmptyShouldBeReturned()
     {
         // Arrange
-        var context = new ConsumerContext() { Properties = new Dictionary<string, object>() };
+        var context = new ConsumerContext { Properties = new Dictionary<string, object>() };
 
         // Act
         var messageId = context.GetMessageId();

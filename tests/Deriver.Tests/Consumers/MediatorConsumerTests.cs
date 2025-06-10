@@ -17,13 +17,13 @@ public class MediatorConsumerTests
     public async Task GivenACreatedEvent_WhenAUnknownResouceType_ThenShouldBeSkipped()
     {
         // ARRANGE
-        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var apiClient = Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = Substitute.For<IDecisionService>();
         var consumer = new ConsumerMediator(NullLoggerFactory.Instance, decisionService, apiClient)
         {
-            Context = new ConsumerContext()
+            Context = new ConsumerContext
             {
-                Headers = new Dictionary<string, object>() { { MessageBusHeaders.ResourceType, "Unknown" } },
+                Headers = new Dictionary<string, object> { { MessageBusHeaders.ResourceType, "Unknown" } },
             },
         };
 
@@ -41,13 +41,13 @@ public class MediatorConsumerTests
     public async Task GivenACreatedEvent_AndNotImportPreNotificationsExist_ThenDecisionShouldBeCreated()
     {
         // ARRANGE
-        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var apiClient = Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = Substitute.For<IDecisionService>();
         var consumer = new ConsumerMediator(NullLoggerFactory.Instance, decisionService, apiClient)
         {
-            Context = new ConsumerContext()
+            Context = new ConsumerContext
             {
-                Headers = new Dictionary<string, object>()
+                Headers = new Dictionary<string, object>
                 {
                     { MessageBusHeaders.ResourceType, ResourceEventResourceTypes.CustomsDeclaration },
                 },
@@ -81,13 +81,13 @@ public class MediatorConsumerTests
     public async Task GivenACreatedEvent_AndCustomsDeclarationsExist_ThenDecisionShouldBeCreated()
     {
         // ARRANGE
-        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var apiClient = Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = Substitute.For<IDecisionService>();
         var consumer = new ConsumerMediator(NullLoggerFactory.Instance, decisionService, apiClient)
         {
-            Context = new ConsumerContext()
+            Context = new ConsumerContext
             {
-                Headers = new Dictionary<string, object>()
+                Headers = new Dictionary<string, object>
                 {
                     { MessageBusHeaders.ResourceType, ResourceEventResourceTypes.ImportPreNotification },
                 },

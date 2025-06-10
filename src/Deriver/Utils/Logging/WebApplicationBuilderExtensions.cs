@@ -63,6 +63,12 @@ public static class WebApplicationBuilderExtensions
                 && x.Properties.TryGetValue("RequestPath", out var path)
                 && path.ToString().Contains("/health")
                 && !x.MessageTemplate.Text.StartsWith("Request finished")
+            )
+            .Filter.ByExcluding(x =>
+                x.Level == LogEventLevel.Error
+                && x.Properties.TryGetValue("SourceContext", out var sourceContext)
+                && sourceContext.ToString().Contains("SlimMessageBus.Host.AmazonSQS.SqsQueueConsumer")
+                && x.MessageTemplate.Text.StartsWith("Message processing error")
             );
 
         if (!string.IsNullOrWhiteSpace(serviceVersion))

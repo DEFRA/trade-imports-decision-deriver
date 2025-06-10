@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Amazon.SQS.Model;
 using SlimMessageBus;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class MessageBusHeaders
 {
     public const string ContentEncoding = "Content-Encoding";
@@ -12,6 +14,7 @@ public static class MessageBusHeaders
     public const string ResourceId = nameof(ResourceId);
 }
 
+[ExcludeFromCodeCoverage]
 public static class ConsumerContextExtensions
 {
     public static string GetMessageId(this IConsumerContext consumerContext)

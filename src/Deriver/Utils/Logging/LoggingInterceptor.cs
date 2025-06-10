@@ -3,7 +3,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using SlimMessageBus;
 using SlimMessageBus.Host.Interceptor;
 
-namespace Defra.TradeImportsDecisionDeriver.Deriver.Interceptors;
+namespace Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 
 [ExcludeFromCodeCoverage]
 public class LoggingInterceptor<TMessage>(ILogger<LoggingInterceptor<TMessage>> logger) : IConsumerInterceptor<TMessage>

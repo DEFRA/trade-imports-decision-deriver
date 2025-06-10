@@ -80,20 +80,27 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output, WireMock
         var status = await mappingBuilder.BuildAndPostAsync();
         Assert.NotNull(status);
 
-        await SendMessage(
-            JsonSerializer.Serialize(customsDeclaration),
-            WithInboundHmrcMessageType(
-                ResourceEventResourceTypes.CustomsDeclaration,
-                ResourceEventSubResourceTypes.ClearanceDecision
-            )
+        var traceId = Guid.NewGuid().ToString("N");
+        const string traceHeader = "x-cdp-request-id";
+        var properties = WithInboundHmrcMessageType(
+            ResourceEventResourceTypes.CustomsDeclaration,
+            ResourceEventSubResourceTypes.ClearanceDecision
         );
+        properties.Add(traceHeader, new MessageAttributeValue { DataType = "String", StringValue = traceId });
+        await SendMessage(JsonSerializer.Serialize(customsDeclaration), properties);
 
         Assert.True(
             await AsyncWaiter.WaitForAsync(async () =>
             {
-                var requestsModel = new RequestModel { Methods = ["PUT"], Path = createPath };
-                var requests = await _wireMockAdminApi.FindRequestsAsync(requestsModel);
-                return requests.Count == 1;
+                var requestModel = new RequestModel { Methods = ["PUT"], Path = createPath };
+                var requests = (await _wireMockAdminApi.FindRequestsAsync(requestModel)).Where(x =>
+                    x.Request.Headers != null
+                    && x.Request.Headers.ContainsKey(traceHeader)
+                    && x.Request.Headers.TryGetValue(traceHeader, out var list)
+                    && list.Contains(traceId)
+                );
+
+                return requests.Count() == 1;
             })
         );
     }

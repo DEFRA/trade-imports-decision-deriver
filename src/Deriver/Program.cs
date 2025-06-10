@@ -1,4 +1,3 @@
-using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Health;
 using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
@@ -54,10 +53,6 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
     builder.Services.AddProcessorConfiguration(builder.Configuration);
     builder.Services.AddDataApiHttpClient();
     builder.Services.AddConsumers(builder.Configuration);
-    builder
-        .Services.AddOptions<DataApiOptions>()
-        .BindConfiguration(DataApiOptions.SectionName)
-        .ValidateDataAnnotations();
 }
 
 static WebApplication BuildWebApplication(WebApplicationBuilder builder)

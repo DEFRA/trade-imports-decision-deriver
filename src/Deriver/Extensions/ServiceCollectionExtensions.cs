@@ -4,7 +4,6 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
-using Defra.TradeImportsDecisionDeriver.Deriver.Interceptors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
 using Defra.TradeImportsDecisionDeriver.Deriver.Serializers;
@@ -38,7 +37,6 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddConsumers(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<ConsumerMetrics>();
         services.AddScoped<IDecisionService, DecisionService>();
         services.AddScoped<IMatchingService, MatchingService>();
 
@@ -48,9 +46,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDecisionFinder, ChedPPDecisionFinder>();
         services.AddScoped<IDecisionFinder, IuuDecisionFinder>();
 
-        services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(MetricsInterceptor<>));
-        services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(TracingInterceptor<>));
+        // Order of interceptors is important here
+        services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(TraceContextInterceptor<>));
         services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(LoggingInterceptor<>));
+        services.AddSingleton<ConsumerMetrics>();
+        services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(MetricsInterceptor<>));
+
         services.AddSlimMessageBus(mbb =>
         {
             var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");
@@ -88,14 +89,6 @@ public static class ServiceCollectionExtensions
     )
     {
         services.AddOptions<DataApiOptions>().BindConfiguration(DataApiOptions.SectionName).ValidateDataAnnotations();
-
-        return services;
-    }
-
-    public static IServiceCollection AddTracingForConsumers(this IServiceCollection services)
-    {
-        services.AddScoped(typeof(IConsumerInterceptor<>), typeof(TraceContextInterceptor<>));
-        services.AddSingleton(typeof(ISqsConsumerErrorHandler<>), typeof(SerilogTraceErrorHandler<>));
 
         return services;
     }

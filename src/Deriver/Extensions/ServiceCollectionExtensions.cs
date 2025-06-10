@@ -64,10 +64,7 @@ public static class ServiceCollectionExtensions
                 s.TryAddSingleton(_ => new ToStringSerializer());
                 s.TryAddSingleton<IMessageSerializer<string>>(svp => svp.GetRequiredService<ToStringSerializer>());
             });
-
-            mbb.AddServicesFromAssemblyContaining<ConsumerMediator>(consumerLifetime: ServiceLifetime.Scoped)
-                .PerMessageScopeEnabled();
-
+            mbb.AddServicesFromAssemblyContaining<ConsumerMediator>();
             mbb.WithProviderAmazonSQS(cfg =>
             {
                 cfg.TopologyProvisioning.Enabled = false;
@@ -76,7 +73,6 @@ public static class ServiceCollectionExtensions
                     configuration
                 );
             });
-
             mbb.Consume<string>(x => x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(consumersPerHost));
         });
 

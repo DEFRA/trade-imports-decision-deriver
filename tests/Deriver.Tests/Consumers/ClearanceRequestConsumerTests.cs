@@ -16,8 +16,8 @@ public class ClearanceRequestConsumerTests
         // ARRANGE
         var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
         customsDeclaration = customsDeclaration with { Finalisation = null };
-        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var apiClient = Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = Substitute.For<IDecisionService>();
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             decisionService,
@@ -53,8 +53,8 @@ public class ClearanceRequestConsumerTests
         customsDeclaration = customsDeclaration with { Finalisation = null };
         customsDeclaration.ClearanceDecision!.SourceVersion =
             $"CR-VERSION-{customsDeclaration.ClearanceRequest?.ExternalVersion}";
-        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var apiClient = Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = Substitute.For<IDecisionService>();
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             decisionService,
@@ -89,8 +89,8 @@ public class ClearanceRequestConsumerTests
         var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
         customsDeclaration.ClearanceRequest!.MessageSentAt = DateTime.UtcNow;
         customsDeclaration.Finalisation!.MessageSentAt = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1));
-        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var apiClient = Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = Substitute.For<IDecisionService>();
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             decisionService,
@@ -118,8 +118,8 @@ public class ClearanceRequestConsumerTests
         var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
         customsDeclaration.ClearanceRequest!.MessageSentAt = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1));
         customsDeclaration.Finalisation!.MessageSentAt = DateTime.UtcNow;
-        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var apiClient = Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = Substitute.For<IDecisionService>();
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             decisionService,
@@ -153,8 +153,8 @@ public class ClearanceRequestConsumerTests
         // ARRANGE
         var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
         customsDeclaration = customsDeclaration with { Finalisation = null };
-        var apiClient = NSubstitute.Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = NSubstitute.Substitute.For<IDecisionService>();
+        var apiClient = Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = Substitute.For<IDecisionService>();
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             decisionService,

@@ -107,7 +107,7 @@ public class NoMatchDecisionsTest
         var matchingService = Substitute.For<IMatchingService>();
         var cr = ClearanceRequestFixtures.ClearanceRequestFixture();
         cr.Commodities = cr.Commodities!.Take(1).ToArray();
-        cr.Commodities[0].Checks = [new CommodityCheck() { CheckCode = "TEST" }];
+        cr.Commodities[0].Checks = [new CommodityCheck { CheckCode = "TEST" }];
 
         var sut = new DecisionService(
             NullLogger<DecisionService>.Instance,

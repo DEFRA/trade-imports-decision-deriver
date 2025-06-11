@@ -6,7 +6,7 @@ public static class ImportPreNotificationExtensions
 {
     public static DecisionImportPreNotification ToDecisionImportPreNotification(this ImportPreNotification notification)
     {
-        var decisionNotification = new DecisionImportPreNotification()
+        var decisionNotification = new DecisionImportPreNotification
         {
             Id = notification.ReferenceNumber!,
             UpdatedSource = notification.UpdatedSource,

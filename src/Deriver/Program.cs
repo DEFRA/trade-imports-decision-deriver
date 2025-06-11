@@ -1,13 +1,13 @@
-using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Health;
 using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
+using Elastic.CommonSchema.Serilog;
 using Microsoft.AspNetCore.Diagnostics;
 using Serilog;
 
-Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
+Log.Logger = new LoggerConfiguration().WriteTo.Console(new EcsTextFormatter()).CreateBootstrapLogger();
 
 try
 {
@@ -44,7 +44,7 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
     );
     builder.Configuration.AddEnvironmentVariables();
 
-    // Load certificates into Trust Store - Note must happen before Mongo and Http client connections
+    // Must happen before Mongo and Http client connections
     builder.Services.AddCustomTrustStore();
 
     builder.ConfigureLoggingAndTracing(integrationTest);
@@ -53,10 +53,6 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
     builder.Services.AddProcessorConfiguration(builder.Configuration);
     builder.Services.AddDataApiHttpClient();
     builder.Services.AddConsumers(builder.Configuration);
-    builder
-        .Services.AddOptions<DataApiOptions>()
-        .BindConfiguration(DataApiOptions.SectionName)
-        .ValidateDataAnnotations();
 }
 
 static WebApplication BuildWebApplication(WebApplicationBuilder builder)
@@ -66,7 +62,6 @@ static WebApplication BuildWebApplication(WebApplicationBuilder builder)
     app.UseEmfExporter();
     app.UseHeaderPropagation();
     app.MapHealth();
-
     app.UseStatusCodePages();
     app.UseExceptionHandler(
         new ExceptionHandlerOptions

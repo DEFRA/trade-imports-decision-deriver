@@ -33,7 +33,7 @@ public class DecisionServiceTests
         chedAFinder.CanFindDecision(decisionContext.Notifications[0], Arg.Any<CheckCode>()).Returns(true);
         chedAFinder
             .FindDecision(decisionContext.Notifications[0], Arg.Any<CheckCode>())
-            .Returns(new DecisionFinderResult(expectedDecisionCode, new CheckCode() { Value = checkCode[0] }));
+            .Returns(new DecisionFinderResult(expectedDecisionCode, new CheckCode { Value = checkCode[0] }));
 
         var sut = new DecisionService(
             NullLogger<DecisionService>.Instance,
@@ -61,7 +61,7 @@ public class DecisionServiceTests
     {
         return new DecisionContext(
             [
-                new DecisionImportPreNotification()
+                new DecisionImportPreNotification
                 {
                     Id = "notification-1",
                     ImportNotificationType = importNotificationType,
@@ -71,16 +71,16 @@ public class DecisionServiceTests
             [
                 new ClearanceRequestWrapper(
                     "clearancerequest-1",
-                    new ClearanceRequest()
+                    new ClearanceRequest
                     {
                         Commodities =
                         [
-                            new Commodity()
+                            new Commodity
                             {
                                 ItemNumber = 1,
-                                Documents = [new ImportDocument() { DocumentCode = "9115" }],
+                                Documents = [new ImportDocument { DocumentCode = "9115" }],
                                 Checks = checkCodes
-                                    ?.Select(checkCode => new CommodityCheck() { CheckCode = checkCode })
+                                    ?.Select(checkCode => new CommodityCheck { CheckCode = checkCode })
                                     .ToArray(),
                             },
                         ],

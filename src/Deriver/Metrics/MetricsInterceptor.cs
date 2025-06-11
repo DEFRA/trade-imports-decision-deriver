@@ -1,10 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
-using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
 using SlimMessageBus;
 using SlimMessageBus.Host.Interceptor;
 
-namespace Defra.TradeImportsDecisionDeriver.Deriver.Interceptors;
+namespace Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
 
 [ExcludeFromCodeCoverage]
 public class MetricsInterceptor<TMessage>(ConsumerMetrics consumerMetrics) : IConsumerInterceptor<TMessage>

@@ -5,7 +5,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 
 public class TraceContextEnricher : ILogEventEnricher
 {
-    public const string PropertyName = "CorrelationId";
+    private const string PropertyName = "CorrelationId";
     private readonly ITraceContextAccessor _traceContextAccessor;
 
     public TraceContextEnricher()

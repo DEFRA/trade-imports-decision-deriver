@@ -1,5 +1,3 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
@@ -17,27 +15,15 @@ public class ImportPreNotificationConsumer(
     ITradeImportsDataApiClient apiClient
 ) : IConsumer<ResourceEvent<object>>, IConsumerWithContext
 {
-    private static JsonSerializerOptions _jsonSerializerOptions = new()
-    {
-        WriteIndented = true,
-        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
-    };
-
     public async Task OnHandle(ResourceEvent<object> message, CancellationToken cancellationToken)
     {
-        logger.LogInformation(
-            "Received notification: {ResourceType}:{ResourceId}",
-            message.ResourceType,
-            message.ResourceId
-        );
-        var clearanceRequests = await GetClearanceRequests(message.ResourceId, cancellationToken);
+        logger.LogInformation("Received notification {ResourceId}", message.ResourceId);
 
+        var clearanceRequests = await GetClearanceRequests(message.ResourceId, cancellationToken);
         if (clearanceRequests.Count == 0)
         {
-            logger.LogInformation(
-                "No Decision Derived, because no Customs Declaration found for {ChedId}",
-                message.ResourceId
-            );
+            logger.LogInformation("No decision derived, no customs declaration found");
+
             return;
         }
 
@@ -50,18 +36,13 @@ public class ImportPreNotificationConsumer(
 
         if (!decisionResult.Decisions.Any())
         {
-            logger.LogInformation(
-                "No Decision Derived: {ResourceType}:{ResourceId}",
-                message.ResourceType,
-                message.ResourceId
-            );
+            logger.LogInformation("No decision derived");
+
             return;
         }
 
-        logger.LogInformation(
-            "Decision Derived: {Decision}",
-            JsonSerializer.Serialize(decisionResult, _jsonSerializerOptions)
-        );
+        logger.LogInformation("Decision derived");
+
         await PersistDecisions(clearanceRequests, decisionResult, cancellationToken);
     }
 
@@ -75,7 +56,7 @@ public class ImportPreNotificationConsumer(
         {
             var existingCustomsDeclaration = await apiClient.GetCustomsDeclaration(mrn, cancellationToken);
 
-            var customsDeclaration = new CustomsDeclaration()
+            var customsDeclaration = new CustomsDeclaration
             {
                 ClearanceDecision = existingCustomsDeclaration?.ClearanceDecision,
                 Finalisation = existingCustomsDeclaration?.Finalisation,
@@ -88,6 +69,7 @@ public class ImportPreNotificationConsumer(
             if (!ClearanceDecisionComparer.Default.Equals(newDecision, customsDeclaration.ClearanceDecision))
             {
                 customsDeclaration.ClearanceDecision = newDecision;
+
                 await apiClient.PutCustomsDeclaration(
                     mrn,
                     customsDeclaration,
@@ -115,6 +97,7 @@ public class ImportPreNotificationConsumer(
     private async Task<List<DecisionImportPreNotification>> GetNotifications(string[] mrns)
     {
         var notifications = new List<ImportPreNotification>();
+
         await Parallel.ForEachAsync(
             mrns,
             async (mrn, cancellationToken) =>
@@ -133,6 +116,7 @@ public class ImportPreNotificationConsumer(
                 }
             }
         );
+
         return notifications.Select(x => x.ToDecisionImportPreNotification()).ToList();
     }
 

@@ -1,16 +1,20 @@
+using System.Diagnostics.CodeAnalysis;
 using Amazon.SQS.Model;
 using SlimMessageBus;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class MessageBusHeaders
 {
     public const string ContentEncoding = "Content-Encoding";
     public const string ResourceType = nameof(ResourceType);
     public const string SubResourceType = nameof(SubResourceType);
     public const string SqsBusMessage = "Sqs_Message";
+    public const string ResourceId = nameof(ResourceId);
 }
 
+[ExcludeFromCodeCoverage]
 public static class ConsumerContextExtensions
 {
     public static string GetMessageId(this IConsumerContext consumerContext)
@@ -36,6 +40,16 @@ public static class ConsumerContextExtensions
     public static string GetSubResourceType(this IConsumerContext consumerContext)
     {
         if (consumerContext.Headers.TryGetValue(MessageBusHeaders.SubResourceType, out var value))
+        {
+            return value.ToString()!;
+        }
+
+        return string.Empty;
+    }
+
+    public static string GetResourceId(this IConsumerContext consumerContext)
+    {
+        if (consumerContext.Headers.TryGetValue(MessageBusHeaders.ResourceId, out var value))
         {
             return value.ToString()!;
         }

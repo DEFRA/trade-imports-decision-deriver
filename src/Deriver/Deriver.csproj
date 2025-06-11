@@ -37,7 +37,4 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Utils\CdpTracing\" />
-  </ItemGroup>
 </Project>

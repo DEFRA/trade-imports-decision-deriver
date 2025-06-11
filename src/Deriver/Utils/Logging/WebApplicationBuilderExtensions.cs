@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.HeaderPropagation;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Serilog;
+using Serilog.Events;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 
@@ -20,7 +21,6 @@ public static class WebApplicationBuilderExtensions
             .Bind(builder.Configuration)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        builder.Services.AddTracingForConsumers();
 
         // Replaces use of AddHeaderPropagation so we can configure outside startup
         // and use the TraceHeader options configured above that will have been validated
@@ -57,7 +57,19 @@ public static class WebApplicationBuilderExtensions
             .ReadFrom.Configuration(hostBuilderContext.Configuration)
             .Enrich.WithEcsHttpContext(httpAccessor)
             .Enrich.FromLogContext()
-            .Enrich.With(new TraceContextEnricher());
+            .Enrich.With(new TraceContextEnricher())
+            .Filter.ByExcluding(x =>
+                x.Level == LogEventLevel.Information
+                && x.Properties.TryGetValue("RequestPath", out var path)
+                && path.ToString().Contains("/health")
+                && !x.MessageTemplate.Text.StartsWith("Request finished")
+            )
+            .Filter.ByExcluding(x =>
+                x.Level == LogEventLevel.Error
+                && x.Properties.TryGetValue("SourceContext", out var sourceContext)
+                && sourceContext.ToString().Contains("SlimMessageBus.Host.AmazonSQS.SqsQueueConsumer")
+                && x.MessageTemplate.Text.StartsWith("Message processing error")
+            );
 
         if (!string.IsNullOrWhiteSpace(serviceVersion))
             config.Enrich.WithProperty("service.version", serviceVersion);

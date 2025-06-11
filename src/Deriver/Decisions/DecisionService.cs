@@ -24,29 +24,29 @@ public class DecisionService(
     private Task<DecisionResult> DeriveDecision(DecisionContext decisionContext, MatchingResult matchingResult)
     {
         var decisionsResult = new DecisionResult();
+
         foreach (var wrapper in decisionContext.ClearanceRequests)
         {
-            if (wrapper.ClearanceRequest?.Commodities != null)
-            {
-                foreach (
-                    var item in wrapper.ClearanceRequest.Commodities.Where(x =>
-                        HasChecks(decisionContext, wrapper.MovementReferenceNumber, x.ItemNumber!.Value)
-                    )
+            if (wrapper.ClearanceRequest.Commodities == null)
+                continue;
+
+            foreach (
+                var item in wrapper.ClearanceRequest.Commodities.Where(x =>
+                    HasChecks(decisionContext, wrapper.MovementReferenceNumber, x.ItemNumber!.Value)
                 )
-                {
-                    var checkCodes = wrapper
-                        .ClearanceRequest.Commodities.First(x => x.ItemNumber == item.ItemNumber!.Value)
-                        .Checks?.Select(x => x.CheckCode)
-                        .Where(x => x != null)
-                        .Cast<string>()
-                        .Select(x => new CheckCode() { Value = x })
-                        .ToArray();
-                    HandleNoMatches(matchingResult, item, wrapper, checkCodes, decisionsResult);
+            )
+            {
+                var checkCodes = wrapper
+                    .ClearanceRequest.Commodities.First(x => x.ItemNumber == item.ItemNumber!.Value)
+                    .Checks?.Select(x => x.CheckCode)
+                    .Where(x => x != null)
+                    .Cast<string>()
+                    .Select(x => new CheckCode { Value = x })
+                    .ToArray();
 
-                    HandleMatches(decisionContext, matchingResult, item, wrapper, checkCodes, decisionsResult);
-
-                    HandleItemsWithInvalidReference(wrapper.MovementReferenceNumber!, item, decisionsResult);
-                }
+                HandleNoMatches(matchingResult, item, wrapper, checkCodes, decisionsResult);
+                HandleMatches(decisionContext, matchingResult, item, wrapper, checkCodes, decisionsResult);
+                HandleItemsWithInvalidReference(wrapper.MovementReferenceNumber!, item, decisionsResult);
             }
         }
 
@@ -62,7 +62,7 @@ public class DecisionService(
         DecisionResult decisionsResult
     )
     {
-        int itemNumber = item.ItemNumber!.Value;
+        var itemNumber = item.ItemNumber!.Value;
         var matches = matchingResult
             .Matches.Where(x => x.ItemNumber == itemNumber && x.Mrn == wrapper.MovementReferenceNumber)
             .ToList();
@@ -70,8 +70,8 @@ public class DecisionService(
         foreach (var match in matches)
         {
             var notification = decisionContext.Notifications.First(x => x.Id == match.ImportPreNotificationId);
-
             var decisionCodes = GetDecisions(notification, checkCodes);
+
             foreach (var decisionCode in decisionCodes)
             {
                 decisionsResult.AddDecision(
@@ -96,7 +96,7 @@ public class DecisionService(
         DecisionResult decisionsResult
     )
     {
-        int itemNumber = item.ItemNumber!.Value;
+        var itemNumber = item.ItemNumber!.Value;
         var noMatches = matchingResult
             .NoMatches.Where(x => x.ItemNumber == itemNumber && x.Mrn == wrapper.MovementReferenceNumber)
             .ToList();
@@ -145,7 +145,7 @@ public class DecisionService(
 
     private static void HandleItemsWithInvalidReference(string mrn, Commodity item, DecisionResult decisionsResult)
     {
-        int itemNumber = item.ItemNumber!.Value;
+        var itemNumber = item.ItemNumber!.Value;
         var decisions = decisionsResult.Decisions.Where(x => x.ItemNumber == itemNumber && x.Mrn == mrn).ToList();
 
         if (decisions.Count == 0)
@@ -167,6 +167,7 @@ public class DecisionService(
     private DecisionFinderResult[] GetDecisions(DecisionImportPreNotification notification, CheckCode[]? checkCodes)
     {
         var results = new List<DecisionFinderResult>();
+
         if (checkCodes == null)
         {
             results.AddRange(GetDecisionsForCheckCode(notification, null, decisionFinders));
@@ -180,7 +181,7 @@ public class DecisionService(
                 foreach (var checkCode in checkCodes)
                 {
                     logger.LogWarning(
-                        "No Decision Finder count for ImportNotification {Id} and Check code {CheckCode}",
+                        "No decision finder count for notification {Id} and check code {CheckCode}",
                         notification.Id,
                         checkCode
                     );
@@ -203,9 +204,10 @@ public class DecisionService(
         }
 
         var item = 1;
+
         foreach (var result in results)
             logger.LogInformation(
-                "Decision finder result {ItemNum} of {NumItems} for Notification {Id} Decision {Decision} - ConsignmentAcceptable {ConsignmentAcceptable}: DecisionEnum {DecisionEnum}: NotAcceptableAction {NotAcceptableAction}",
+                "Decision finder result {ItemNum} of {NumItems} for notification {Id} decision {Decision} - ConsignmentAcceptable {ConsignmentAcceptable}, DecisionEnum {DecisionEnum}, NotAcceptableAction {NotAcceptableAction}",
                 item++,
                 results.Count,
                 notification.Id,
@@ -247,6 +249,7 @@ public class DecisionService(
         var clearanceRequestCommodities = decisionContext
             .ClearanceRequests.First(x => x.MovementReferenceNumber == mrn)
             .ClearanceRequest.Commodities;
+
         if (clearanceRequestCommodities != null)
         {
             var checks = clearanceRequestCommodities.First(x => x.ItemNumber == itemNumber).Checks;

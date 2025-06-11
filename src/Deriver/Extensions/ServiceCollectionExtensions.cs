@@ -4,7 +4,6 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
-using Defra.TradeImportsDecisionDeriver.Deriver.Interceptors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
 using Defra.TradeImportsDecisionDeriver.Deriver.Serializers;
@@ -12,6 +11,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Options;
+using Polly;
 using SlimMessageBus.Host;
 using SlimMessageBus.Host.AmazonSQS;
 using SlimMessageBus.Host.Interceptor;
@@ -24,21 +24,38 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddDataApiHttpClient(this IServiceCollection services)
     {
+        var resilienceOptions = new HttpStandardResilienceOptions { Retry = { UseJitter = true } };
+        resilienceOptions.Retry.DisableForUnsafeHttpMethods();
+
         services
             .AddTradeImportsDataApiClient()
-            .ConfigureHttpClient((sp, c) => sp.GetRequiredService<IOptions<DataApiOptions>>().Value.Configure(c))
+            .ConfigureHttpClient(
+                (sp, c) =>
+                {
+                    sp.GetRequiredService<IOptions<DataApiOptions>>().Value.Configure(c);
+
+                    // Disable the HttpClient timeout to allow the resilient pipeline below
+                    // to handle all timeouts
+                    c.Timeout = Timeout.InfiniteTimeSpan;
+                }
+            )
             .AddHeaderPropagation()
-            .AddStandardResilienceHandler(o =>
-            {
-                o.Retry.DisableForUnsafeHttpMethods();
-            });
+            .AddResilienceHandler(
+                "DataApi",
+                builder =>
+                {
+                    builder
+                        .AddTimeout(resilienceOptions.TotalRequestTimeout)
+                        .AddRetry(resilienceOptions.Retry)
+                        .AddTimeout(resilienceOptions.AttemptTimeout);
+                }
+            );
 
         return services;
     }
 
     public static IServiceCollection AddConsumers(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<ConsumerMetrics>();
         services.AddScoped<IDecisionService, DecisionService>();
         services.AddScoped<IMatchingService, MatchingService>();
 
@@ -48,9 +65,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDecisionFinder, ChedPPDecisionFinder>();
         services.AddScoped<IDecisionFinder, IuuDecisionFinder>();
 
-        services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(MetricsInterceptor<>));
-        services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(TracingInterceptor<>));
+        // Order of interceptors is important here
+        services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(TraceContextInterceptor<>));
         services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(LoggingInterceptor<>));
+        services.AddSingleton<ConsumerMetrics>();
+        services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(MetricsInterceptor<>));
+
         services.AddSlimMessageBus(mbb =>
         {
             var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");
@@ -63,10 +83,7 @@ public static class ServiceCollectionExtensions
                 s.TryAddSingleton(_ => new ToStringSerializer());
                 s.TryAddSingleton<IMessageSerializer<string>>(svp => svp.GetRequiredService<ToStringSerializer>());
             });
-
-            mbb.AddServicesFromAssemblyContaining<ConsumerMediator>(consumerLifetime: ServiceLifetime.Scoped)
-                .PerMessageScopeEnabled();
-
+            mbb.AddServicesFromAssemblyContaining<ConsumerMediator>();
             mbb.WithProviderAmazonSQS(cfg =>
             {
                 cfg.TopologyProvisioning.Enabled = false;
@@ -75,7 +92,6 @@ public static class ServiceCollectionExtensions
                     configuration
                 );
             });
-
             mbb.Consume<string>(x => x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(consumersPerHost));
         });
 
@@ -88,14 +104,6 @@ public static class ServiceCollectionExtensions
     )
     {
         services.AddOptions<DataApiOptions>().BindConfiguration(DataApiOptions.SectionName).ValidateDataAnnotations();
-
-        return services;
-    }
-
-    public static IServiceCollection AddTracingForConsumers(this IServiceCollection services)
-    {
-        services.AddScoped(typeof(IConsumerInterceptor<>), typeof(TraceContextInterceptor<>));
-        services.AddSingleton(typeof(ISqsConsumerErrorHandler<>), typeof(SerilogTraceErrorHandler<>));
 
         return services;
     }

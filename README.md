@@ -42,7 +42,7 @@ When events are received the Decision Deriver will determine if there is enough 
 Run the application with the command:
 
 ```bash
-dotnet run --project BtmsGateway --launch-profile BtmsGateway
+dotnet run --project Defra.TradeImportsDecisionDeriver --launch-profile Defra.TradeImportsDecisionDeriver
 ```
 
 ### How to run Tests

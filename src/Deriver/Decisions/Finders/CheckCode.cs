@@ -10,7 +10,7 @@ public class CheckCode
 
     public string? GetImportNotificationType()
     {
-        //This is the mapping from https://eaflood.atlassian.net/wiki/spaces/ALVS/pages/5400920093/DocumentCode+CheckCode+Mapping
+        // This is the mapping from https://eaflood.atlassian.net/wiki/spaces/ALVS/pages/5400920093/DocumentCode+CheckCode+Mapping
         return Value switch
         {
             "H221" => ImportNotificationType.Cveda,
@@ -25,4 +25,6 @@ public class CheckCode
     {
         return Value == IuuCheckCode;
     }
+
+    public override string ToString() => Value;
 }

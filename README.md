@@ -1,4 +1,4 @@
-# trade-imports-decision-deriver
+# Trade Imports Decision Deriver
 
 The Trade Imports Decision Deriver is a .NET application which subscribes to the Trade Import Api Events.
 
@@ -85,7 +85,7 @@ We have added an example dependabot configuration file to the repository. You ca
 the [.github/example.dependabot.yml](.github/example.dependabot.yml) to `.github/dependabot.yml`
 
 ### Message Consumption
-This service using a framework called [Slim Message Bus](https://github.com/zarusz/SlimMessageBus), which maps queues/types to consumer classes.
+This service is using a framework called [Slim Message Bus](https://github.com/zarusz/SlimMessageBus), which maps queues/types to consumer classes.
 
 The Decision Deriver is only interested in a sub set of the Trade Import Api Events:
 

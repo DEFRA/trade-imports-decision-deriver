@@ -25,7 +25,6 @@ services:
     build:
       args:
         DEFRA_NUGET_PAT: ${DEFRA_NUGET_PAT}
-    command: ["--integrationTest=true"]
     ports:
       - '8080:8080'   
     depends_on:
@@ -37,10 +36,12 @@ services:
       - 'compose/aws.env'
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      ENVIRONMENT: local
+      PORT: 8080
       DataApi__BaseAddress: "http://wiremock"
       DataApi__Password: "secret"
-      PORT: 8080
       SQS_Endpoint: http://localstack:4566
+      AWS_EMF_ENVIRONMENT: Local
   
   wiremock:
     environment:
@@ -48,10 +49,3 @@ services:
     image: sheyenrath/wiremock.net:latest
     ports:
       - "9090:80"
-    
-
-################################################################################
-
-volumes:
-  mongodb-data:
-

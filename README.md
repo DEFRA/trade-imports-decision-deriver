@@ -30,7 +30,7 @@ When events are received the Decision Deriver will determine if there is enough 
 
 ### Setup Process
 
-- Install the .NET 9 SDK installed
+- Install the .NET 9 SDK
 - Install Docker
   - Run the following Docker Compose to set up locally running queues for testing
   ```bash

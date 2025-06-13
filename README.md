@@ -81,8 +81,7 @@ Example SonarCloud configuration are available in the GitHub Action workflows.
 
 ### Dependabot
 
-We have added an example dependabot configuration file to the repository. You can enable it by renaming
-the [.github/example.dependabot.yml](.github/example.dependabot.yml) to `.github/dependabot.yml`
+We are using dependabot
 
 ### Message Consumption
 This service is using a framework called [Slim Message Bus](https://github.com/zarusz/SlimMessageBus), which maps queues/types to consumer classes.

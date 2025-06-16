@@ -50,7 +50,10 @@ public static class ImportPreNotificationExtensions
         decisionNotification.Commodities = commodities
             .CommodityComplements.Select(commodityComplement =>
             {
-                var parameters = complementParameters[commodityComplement.ComplementId!.Value];
+                if (!complementParameters.TryGetValue(commodityComplement.ComplementId!.Value, out var parameters))
+                {
+                    return new DecisionCommodityComplement();
+                }
 
                 if (
                     complementRiskAssessments.Count != 0

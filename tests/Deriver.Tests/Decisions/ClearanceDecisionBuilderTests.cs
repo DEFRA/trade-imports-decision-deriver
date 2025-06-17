@@ -14,6 +14,7 @@ public class ClearanceDecisionBuilderTests
     {
         _settings = new VerifySettings();
         _settings.IgnoreMember<ClearanceDecision>(x => x.Created);
+        _settings.IgnoreMember<ClearanceDecision>(x => x.CorrelationId);
         _settings.DontScrubDateTimes();
         _settings.DontScrubGuids();
     }

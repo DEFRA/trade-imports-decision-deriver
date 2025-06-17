@@ -1,5 +1,6 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
+using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
@@ -23,7 +24,7 @@ public static class ClearanceDecisionBuilder
             ),
             Created = DateTime.UtcNow,
             // logic to generate the correlation Id will need to be applied here when HMRC have confirmed the proposed approach
-            CorrelationId = customsDeclaration.ClearanceRequest?.ExternalCorrelationId,
+            CorrelationId = CorrelationId.GenerateNewId().ToString(),
             ExternalVersionNumber = customsDeclaration.ClearanceRequest?.ExternalVersion,
             Items = BuildItems(customsDeclaration.ClearanceRequest!, decisions).ToArray(),
         };

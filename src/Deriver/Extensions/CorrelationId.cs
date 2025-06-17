@@ -2,8 +2,9 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
 public readonly struct CorrelationId
 {
+#pragma warning disable S2245
     private static readonly int __random = new Random().Next(1, 9999);
-
+#pragma warning restore S2245
     // private fields
     private readonly long _timestamp;
     private readonly int _randomValue;

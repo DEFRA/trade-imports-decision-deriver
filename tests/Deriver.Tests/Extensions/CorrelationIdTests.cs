@@ -11,6 +11,6 @@ public class CorrelationIdTests
 
         var id = generator.Generate();
 
-        id.Length.Should().BeLessThanOrEqualTo(20);
+        id.Length.Should().Be(20);
     }
 }

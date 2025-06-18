@@ -19,7 +19,8 @@ public class ImportPreNotificationConsumerTests
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             decisionService,
-            apiClient
+            apiClient,
+            new TestCorrelationIdGenerator("CorrelationId")
         )
         {
             Context = new ConsumerContext(),
@@ -50,7 +51,8 @@ public class ImportPreNotificationConsumerTests
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             decisionService,
-            apiClient
+            apiClient,
+            new TestCorrelationIdGenerator("CorrelationId")
         );
 
         var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
@@ -95,7 +97,8 @@ public class ImportPreNotificationConsumerTests
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             decisionService,
-            apiClient
+            apiClient,
+            new TestCorrelationIdGenerator("CorrelationId")
         );
 
         var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
@@ -143,7 +146,8 @@ public class ImportPreNotificationConsumerTests
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             decisionService,
-            apiClient
+            apiClient,
+            new TestCorrelationIdGenerator("CorrelationId")
         );
 
         var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();

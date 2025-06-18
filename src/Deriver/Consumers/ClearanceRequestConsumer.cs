@@ -4,6 +4,7 @@ using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
+using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using SlimMessageBus;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
@@ -11,7 +12,8 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 public class ClearanceRequestConsumer(
     ILogger<ClearanceRequestConsumer> logger,
     IDecisionService decisionService,
-    ITradeImportsDataApiClient apiClient
+    ITradeImportsDataApiClient apiClient,
+    ICorrelationIdGenerator correlationIdGenerator
 ) : IConsumer<ResourceEvent<object>>, IConsumerWithContext
 {
     public async Task OnHandle(ResourceEvent<object> message, CancellationToken cancellationToken)
@@ -74,7 +76,8 @@ public class ClearanceRequestConsumer(
 
         var newDecision = decisionResult.BuildClearanceDecision(
             existingCustomsDeclaration.MovementReferenceNumber,
-            customsDeclaration
+            customsDeclaration,
+            correlationIdGenerator
         );
 
         if (!ClearanceDecisionComparer.Default.Equals(newDecision, customsDeclaration.ClearanceDecision))

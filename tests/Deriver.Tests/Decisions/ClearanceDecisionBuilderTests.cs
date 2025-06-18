@@ -46,7 +46,8 @@ public class ClearanceDecisionBuilderTests
 
         var clearanceDecision = decisionResult.BuildClearanceDecision(
             customsDeclaration.MovementReferenceNumber,
-            new CustomsDeclaration { ClearanceRequest = customsDeclaration.ClearanceRequest }
+            new CustomsDeclaration { ClearanceRequest = customsDeclaration.ClearanceRequest },
+            new TestCorrelationIdGenerator("correlationId")
         );
 
         await Verify(clearanceDecision, _settings).UseMethodName(nameof(BuildClearanceDecision_WithNoReasons));
@@ -96,7 +97,8 @@ public class ClearanceDecisionBuilderTests
 
         var clearanceDecision = decisionResult.BuildClearanceDecision(
             customsDeclaration.MovementReferenceNumber,
-            new CustomsDeclaration { ClearanceRequest = customsDeclaration.ClearanceRequest }
+            new CustomsDeclaration { ClearanceRequest = customsDeclaration.ClearanceRequest },
+            new TestCorrelationIdGenerator("correlationId")
         );
 
         await Verify(clearanceDecision, _settings).UseMethodName(nameof(BuildClearanceDecision_WithReasons));
@@ -136,7 +138,8 @@ public class ClearanceDecisionBuilderTests
             {
                 ClearanceRequest = customsDeclaration.ClearanceRequest,
                 ClearanceDecision = customsDeclaration.ClearanceDecision,
-            }
+            },
+            new TestCorrelationIdGenerator("correlationId")
         );
 
         await Verify(clearanceDecision, _settings)

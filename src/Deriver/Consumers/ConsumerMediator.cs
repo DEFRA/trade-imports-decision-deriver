@@ -4,6 +4,7 @@ using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils;
+using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 using SlimMessageBus;
 
@@ -12,7 +13,8 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 public class ConsumerMediator(
     ILoggerFactory loggerFactory,
     IDecisionService decisionService,
-    ITradeImportsDataApiClient apiClient
+    ITradeImportsDataApiClient apiClient,
+    ICorrelationIdGenerator correlationIdGenerator
 ) : IConsumer<string>, IConsumerWithContext
 {
     private readonly ILogger<ConsumerMediator> _logger = loggerFactory.CreateLogger<ConsumerMediator>();
@@ -43,7 +45,8 @@ public class ConsumerMediator(
         var consumer = new ImportPreNotificationConsumer(
             loggerFactory.CreateLogger<ImportPreNotificationConsumer>(),
             decisionService,
-            apiClient
+            apiClient,
+            correlationIdGenerator
         )
         {
             Context = Context,
@@ -59,7 +62,8 @@ public class ConsumerMediator(
         var consumer = new ClearanceRequestConsumer(
             loggerFactory.CreateLogger<ClearanceRequestConsumer>(),
             decisionService,
-            apiClient
+            apiClient,
+            correlationIdGenerator
         )
         {
             Context = Context,

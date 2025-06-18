@@ -19,7 +19,12 @@ public class MediatorConsumerTests
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
         var decisionService = Substitute.For<IDecisionService>();
-        var consumer = new ConsumerMediator(NullLoggerFactory.Instance, decisionService, apiClient)
+        var consumer = new ConsumerMediator(
+            NullLoggerFactory.Instance,
+            decisionService,
+            apiClient,
+            new TestCorrelationIdGenerator("CorrelationId")
+        )
         {
             Context = new ConsumerContext
             {
@@ -43,7 +48,12 @@ public class MediatorConsumerTests
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
         var decisionService = Substitute.For<IDecisionService>();
-        var consumer = new ConsumerMediator(NullLoggerFactory.Instance, decisionService, apiClient)
+        var consumer = new ConsumerMediator(
+            NullLoggerFactory.Instance,
+            decisionService,
+            apiClient,
+            new TestCorrelationIdGenerator("CorrelationId")
+        )
         {
             Context = new ConsumerContext
             {
@@ -83,7 +93,12 @@ public class MediatorConsumerTests
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
         var decisionService = Substitute.For<IDecisionService>();
-        var consumer = new ConsumerMediator(NullLoggerFactory.Instance, decisionService, apiClient)
+        var consumer = new ConsumerMediator(
+            NullLoggerFactory.Instance,
+            decisionService,
+            apiClient,
+            new TestCorrelationIdGenerator("CorrelationId")
+        )
         {
             Context = new ConsumerContext
             {

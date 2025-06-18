@@ -5,6 +5,7 @@ using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
+using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using SlimMessageBus;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
@@ -12,7 +13,8 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 public class ImportPreNotificationConsumer(
     ILogger<ImportPreNotificationConsumer> logger,
     IDecisionService decisionService,
-    ITradeImportsDataApiClient apiClient
+    ITradeImportsDataApiClient apiClient,
+    ICorrelationIdGenerator correlationIdGenerator
 ) : IConsumer<ResourceEvent<object>>, IConsumerWithContext
 {
     public async Task OnHandle(ResourceEvent<object> message, CancellationToken cancellationToken)
@@ -64,7 +66,7 @@ public class ImportPreNotificationConsumer(
                 ExternalErrors = existingCustomsDeclaration?.ExternalErrors,
             };
 
-            var newDecision = decisionResult.BuildClearanceDecision(mrn, customsDeclaration);
+            var newDecision = decisionResult.BuildClearanceDecision(mrn, customsDeclaration, correlationIdGenerator);
 
             if (!ClearanceDecisionComparer.Default.Equals(newDecision, customsDeclaration.ClearanceDecision))
             {

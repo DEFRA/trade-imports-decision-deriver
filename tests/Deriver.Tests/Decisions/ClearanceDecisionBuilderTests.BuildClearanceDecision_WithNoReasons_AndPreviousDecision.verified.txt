@@ -1,4 +1,5 @@
 ﻿{
+  CorrelationId: correlationId,
   ExternalVersionNumber: 22,
   DecisionNumber: 5,
   SourceVersion: CR-VERSION-22,

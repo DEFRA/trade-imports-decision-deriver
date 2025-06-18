@@ -1,26 +1,16 @@
-using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Extensions;
 
 public class CorrelationIdTests
 {
     [Fact]
-    public void CorrelationId_WithTimestamp_ShouldBeGenerated()
+    public void CorrelationId_ShouldBeGenerated()
     {
-        var dateTime = new DateTimeOffset(2025, 08, 08, 05, 25, 44, TimeSpan.Zero);
-        var timestamp = dateTime.ToUnixTimeMilliseconds();
-        var id = CorrelationId.GenerateNewId(timestamp);
+        var generator = new CorrelationIdGenerator();
 
-        id.CreationTime.Should().Be(dateTime);
-        id.Timestamp.Should().Be(timestamp);
-        id.ToString().Should().StartWith(timestamp.ToString());
-    }
+        var id = generator.Generate();
 
-    [Fact]
-    public void CorrelationId_WithNoTimestamp_ShouldBeGenerated()
-    {
-        var id = CorrelationId.GenerateNewId();
-
-        id.ToString().Should().NotBeNull();
+        id.Length.Should().BeLessThanOrEqualTo(20);
     }
 }

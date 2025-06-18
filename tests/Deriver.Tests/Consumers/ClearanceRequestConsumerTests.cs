@@ -21,7 +21,8 @@ public class ClearanceRequestConsumerTests
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             decisionService,
-            apiClient
+            apiClient,
+            new TestCorrelationIdGenerator("CorrelationId")
         );
 
         var createdEvent = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();
@@ -58,7 +59,8 @@ public class ClearanceRequestConsumerTests
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             decisionService,
-            apiClient
+            apiClient,
+            new TestCorrelationIdGenerator("CorrelationId")
         );
 
         var createdEvent = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();
@@ -94,7 +96,8 @@ public class ClearanceRequestConsumerTests
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             decisionService,
-            apiClient
+            apiClient,
+            new TestCorrelationIdGenerator("CorrelationId")
         );
 
         var createdEvent = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();
@@ -123,7 +126,8 @@ public class ClearanceRequestConsumerTests
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             decisionService,
-            apiClient
+            apiClient,
+            new TestCorrelationIdGenerator("CorrelationId")
         );
 
         var createdEvent = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();
@@ -158,7 +162,8 @@ public class ClearanceRequestConsumerTests
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             decisionService,
-            apiClient
+            apiClient,
+            new TestCorrelationIdGenerator("CorrelationId")
         );
 
         var createdEvent = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();

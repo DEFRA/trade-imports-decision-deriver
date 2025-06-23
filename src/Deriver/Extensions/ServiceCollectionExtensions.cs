@@ -78,8 +78,7 @@ public static class ServiceCollectionExtensions
         {
             var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");
             var consumersPerHost = configuration.GetValue<int>("CONSUMERS_PER_HOST");
-            if (consumersPerHost <= 0)
-                consumersPerHost = 20;
+            var autoStartConsumers = configuration.GetValue<bool>("AUTO_START_CONSUMERS");
 
             mbb.RegisterSerializer<ToStringSerializer>(s =>
             {
@@ -95,7 +94,8 @@ public static class ServiceCollectionExtensions
                     configuration
                 );
             });
-            mbb.Consume<string>(x => x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(consumersPerHost));
+            mbb.AutoStartConsumersEnabled(autoStartConsumers)
+                .Consume<string>(x => x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(consumersPerHost));
         });
 
         return services;

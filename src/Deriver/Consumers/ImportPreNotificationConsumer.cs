@@ -68,7 +68,7 @@ public class ImportPreNotificationConsumer(
 
             var newDecision = decisionResult.BuildClearanceDecision(mrn, customsDeclaration, correlationIdGenerator);
 
-            if (!ClearanceDecisionComparer.Default.Equals(newDecision, customsDeclaration.ClearanceDecision))
+            if (!DecisionExistsComparer.Default.Equals(newDecision, customsDeclaration.ClearanceDecision))
             {
                 customsDeclaration.ClearanceDecision = newDecision;
 
@@ -77,6 +77,13 @@ public class ImportPreNotificationConsumer(
                     customsDeclaration,
                     existingCustomsDeclaration?.ETag,
                     cancellationToken
+                );
+            }
+            else
+            {
+                logger.LogInformation(
+                    "Decision already exists, not persisting (source version {SourceVersion})",
+                    customsDeclaration.ClearanceDecision.SourceVersion
                 );
             }
         }

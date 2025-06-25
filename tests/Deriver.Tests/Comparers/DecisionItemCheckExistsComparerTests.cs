@@ -3,13 +3,13 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Comparers;
 
-public class ClearanceDecisionCheckComparerTests
+public class DecisionItemCheckExistsComparerTests
 {
     [Fact]
     public void HashCodeTest()
     {
         var check = new ClearanceDecisionCheck { CheckCode = "H201", DecisionCode = "C03" };
-        var sut = new ClearanceDecisionCheckComparer();
+        var sut = new DecisionItemCheckExistsComparer();
 
         Action act = () => sut.GetHashCode(check);
 
@@ -20,7 +20,7 @@ public class ClearanceDecisionCheckComparerTests
     public void ReferenceEqualsTest()
     {
         var check = new ClearanceDecisionCheck { CheckCode = "H201", DecisionCode = "C03" };
-        var sut = new ClearanceDecisionCheckComparer();
+        var sut = new DecisionItemCheckExistsComparer();
 
         var result = sut.Equals(check, check);
 
@@ -31,7 +31,7 @@ public class ClearanceDecisionCheckComparerTests
     public void FirstItemIsNull()
     {
         var check = new ClearanceDecisionCheck { CheckCode = "H201", DecisionCode = "C03" };
-        var sut = new ClearanceDecisionCheckComparer();
+        var sut = new DecisionItemCheckExistsComparer();
 
         var result = sut.Equals(check, null);
 
@@ -42,7 +42,7 @@ public class ClearanceDecisionCheckComparerTests
     public void SecondItemIsNull()
     {
         var check = new ClearanceDecisionCheck { CheckCode = "H201", DecisionCode = "C03" };
-        var sut = new ClearanceDecisionCheckComparer();
+        var sut = new DecisionItemCheckExistsComparer();
 
         var result = sut.Equals(null, check);
 
@@ -54,7 +54,7 @@ public class ClearanceDecisionCheckComparerTests
     {
         var check1 = new ClearanceDecisionCheck { CheckCode = "H201", DecisionCode = "C03" };
         var check2 = new ClearanceDecisionCheck { CheckCode = "H201", DecisionCode = "C03" };
-        var sut = new ClearanceDecisionCheckComparer();
+        var sut = new DecisionItemCheckExistsComparer();
 
         var result = sut.Equals(check1, check2);
 
@@ -66,7 +66,7 @@ public class ClearanceDecisionCheckComparerTests
     {
         var check1 = new ClearanceDecisionCheck { CheckCode = "H201", DecisionCode = "C03" };
         var check2 = new ClearanceDecisionCheck { CheckCode = "H202", DecisionCode = "C03" };
-        var sut = new ClearanceDecisionCheckComparer();
+        var sut = new DecisionItemCheckExistsComparer();
 
         var result = sut.Equals(check1, check2);
 
@@ -78,7 +78,7 @@ public class ClearanceDecisionCheckComparerTests
     {
         var check1 = new ClearanceDecisionCheck { CheckCode = "H201", DecisionCode = "C03" };
         var check2 = new ClearanceDecisionCheck { CheckCode = "H201", DecisionCode = "C04" };
-        var sut = new ClearanceDecisionCheckComparer();
+        var sut = new DecisionItemCheckExistsComparer();
 
         var result = sut.Equals(check1, check2);
 

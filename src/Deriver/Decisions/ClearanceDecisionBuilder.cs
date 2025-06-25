@@ -24,7 +24,6 @@ public static class ClearanceDecisionBuilder
                 customsDeclaration.ClearanceRequest?.ExternalVersion
             ),
             Created = DateTime.UtcNow,
-            // logic to generate the correlation Id will need to be applied here when HMRC have confirmed the proposed approach
             CorrelationId = correlationIdGenerator.Generate(),
             ExternalVersionNumber = customsDeclaration.ClearanceRequest?.ExternalVersion,
             Items = BuildItems(customsDeclaration.ClearanceRequest!, decisions).ToArray(),

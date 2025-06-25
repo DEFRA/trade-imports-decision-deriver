@@ -3,7 +3,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Comparers;
 
-public class ClearanceDecisionComparerTests
+public class DecisionExistsComparerTests
 {
     [Fact]
     public void HashCodeTest()
@@ -20,7 +20,7 @@ public class ClearanceDecisionComparerTests
                 },
             ],
         };
-        var sut = new ClearanceDecisionComparer();
+        var sut = new DecisionExistsComparer();
 
         Action act = () => sut.GetHashCode(decision);
 
@@ -42,7 +42,7 @@ public class ClearanceDecisionComparerTests
                 },
             ],
         };
-        var sut = new ClearanceDecisionComparer();
+        var sut = new DecisionExistsComparer();
 
         var result = sut.Equals(decision, decision);
 
@@ -64,7 +64,7 @@ public class ClearanceDecisionComparerTests
                 },
             ],
         };
-        var sut = new ClearanceDecisionComparer();
+        var sut = new DecisionExistsComparer();
 
         var result = sut.Equals(null, decision);
 
@@ -86,7 +86,7 @@ public class ClearanceDecisionComparerTests
                 },
             ],
         };
-        var sut = new ClearanceDecisionComparer();
+        var sut = new DecisionExistsComparer();
 
         var result = sut.Equals(decision, null);
 
@@ -121,7 +121,7 @@ public class ClearanceDecisionComparerTests
                 },
             ],
         };
-        var sut = new ClearanceDecisionComparer();
+        var sut = new DecisionExistsComparer();
 
         var result = sut.Equals(decision1, decision2);
 
@@ -166,7 +166,7 @@ public class ClearanceDecisionComparerTests
                 },
             ],
         };
-        var sut = new ClearanceDecisionComparer();
+        var sut = new DecisionExistsComparer();
 
         var result = sut.Equals(decision1, decision2);
 

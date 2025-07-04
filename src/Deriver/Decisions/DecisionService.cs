@@ -207,12 +207,11 @@ public class DecisionService(
 
         foreach (var result in results)
             logger.LogInformation(
-                "Decision finder result {ItemNum} of {NumItems} for notification {Id} decision {Decision} - ConsignmentAcceptable {ConsignmentAcceptable}, DecisionEnum {DecisionEnum}, NotAcceptableAction {NotAcceptableAction}",
+                "Decision finder result {ItemNum} of {NumItems} for notification {Id} decision {Decision}, DecisionEnum {DecisionEnum}, NotAcceptableAction {NotAcceptableAction}",
                 item++,
                 results.Count,
                 notification.Id,
                 result.DecisionCode.ToString(),
-                notification.ConsignmentAcceptable,
                 notification.ConsignmentDecision,
                 notification.NotAcceptableAction
             );

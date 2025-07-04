@@ -17,10 +17,9 @@ public class ChedADecisionFinder : DecisionFinder
             return new DecisionFinderResult(code!.Value, checkCode);
         }
 
-        var consignmentAcceptable = notification.ConsignmentAcceptable;
-        return consignmentAcceptable switch
+        if (notification.ConsignmentDecision is not null)
         {
-            true => notification.ConsignmentDecision switch
+            return notification.ConsignmentDecision switch
             {
                 ConsignmentDecision.AcceptableForTranshipment or ConsignmentDecision.AcceptableForTransit =>
                     new DecisionFinderResult(DecisionCode.E03, checkCode),
@@ -38,24 +37,33 @@ public class ChedADecisionFinder : DecisionFinder
                     checkCode,
                     InternalDecisionCode: DecisionInternalFurtherDetail.E96
                 ),
-            },
-            false => notification.NotAcceptableAction switch
+            };
+        }
+
+        if (notification.NotAcceptableAction is not null)
+        {
+            return notification.NotAcceptableAction switch
             {
                 DecisionNotAcceptableAction.Euthanasia or DecisionNotAcceptableAction.Slaughter =>
                     new DecisionFinderResult(DecisionCode.N02, checkCode),
                 DecisionNotAcceptableAction.Reexport => new DecisionFinderResult(DecisionCode.N04, checkCode),
-                null => HandleNullNotAcceptableAction(notification, checkCode),
                 _ => new DecisionFinderResult(
                     DecisionCode.X00,
                     checkCode,
                     InternalDecisionCode: DecisionInternalFurtherDetail.E97
                 ),
-            },
-            _ => new DecisionFinderResult(
-                DecisionCode.X00,
-                checkCode,
-                InternalDecisionCode: DecisionInternalFurtherDetail.E99
-            ),
-        };
+            };
+        }
+
+        if (notification.NotAcceptableReasons?.Length > 0)
+        {
+            return new DecisionFinderResult(DecisionCode.N04, checkCode);
+        }
+
+        return new DecisionFinderResult(
+            DecisionCode.X00,
+            checkCode,
+            InternalDecisionCode: DecisionInternalFurtherDetail.E99
+        );
     }
 }

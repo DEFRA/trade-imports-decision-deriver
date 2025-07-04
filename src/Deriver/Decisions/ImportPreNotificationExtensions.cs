@@ -16,9 +16,7 @@ public static class ImportPreNotificationExtensions
             NotAcceptableAction = notification.PartTwo?.Decision?.NotAcceptableAction,
             IuuCheckRequired = notification.PartTwo?.ControlAuthority?.IuuCheckRequired,
             IuuOption = notification.PartTwo?.ControlAuthority?.IuuOption,
-            ConsignmentAcceptable = notification.PartTwo?.Decision?.ConsignmentAcceptable,
             NotAcceptableReasons = notification.PartTwo?.Decision?.NotAcceptableReasons,
-            AutoClearedOn = notification.PartTwo?.AutoClearedOn,
             InspectionRequired = notification.PartTwo?.InspectionRequired,
         };
 

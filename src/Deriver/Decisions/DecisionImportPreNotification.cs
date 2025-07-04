@@ -10,9 +10,6 @@ public class DecisionImportPreNotification
     [JsonPropertyName("updatedSource")]
     public DateTime? UpdatedSource { get; set; }
 
-    [JsonPropertyName("consignmentAcceptable")]
-    public bool? ConsignmentAcceptable { get; set; }
-
     [JsonPropertyName("notAcceptableAction")]
     public string? NotAcceptableAction { get; set; }
 
@@ -30,9 +27,6 @@ public class DecisionImportPreNotification
 
     [JsonPropertyName("inspectionRequired")]
     public string? InspectionRequired { get; set; }
-
-    [JsonPropertyName("autoClearedOn")]
-    public DateTime? AutoClearedOn { get; set; }
 
     [JsonPropertyName("importNotificationType")]
     public string? ImportNotificationType { get; set; }

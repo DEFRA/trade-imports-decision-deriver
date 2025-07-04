@@ -21,21 +21,9 @@ public class ChedPDecisionFinder : DecisionFinder
             return new DecisionFinderResult(code!.Value, checkCode);
         }
 
-        if (
-            !TryGetConsignmentAcceptable(
-                notification,
-                out var consignmentAcceptable,
-                out var decisionCode,
-                out var internalDecisionCode
-            )
-        )
+        if (notification.ConsignmentDecision is not null)
         {
-            return new DecisionFinderResult(decisionCode!.Value, checkCode, InternalDecisionCode: internalDecisionCode);
-        }
-
-        return consignmentAcceptable switch
-        {
-            true => notification.ConsignmentDecision switch
+            return notification.ConsignmentDecision switch
             {
                 ConsignmentDecision.AcceptableForTranshipment
                 or ConsignmentDecision.AcceptableForTransit
@@ -53,49 +41,34 @@ public class ChedPDecisionFinder : DecisionFinder
                     checkCode,
                     InternalDecisionCode: DecisionInternalFurtherDetail.E96
                 ),
-            },
-            false => notification.NotAcceptableAction switch
+            };
+        }
+
+        if (notification.NotAcceptableAction is not null)
+        {
+            return notification.NotAcceptableAction switch
             {
                 DecisionNotAcceptableAction.Destruction => new DecisionFinderResult(DecisionCode.N02, checkCode),
                 DecisionNotAcceptableAction.Reexport => new DecisionFinderResult(DecisionCode.N04, checkCode),
                 DecisionNotAcceptableAction.Transformation => new DecisionFinderResult(DecisionCode.N03, checkCode),
                 DecisionNotAcceptableAction.Other => new DecisionFinderResult(DecisionCode.N07, checkCode),
-                null => HandleNullNotAcceptableAction(notification, checkCode),
                 _ => new DecisionFinderResult(
                     DecisionCode.X00,
                     checkCode,
                     InternalDecisionCode: DecisionInternalFurtherDetail.E97
                 ),
-            },
-        };
-    }
-
-    private static bool TryGetConsignmentAcceptable(
-        DecisionImportPreNotification notification,
-        out bool acceptable,
-        out DecisionCode? decisionCode,
-        out DecisionInternalFurtherDetail? internalDecisionCode
-    )
-    {
-        var consignmentAcceptable = notification.ConsignmentAcceptable;
-        decisionCode = null;
-        internalDecisionCode = null;
-        acceptable = false;
-
-        if (consignmentAcceptable.HasValue)
-        {
-            acceptable = consignmentAcceptable.Value;
-            return true;
+            };
         }
 
-        if (notification.AutoClearedOn.HasValue)
+        if (notification.NotAcceptableReasons?.Length > 0)
         {
-            acceptable = true;
-            return true;
+            return new DecisionFinderResult(DecisionCode.N04, checkCode);
         }
 
-        decisionCode = DecisionCode.X00;
-        internalDecisionCode = DecisionInternalFurtherDetail.E99;
-        return false;
+        return new DecisionFinderResult(
+            DecisionCode.X00,
+            checkCode,
+            InternalDecisionCode: DecisionInternalFurtherDetail.E99
+        );
     }
 }

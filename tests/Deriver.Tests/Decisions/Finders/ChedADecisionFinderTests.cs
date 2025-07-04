@@ -42,13 +42,12 @@ public class ChedADecisionFinderTests
     }
 
     [Theory]
-    [InlineData(true, ConsignmentDecision.AcceptableForTranshipment, null, new[] { "Other" }, DecisionCode.E03)]
-    [InlineData(true, ConsignmentDecision.AcceptableForTransit, null, new[] { "Other" }, DecisionCode.E03)]
-    [InlineData(true, ConsignmentDecision.AcceptableForInternalMarket, null, new[] { "Other" }, DecisionCode.C03)]
-    [InlineData(true, ConsignmentDecision.AcceptableForTemporaryImport, null, new[] { "Other" }, DecisionCode.C05)]
-    [InlineData(true, ConsignmentDecision.HorseReEntry, null, new[] { "Other" }, DecisionCode.C06)]
+    [InlineData(ConsignmentDecision.AcceptableForTranshipment, null, new[] { "Other" }, DecisionCode.E03)]
+    [InlineData(ConsignmentDecision.AcceptableForTransit, null, new[] { "Other" }, DecisionCode.E03)]
+    [InlineData(ConsignmentDecision.AcceptableForInternalMarket, null, new[] { "Other" }, DecisionCode.C03)]
+    [InlineData(ConsignmentDecision.AcceptableForTemporaryImport, null, new[] { "Other" }, DecisionCode.C05)]
+    [InlineData(ConsignmentDecision.HorseReEntry, null, new[] { "Other" }, DecisionCode.C06)]
     [InlineData(
-        true,
         ConsignmentDecision.NonAcceptable,
         null,
         new[] { "Other" },
@@ -56,7 +55,6 @@ public class ChedADecisionFinderTests
         DecisionInternalFurtherDetail.E96
     )]
     [InlineData(
-        true,
         ConsignmentDecision.AcceptableIfChanneled,
         null,
         new[] { "Other" },
@@ -64,7 +62,6 @@ public class ChedADecisionFinderTests
         DecisionInternalFurtherDetail.E96
     )]
     [InlineData(
-        true,
         ConsignmentDecision.AcceptableForSpecificWarehouse,
         null,
         new[] { "Other" },
@@ -72,7 +69,6 @@ public class ChedADecisionFinderTests
         DecisionInternalFurtherDetail.E96
     )]
     [InlineData(
-        true,
         ConsignmentDecision.AcceptableForPrivateImport,
         null,
         new[] { "Other" },
@@ -80,21 +76,18 @@ public class ChedADecisionFinderTests
         DecisionInternalFurtherDetail.E96
     )]
     [InlineData(
-        true,
         ConsignmentDecision.AcceptableForTransfer,
         null,
         new[] { "Other" },
         DecisionCode.X00,
         DecisionInternalFurtherDetail.E96
     )]
-    [InlineData(null, null, null, new[] { "Other" }, DecisionCode.X00, DecisionInternalFurtherDetail.E99)]
-    [InlineData(false, null, DecisionNotAcceptableAction.Euthanasia, null, DecisionCode.N02)]
-    [InlineData(false, null, DecisionNotAcceptableAction.Reexport, new[] { "Other" }, DecisionCode.N04)]
-    [InlineData(false, null, null, new[] { "Other" }, DecisionCode.N04)]
-    [InlineData(false, null, null, new[] { "IdMismatchWithDocuments", "Other" }, DecisionCode.N04)]
-    [InlineData(false, null, DecisionNotAcceptableAction.Slaughter, null, DecisionCode.N02)]
+    [InlineData(null, DecisionNotAcceptableAction.Euthanasia, null, DecisionCode.N02)]
+    [InlineData(null, DecisionNotAcceptableAction.Reexport, new[] { "Other" }, DecisionCode.N04)]
+    [InlineData(null, null, new[] { "Other" }, DecisionCode.N04)]
+    [InlineData(null, null, new[] { "IdMismatchWithDocuments", "Other" }, DecisionCode.N04)]
+    [InlineData(null, DecisionNotAcceptableAction.Slaughter, null, DecisionCode.N02)]
     [InlineData(
-        false,
         null,
         DecisionNotAcceptableAction.Redispatching,
         new[] { "Other" },
@@ -102,7 +95,6 @@ public class ChedADecisionFinderTests
         DecisionInternalFurtherDetail.E97
     )]
     [InlineData(
-        false,
         null,
         DecisionNotAcceptableAction.Destruction,
         new[] { "Other" },
@@ -110,7 +102,6 @@ public class ChedADecisionFinderTests
         DecisionInternalFurtherDetail.E97
     )]
     [InlineData(
-        false,
         null,
         DecisionNotAcceptableAction.Transformation,
         new[] { "Other" },
@@ -118,7 +109,6 @@ public class ChedADecisionFinderTests
         DecisionInternalFurtherDetail.E97
     )]
     [InlineData(
-        false,
         null,
         DecisionNotAcceptableAction.Other,
         new[] { "Other" },
@@ -126,7 +116,6 @@ public class ChedADecisionFinderTests
         DecisionInternalFurtherDetail.E97
     )]
     [InlineData(
-        false,
         null,
         DecisionNotAcceptableAction.EntryRefusal,
         new[] { "Other" },
@@ -134,7 +123,6 @@ public class ChedADecisionFinderTests
         DecisionInternalFurtherDetail.E97
     )]
     [InlineData(
-        false,
         null,
         DecisionNotAcceptableAction.QuarantineImposed,
         new[] { "Other" },
@@ -142,7 +130,6 @@ public class ChedADecisionFinderTests
         DecisionInternalFurtherDetail.E97
     )]
     [InlineData(
-        false,
         null,
         DecisionNotAcceptableAction.SpecialTreatment,
         new[] { "Other" },
@@ -150,7 +137,6 @@ public class ChedADecisionFinderTests
         DecisionInternalFurtherDetail.E97
     )]
     [InlineData(
-        false,
         null,
         DecisionNotAcceptableAction.IndustrialProcessing,
         new[] { "Other" },
@@ -158,7 +144,6 @@ public class ChedADecisionFinderTests
         DecisionInternalFurtherDetail.E97
     )]
     [InlineData(
-        false,
         null,
         DecisionNotAcceptableAction.ReDispatch,
         new[] { "Other" },
@@ -166,7 +151,6 @@ public class ChedADecisionFinderTests
         DecisionInternalFurtherDetail.E97
     )]
     [InlineData(
-        false,
         null,
         DecisionNotAcceptableAction.UseForOtherPurposes,
         new[] { "Other" },
@@ -174,7 +158,6 @@ public class ChedADecisionFinderTests
         DecisionInternalFurtherDetail.E97
     )]
     public void DecisionFinderTest(
-        bool? consignmentAcceptable,
         string? decision,
         string? notAcceptableAction,
         String[]? notAcceptableReasons,
@@ -185,7 +168,6 @@ public class ChedADecisionFinderTests
         var notification = new DecisionImportPreNotification
         {
             Id = "TEst",
-            ConsignmentAcceptable = consignmentAcceptable,
             ConsignmentDecision = decision,
             NotAcceptableAction = notAcceptableAction,
             NotAcceptableReasons = notAcceptableReasons,

@@ -106,6 +106,7 @@ public class ChedDDecisionFinderTests
         DecisionCode.X00,
         DecisionInternalFurtherDetail.E96
     )]
+    [InlineData(null, null, null, DecisionCode.X00, DecisionInternalFurtherDetail.E99)]
     [InlineData(null, null, new[] { "Other" }, DecisionCode.N04)]
     [InlineData(null, null, new[] { "PhysicalHygieneFailure", "ChemicalContamination" }, DecisionCode.N04)]
     [InlineData(null, DecisionNotAcceptableAction.Redispatching, new[] { "Other" }, DecisionCode.N04)]

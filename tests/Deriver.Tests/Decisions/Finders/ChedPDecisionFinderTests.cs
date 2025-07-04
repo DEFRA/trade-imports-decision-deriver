@@ -84,6 +84,7 @@ public class ChedPDecisionFinderTests
         DecisionCode.X00,
         DecisionInternalFurtherDetail.E96
     )]
+    [InlineData(null, null, null, DecisionCode.X00, DecisionInternalFurtherDetail.E99)]
     [InlineData(null, DecisionNotAcceptableAction.Reexport, new[] { "Other" }, DecisionCode.N04)]
     [InlineData(null, null, new[] { "Other" }, DecisionCode.N04)]
     [InlineData(null, null, new[] { "InvasiveAlienSpecies", "NonApprovedCountry" }, DecisionCode.N04)]

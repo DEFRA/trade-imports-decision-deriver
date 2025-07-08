@@ -150,16 +150,30 @@ public class DecisionService(
 
         if (decisions.Count == 0)
         {
-            foreach (var document in item.Documents!)
+            if (item.Documents == null)
             {
                 decisionsResult.AddDecision(
                     mrn,
                     itemNumber,
-                    document.DocumentReference!.Value,
+                    string.Empty,
                     null,
                     DecisionCode.X00,
-                    internalDecisionCode: DecisionInternalFurtherDetail.E89
+                    internalDecisionCode: DecisionInternalFurtherDetail.E87
                 );
+            }
+            else
+            {
+                foreach (var document in item.Documents)
+                {
+                    decisionsResult.AddDecision(
+                        mrn,
+                        itemNumber,
+                        document.DocumentReference!.Value,
+                        null,
+                        DecisionCode.X00,
+                        internalDecisionCode: DecisionInternalFurtherDetail.E89
+                    );
+                }
             }
         }
     }

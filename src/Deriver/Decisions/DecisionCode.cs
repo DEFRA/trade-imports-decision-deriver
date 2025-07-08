@@ -23,6 +23,7 @@ public enum DecisionCode
 
 public enum DecisionInternalFurtherDetail
 {
+    E87, // No Documents
     E88, // Cancelled or Replaced or Deleted
     E89, // Item with document references where none are valid format
     E90, // No Decision Finder found

@@ -150,7 +150,7 @@ public class DecisionService(
 
         if (decisions.Count == 0)
         {
-            if (item.Documents == null)
+            if (item.Documents == null || !item.Documents.Any())
             {
                 decisionsResult.AddDecision(
                     mrn,

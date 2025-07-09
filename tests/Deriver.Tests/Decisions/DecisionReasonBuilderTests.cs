@@ -50,7 +50,7 @@ public class DecisionReasonBuilderTests
     }
 
     [Fact]
-    public void WhenDecisionResultIsNotLinkedToChed_AndHasNotDocuments_AndCheckCodeIsH220_ThenShouldBeHmiGmsReason()
+    public void WhenDecisionResultIsNotLinkedToChed_AndHasNoDocuments_AndCheckCodeIsH220_ThenShouldBeHmiGmsReason()
     {
         // Act
         var result = DecisionReasonBuilder.Build(

@@ -1,5 +1,4 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
-using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
@@ -70,49 +69,12 @@ public static class ClearanceDecisionBuilder
                 {
                     CheckCode = checkCode,
                     DecisionCode = maxDecisionResult.DecisionCode.ToString(),
-                    DecisionReasons = BuildDecisionReasons(item, maxDecisionResult!),
+                    DecisionReasons = DecisionReasonBuilder.Build(item, maxDecisionResult!).ToArray(),
                     DecisionInternalFurtherDetail = maxDecisionResult.InternalDecisionCode.HasValue
                         ? [maxDecisionResult.InternalDecisionCode.Value.ToString()]
                         : null,
                 };
             }
         }
-    }
-
-    private static string[] BuildDecisionReasons(Commodity item, DocumentDecisionResult maxDecisionResult)
-    {
-        var reasons = new List<string>();
-
-        if (maxDecisionResult.DecisionReason != null)
-        {
-            reasons.Add(maxDecisionResult.DecisionReason);
-        }
-
-        if (maxDecisionResult.DecisionCode == DecisionCode.X00)
-        {
-            var chedType = MapToChedType(item.Documents?[0]);
-            var chedNumbers = string.Join(", ", item.Documents!.Select(x => x.DocumentReference?.Value));
-
-            if (reasons.Count == 0)
-            {
-                reasons.Add(
-                    $"A Customs Declaration has been submitted however no matching {chedType}(s) have been submitted to Port Health (for {chedType} number(s) {chedNumbers}). Please correct the {chedType} number(s) entered on your customs declaration."
-                );
-            }
-        }
-
-        return reasons.ToArray();
-    }
-
-    private static string MapToChedType(ImportDocument? documentCode)
-    {
-        var ct = documentCode?.GetChedType();
-
-        if (ct is null)
-        {
-            throw new ArgumentOutOfRangeException(nameof(documentCode), documentCode, null);
-        }
-
-        return ct;
     }
 }

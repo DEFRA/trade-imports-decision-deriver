@@ -17,7 +17,7 @@ public class ChedADecisionFinder : DecisionFinder
             return new DecisionFinderResult(code!.Value, checkCode);
         }
 
-        if (notification.ConsignmentDecision is not null)
+        if (notification.HasAcceptableConsignmentDecision())
         {
             return notification.ConsignmentDecision switch
             {

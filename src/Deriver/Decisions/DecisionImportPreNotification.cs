@@ -36,4 +36,11 @@ public class DecisionImportPreNotification
 
     [JsonPropertyName("commodities")]
     public DecisionCommodityComplement[] Commodities { get; set; } = [];
+
+    public bool HasAcceptableConsignmentDecision()
+    {
+        return ConsignmentDecision is not null
+            && ConsignmentDecision
+                != Defra.TradeImportsDecisionDeriver.Deriver.Decisions.ConsignmentDecision.NonAcceptable;
+    }
 }

@@ -63,13 +63,7 @@ public class ChedPDecisionFinderTests
         DecisionCode.X00,
         DecisionInternalFurtherDetail.E96
     )]
-    [InlineData(
-        ConsignmentDecision.NonAcceptable,
-        null,
-        new[] { "Other" },
-        DecisionCode.X00,
-        DecisionInternalFurtherDetail.E96
-    )]
+    [InlineData(ConsignmentDecision.NonAcceptable, null, new[] { "Other" }, DecisionCode.N04)]
     [InlineData(
         ConsignmentDecision.AcceptableForPrivateImport,
         null,

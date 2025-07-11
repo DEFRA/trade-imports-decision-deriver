@@ -2,6 +2,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
 public enum DecisionCode
 {
+    C02,
     C03,
     C05,
     C06,
@@ -13,6 +14,7 @@ public enum DecisionCode
 
     X00,
 
+    N01,
     N02,
     N03,
     N04,
@@ -23,6 +25,8 @@ public enum DecisionCode
 
 public enum DecisionInternalFurtherDetail
 {
+    E85, // Missing PHSI check
+    E86, // No HMI check
     E87, // No Documents
     E88, // Cancelled or Replaced or Deleted
     E89, // Item with document references where none are valid format

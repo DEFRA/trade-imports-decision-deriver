@@ -16,25 +16,25 @@ public class ChedPPDecisionFinder : DecisionFinder
         CheckCode? checkCode
     )
     {
-        return checkCode?.Value switch
+        return notification.Status switch
         {
-            "H218" => ProcessHmi(notification, checkCode),
-            "H219" => ProcessPhsi(notification, checkCode),
-            _ => notification.Status switch
+            ImportNotificationStatus.Submitted or ImportNotificationStatus.InProgress => new DecisionFinderResult(
+                DecisionCode.H02,
+                checkCode
+            ),
+            ImportNotificationStatus.Validated => checkCode?.Value switch
             {
-                ImportNotificationStatus.Submitted or ImportNotificationStatus.InProgress => new DecisionFinderResult(
-                    DecisionCode.H02,
-                    checkCode
-                ),
-                ImportNotificationStatus.Validated => new DecisionFinderResult(DecisionCode.C03, checkCode),
-                ImportNotificationStatus.Rejected => new DecisionFinderResult(DecisionCode.N02, checkCode),
-                ImportNotificationStatus.PartiallyRejected => new DecisionFinderResult(DecisionCode.H01, checkCode),
-                _ => new DecisionFinderResult(
-                    DecisionCode.X00,
-                    checkCode,
-                    InternalDecisionCode: DecisionInternalFurtherDetail.E99
-                ),
+                "H218" => ProcessHmi(notification, checkCode),
+                "H219" => ProcessPhsi(notification, checkCode),
+                _ => new DecisionFinderResult(DecisionCode.C03, checkCode),
             },
+            ImportNotificationStatus.Rejected => new DecisionFinderResult(DecisionCode.N02, checkCode),
+            ImportNotificationStatus.PartiallyRejected => new DecisionFinderResult(DecisionCode.H01, checkCode),
+            _ => new DecisionFinderResult(
+                DecisionCode.X00,
+                checkCode,
+                InternalDecisionCode: DecisionInternalFurtherDetail.E99
+            ),
         };
     }
 

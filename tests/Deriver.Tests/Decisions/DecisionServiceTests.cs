@@ -261,6 +261,12 @@ public class DecisionServiceTests
                     IuuCheckRequired = null,
                     IuuOption = null,
                     NotAcceptableReasons = null,
+                    CommodityChecks =
+                    [
+                        new DecisionCommodityCheck.Check() { Type = "PHSI_DOCUMENT", Status = "Compliant" },
+                        new DecisionCommodityCheck.Check() { Type = "PHSI_IDENTITY", Status = "Auto cleared" },
+                        new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "Auto cleared" },
+                    ],
                 },
                 new DecisionImportPreNotification()
                 {

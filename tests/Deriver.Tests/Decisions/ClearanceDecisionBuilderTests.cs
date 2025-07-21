@@ -31,9 +31,12 @@ public class ClearanceDecisionBuilderTests
             commodity.ItemNumber = i + 1;
             commodity.Checks = commodity.Checks!.Take(1).ToArray();
             commodity.Checks[0].CheckCode = "9115";
+
+            var documentReferenceCount = 1;
             foreach (var document in commodity.Documents!)
             {
                 document.DocumentCode = "9115";
+                document.DocumentReference!.Value = $"docref_{commodity.ItemNumber}_{documentReferenceCount}";
                 decisionResult.AddDecision(
                     customsDeclaration.MovementReferenceNumber,
                     commodity.ItemNumber!.Value!,
@@ -41,6 +44,8 @@ public class ClearanceDecisionBuilderTests
                     commodity.Checks[0].CheckCode,
                     DecisionCode.C03
                 );
+
+                documentReferenceCount++;
             }
         }
 
@@ -119,9 +124,12 @@ public class ClearanceDecisionBuilderTests
             commodity.ItemNumber = i + 1;
             commodity.Checks = commodity.Checks!.Take(1).ToArray();
             commodity.Checks[0].CheckCode = "9115";
+
+            var documentReferenceCount = 1;
             foreach (var document in commodity.Documents!)
             {
                 document.DocumentCode = "9115";
+                document.DocumentReference!.Value = $"docref_{commodity.ItemNumber}_{documentReferenceCount}";
                 decisionResult.AddDecision(
                     customsDeclaration.MovementReferenceNumber,
                     commodity.ItemNumber!.Value!,
@@ -129,6 +137,8 @@ public class ClearanceDecisionBuilderTests
                     commodity.Checks[0].CheckCode,
                     DecisionCode.C03
                 );
+
+                documentReferenceCount++;
             }
         }
 

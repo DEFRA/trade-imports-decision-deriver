@@ -26,6 +26,18 @@ public static class ClearanceDecisionBuilder
             CorrelationId = correlationIdGenerator.Generate(),
             ExternalVersionNumber = customsDeclaration.ClearanceRequest?.ExternalVersion,
             Items = BuildItems(customsDeclaration.ClearanceRequest!, decisions).ToArray(),
+            Results = decisions
+                .Select(x => new ClearanceDecisionResult
+                {
+                    ItemNumber = x.ItemNumber,
+                    ImportPreNotification = x.PreNotification?.Id,
+                    DocumentReference = x.DocumentReference,
+                    CheckCode = x.CheckCode,
+                    DecisionCode = x.DecisionCode.ToString(),
+                    DecisionReason = x.DecisionReason,
+                    InternalDecisionCode = x.InternalDecisionCode?.ToString(),
+                })
+                .ToArray(),
         };
     }
 

@@ -10,7 +10,6 @@ public class DecisionExistsComparerTests
     {
         var decision = new ClearanceDecision
         {
-            SourceVersion = "1",
             Items =
             [
                 new ClearanceDecisionItem
@@ -32,7 +31,6 @@ public class DecisionExistsComparerTests
     {
         var decision = new ClearanceDecision
         {
-            SourceVersion = "1",
             Items =
             [
                 new ClearanceDecisionItem
@@ -54,7 +52,6 @@ public class DecisionExistsComparerTests
     {
         var decision = new ClearanceDecision
         {
-            SourceVersion = "1",
             Items =
             [
                 new ClearanceDecisionItem
@@ -76,7 +73,6 @@ public class DecisionExistsComparerTests
     {
         var decision = new ClearanceDecision
         {
-            SourceVersion = "1",
             Items =
             [
                 new ClearanceDecisionItem
@@ -98,7 +94,6 @@ public class DecisionExistsComparerTests
     {
         var decision1 = new ClearanceDecision
         {
-            SourceVersion = "1",
             Items =
             [
                 new ClearanceDecisionItem
@@ -111,7 +106,6 @@ public class DecisionExistsComparerTests
 
         var decision2 = new ClearanceDecision
         {
-            SourceVersion = "1",
             Items =
             [
                 new ClearanceDecisionItem
@@ -133,7 +127,6 @@ public class DecisionExistsComparerTests
     {
         var decision1 = new ClearanceDecision
         {
-            SourceVersion = "1",
             Items =
             [
                 new ClearanceDecisionItem
@@ -151,7 +144,6 @@ public class DecisionExistsComparerTests
 
         var decision2 = new ClearanceDecision
         {
-            SourceVersion = "1",
             Items =
             [
                 new ClearanceDecisionItem

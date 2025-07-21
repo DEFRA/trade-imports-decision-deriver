@@ -21,8 +21,7 @@ public class DecisionExistsComparer : IEqualityComparer<ClearanceDecision>
         if (y is null)
             return false;
 
-        return x.SourceVersion == y.SourceVersion
-            || x.Items.OrderBy(item => item.ItemNumber)
+        return x.Items.OrderBy(item => item.ItemNumber)
                 .SequenceEqual(y.Items.OrderBy(item => item.ItemNumber), DecisionItemExistsComparer.Default);
     }
 

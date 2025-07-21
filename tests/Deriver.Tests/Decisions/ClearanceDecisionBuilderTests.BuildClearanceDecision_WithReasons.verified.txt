@@ -2,7 +2,6 @@
   CorrelationId: correlationId,
   ExternalVersionNumber: 22,
   DecisionNumber: 1,
-  SourceVersion: CR-VERSION-22,
   Items: [
     {
       ItemNumber: 1,

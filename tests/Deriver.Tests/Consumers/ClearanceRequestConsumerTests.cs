@@ -1,4 +1,5 @@
 using Defra.TradeImportsDataApi.Api.Client;
+using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
@@ -52,8 +53,53 @@ public class ClearanceRequestConsumerTests
         // ARRANGE
         var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
         customsDeclaration = customsDeclaration with { Finalisation = null };
-        customsDeclaration.ClearanceDecision!.SourceVersion =
-            $"CR-VERSION-{customsDeclaration.ClearanceRequest?.ExternalVersion}";
+        customsDeclaration = customsDeclaration with
+        {
+            ClearanceDecision = new ClearanceDecision()
+            {
+                DecisionNumber = 4,
+                ExternalVersionNumber = 22,
+                Items =
+                [
+                    new ClearanceDecisionItem()
+                    {
+                        ItemNumber = 1,
+                        Checks =
+                        [
+                            new ClearanceDecisionCheck()
+                            {
+                                CheckCode = "9115",
+                                DecisionCode = "C03"
+                            }
+                        ]
+                    },
+                    new ClearanceDecisionItem()
+                    {
+                        ItemNumber = 2,
+                        Checks =
+                        [
+                            new ClearanceDecisionCheck()
+                            {
+                                CheckCode = "9115",
+                                DecisionCode = "C03"
+                            }
+                        ]
+                    },
+                    new ClearanceDecisionItem()
+                    {
+                        ItemNumber = 3,
+                        Checks =
+                        [
+                            new ClearanceDecisionCheck()
+                            {
+                                CheckCode = "9115",
+                                DecisionCode = "C03"
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
         var decisionService = Substitute.For<IDecisionService>();
         var consumer = new ClearanceRequestConsumer(
@@ -74,7 +120,24 @@ public class ClearanceRequestConsumerTests
             .Returns(new ImportPreNotificationsResponse([]));
 
         var decisionResult = new DecisionResult();
-        decisionResult.AddDecision("mrn", 1, "docref", "checkCode", DecisionCode.C03);
+        for (var i = 0; i < (customsDeclaration.ClearanceRequest?.Commodities!).Length; i++)
+        {
+            var commodity = (customsDeclaration.ClearanceRequest?.Commodities!)[i];
+            commodity.ItemNumber = i + 1;
+            commodity.Checks = commodity.Checks!.Take(1).ToArray();
+            commodity.Checks[0].CheckCode = "9115";
+            foreach (var document in commodity.Documents!)
+            {
+                document.DocumentCode = "9115";
+                decisionResult.AddDecision(
+                    customsDeclaration.MovementReferenceNumber,
+                    commodity.ItemNumber!.Value!,
+                    document.DocumentReference!.Value,
+                    commodity.Checks[0].CheckCode,
+                    DecisionCode.C03
+                );
+            }
+        }
         decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
 
         // ACT

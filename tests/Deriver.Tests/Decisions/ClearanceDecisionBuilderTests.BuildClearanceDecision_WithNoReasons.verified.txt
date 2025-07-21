@@ -31,5 +31,61 @@
         }
       ]
     }
+  ],
+  Results: [
+    {
+      ItemNumber: 1,
+      DocumentReference: docref_1_1,
+      CheckCode: 9115,
+      DecisionCode: C03
+    },
+    {
+      ItemNumber: 1,
+      DocumentReference: docref_1_2,
+      CheckCode: 9115,
+      DecisionCode: C03
+    },
+    {
+      ItemNumber: 1,
+      DocumentReference: docref_1_3,
+      CheckCode: 9115,
+      DecisionCode: C03
+    },
+    {
+      ItemNumber: 2,
+      DocumentReference: docref_2_1,
+      CheckCode: 9115,
+      DecisionCode: C03
+    },
+    {
+      ItemNumber: 2,
+      DocumentReference: docref_2_2,
+      CheckCode: 9115,
+      DecisionCode: C03
+    },
+    {
+      ItemNumber: 2,
+      DocumentReference: docref_2_3,
+      CheckCode: 9115,
+      DecisionCode: C03
+    },
+    {
+      ItemNumber: 3,
+      DocumentReference: docref_3_1,
+      CheckCode: 9115,
+      DecisionCode: C03
+    },
+    {
+      ItemNumber: 3,
+      DocumentReference: docref_3_2,
+      CheckCode: 9115,
+      DecisionCode: C03
+    },
+    {
+      ItemNumber: 3,
+      DocumentReference: docref_3_3,
+      CheckCode: 9115,
+      DecisionCode: C03
+    }
   ]
 }

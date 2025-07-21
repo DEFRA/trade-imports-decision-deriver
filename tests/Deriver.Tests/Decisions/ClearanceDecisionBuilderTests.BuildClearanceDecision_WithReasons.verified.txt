@@ -40,5 +40,64 @@
         }
       ]
     }
+  ],
+  Results: [
+    {
+      ItemNumber: 1,
+      DocumentReference: fixed-1,
+      CheckCode: 9115,
+      DecisionCode: X00,
+      DecisionReason: Some Reason
+    },
+    {
+      ItemNumber: 1,
+      DocumentReference: fixed-2,
+      CheckCode: 9115,
+      DecisionCode: X00,
+      DecisionReason: Some Reason
+    },
+    {
+      ItemNumber: 1,
+      DocumentReference: fixed-3,
+      CheckCode: 9115,
+      DecisionCode: X00,
+      DecisionReason: Some Reason
+    },
+    {
+      ItemNumber: 2,
+      DocumentReference: fixed-4,
+      CheckCode: 9115,
+      DecisionCode: X00
+    },
+    {
+      ItemNumber: 2,
+      DocumentReference: fixed-5,
+      CheckCode: 9115,
+      DecisionCode: X00
+    },
+    {
+      ItemNumber: 2,
+      DocumentReference: fixed-6,
+      CheckCode: 9115,
+      DecisionCode: X00
+    },
+    {
+      ItemNumber: 3,
+      DocumentReference: fixed-7,
+      CheckCode: 9115,
+      DecisionCode: X00
+    },
+    {
+      ItemNumber: 3,
+      DocumentReference: fixed-8,
+      CheckCode: 9115,
+      DecisionCode: X00
+    },
+    {
+      ItemNumber: 3,
+      DocumentReference: fixed-9,
+      CheckCode: 9115,
+      DecisionCode: X00
+    }
   ]
 }

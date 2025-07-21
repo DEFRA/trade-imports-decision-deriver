@@ -19,9 +19,6 @@ public static class ClearanceDecisionBuilder
             DecisionNumber = customsDeclaration.ClearanceDecision is { DecisionNumber: not null }
                 ? customsDeclaration.ClearanceDecision.DecisionNumber + 1
                 : 1,
-            ////SourceVersion = decisionResult.BuildDecisionSourceVersion(
-            ////    customsDeclaration.ClearanceRequest?.ExternalVersion
-            ////),
             Created = DateTime.UtcNow,
             CorrelationId = correlationIdGenerator.Generate(),
             ExternalVersionNumber = customsDeclaration.ClearanceRequest?.ExternalVersion,

@@ -110,7 +110,9 @@ public class ImportPreNotificationConsumerTests
         customsDeclaration.ClearanceRequest!.ExternalCorrelationId = "correlationId";
         customsDeclaration.ClearanceDecision!.CorrelationId = "correlationId";
         customsDeclaration.ClearanceRequest!.ExternalVersion = 22;
-        customsDeclaration = customsDeclaration with { ClearanceDecision = new ClearanceDecision()
+        customsDeclaration = customsDeclaration with
+        {
+            ClearanceDecision = new ClearanceDecision()
             {
                 DecisionNumber = 4,
                 ExternalVersionNumber = 22,
@@ -119,43 +121,22 @@ public class ImportPreNotificationConsumerTests
                     new ClearanceDecisionItem()
                     {
                         ItemNumber = 1,
-                        Checks =
-                        [
-                            new ClearanceDecisionCheck()
-                            {
-                                CheckCode = "9115",
-                                DecisionCode = "C03"
-                            }
-                        ]
+                        Checks = [new ClearanceDecisionCheck() { CheckCode = "9115", DecisionCode = "C03" }],
                     },
                     new ClearanceDecisionItem()
                     {
                         ItemNumber = 2,
-                        Checks =
-                        [
-                            new ClearanceDecisionCheck()
-                            {
-                                CheckCode = "9115",
-                                DecisionCode = "C03"
-                            }
-                        ]
+                        Checks = [new ClearanceDecisionCheck() { CheckCode = "9115", DecisionCode = "C03" }],
                     },
                     new ClearanceDecisionItem()
                     {
                         ItemNumber = 3,
-                        Checks =
-                        [
-                            new ClearanceDecisionCheck()
-                            {
-                                CheckCode = "9115",
-                                DecisionCode = "C03"
-                            }
-                        ]
-                    }
-                ]
-            }
+                        Checks = [new ClearanceDecisionCheck() { CheckCode = "9115", DecisionCode = "C03" }],
+                    },
+                ],
+            },
         };
-        
+
         var decisionResult = new DecisionResult();
         for (var i = 0; i < (customsDeclaration.ClearanceRequest?.Commodities!).Length; i++)
         {

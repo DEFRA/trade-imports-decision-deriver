@@ -64,41 +64,20 @@ public class ClearanceRequestConsumerTests
                     new ClearanceDecisionItem()
                     {
                         ItemNumber = 1,
-                        Checks =
-                        [
-                            new ClearanceDecisionCheck()
-                            {
-                                CheckCode = "9115",
-                                DecisionCode = "C03"
-                            }
-                        ]
+                        Checks = [new ClearanceDecisionCheck() { CheckCode = "9115", DecisionCode = "C03" }],
                     },
                     new ClearanceDecisionItem()
                     {
                         ItemNumber = 2,
-                        Checks =
-                        [
-                            new ClearanceDecisionCheck()
-                            {
-                                CheckCode = "9115",
-                                DecisionCode = "C03"
-                            }
-                        ]
+                        Checks = [new ClearanceDecisionCheck() { CheckCode = "9115", DecisionCode = "C03" }],
                     },
                     new ClearanceDecisionItem()
                     {
                         ItemNumber = 3,
-                        Checks =
-                        [
-                            new ClearanceDecisionCheck()
-                            {
-                                CheckCode = "9115",
-                                DecisionCode = "C03"
-                            }
-                        ]
-                    }
-                ]
-            }
+                        Checks = [new ClearanceDecisionCheck() { CheckCode = "9115", DecisionCode = "C03" }],
+                    },
+                ],
+            },
         };
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
         var decisionService = Substitute.For<IDecisionService>();

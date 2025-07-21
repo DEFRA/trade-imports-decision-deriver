@@ -21,8 +21,9 @@ public class DecisionExistsComparer : IEqualityComparer<ClearanceDecision>
         if (y is null)
             return false;
 
-        return x.Items.OrderBy(item => item.ItemNumber)
-                .SequenceEqual(y.Items.OrderBy(item => item.ItemNumber), DecisionItemExistsComparer.Default);
+        return x
+            .Items.OrderBy(item => item.ItemNumber)
+            .SequenceEqual(y.Items.OrderBy(item => item.ItemNumber), DecisionItemExistsComparer.Default);
     }
 
     public int GetHashCode(ClearanceDecision obj)

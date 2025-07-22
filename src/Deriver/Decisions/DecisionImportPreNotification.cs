@@ -37,6 +37,9 @@ public class DecisionImportPreNotification
     [JsonPropertyName("commodities")]
     public DecisionCommodityComplement[] Commodities { get; set; } = [];
 
+    [JsonPropertyName("commodityChecks")]
+    public DecisionCommodityCheck.Check[] CommodityChecks { get; set; } = [];
+
     public bool HasAcceptableConsignmentDecision()
     {
         return ConsignmentDecision is not null

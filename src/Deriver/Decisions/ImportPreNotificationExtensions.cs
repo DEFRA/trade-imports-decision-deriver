@@ -1,3 +1,4 @@
+using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
@@ -19,6 +20,25 @@ public static class ImportPreNotificationExtensions
             NotAcceptableReasons = notification.PartTwo?.Decision?.NotAcceptableReasons,
             InspectionRequired = notification.PartTwo?.InspectionRequired,
         };
+
+        var commodityChecks = new List<DecisionCommodityCheck>();
+        if (notification.PartTwo?.CommodityChecks != null)
+        {
+            foreach (var commodityCheck in notification.PartTwo.CommodityChecks.Where(x => x.Checks != null))
+            {
+                var checks = new List<DecisionCommodityCheck.Check>();
+                checks.AddRange(
+                    commodityCheck.Checks!.Select(check => new DecisionCommodityCheck.Check()
+                    {
+                        Status = check.Status ?? string.Empty,
+                        Type = check.Type,
+                    })
+                );
+                commodityChecks.Add(new DecisionCommodityCheck() { Checks = checks.ToArray() });
+            }
+        }
+
+        decisionNotification.CommodityChecks = commodityChecks.SelectMany(x => x.Checks).ToArray();
 
         var commodities = notification.PartOne?.Commodities;
 

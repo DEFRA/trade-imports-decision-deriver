@@ -7,7 +7,15 @@ public record MatchingResult
 
     public void AddMatch(string notificationId, string mrn, int itemNumber, string documentReference)
     {
-        _matches.Add(new Match(notificationId, mrn, itemNumber, documentReference));
+        if (
+            !_matches.Exists(x =>
+                x.ImportPreNotificationId == notificationId
+                && x.Mrn == mrn
+                && x.ItemNumber == itemNumber
+                && x.DocumentReference == documentReference
+            )
+        )
+            _matches.Add(new Match(notificationId, mrn, itemNumber, documentReference));
     }
 
     public void AddDocumentNoMatch(string mrn, int itemNumber, string documentReference)

@@ -85,9 +85,7 @@ public class MatchingServiceTests
 
         // Assert
         matchResult.NoMatches.Count.Should().Be(0);
-        matchResult
-            .Matches.Count.Should()
-            .Be(clearanceRequestWrapper.ClearanceRequest.Commodities.Sum(x => x.Documents!.Length));
+        matchResult.Matches.Count.Should().Be(clearanceRequestWrapper.ClearanceRequest.Commodities.Length);
     }
 
     private static ClearanceRequestWrapper GenerateSimpleClearanceRequestWrapper()

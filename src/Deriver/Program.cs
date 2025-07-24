@@ -1,3 +1,5 @@
+using Defra.TradeImportsDecisionDeriver.Deriver.Authentication;
+using Defra.TradeImportsDecisionDeriver.Deriver.Endpoints.Decision;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Health;
 using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
@@ -53,6 +55,8 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
     builder.Services.AddProcessorConfiguration(builder.Configuration);
     builder.Services.AddDataApiHttpClient();
     builder.Services.AddConsumers(builder.Configuration);
+
+    builder.Services.AddAuthenticationAuthorization();
 }
 
 static WebApplication BuildWebApplication(WebApplicationBuilder builder)
@@ -61,7 +65,10 @@ static WebApplication BuildWebApplication(WebApplicationBuilder builder)
 
     app.UseEmfExporter();
     app.UseHeaderPropagation();
+    app.UseAuthentication();
+    app.UseAuthorization();
     app.MapHealth();
+    app.MapOnDemandEndpoints();
     app.UseStatusCodePages();
     app.UseExceptionHandler(
         new ExceptionHandlerOptions

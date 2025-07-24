@@ -60,14 +60,9 @@ public class PostTests
 
         mappingBuilder.Given(m =>
             m.WithRequest(req =>
-                    req.UsingPut()
-                        .WithPath(
-                            $"/customs-declarations/{customsDeclaration.MovementReferenceNumber}"
-                        )
+                    req.UsingPut().WithPath($"/customs-declarations/{customsDeclaration.MovementReferenceNumber}")
                 )
-                .WithResponse(rsp =>
-                    rsp.WithStatusCode(HttpStatusCode.OK)
-                )
+                .WithResponse(rsp => rsp.WithStatusCode(HttpStatusCode.OK))
         );
 
         var getMappingBuilderResult = await mappingBuilder.BuildAndPostAsync();

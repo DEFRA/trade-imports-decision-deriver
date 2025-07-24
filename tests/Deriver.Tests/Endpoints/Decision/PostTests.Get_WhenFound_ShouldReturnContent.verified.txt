@@ -6,7 +6,7 @@
     created: {Scrubbed},
     externalVersionNumber: 2,
     decisionNumber: 1,
-    sourceVersion: CR-VERSION-2,
+    sourceVersion: null,
     items: [
       {
         itemNumber: 1,

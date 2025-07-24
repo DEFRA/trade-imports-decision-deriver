@@ -93,10 +93,7 @@ public class ClearanceRequestConsumer(
         }
         else
         {
-            logger.LogInformation(
-                "Decision already exists, not persisting (source version {SourceVersion})",
-                customsDeclaration.ClearanceDecision.SourceVersion
-            );
+            logger.LogInformation("Decision already exists, not persisting");
         }
     }
 

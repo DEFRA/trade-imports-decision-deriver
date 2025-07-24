@@ -19,9 +19,6 @@ public static class ClearanceDecisionBuilder
             DecisionNumber = customsDeclaration.ClearanceDecision is { DecisionNumber: not null }
                 ? customsDeclaration.ClearanceDecision.DecisionNumber + 1
                 : 1,
-            SourceVersion = decisionResult.BuildDecisionSourceVersion(
-                customsDeclaration.ClearanceRequest?.ExternalVersion
-            ),
             Created = DateTime.UtcNow,
             CorrelationId = correlationIdGenerator.Generate(),
             ExternalVersionNumber = customsDeclaration.ClearanceRequest?.ExternalVersion,
@@ -46,17 +43,20 @@ public static class ClearanceDecisionBuilder
         List<DocumentDecisionResult> movementDecisions
     )
     {
-        var decisionsByItem = movementDecisions.GroupBy(x => x.ItemNumber);
-        foreach (var itemDecisions in decisionsByItem)
+        if (clearanceRequest is not null)
         {
-            if (clearanceRequest.Commodities != null)
+            var decisionsByItem = movementDecisions.GroupBy(x => x.ItemNumber);
+            foreach (var itemDecisions in decisionsByItem)
             {
-                var commodity = clearanceRequest.Commodities.First(x => x.ItemNumber == itemDecisions.Key);
-                yield return new ClearanceDecisionItem
+                if (clearanceRequest.Commodities != null)
                 {
-                    ItemNumber = itemDecisions.Key,
-                    Checks = BuildChecks(commodity, itemDecisions).ToArray(),
-                };
+                    var commodity = clearanceRequest.Commodities.First(x => x.ItemNumber == itemDecisions.Key);
+                    yield return new ClearanceDecisionItem
+                    {
+                        ItemNumber = itemDecisions.Key,
+                        Checks = BuildChecks(commodity, itemDecisions).ToArray(),
+                    };
+                }
             }
         }
     }

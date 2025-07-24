@@ -81,10 +81,7 @@ public class ImportPreNotificationConsumer(
             }
             else
             {
-                logger.LogInformation(
-                    "Decision already exists, not persisting (source version {SourceVersion})",
-                    customsDeclaration.ClearanceDecision.SourceVersion
-                );
+                logger.LogInformation("Decision already exists, not persisting");
             }
         }
     }

@@ -68,7 +68,7 @@ static WebApplication BuildWebApplication(WebApplicationBuilder builder)
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapHealth();
-    app.MapOnDemandEndpoints();
+    app.MapDecisionEndpoints();
     app.UseStatusCodePages();
     app.UseExceptionHandler(
         new ExceptionHandlerOptions

@@ -11,7 +11,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Endpoints.Decision;
 
 public static class EndpointRouteBuilderExtensions
 {
-    public static void MapOnDemandEndpoints(this IEndpointRouteBuilder app)
+    public static void MapDecisionEndpoints(this IEndpointRouteBuilder app)
     {
         const string groupName = "Decisions";
 

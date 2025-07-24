@@ -1,7 +1,7 @@
 ﻿{
   isDifferent: false,
   persisted: false,
-  ClearanceDecision: {
+  clearanceDecision: {
     correlationId: TestCorrelationId,
     created: {Scrubbed},
     externalVersionNumber: 2,

@@ -1,0 +1,38 @@
+{
+  isDifferent: false,
+  persisted: false,
+  clearanceDecision: {
+    correlationId: {Scrubbed},
+    created: {Scrubbed},
+    externalVersionNumber: 2,
+    decisionNumber: 1,
+    sourceVersion: CR-VERSION-2,
+    items: [
+      {
+        itemNumber: 1,
+        checks: [
+          {
+            checkCode: H218,
+            decisionCode: X00,
+            decisionsValidUntil: null,
+            decisionReasons: [
+              A Customs Declaration has been submitted however no matching CHEDPP(s) have been submitted to Port Health (for CHEDPP number(s) GBCHD2025.6244952). Please correct the CHEDPP number(s) entered on your customs declaration.
+            ],
+            decisionInternalFurtherDetail: null
+          }
+        ]
+      }
+    ],
+    results: [
+      {
+        itemNumber: 1,
+        importPreNotification: null,
+        documentReference: GBCHD2025.6244952,
+        checkCode: H218,
+        decisionCode: X00,
+        decisionReason: null,
+        internalDecisionCode: null
+      }
+    ]
+  }
+}

@@ -1,5 +1,6 @@
 using AutoFixture;
 using Defra.TradeImportsDataApi.Api.Client;
+using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 
 namespace Defra.TradeImportsDecisionDeriver.TestFixtures;
 
@@ -40,5 +41,37 @@ public static class CustomsDeclarationResponseFixtures
         }
 
         return response;
+    }
+
+    public static CustomsDeclarationResponse CustomsDeclarationResponseSimpleStaticFixture(string mrn = "mrn123")
+    {
+        return new CustomsDeclarationResponse(
+            mrn,
+            new ClearanceRequest()
+            {
+                ExternalVersion = 2,
+                Commodities =
+                [
+                    new Commodity()
+                    {
+                        ItemNumber = 1,
+                        Checks = [new CommodityCheck() { CheckCode = "H218", DepartmentCode = "HMI" }],
+                        Documents =
+                        [
+                            new ImportDocument()
+                            {
+                                DocumentCode = "N002",
+                                DocumentReference = new ImportDocumentReference("GBCHD2025.6244952"),
+                            },
+                        ],
+                    },
+                ],
+            },
+            null,
+            null,
+            null,
+            DateTime.Now,
+            DateTime.Now
+        );
     }
 }

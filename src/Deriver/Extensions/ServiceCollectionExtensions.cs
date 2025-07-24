@@ -74,29 +74,35 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ConsumerMetrics>();
         services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(MetricsInterceptor<>));
 
-        services.AddSlimMessageBus(mbb =>
-        {
-            var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");
-            var consumersPerHost = configuration.GetValue<int>("CONSUMERS_PER_HOST");
-            var autoStartConsumers = configuration.GetValue<bool>("AUTO_START_CONSUMERS");
+        var autoStartConsumers = configuration.GetValue<bool>("AUTO_START_CONSUMERS");
 
-            mbb.RegisterSerializer<ToStringSerializer>(s =>
+        if (autoStartConsumers)
+        {
+            services.AddSlimMessageBus(mbb =>
             {
-                s.TryAddSingleton(_ => new ToStringSerializer());
-                s.TryAddSingleton<IMessageSerializer<string>>(svp => svp.GetRequiredService<ToStringSerializer>());
+                var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");
+                var consumersPerHost = configuration.GetValue<int>("CONSUMERS_PER_HOST");
+
+                mbb.RegisterSerializer<ToStringSerializer>(s =>
+                {
+                    s.TryAddSingleton(_ => new ToStringSerializer());
+                    s.TryAddSingleton<IMessageSerializer<string>>(svp => svp.GetRequiredService<ToStringSerializer>());
+                });
+                mbb.AddServicesFromAssemblyContaining<ConsumerMediator>();
+                mbb.WithProviderAmazonSQS(cfg =>
+                {
+                    cfg.TopologyProvisioning.Enabled = false;
+                    cfg.ClientProviderFactory = _ => new CdpCredentialsSqsClientProvider(
+                        cfg.SqsClientConfig,
+                        configuration
+                    );
+                });
+                mbb.AutoStartConsumersEnabled(autoStartConsumers)
+                    .Consume<string>(x =>
+                        x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(consumersPerHost)
+                    );
             });
-            mbb.AddServicesFromAssemblyContaining<ConsumerMediator>();
-            mbb.WithProviderAmazonSQS(cfg =>
-            {
-                cfg.TopologyProvisioning.Enabled = false;
-                cfg.ClientProviderFactory = _ => new CdpCredentialsSqsClientProvider(
-                    cfg.SqsClientConfig,
-                    configuration
-                );
-            });
-            mbb.AutoStartConsumersEnabled(autoStartConsumers)
-                .Consume<string>(x => x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(consumersPerHost));
-        });
+        }
 
         return services;
     }

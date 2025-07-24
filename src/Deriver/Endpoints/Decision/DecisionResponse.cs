@@ -6,5 +6,5 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Endpoints.Decision;
 public record DecisionResponse(
     [property: JsonPropertyName("isDifferent")] bool IsDifferent,
     [property: JsonPropertyName("persisted")] bool Persisted,
-    [property: JsonPropertyName("ClearanceDecision")] ClearanceDecision ClearanceDecision
+    [property: JsonPropertyName("clearanceDecision")] ClearanceDecision ClearanceDecision
 );

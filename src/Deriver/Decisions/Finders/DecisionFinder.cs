@@ -1,5 +1,3 @@
-using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
-
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 
 public abstract class DecisionFinder : IDecisionFinder
@@ -17,12 +15,13 @@ public abstract class DecisionFinder : IDecisionFinder
             notification.Status == ImportNotificationStatus.Cancelled
             || notification.Status == ImportNotificationStatus.Replaced
             || notification.Status == ImportNotificationStatus.Deleted
+            || notification.Status == ImportNotificationStatus.SplitConsignment
         )
         {
             return new DecisionFinderResult(
                 DecisionCode.X00,
                 checkCode,
-                InternalDecisionCode: DecisionInternalFurtherDetail.E88
+                InternalDecisionCode: DecisionInternalFurtherDetail.E80
             );
         }
 
@@ -52,22 +51,5 @@ public abstract class DecisionFinder : IDecisionFinder
 
         decisionCode = null;
         return false;
-    }
-
-    protected static DecisionFinderResult HandleNullNotAcceptableAction(
-        DecisionImportPreNotification notification,
-        CheckCode? checkCode
-    )
-    {
-        if (notification.NotAcceptableReasons?.Length > 0)
-        {
-            return new DecisionFinderResult(DecisionCode.N04, checkCode);
-        }
-
-        return new DecisionFinderResult(
-            DecisionCode.X00,
-            checkCode,
-            InternalDecisionCode: DecisionInternalFurtherDetail.E97
-        );
     }
 }

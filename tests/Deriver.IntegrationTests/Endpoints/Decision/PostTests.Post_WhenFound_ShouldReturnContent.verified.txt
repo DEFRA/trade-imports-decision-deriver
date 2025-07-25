@@ -18,7 +18,9 @@
             decisionReasons: [
               A Customs Declaration has been submitted however no matching CHEDPP(s) have been submitted to Port Health (for CHEDPP number(s) GBCHD2025.6244952). Please correct the CHEDPP number(s) entered on your customs declaration.
             ],
-            decisionInternalFurtherDetail: null
+            decisionInternalFurtherDetail: [
+              E80
+            ]
           }
         ]
       }
@@ -31,7 +33,7 @@
         checkCode: H218,
         decisionCode: X00,
         decisionReason: null,
-        internalDecisionCode: null
+        internalDecisionCode: E80
       }
     ]
   }

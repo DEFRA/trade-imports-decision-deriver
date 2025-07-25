@@ -25,6 +25,7 @@ public enum DecisionCode
 
 public enum DecisionInternalFurtherDetail
 {
+    E80, // No Match (Including Cancelled or Replaced or Deleted or Partially Rejected or Split Consignment)
     E85, // Missing PHSI check
     E86, // No HMI check
     E87, // No Documents

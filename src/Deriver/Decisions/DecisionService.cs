@@ -127,7 +127,8 @@ public class DecisionService(
                     noMatch.DocumentReference,
                     checkCode,
                     DecisionCode.X00,
-                    decisionReason: reason
+                    decisionReason: reason,
+                    internalDecisionCode: DecisionInternalFurtherDetail.E80
                 );
             }
         }
@@ -138,7 +139,8 @@ public class DecisionService(
                 noMatch.ItemNumber,
                 noMatch.DocumentReference,
                 null,
-                DecisionCode.X00
+                DecisionCode.X00,
+                internalDecisionCode: DecisionInternalFurtherDetail.E80
             );
         }
     }

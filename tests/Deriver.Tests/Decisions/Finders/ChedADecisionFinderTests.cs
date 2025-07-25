@@ -208,4 +208,22 @@ public class ChedADecisionFinderTests
 
         result.DecisionCode.Should().Be(DecisionCode.H02);
     }
+
+    [Fact]
+    public void WhenPartiallyRejected_DecisionShouldBeX00()
+    {
+        var notification = new DecisionImportPreNotification
+        {
+            Id = "TEst",
+            Status = ImportNotificationStatus.PartiallyRejected,
+            InspectionRequired = InspectionRequired.Required,
+            Commodities = [new DecisionCommodityComplement { HmiDecision = CommodityRiskResultHmiDecision.Required }],
+        };
+        var sut = new ChedADecisionFinder();
+
+        var result = sut.FindDecision(notification, null);
+
+        result.DecisionCode.Should().Be(DecisionCode.X00);
+        result.InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E80);
+    }
 }

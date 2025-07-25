@@ -1,5 +1,5 @@
 {
-  isDifferent: false,
+  isDifferent: true,
   persisted: true,
   clearanceDecision: {
     correlationId: {Scrubbed},

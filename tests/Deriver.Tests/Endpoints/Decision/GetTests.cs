@@ -61,10 +61,55 @@ public class GetTests : EndpointTestBase, IClassFixture<WireMockContext>
     }
 
     [Fact]
-    public async Task Get_WhenFound_ShouldReturnContent()
+    public async Task Get_WhenFound_AndDecisionDifferent_ShouldReturnContent()
     {
         var client = CreateClient();
         var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseSimpleStaticFixture();
+
+        MockCorrelationIdGenerator.Generate().Returns("TestCorrelationId");
+
+        MockTradeImportsDataApiClient
+            .GetCustomsDeclaration(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
+            .Returns(customsDeclaration);
+
+        MockTradeImportsDataApiClient
+            .GetImportPreNotificationsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
+            .Returns(new ImportPreNotificationsResponse([]));
+
+        var response = await client.GetAsync(
+            Testing.Endpoints.Decision.Get(customsDeclaration.MovementReferenceNumber)
+        );
+
+        await MockTradeImportsDataApiClient
+            .Received(0)
+            .PutCustomsDeclaration(
+                customsDeclaration.MovementReferenceNumber,
+                Arg.Any<CustomsDeclaration>(),
+                Arg.Any<string>(),
+                Arg.Any<CancellationToken>()
+            );
+        await VerifyJson(await response.Content.ReadAsStringAsync(), _settings);
+    }
+
+    [Fact]
+    public async Task Get_WhenFound_AndDecisionNotDifferent_ShouldReturnContent()
+    {
+        var client = CreateClient();
+        var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseSimpleStaticFixture();
+        customsDeclaration = customsDeclaration with
+        {
+            ClearanceDecision = new ClearanceDecision()
+            {
+                Items =
+                [
+                    new ClearanceDecisionItem()
+                    {
+                        ItemNumber = 1,
+                        Checks = [new ClearanceDecisionCheck() { CheckCode = "H218", DecisionCode = "X00" }],
+                    },
+                ],
+            },
+        };
 
         MockCorrelationIdGenerator.Generate().Returns("TestCorrelationId");
 

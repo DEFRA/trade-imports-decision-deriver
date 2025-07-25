@@ -1,8 +1,8 @@
-{
+﻿{
   isDifferent: true,
-  persisted: true,
+  persisted: false,
   clearanceDecision: {
-    correlationId: {Scrubbed},
+    correlationId: TestCorrelationId,
     created: {Scrubbed},
     externalVersionNumber: 2,
     decisionNumber: 1,

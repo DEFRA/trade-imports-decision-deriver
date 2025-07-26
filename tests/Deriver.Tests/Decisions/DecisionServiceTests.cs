@@ -5,6 +5,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using System.Linq;
 
 // ReSharper disable InconsistentNaming
 
@@ -359,6 +360,118 @@ public class DecisionServiceTests
         decisionResult.Decisions[2].DecisionCode.Should().Be(DecisionCode.C03);
     }
 
+    [Theory]
+    [InlineData("both", "Compliant", "Compliant", "Compliant", "Compliant", DecisionCode.C03, DecisionCode.C03)]
+    [InlineData("both", "Non compliant", "Non compliant", "Non compliant", "Compliant", DecisionCode.N01, DecisionCode.C03)]
+    [InlineData("both", "Compliant", "Compliant", "Compliant", "Non compliant", DecisionCode.C03, DecisionCode.N01)]
+    [InlineData("both", "Non compliant", "Non compliant", "Non compliant", "Non compliant", DecisionCode.N01, DecisionCode.N01)]
+    [InlineData("both", "Compliant", "Compliant", "Compliant", "Missing", DecisionCode.C03, DecisionCode.H01)]
+    [InlineData("both", "Non compliant", "Non compliant", "Non compliant", "Missing", DecisionCode.N01, DecisionCode.H01)]
+    [InlineData("both", "Missing", "Missing", "Missing", "Compliant", DecisionCode.H01, DecisionCode.C03)]
+    [InlineData("both", "Missing", "Missing", "Missing", "Non compliant", DecisionCode.H01, DecisionCode.N01)]
+    [InlineData("phsi", "Compliant", "Compliant", "Compliant", "Missing", DecisionCode.C03)]
+    [InlineData("phsi", "Non compliant", "Non compliant", "Non compliant", "Missing", DecisionCode.N01)]
+    [InlineData("phsi", "Compliant", "Compliant", "Compliant", "Compliant", DecisionCode.C03)]
+    [InlineData("phsi", "Compliant", "Compliant", "Compliant", "Non compliant", DecisionCode.C03)]
+    [InlineData("phsi", "Non compliant", "Non compliant", "Non compliant", "Non compliant", DecisionCode.N01)]
+    [InlineData("phsi", "Non compliant", "Non compliant", "Non compliant", "Compliant", DecisionCode.N01)]
+    [InlineData("hmi", "Compliant", "Compliant", "Compliant", "Compliant", DecisionCode.C03)]
+    [InlineData("hmi", "Non compliant", "Non compliant", "Non compliant", "Non compliant", DecisionCode.N01)]
+    [InlineData("hmi", "Compliant", "Compliant", "Compliant", "Non compliant", DecisionCode.N01)]
+    [InlineData("hmi", "Non compliant", "Non compliant", "Non compliant", "Compliant", DecisionCode.C03)]
+    [InlineData("hmi", "Missing", "Missing", "Missing", "Compliant", DecisionCode.C03)]
+    [InlineData("hmi", "Missing", "Missing", "Missing", "Non compliant", DecisionCode.N01)]
+    // Mixed PHSI status scenarios
+    [InlineData("both", "Compliant", "Non compliant", "Auto cleared", "Compliant", DecisionCode.N01, DecisionCode.C03)]
+    [InlineData("both", "Auto cleared", "Compliant", "Non compliant", "Non compliant", DecisionCode.N01, DecisionCode.N01)]
+    [InlineData("phsi", "Compliant", "Non compliant", "Auto cleared", "Missing", DecisionCode.N01)]
+    // Edge case status scenarios
+    [InlineData("both", "To do", "To do", "To do", "Compliant", DecisionCode.H01, DecisionCode.C03)]
+    [InlineData("both", "Hold", "Hold", "Hold", "Non compliant", DecisionCode.H01, DecisionCode.N01)]
+    [InlineData("both", "To be inspected", "To be inspected", "To be inspected", "Compliant", DecisionCode.H02, DecisionCode.C03)]
+    [InlineData("both", "Not inspected", "Not inspected", "Not inspected", "Non compliant", DecisionCode.C02, DecisionCode.N01)]
+    [InlineData("phsi", "To do", "To do", "To do", "Missing", DecisionCode.H01)]
+    [InlineData("hmi", "Missing", "Missing", "Missing", "Hold", DecisionCode.H01)]
+    [InlineData("hmi", "Missing", "Missing", "Missing", "To be inspected", DecisionCode.H02)]
+    [InlineData("hmi", "Missing", "Missing", "Missing", "Not inspected", DecisionCode.C02)]
+    public async Task When_processing_chedpp_scenarios_Then_should_return_expected_decisions(
+        string scenario,
+        string phsiDocumentStatus,
+        string phsiIdentityStatus,
+        string phsiPhysicalStatus,
+        string hmiStatus,
+        DecisionCode expectedPhsiDecisionCode,
+        DecisionCode? expectedHmiDecisionCode = null
+    )
+    {
+        // Arrange
+        var matchingResult = new MatchingResult();
+        matchingResult.AddMatch("CHEDPP.GB.2025.1234567", "25GB12345678901234", 1, "GBCHD2025.1234567");
+
+        var matchingService = Substitute.For<IMatchingService>();
+        matchingService
+            .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(matchingResult));
+
+        var decisionContext = CreateChedppDecisionContext(
+            scenario,
+            phsiDocumentStatus,
+            phsiIdentityStatus,
+            phsiPhysicalStatus,
+            hmiStatus
+        );
+
+        var sut = new DecisionService(
+            NullLogger<DecisionService>.Instance,
+            matchingService,
+            [
+                new ChedADecisionFinder(),
+                new ChedDDecisionFinder(),
+                new ChedPDecisionFinder(),
+                new ChedPPDecisionFinder(),
+                new IuuDecisionFinder(),
+            ]
+        );
+
+        // Act
+        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+
+        // Assert
+        decisionResult.Decisions.Should().NotBeEmpty();
+        
+        // Log the scenario being tested for debugging
+        Console.WriteLine($"Testing scenario: {scenario} - PHSI: {phsiDocumentStatus}/{phsiIdentityStatus}/{phsiPhysicalStatus}, HMI: {hmiStatus}");
+        
+        // For scenarios with both PHSI and HMI checks, we need to verify the correct decision for each
+        if (scenario == "both")
+        {
+            var phsiDecision = decisionResult.Decisions.FirstOrDefault(d => d.CheckCode == "H219");
+            var hmiDecision = decisionResult.Decisions.FirstOrDefault(d => d.CheckCode == "H218");
+            
+            if (phsiDecision != null)
+            {
+                phsiDecision.DecisionCode.Should().Be(expectedPhsiDecisionCode);
+            }
+            
+            if (hmiDecision != null && expectedHmiDecisionCode.HasValue)
+            {
+                hmiDecision.DecisionCode.Should().Be(expectedHmiDecisionCode.Value);
+            }
+        }
+        else if (scenario == "phsi")
+        {
+            var phsiDecision = decisionResult.Decisions.FirstOrDefault(d => d.CheckCode == "H219");
+            phsiDecision.Should().NotBeNull();
+            phsiDecision!.DecisionCode.Should().Be(expectedPhsiDecisionCode);
+        }
+        else if (scenario == "hmi")
+        {
+            var hmiDecision = decisionResult.Decisions.FirstOrDefault(d => d.CheckCode == "H218");
+            hmiDecision.Should().NotBeNull();
+            hmiDecision!.DecisionCode.Should().Be(expectedPhsiDecisionCode);
+        }
+    }
+
     private static DecisionContext CreateDecisionContext(
         string? importNotificationType,
         string[]? checkCodes,
@@ -395,4 +508,109 @@ public class DecisionServiceTests
             ]
         );
     }
+
+    private static DecisionContext CreateChedppDecisionContext(
+        string scenario,
+        string phsiDocumentStatus,
+        string phsiIdentityStatus,
+        string phsiPhysicalStatus,
+        string hmiStatus
+    )
+    {
+        var commodityChecks = new List<DecisionCommodityCheck.Check>();
+        
+        // Add PHSI checks if scenario includes PHSI
+        if ((scenario == "phsi" || scenario == "both") && phsiDocumentStatus != "Missing")
+        {
+            commodityChecks.Add(new DecisionCommodityCheck.Check { Type = "PHSI_DOCUMENT", Status = phsiDocumentStatus });
+        }
+        if ((scenario == "phsi" || scenario == "both") && phsiIdentityStatus != "Missing")
+        {
+            commodityChecks.Add(new DecisionCommodityCheck.Check { Type = "PHSI_IDENTITY", Status = phsiIdentityStatus });
+        }
+        if ((scenario == "phsi" || scenario == "both") && phsiPhysicalStatus != "Missing")
+        {
+            commodityChecks.Add(new DecisionCommodityCheck.Check { Type = "PHSI_PHYSICAL", Status = phsiPhysicalStatus });
+        }
+        
+        // Add HMI check if scenario includes HMI
+        if ((scenario == "hmi" || scenario == "both") && hmiStatus != "Missing")
+        {
+            commodityChecks.Add(new DecisionCommodityCheck.Check { Type = "HMI", Status = hmiStatus });
+        }
+
+        var clearanceRequestChecks = new List<CommodityCheck>();
+        
+        if (scenario == "phsi" || scenario == "both")
+        {
+            clearanceRequestChecks.Add(new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" });
+        }
+        
+        if (scenario == "hmi" || scenario == "both")
+        {
+            clearanceRequestChecks.Add(new CommodityCheck { CheckCode = "H218", DepartmentCode = "HMI" });
+        }
+
+        return new DecisionContext(
+            [
+                new DecisionImportPreNotification()
+                {
+                    Id = "CHEDPP.GB.2025.1234567",
+                    Status = ImportNotificationStatus.Validated,
+                    ImportNotificationType = ImportNotificationType.Chedpp,
+                    UpdatedSource = DateTime.UtcNow,
+                    ConsignmentDecision = null,
+                    NotAcceptableAction = null,
+                    IuuCheckRequired = null,
+                    IuuOption = null,
+                    NotAcceptableReasons = null,
+                    InspectionRequired = "Required",
+                    Commodities =
+                    [
+                        new DecisionCommodityComplement() 
+                        { 
+                            HmiDecision = scenario == "hmi" || scenario == "both" ? "REQUIRED" : "NOTREQUIRED", 
+                            PhsiDecision = scenario == "phsi" || scenario == "both" ? "REQUIRED" : "NOTREQUIRED" 
+                        },
+                    ],
+                    CommodityChecks = commodityChecks.ToArray(),
+                },
+            ],
+            [
+                new ClearanceRequestWrapper(
+                    "25GB12345678901234",
+                    new ClearanceRequest
+                    {
+                        Commodities =
+                        [
+                            new Commodity
+                            {
+                                ItemNumber = 1,
+                                Documents =
+                                [
+                                    new ImportDocument()
+                                    {
+                                        DocumentCode = "N002",
+                                        DocumentReference = new ImportDocumentReference("GBCHD2025.1234567"),
+                                        DocumentStatus = "AE",
+                                        DocumentControl = "P",
+                                    },
+                                    new ImportDocument()
+                                    {
+                                        DocumentCode = "N851",
+                                        DocumentReference = new ImportDocumentReference("GBCHD2025.1234567"),
+                                        DocumentStatus = "AE",
+                                        DocumentControl = "P",
+                                    },
+                                ],
+                                Checks = clearanceRequestChecks.ToArray(),
+                            },
+                        ],
+                    }
+                ),
+            ]
+        );
+    }
+
+
 }

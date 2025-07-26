@@ -103,19 +103,47 @@ public class ChedPpPhsiDecisionFinderTests
         result.DecisionCode.Should().Be(expectedCode);
     }
 
+
     [Theory]
+    [InlineData("To do", "Hold", "To be inspected", DecisionCode.H02)]
+    [InlineData("Hold", "To be inspected", "Non compliant", DecisionCode.N01)]
+    [InlineData("To be inspected", "Non compliant", "Compliant", DecisionCode.N01)]
+    [InlineData("Compliant", null, "Compliant", DecisionCode.H01)]
+    [InlineData("Compliant", "To do", "Compliant", DecisionCode.H01)]
+    [InlineData("Compliant", "Hold", "Compliant", DecisionCode.H01)]
+    [InlineData("Compliant", "To be inspected", "Compliant", DecisionCode.H02)]
+    [InlineData("Compliant", "Auto cleared", "Compliant", DecisionCode.C03)]
+    [InlineData("Compliant", "Non compliant", "Compliant", DecisionCode.N01)]
+    [InlineData("Compliant", "Not inspected", "Compliant", DecisionCode.C03)]
+    [InlineData("Compliant", "Compliant", null, DecisionCode.H01)]
+    [InlineData("Compliant", "Compliant", "To do", DecisionCode.H01)]
+    [InlineData("Compliant", "Compliant", "Hold", DecisionCode.H01)]
+    [InlineData("Compliant", "Compliant", "To be inspected", DecisionCode.H02)]
+    [InlineData("Compliant", "Compliant", "Auto cleared", DecisionCode.C03)]
+    [InlineData("Compliant", "Compliant", "Non compliant", DecisionCode.N01)]
+    [InlineData("Compliant", "Compliant", "Not inspected", DecisionCode.C03)]
+    [InlineData("Non compliant", "Compliant", "Compliant", DecisionCode.N01)]
+    [InlineData("Not inspected", null, "To do", DecisionCode.H01)]
+    [InlineData("Not inspected", "Not inspected", "Not inspected", DecisionCode.C02)]
+    [InlineData("Not inspected", "Compliant", "Compliant", DecisionCode.C03)]
+    [InlineData(null, "Compliant", "Compliant", DecisionCode.H01)]
+    [InlineData("To do", "Compliant", "Compliant", DecisionCode.H01)]
+    [InlineData("Hold", "Compliant", "Compliant", DecisionCode.H01)]
+    [InlineData("To be inspected", "Compliant", "Compliant", DecisionCode.H02)]
+    [InlineData(null, "To do", "Hold", DecisionCode.H01)]
+    [InlineData(null, "Auto cleared", "Auto cleared", DecisionCode.H01)]
+    [InlineData("Auto cleared", "Compliant", "Compliant", DecisionCode.C03)]
+    [InlineData("Auto cleared", null, "Auto cleared", DecisionCode.H01)]
+    [InlineData("Auto cleared", "Auto cleared", null, DecisionCode.H01)]
+    // All checks in same state
     [InlineData("To do", "To do", "To do", DecisionCode.H01)]
     [InlineData("Hold", "Hold", "Hold", DecisionCode.H01)]
     [InlineData("To be inspected", "To be inspected", "To be inspected", DecisionCode.H02)]
     [InlineData("Compliant", "Compliant", "Compliant", DecisionCode.C03)]
     [InlineData("Auto cleared", "Auto cleared", "Auto cleared", DecisionCode.C03)]
     [InlineData("Non compliant", "Non compliant", "Non compliant", DecisionCode.N01)]
-    [InlineData("Not inspected", "Not inspected", "Not inspected", DecisionCode.C02)]
     [InlineData("invalid", "invalid", "invalid", DecisionCode.X00)]
     [InlineData(null, null, null, DecisionCode.H01)]
-    [InlineData(null, "Auto cleared", "Auto cleared", DecisionCode.H01)]
-    [InlineData("Auto cleared", null, "Auto cleared", DecisionCode.H01)]
-    [InlineData("Auto cleared", "Auto cleared", null, DecisionCode.H01)]
     public void PhsiDecisionFinderTest(
         string? documentStatus,
         string? physicalStatus,
@@ -150,6 +178,7 @@ public class ChedPpPhsiDecisionFinderTests
 
         var result = sut.FindDecision(notification, new CheckCode() { Value = "H219" });
 
+        Console.WriteLine(result);
         result.DecisionCode.Should().Be(expectedCode);
     }
 }

@@ -44,7 +44,7 @@ public class ImportPreNotificationConsumerTests
     }
 
     [Fact]
-    public async Task GivenACreatedEvent_AndCustomsDeclarationsExist_ThenDecisionShouldBeCreated()
+    public async Task GivenACreatedEvent_AndCustomsDeclarationsExist_AndVersionsAreTheSame_ThenDecisionShouldBeCreated()
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
@@ -71,6 +71,52 @@ public class ImportPreNotificationConsumerTests
                     [
                         new ImportPreNotificationResponse(
                             ImportPreNotificationFixtures.ImportPreNotificationFixture("test")!,
+                            DateTime.Now,
+                            DateTime.Now
+                        ),
+                    ]
+                )
+            );
+
+        var decisionResult = new DecisionResult();
+        decisionResult.AddDecision("mrn123", 1, "docref", "checkCode", DecisionCode.C03);
+        decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
+
+        // ACT
+        await consumer.OnHandle(createdEvent, CancellationToken.None);
+
+        // ASSERT
+        apiClient.ReceivedCalls().Count().Should().Be(4);
+    }
+
+    [Fact]
+    public async Task GivenACreatedEvent_AndCustomsDeclarationsExist_ThenDecisionShouldBeCreated1()
+    {
+        // ARRANGE
+        var apiClient = Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = Substitute.For<IDecisionService>();
+        var consumer = new ImportPreNotificationConsumer(
+            NullLogger<ImportPreNotificationConsumer>.Instance,
+            decisionService,
+            apiClient,
+            new TestCorrelationIdGenerator("CorrelationId")
+        );
+
+        var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
+
+        var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
+        customsDeclaration = customsDeclaration with { Finalisation = null };
+        apiClient
+            .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
+            .Returns(new CustomsDeclarationsResponse([customsDeclaration]));
+
+        apiClient
+            .GetImportPreNotificationsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
+            .Returns(
+                new ImportPreNotificationsResponse(
+                    [
+                        new ImportPreNotificationResponse(
+                            ImportPreNotificationFixtures.ImportPreNotificationFixture(createdEvent.ResourceId)!,
                             DateTime.Now,
                             DateTime.Now
                         ),

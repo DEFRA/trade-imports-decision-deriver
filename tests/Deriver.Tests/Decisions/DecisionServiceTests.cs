@@ -1,3 +1,4 @@
+using System.Linq;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
@@ -5,7 +6,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
-using System.Linq;
+using Xunit.Abstractions;
 
 // ReSharper disable InconsistentNaming
 
@@ -13,6 +14,13 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions;
 
 public class DecisionServiceTests
 {
+    private readonly ITestOutputHelper output;
+
+    public DecisionServiceTests(ITestOutputHelper output)
+    {
+        this.output = output;
+    }
+
     [Theory]
     [InlineData(ImportNotificationType.Cveda, DecisionCode.C06, "H221")]
     public async Task When_processing_decisions_for_ched_type_notifications_not_requiring_iuu_check_Then_should_use_matching_ched_decision_finder_only(
@@ -362,11 +370,35 @@ public class DecisionServiceTests
 
     [Theory]
     [InlineData("both", "Compliant", "Compliant", "Compliant", "Compliant", DecisionCode.C03, DecisionCode.C03)]
-    [InlineData("both", "Non compliant", "Non compliant", "Non compliant", "Compliant", DecisionCode.N01, DecisionCode.C03)]
+    [InlineData(
+        "both",
+        "Non compliant",
+        "Non compliant",
+        "Non compliant",
+        "Compliant",
+        DecisionCode.N01,
+        DecisionCode.C03
+    )]
     [InlineData("both", "Compliant", "Compliant", "Compliant", "Non compliant", DecisionCode.C03, DecisionCode.N01)]
-    [InlineData("both", "Non compliant", "Non compliant", "Non compliant", "Non compliant", DecisionCode.N01, DecisionCode.N01)]
+    [InlineData(
+        "both",
+        "Non compliant",
+        "Non compliant",
+        "Non compliant",
+        "Non compliant",
+        DecisionCode.N01,
+        DecisionCode.N01
+    )]
     [InlineData("both", "Compliant", "Compliant", "Compliant", "Missing", DecisionCode.C03, DecisionCode.H01)]
-    [InlineData("both", "Non compliant", "Non compliant", "Non compliant", "Missing", DecisionCode.N01, DecisionCode.H01)]
+    [InlineData(
+        "both",
+        "Non compliant",
+        "Non compliant",
+        "Non compliant",
+        "Missing",
+        DecisionCode.N01,
+        DecisionCode.H01
+    )]
     [InlineData("both", "Missing", "Missing", "Missing", "Compliant", DecisionCode.H01, DecisionCode.C03)]
     [InlineData("both", "Missing", "Missing", "Missing", "Non compliant", DecisionCode.H01, DecisionCode.N01)]
     [InlineData("phsi", "Compliant", "Compliant", "Compliant", "Missing", DecisionCode.C03)]
@@ -383,13 +415,37 @@ public class DecisionServiceTests
     [InlineData("hmi", "Missing", "Missing", "Missing", "Non compliant", DecisionCode.N01)]
     // Mixed PHSI status scenarios
     [InlineData("both", "Compliant", "Non compliant", "Auto cleared", "Compliant", DecisionCode.N01, DecisionCode.C03)]
-    [InlineData("both", "Auto cleared", "Compliant", "Non compliant", "Non compliant", DecisionCode.N01, DecisionCode.N01)]
+    [InlineData(
+        "both",
+        "Auto cleared",
+        "Compliant",
+        "Non compliant",
+        "Non compliant",
+        DecisionCode.N01,
+        DecisionCode.N01
+    )]
     [InlineData("phsi", "Compliant", "Non compliant", "Auto cleared", "Missing", DecisionCode.N01)]
     // Edge case status scenarios
     [InlineData("both", "To do", "To do", "To do", "Compliant", DecisionCode.H01, DecisionCode.C03)]
     [InlineData("both", "Hold", "Hold", "Hold", "Non compliant", DecisionCode.H01, DecisionCode.N01)]
-    [InlineData("both", "To be inspected", "To be inspected", "To be inspected", "Compliant", DecisionCode.H02, DecisionCode.C03)]
-    [InlineData("both", "Not inspected", "Not inspected", "Not inspected", "Non compliant", DecisionCode.C02, DecisionCode.N01)]
+    [InlineData(
+        "both",
+        "To be inspected",
+        "To be inspected",
+        "To be inspected",
+        "Compliant",
+        DecisionCode.H02,
+        DecisionCode.C03
+    )]
+    [InlineData(
+        "both",
+        "Not inspected",
+        "Not inspected",
+        "Not inspected",
+        "Non compliant",
+        DecisionCode.C02,
+        DecisionCode.N01
+    )]
     [InlineData("phsi", "To do", "To do", "To do", "Missing", DecisionCode.H01)]
     [InlineData("hmi", "Missing", "Missing", "Missing", "Hold", DecisionCode.H01)]
     [InlineData("hmi", "Missing", "Missing", "Missing", "To be inspected", DecisionCode.H02)]
@@ -438,21 +494,23 @@ public class DecisionServiceTests
 
         // Assert
         decisionResult.Decisions.Should().NotBeEmpty();
-        
+
         // Log the scenario being tested for debugging
-        Console.WriteLine($"Testing scenario: {scenario} - PHSI: {phsiDocumentStatus}/{phsiIdentityStatus}/{phsiPhysicalStatus}, HMI: {hmiStatus}");
-        
+        output.WriteLine(
+            $"Testing scenario: {scenario} - PHSI: {phsiDocumentStatus}/{phsiIdentityStatus}/{phsiPhysicalStatus}, HMI: {hmiStatus}"
+        );
+
         // For scenarios with both PHSI and HMI checks, we need to verify the correct decision for each
         if (scenario == "both")
         {
             var phsiDecision = decisionResult.Decisions.FirstOrDefault(d => d.CheckCode == "H219");
             var hmiDecision = decisionResult.Decisions.FirstOrDefault(d => d.CheckCode == "H218");
-            
+
             if (phsiDecision != null)
             {
                 phsiDecision.DecisionCode.Should().Be(expectedPhsiDecisionCode);
             }
-            
+
             if (hmiDecision != null && expectedHmiDecisionCode.HasValue)
             {
                 hmiDecision.DecisionCode.Should().Be(expectedHmiDecisionCode.Value);
@@ -518,21 +576,27 @@ public class DecisionServiceTests
     )
     {
         var commodityChecks = new List<DecisionCommodityCheck.Check>();
-        
+
         // Add PHSI checks if scenario includes PHSI
         if ((scenario == "phsi" || scenario == "both") && phsiDocumentStatus != "Missing")
         {
-            commodityChecks.Add(new DecisionCommodityCheck.Check { Type = "PHSI_DOCUMENT", Status = phsiDocumentStatus });
+            commodityChecks.Add(
+                new DecisionCommodityCheck.Check { Type = "PHSI_DOCUMENT", Status = phsiDocumentStatus }
+            );
         }
         if ((scenario == "phsi" || scenario == "both") && phsiIdentityStatus != "Missing")
         {
-            commodityChecks.Add(new DecisionCommodityCheck.Check { Type = "PHSI_IDENTITY", Status = phsiIdentityStatus });
+            commodityChecks.Add(
+                new DecisionCommodityCheck.Check { Type = "PHSI_IDENTITY", Status = phsiIdentityStatus }
+            );
         }
         if ((scenario == "phsi" || scenario == "both") && phsiPhysicalStatus != "Missing")
         {
-            commodityChecks.Add(new DecisionCommodityCheck.Check { Type = "PHSI_PHYSICAL", Status = phsiPhysicalStatus });
+            commodityChecks.Add(
+                new DecisionCommodityCheck.Check { Type = "PHSI_PHYSICAL", Status = phsiPhysicalStatus }
+            );
         }
-        
+
         // Add HMI check if scenario includes HMI
         if ((scenario == "hmi" || scenario == "both") && hmiStatus != "Missing")
         {
@@ -540,12 +604,12 @@ public class DecisionServiceTests
         }
 
         var clearanceRequestChecks = new List<CommodityCheck>();
-        
+
         if (scenario == "phsi" || scenario == "both")
         {
             clearanceRequestChecks.Add(new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" });
         }
-        
+
         if (scenario == "hmi" || scenario == "both")
         {
             clearanceRequestChecks.Add(new CommodityCheck { CheckCode = "H218", DepartmentCode = "HMI" });
@@ -567,10 +631,10 @@ public class DecisionServiceTests
                     InspectionRequired = "Required",
                     Commodities =
                     [
-                        new DecisionCommodityComplement() 
-                        { 
-                            HmiDecision = scenario == "hmi" || scenario == "both" ? "REQUIRED" : "NOTREQUIRED", 
-                            PhsiDecision = scenario == "phsi" || scenario == "both" ? "REQUIRED" : "NOTREQUIRED" 
+                        new DecisionCommodityComplement()
+                        {
+                            HmiDecision = scenario == "hmi" || scenario == "both" ? "REQUIRED" : "NOTREQUIRED",
+                            PhsiDecision = scenario == "phsi" || scenario == "both" ? "REQUIRED" : "NOTREQUIRED",
                         },
                     ],
                     CommodityChecks = commodityChecks.ToArray(),
@@ -611,6 +675,4 @@ public class DecisionServiceTests
             ]
         );
     }
-
-
 }

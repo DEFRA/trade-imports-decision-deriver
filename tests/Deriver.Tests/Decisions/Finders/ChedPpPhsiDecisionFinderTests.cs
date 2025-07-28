@@ -103,7 +103,6 @@ public class ChedPpPhsiDecisionFinderTests
         result.DecisionCode.Should().Be(expectedCode);
     }
 
-
     [Theory]
     [InlineData("To do", "Hold", "To be inspected", DecisionCode.H02)]
     [InlineData("Hold", "To be inspected", "Non compliant", DecisionCode.N01)]

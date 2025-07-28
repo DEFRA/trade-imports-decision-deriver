@@ -36,6 +36,7 @@ public class ImportPreNotificationConsumer(
         }
 
         var notifications = await GetNotifications(
+            message,
             clearanceRequests.Select(x => x.MovementReferenceNumber).Distinct().ToArray()
         );
 
@@ -113,7 +114,10 @@ public class ImportPreNotificationConsumer(
             .ToList();
     }
 
-    private async Task<List<DecisionImportPreNotification>> GetNotifications(string[] mrns)
+    private async Task<List<DecisionImportPreNotification>> GetNotifications(
+        ResourceEvent<ImportPreNotificationEntity> message,
+        string[] mrns
+    )
     {
         var notifications = new List<ImportPreNotification>();
 
@@ -124,14 +128,30 @@ public class ImportPreNotificationConsumer(
                 var apiResponse = await apiClient.GetImportPreNotificationsByMrn(mrn, cancellationToken);
 
                 foreach (
-                    var notificationResponse in apiResponse.ImportPreNotifications.Where(notificationResponse =>
-                        !notifications.Exists(x =>
-                            x.ReferenceNumber == notificationResponse.ImportPreNotification.ReferenceNumber
+                    var notificationResponse in apiResponse
+                        .ImportPreNotifications.Where(notificationResponse =>
+                            !notifications.Exists(x =>
+                                x.ReferenceNumber == notificationResponse.ImportPreNotification.ReferenceNumber
+                            )
                         )
-                    )
+                        .Select(x => x.ImportPreNotification)
                 )
                 {
-                    notifications.Add(notificationResponse.ImportPreNotification);
+                    notifications.Add(notificationResponse);
+
+                    if (message.ResourceId == notificationResponse.ReferenceNumber)
+                    {
+                        if (message.Resource?.ImportPreNotification.GetVersion() != notificationResponse.GetVersion())
+                        {
+                            logger.LogInformation(
+                                "ImportPreNotification ResourceEvent version does not match API response"
+                            );
+                        }
+                    }
+                    else
+                    {
+                        logger.LogInformation("ImportPreNotification ResourceEvent version matches API response");
+                    }
                 }
             }
         );

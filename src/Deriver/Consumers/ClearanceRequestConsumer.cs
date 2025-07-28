@@ -37,6 +37,11 @@ public class ClearanceRequestConsumer(
             clearanceRequest?.ClearanceRequest.GetVersion()
         );
 
+        if (message.Resource?.ClearanceRequest?.GetVersion() != clearanceRequest?.ClearanceRequest.GetVersion())
+        {
+            logger.LogInformation("ClearanceRequest ResourceEvent version does not match API response");
+        }
+
         if (WasFinalisedBeforeClearanceRequest(clearanceRequest))
         {
             logger.LogInformation("Skipping, already finalised");

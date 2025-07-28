@@ -3,6 +3,8 @@ using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
+using Defra.TradeImportsDecisionDeriver.Deriver.Entities;
+using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using SlimMessageBus;
@@ -14,17 +16,26 @@ public class ClearanceRequestConsumer(
     IDecisionService decisionService,
     ITradeImportsDataApiClient apiClient,
     ICorrelationIdGenerator correlationIdGenerator
-) : IConsumer<ResourceEvent<object>>, IConsumerWithContext
+) : IConsumer<ResourceEvent<CustomsDeclarationEntity>>, IConsumerWithContext
 {
-    public async Task OnHandle(ResourceEvent<object> message, CancellationToken cancellationToken)
+    public async Task OnHandle(ResourceEvent<CustomsDeclarationEntity> message, CancellationToken cancellationToken)
     {
         logger.LogInformation(
-            "Received clearance request {ResourceId} of sub type {SubResourceType}",
+            "Received clearance request {ResourceId} of sub type {SubResourceType} with Etag {Etag} and resource version {Version}",
             message.ResourceId,
-            message.SubResourceType
+            message.SubResourceType,
+            message.ETag,
+            message.Resource?.ClearanceRequest?.GetVersion()
         );
 
         var clearanceRequest = await apiClient.GetCustomsDeclaration(message.ResourceId, cancellationToken);
+
+        logger.LogInformation(
+            "Fetched clearance request {ResourceId} with Etag {Etag} and resource version {Version}",
+            message.ResourceId,
+            clearanceRequest?.ETag,
+            clearanceRequest?.ClearanceRequest.GetVersion()
+        );
 
         if (WasFinalisedBeforeClearanceRequest(clearanceRequest))
         {

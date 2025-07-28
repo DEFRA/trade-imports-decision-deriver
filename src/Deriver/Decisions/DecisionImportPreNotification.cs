@@ -46,4 +46,9 @@ public class DecisionImportPreNotification
             && ConsignmentDecision
                 != Defra.TradeImportsDecisionDeriver.Deriver.Decisions.ConsignmentDecision.NonAcceptable;
     }
+
+    public string GetVersion()
+    {
+        return $"{Id}_{Status}_{UpdatedSource:ddMMyyhhmmssms}";
+    }
 }

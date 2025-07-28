@@ -4,6 +4,8 @@ using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
+using Defra.TradeImportsDecisionDeriver.Deriver.Entities;
+using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using SlimMessageBus;
@@ -15,11 +17,15 @@ public class ImportPreNotificationConsumer(
     IDecisionService decisionService,
     ITradeImportsDataApiClient apiClient,
     ICorrelationIdGenerator correlationIdGenerator
-) : IConsumer<ResourceEvent<object>>, IConsumerWithContext
+) : IConsumer<ResourceEvent<ImportPreNotificationEntity>>, IConsumerWithContext
 {
-    public async Task OnHandle(ResourceEvent<object> message, CancellationToken cancellationToken)
+    public async Task OnHandle(ResourceEvent<ImportPreNotificationEntity> message, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Received notification {ResourceId}", message.ResourceId);
+        logger.LogInformation(
+            "Received notification {ResourceId} with version {Version}",
+            message.ResourceId,
+            message.Resource?.ImportPreNotification.GetVersion()
+        );
 
         var clearanceRequests = await GetClearanceRequests(message.ResourceId, cancellationToken);
         if (clearanceRequests.Count == 0)
@@ -57,6 +63,13 @@ public class ImportPreNotificationConsumer(
         foreach (var mrn in clearanceRequests.Select(x => x.MovementReferenceNumber))
         {
             var existingCustomsDeclaration = await apiClient.GetCustomsDeclaration(mrn, cancellationToken);
+
+            logger.LogInformation(
+                "Fetched clearance request {ResourceId} with Etag {Etag} and resource version {Version}",
+                mrn,
+                existingCustomsDeclaration?.ETag,
+                existingCustomsDeclaration?.ClearanceRequest.GetVersion()
+            );
 
             var customsDeclaration = new CustomsDeclaration
             {

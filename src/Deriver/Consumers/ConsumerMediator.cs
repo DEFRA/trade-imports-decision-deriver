@@ -2,6 +2,7 @@ using System.Text.Json;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Entities;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
@@ -52,7 +53,7 @@ public class ConsumerMediator(
             Context = Context,
         };
 
-        var @event = message.Deserialize<ResourceEvent<object>>();
+        var @event = message.Deserialize<ResourceEvent<ImportPreNotificationEntity>>();
 
         return consumer.OnHandle(@event!, cancellationToken);
     }
@@ -69,7 +70,7 @@ public class ConsumerMediator(
             Context = Context,
         };
 
-        var @event = message.Deserialize<ResourceEvent<object>>();
+        var @event = message.Deserialize<ResourceEvent<CustomsDeclarationEntity>>();
 
         return consumer.OnHandle(@event!, cancellationToken);
     }

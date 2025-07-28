@@ -12,6 +12,7 @@ public class DecisionService(
 {
     public async Task<DecisionResult> Process(DecisionContext decisionContext, CancellationToken cancellationToken)
     {
+        decisionContext.LogVersions(logger);
         var matchResult = await matchingService.Process(
             new MatchingContext(decisionContext.Notifications, decisionContext.ClearanceRequests),
             cancellationToken

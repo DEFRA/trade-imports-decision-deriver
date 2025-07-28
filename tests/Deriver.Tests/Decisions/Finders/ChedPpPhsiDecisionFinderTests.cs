@@ -178,7 +178,6 @@ public class ChedPpPhsiDecisionFinderTests
 
         var result = sut.FindDecision(notification, new CheckCode() { Value = "H219" });
 
-        Console.WriteLine(result);
         result.DecisionCode.Should().Be(expectedCode);
     }
 }

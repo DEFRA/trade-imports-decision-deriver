@@ -1,18 +1,19 @@
 using AutoFixture;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
+using Defra.TradeImportsDecisionDeriver.Deriver.Entities;
 
 namespace Defra.TradeImportsDecisionDeriver.TestFixtures;
 
 public static class ClearanceRequestFixtures
 {
-    public static ResourceEvent<object> ClearanceRequestCreatedFixture()
+    public static ResourceEvent<CustomsDeclarationEntity> ClearanceRequestCreatedFixture()
     {
         var fixture = new Fixture();
         fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
 
         return fixture
-            .Build<ResourceEvent<object>>()
+            .Build<ResourceEvent<CustomsDeclarationEntity>>()
             .With(x => x.Operation, ResourceEventOperations.Created)
             .With(x => x.SubResourceType, ResourceEventSubResourceTypes.ClearanceRequest)
             .Create();

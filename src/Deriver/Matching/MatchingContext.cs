@@ -1,5 +1,6 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 
@@ -12,4 +13,10 @@ public class MatchingContext(
     public List<ClearanceRequestWrapper> ClearanceRequests { get; } = clearanceRequests;
 }
 
-public record ClearanceRequestWrapper(string MovementReferenceNumber, ClearanceRequest ClearanceRequest);
+public record ClearanceRequestWrapper(string MovementReferenceNumber, ClearanceRequest ClearanceRequest)
+{
+    public string GetVersion()
+    {
+        return $"{MovementReferenceNumber}_{ClearanceRequest.GetVersion()}";
+    }
+}

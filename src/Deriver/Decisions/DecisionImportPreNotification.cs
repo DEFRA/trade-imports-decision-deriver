@@ -49,6 +49,6 @@ public class DecisionImportPreNotification
 
     public string GetVersion()
     {
-        return $"{Id}_{Status}_{UpdatedSource:ddMMyyhhmmssms}";
+        return $"{Id}_{Status}_{UpdatedSource:o}";
     }
 }

@@ -6,6 +6,6 @@ public static class ClearanceRequestExtensions
 {
     public static string GetVersion(this ClearanceRequest? clearanceRequest)
     {
-        return $"{clearanceRequest?.ExternalVersion}_{clearanceRequest?.MessageSentAt:s}";
+        return $"{clearanceRequest?.ExternalVersion}_{clearanceRequest?.MessageSentAt:o}";
     }
 }

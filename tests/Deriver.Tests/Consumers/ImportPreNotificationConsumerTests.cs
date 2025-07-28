@@ -90,7 +90,7 @@ public class ImportPreNotificationConsumerTests
     }
 
     [Fact]
-    public async Task GivenACreatedEvent_AndCustomsDeclarationsExist_ThenDecisionShouldBeCreated1()
+    public async Task GivenACreatedEvent_AndCustomsDeclarationsExist_ThenDecisionShouldBeCreated()
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();

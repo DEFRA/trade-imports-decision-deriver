@@ -6,6 +6,6 @@ public static class ImportPreNotificationExtensions
 {
     public static string GetVersion(this ImportPreNotification notification)
     {
-        return $"{notification.ReferenceNumber}_{notification.Status}_{notification.UpdatedSource:s}";
+        return $"{notification.ReferenceNumber}_{notification.Status}_{notification.UpdatedSource:o}";
     }
 }

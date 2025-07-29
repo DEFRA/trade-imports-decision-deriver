@@ -7,7 +7,8 @@ using SlimMessageBus.Host.Interceptor;
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
 
 [ExcludeFromCodeCoverage]
-public class MetricsInterceptor<TMessage>(ConsumerMetrics consumerMetrics) : IConsumerInterceptor<TMessage>
+public class MetricsInterceptor<TMessage>(ConsumerMetrics consumerMetrics, ILogger<MetricsInterceptor<TMessage>> logger)
+    : IConsumerInterceptor<TMessage>
     where TMessage : notnull
 {
     public async Task<object> OnHandle(TMessage message, Func<Task<object>> next, IConsumerContext context)
@@ -16,6 +17,7 @@ public class MetricsInterceptor<TMessage>(ConsumerMetrics consumerMetrics) : ICo
         var consumerName = context.Consumer.GetType().Name;
         var resourceType = context.GetResourceType();
         var subResourceType = context.GetSubResourceType();
+        var resourceId = context.GetResourceId();
 
         try
         {
@@ -28,11 +30,15 @@ public class MetricsInterceptor<TMessage>(ConsumerMetrics consumerMetrics) : ICo
         {
             consumerMetrics.Warn(context.Path, consumerName, resourceType, subResourceType, httpRequestException);
 
+            LogForTriaging("Warn", consumerName, resourceId, resourceType, subResourceType);
+
             throw;
         }
         catch (Exception exception)
         {
             consumerMetrics.Faulted(context.Path, consumerName, resourceType, subResourceType, exception);
+
+            LogForTriaging("Faulted", consumerName, resourceId, resourceType, subResourceType);
 
             throw;
         }
@@ -46,5 +52,32 @@ public class MetricsInterceptor<TMessage>(ConsumerMetrics consumerMetrics) : ICo
                 subResourceType
             );
         }
+    }
+
+    /// <summary>
+    /// Intentionally an information log as this supports triaging, not alerting.
+    /// The logging interceptor will log for the benefit of alerting.
+    /// </summary>
+    /// <param name="level"></param>
+    /// <param name="consumerName"></param>
+    /// <param name="resourceId"></param>
+    /// <param name="resourceType"></param>
+    /// <param name="subResourceType"></param>
+    private void LogForTriaging(
+        string level,
+        string consumerName,
+        string resourceId,
+        string resourceType,
+        string subResourceType
+    )
+    {
+        logger.LogInformation(
+            "{Level} consumer {Consumer} for resource {Resource} of type {Type} {SubType}",
+            level,
+            consumerName,
+            resourceId,
+            resourceType,
+            subResourceType
+        );
     }
 }

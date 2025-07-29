@@ -13,15 +13,27 @@ public abstract class DecisionFinder : IDecisionFinder
     {
         return notification.Status switch
         {
-            ImportNotificationStatus.Cancelled => new DecisionFinderResult(DecisionCode.X00, checkCode,
-                InternalDecisionCode: DecisionInternalFurtherDetail.E71),
-            ImportNotificationStatus.Replaced => new DecisionFinderResult(DecisionCode.X00, checkCode,
-                InternalDecisionCode: DecisionInternalFurtherDetail.E72),
-            ImportNotificationStatus.Deleted => new DecisionFinderResult(DecisionCode.X00, checkCode,
-                InternalDecisionCode: DecisionInternalFurtherDetail.E73),
-            ImportNotificationStatus.SplitConsignment => new DecisionFinderResult(DecisionCode.X00, checkCode,
-                InternalDecisionCode: DecisionInternalFurtherDetail.E75),
-            _ => FindDecisionInternal(notification, checkCode)
+            ImportNotificationStatus.Cancelled => new DecisionFinderResult(
+                DecisionCode.X00,
+                checkCode,
+                InternalDecisionCode: DecisionInternalFurtherDetail.E71
+            ),
+            ImportNotificationStatus.Replaced => new DecisionFinderResult(
+                DecisionCode.X00,
+                checkCode,
+                InternalDecisionCode: DecisionInternalFurtherDetail.E72
+            ),
+            ImportNotificationStatus.Deleted => new DecisionFinderResult(
+                DecisionCode.X00,
+                checkCode,
+                InternalDecisionCode: DecisionInternalFurtherDetail.E73
+            ),
+            ImportNotificationStatus.SplitConsignment => new DecisionFinderResult(
+                DecisionCode.X00,
+                checkCode,
+                InternalDecisionCode: DecisionInternalFurtherDetail.E75
+            ),
+            _ => FindDecisionInternal(notification, checkCode),
         };
     }
 

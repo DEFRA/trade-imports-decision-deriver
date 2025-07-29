@@ -11,21 +11,18 @@ public abstract class DecisionFinder : IDecisionFinder
 
     public DecisionFinderResult FindDecision(DecisionImportPreNotification notification, CheckCode? checkCode)
     {
-        if (
-            notification.Status == ImportNotificationStatus.Cancelled
-            || notification.Status == ImportNotificationStatus.Replaced
-            || notification.Status == ImportNotificationStatus.Deleted
-            || notification.Status == ImportNotificationStatus.SplitConsignment
-        )
+        return notification.Status switch
         {
-            return new DecisionFinderResult(
-                DecisionCode.X00,
-                checkCode,
-                InternalDecisionCode: DecisionInternalFurtherDetail.E80
-            );
-        }
-
-        return FindDecisionInternal(notification, checkCode);
+            ImportNotificationStatus.Cancelled => new DecisionFinderResult(DecisionCode.X00, checkCode,
+                InternalDecisionCode: DecisionInternalFurtherDetail.E71),
+            ImportNotificationStatus.Replaced => new DecisionFinderResult(DecisionCode.X00, checkCode,
+                InternalDecisionCode: DecisionInternalFurtherDetail.E72),
+            ImportNotificationStatus.Deleted => new DecisionFinderResult(DecisionCode.X00, checkCode,
+                InternalDecisionCode: DecisionInternalFurtherDetail.E73),
+            ImportNotificationStatus.SplitConsignment => new DecisionFinderResult(DecisionCode.X00, checkCode,
+                InternalDecisionCode: DecisionInternalFurtherDetail.E75),
+            _ => FindDecisionInternal(notification, checkCode)
+        };
     }
 
     protected static bool TryGetHoldDecision(DecisionImportPreNotification notification, out DecisionCode? decisionCode)

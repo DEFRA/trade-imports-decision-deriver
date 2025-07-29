@@ -48,16 +48,16 @@ public class ChedPpPhsiDecisionFinderTests
 
     [Theory]
     [InlineData(ImportNotificationStatus.Amend, DecisionCode.X00, DecisionInternalFurtherDetail.E99)]
-    [InlineData(ImportNotificationStatus.Cancelled, DecisionCode.X00, DecisionInternalFurtherDetail.E80)]
-    [InlineData(ImportNotificationStatus.Deleted, DecisionCode.X00, DecisionInternalFurtherDetail.E80)]
+    [InlineData(ImportNotificationStatus.Cancelled, DecisionCode.X00, DecisionInternalFurtherDetail.E71)]
+    [InlineData(ImportNotificationStatus.Deleted, DecisionCode.X00, DecisionInternalFurtherDetail.E73)]
     [InlineData(ImportNotificationStatus.Draft, DecisionCode.X00, DecisionInternalFurtherDetail.E99)]
     [InlineData(ImportNotificationStatus.InProgress, DecisionCode.H02)]
     [InlineData(ImportNotificationStatus.Submitted, DecisionCode.H02)]
     [InlineData(ImportNotificationStatus.Modify, DecisionCode.X00, DecisionInternalFurtherDetail.E99)]
     [InlineData(ImportNotificationStatus.PartiallyRejected, DecisionCode.H01)]
     [InlineData(ImportNotificationStatus.Rejected, DecisionCode.N02)]
-    [InlineData(ImportNotificationStatus.Replaced, DecisionCode.X00, DecisionInternalFurtherDetail.E80)]
-    [InlineData(ImportNotificationStatus.SplitConsignment, DecisionCode.X00, DecisionInternalFurtherDetail.E80)]
+    [InlineData(ImportNotificationStatus.Replaced, DecisionCode.X00, DecisionInternalFurtherDetail.E72)]
+    [InlineData(ImportNotificationStatus.SplitConsignment, DecisionCode.X00, DecisionInternalFurtherDetail.E75)]
     public void DecisionFinderTest(
         string status,
         DecisionCode expectedCode,

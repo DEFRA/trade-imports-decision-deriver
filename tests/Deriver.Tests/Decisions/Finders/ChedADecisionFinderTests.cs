@@ -224,6 +224,6 @@ public class ChedADecisionFinderTests
         var result = sut.FindDecision(notification, null);
 
         result.DecisionCode.Should().Be(DecisionCode.X00);
-        result.InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E80);
+        result.InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E74);
     }
 }

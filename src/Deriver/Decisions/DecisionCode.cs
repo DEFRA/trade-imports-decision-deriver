@@ -25,11 +25,17 @@ public enum DecisionCode
 
 public enum DecisionInternalFurtherDetail
 {
-    E80, // No Match (Including Cancelled or Replaced or Deleted or Partially Rejected or Split Consignment)
+    E70, // No Match
+    E71, // Cancelled
+    E72, // Replaced
+    E73, // Deleted
+    E74, // Partially Rejected
+    E75, // Split Consignment
+    E80, // NO LONGER USED
     E85, // Missing PHSI check
     E86, // No HMI check
     E87, // No Documents
-    E88, // Cancelled or Replaced or Deleted
+    E88, // NO LONGER USED
     E89, // Item with document references where none are valid format
     E90, // No Decision Finder found
     E94, // IUU not indicated in PartTwo?.ControlAuthority?.IuuCheckRequired but "H224" requested in Items[]?.Checks[]?.CheckCode

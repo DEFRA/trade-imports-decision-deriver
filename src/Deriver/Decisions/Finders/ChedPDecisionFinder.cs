@@ -21,7 +21,7 @@ public class ChedPDecisionFinder : DecisionFinder
             return new DecisionFinderResult(
                 DecisionCode.X00,
                 checkCode,
-                InternalDecisionCode: DecisionInternalFurtherDetail.E80
+                InternalDecisionCode: DecisionInternalFurtherDetail.E74
             );
         }
 

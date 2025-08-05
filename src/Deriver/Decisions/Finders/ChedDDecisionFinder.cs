@@ -4,7 +4,11 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 
 public class ChedDDecisionFinder : DecisionFinder
 {
-    public override bool CanFindDecision(DecisionImportPreNotification notification, CheckCode? checkCode) =>
+    public override bool CanFindDecision(
+        DecisionImportPreNotification notification,
+        CheckCode? checkCode,
+        string? documentCode
+    ) =>
         notification.ImportNotificationType == ImportNotificationType.Ced
         && notification.IuuCheckRequired != true
         && checkCode?.GetImportNotificationType() == ImportNotificationType.Ced;

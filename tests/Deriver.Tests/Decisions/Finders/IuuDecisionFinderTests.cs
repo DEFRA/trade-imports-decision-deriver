@@ -38,7 +38,8 @@ public class IuuDecisionFinderTests
 
         var result = sut.CanFindDecision(
             notification,
-            string.IsNullOrEmpty(checkCode) ? null : new CheckCode { Value = checkCode }
+            string.IsNullOrEmpty(checkCode) ? null : new CheckCode { Value = checkCode },
+            null
         );
 
         result.Should().Be(expectedResult);

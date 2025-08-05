@@ -5,11 +5,16 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 // ReSharper disable once InconsistentNaming
 public class ChedPPDecisionFinder : DecisionFinder
 {
-    public override bool CanFindDecision(DecisionImportPreNotification notification, CheckCode? checkCode) =>
+    public override bool CanFindDecision(
+        DecisionImportPreNotification notification,
+        CheckCode? checkCode,
+        string? documentCode
+    ) =>
         notification.ImportNotificationType == ImportNotificationType.Chedpp
         && notification.Status != ImportNotificationStatus.Cancelled
         && notification.Status != ImportNotificationStatus.Replaced
-        && checkCode?.GetImportNotificationType() == ImportNotificationType.Chedpp;
+        && checkCode?.GetImportNotificationType() == ImportNotificationType.Chedpp
+        && ValidCheckCodeAndDocumentCodeMapping(checkCode, documentCode);
 
     protected override DecisionFinderResult FindDecisionInternal(
         DecisionImportPreNotification notification,
@@ -94,5 +99,16 @@ public class ChedPPDecisionFinder : DecisionFinder
                 InternalDecisionCode: DecisionInternalFurtherDetail.E99
             ),
         };
+    }
+
+    private static bool ValidCheckCodeAndDocumentCodeMapping(CheckCode? checkCode, string? documentCode)
+    {
+        if (checkCode?.Value != "H218" && checkCode?.Value != "H219")
+        {
+            return true;
+        }
+
+        return (checkCode.Value == "H219" && documentCode is "N851" or "9115")
+            || (checkCode.Value == "H218" && documentCode is "N002");
     }
 }

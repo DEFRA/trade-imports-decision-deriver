@@ -36,7 +36,7 @@ public class ChedDDecisionFinderTests
         };
         var sut = new ChedDDecisionFinder();
 
-        var result = sut.CanFindDecision(notification, new CheckCode { Value = "H223" });
+        var result = sut.CanFindDecision(notification, new CheckCode { Value = "H223" }, null);
 
         result.Should().Be(expectedResult);
     }

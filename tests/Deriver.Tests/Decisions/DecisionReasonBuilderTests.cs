@@ -12,7 +12,7 @@ public class DecisionReasonBuilderTests
         // Act
         var result = DecisionReasonBuilder.Build(
             new Commodity(),
-            new DocumentDecisionResult(null, "Test", 1, string.Empty, null, DecisionCode.X00, "Test Reason", null)
+            new DocumentDecisionResult(null, "Test", 1, string.Empty, null, null, DecisionCode.X00, "Test Reason", null)
         );
 
         // Assert
@@ -37,7 +37,17 @@ public class DecisionReasonBuilderTests
                 ],
                 Checks = [new CommodityCheck()],
             },
-            new DocumentDecisionResult(null, "Test", 1, "Test Doc Ref", "H221", DecisionCode.X00, null, null)
+            new DocumentDecisionResult(
+                null,
+                "Test",
+                1,
+                "Test Doc Ref",
+                "Test Doc Code",
+                "H221",
+                DecisionCode.X00,
+                null,
+                null
+            )
         );
 
         // Assert
@@ -55,7 +65,17 @@ public class DecisionReasonBuilderTests
         // Act
         var result = DecisionReasonBuilder.Build(
             new Commodity() { Checks = [new CommodityCheck() { CheckCode = "H220" }] },
-            new DocumentDecisionResult(null, "Test", 1, "Test Doc Ref", "H221", DecisionCode.X00, null, null)
+            new DocumentDecisionResult(
+                null,
+                "Test",
+                1,
+                "Test Doc Ref",
+                "Test Doc Code",
+                "H221",
+                DecisionCode.X00,
+                null,
+                null
+            )
         );
 
         // Assert
@@ -73,7 +93,17 @@ public class DecisionReasonBuilderTests
         // Act
         var result = DecisionReasonBuilder.Build(
             new Commodity() { Checks = [new CommodityCheck() { CheckCode = "H221" }] },
-            new DocumentDecisionResult(null, "Test", 1, "Test Doc Ref", "H221", DecisionCode.X00, null, null)
+            new DocumentDecisionResult(
+                null,
+                "Test",
+                1,
+                "Test Doc Ref",
+                "Test Doc Code",
+                "H221",
+                DecisionCode.X00,
+                null,
+                null
+            )
         );
 
         // Assert

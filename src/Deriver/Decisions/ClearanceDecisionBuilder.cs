@@ -29,6 +29,7 @@ public static class ClearanceDecisionBuilder
                     ItemNumber = x.ItemNumber,
                     ImportPreNotification = x.PreNotification?.Id,
                     DocumentReference = x.DocumentReference,
+                    DocumentCode = x.DocumentCode,
                     CheckCode = x.CheckCode,
                     DecisionCode = x.DecisionCode.ToString(),
                     DecisionReason = x.DecisionReason,

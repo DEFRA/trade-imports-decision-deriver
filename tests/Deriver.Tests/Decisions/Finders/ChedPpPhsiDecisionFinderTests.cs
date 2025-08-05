@@ -40,7 +40,13 @@ public class ChedPpPhsiDecisionFinderTests
 
         var result = sut.CanFindDecision(
             notification,
-            string.IsNullOrEmpty(checkCode) ? null : new CheckCode { Value = checkCode }
+            string.IsNullOrEmpty(checkCode) ? null : new CheckCode { Value = checkCode },
+            checkCode switch
+            {
+                "H218" => "N002",
+                "H219" => "N851",
+                _ => null,
+            }
         );
 
         result.Should().Be(expectedResult);

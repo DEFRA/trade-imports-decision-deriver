@@ -59,7 +59,8 @@ public class MatchingService : IMatchingService
             matchingResult.AddDocumentNoMatch(
                 wrapper.MovementReferenceNumber,
                 item.ItemNumber!.Value,
-                documentGroup.Value
+                documentGroup.Value,
+                documentCode
             );
         }
         else
@@ -68,7 +69,8 @@ public class MatchingService : IMatchingService
                 notification.Id!,
                 wrapper.MovementReferenceNumber,
                 item.ItemNumber!.Value,
-                documentGroup.Value
+                documentGroup.Value,
+                documentCode
             );
         }
     }

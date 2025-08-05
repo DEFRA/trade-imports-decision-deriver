@@ -26,7 +26,8 @@ public class NoMatchDecisionsTest
         matchingResult.AddDocumentNoMatch(
             "123",
             cr.Commodities[0].ItemNumber!.Value,
-            cr.Commodities[0].Documents?[0].DocumentReference!.Value!
+            cr.Commodities[0].Documents?[0].DocumentReference!.Value!,
+            cr.Commodities[0].Documents?[0].DocumentCode!
         );
 
         var matchingService = Substitute.For<IMatchingService>();
@@ -81,7 +82,8 @@ public class NoMatchDecisionsTest
         matchingResult.AddDocumentNoMatch(
             "123",
             cr.Commodities[0].ItemNumber!.Value,
-            cr.Commodities[0].Documents?[0].DocumentReference!.Value!
+            cr.Commodities[0].Documents?[0].DocumentReference!.Value!,
+            cr.Commodities[0].Documents?[0].DocumentCode!
         );
         matchingService
             .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())
@@ -119,7 +121,8 @@ public class NoMatchDecisionsTest
         matchingResult.AddDocumentNoMatch(
             "123",
             cr.Commodities[0].ItemNumber!.Value,
-            cr.Commodities[0].Documents?[0].DocumentReference!.Value!
+            cr.Commodities[0].Documents?[0].DocumentReference!.Value!,
+            cr.Commodities[0].Documents?[0].DocumentCode!
         );
         matchingService
             .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())

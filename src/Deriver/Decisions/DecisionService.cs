@@ -47,7 +47,7 @@ public class DecisionService(
 
                 HandleNoMatches(matchingResult, item, wrapper, checkCodes, decisionsResult);
                 HandleMatches(decisionContext, matchingResult, item, wrapper, checkCodes, decisionsResult);
-                HandleItemsWithInvalidReference(wrapper.MovementReferenceNumber!, item, decisionsResult);
+                HandleItemsWithInvalidReference(wrapper.MovementReferenceNumber!, checkCodes, item, decisionsResult);
             }
         }
 
@@ -149,7 +149,7 @@ public class DecisionService(
         }
     }
 
-    private static void HandleItemsWithInvalidReference(string mrn, Commodity item, DecisionResult decisionsResult)
+    private static void HandleItemsWithInvalidReference(string mrn, CheckCode[]? checkCodes, Commodity item, DecisionResult decisionsResult)
     {
         var itemNumber = item.ItemNumber!.Value;
         var decisions = decisionsResult.Decisions.Where(x => x.ItemNumber == itemNumber && x.Mrn == mrn).ToList();
@@ -158,15 +158,33 @@ public class DecisionService(
         {
             if (item.Documents == null || !item.Documents.Any())
             {
-                decisionsResult.AddDecision(
-                    mrn,
-                    itemNumber,
-                    string.Empty,
+                if (checkCodes is not null && checkCodes.Any())
+                {
+                    foreach (var checkCode in checkCodes)
+                    {
+                        decisionsResult.AddDecision(
+                            mrn,
+                            itemNumber,
+                            string.Empty,
+                            checkCode.Value,
+                            DecisionCode.X00,
+                            internalDecisionCode: DecisionInternalFurtherDetail.E87);
+                    }
+                  
+                }
+                else
+                {
+                    decisionsResult.AddDecision(
+                        mrn,
+                        itemNumber,
+                        string.Empty,
+                        null,
                     null,
-                    null,
-                    DecisionCode.X00,
-                    internalDecisionCode: DecisionInternalFurtherDetail.E87
-                );
+                        DecisionCode.X00,
+                        internalDecisionCode: DecisionInternalFurtherDetail.E87);
+                }
+               
+               
             }
             else
             {

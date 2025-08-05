@@ -39,7 +39,7 @@ public class DecisionService(
             {
                 var checkCodes = wrapper
                     .ClearanceRequest.Commodities.First(x => x.ItemNumber == item.ItemNumber!.Value)
-                    .Checks?.Select(x => x.CheckCode)
+                    .Checks!.Select(x => x.CheckCode)
                     .Where(x => x != null)
                     .Cast<string>()
                     .Select(x => new CheckCode { Value = x })
@@ -94,7 +94,7 @@ public class DecisionService(
         MatchingResult matchingResult,
         Commodity item,
         ClearanceRequestWrapper wrapper,
-        CheckCode[]? checkCodes,
+        CheckCode[] checkCodes,
         DecisionResult decisionsResult
     )
     {
@@ -109,41 +109,26 @@ public class DecisionService(
         }
     }
 
-    private static void HandleNoMatch(CheckCode[]? checkCodes, DecisionResult decisionsResult, DocumentNoMatch noMatch)
+    private static void HandleNoMatch(CheckCode[] checkCodes, DecisionResult decisionsResult, DocumentNoMatch noMatch)
     {
-        if (checkCodes != null)
+        foreach (var checkCode in checkCodes.Select(checkCode => checkCode.Value))
         {
-            foreach (var checkCode in checkCodes.Select(checkCode => checkCode.Value))
+            string? reason = null;
+
+            if (checkCode is "H220")
             {
-                string? reason = null;
-
-                if (checkCode is "H220")
-                {
-                    reason =
-                        "A Customs Declaration with a GMS product has been selected for HMI inspection. In IPAFFS create a CHEDPP and amend your licence to reference it. If a CHEDPP exists, amend your licence to reference it. Failure to do so will delay your Customs release";
-                }
-
-                decisionsResult.AddDecision(
-                    noMatch.Mrn,
-                    noMatch.ItemNumber,
-                    noMatch.DocumentReference,
-                    noMatch.DocumentCode,
-                    checkCode,
-                    DecisionCode.X00,
-                    decisionReason: reason,
-                    internalDecisionCode: DecisionInternalFurtherDetail.E70
-                );
+                reason =
+                    "A Customs Declaration with a GMS product has been selected for HMI inspection. In IPAFFS create a CHEDPP and amend your licence to reference it. If a CHEDPP exists, amend your licence to reference it. Failure to do so will delay your Customs release";
             }
-        }
-        else
-        {
+
             decisionsResult.AddDecision(
                 noMatch.Mrn,
                 noMatch.ItemNumber,
                 noMatch.DocumentReference,
                 noMatch.DocumentCode,
-                null,
+                checkCode,
                 DecisionCode.X00,
+                decisionReason: reason,
                 internalDecisionCode: DecisionInternalFurtherDetail.E70
             );
         }
@@ -159,53 +144,62 @@ public class DecisionService(
         var itemNumber = item.ItemNumber!.Value;
         var decisions = decisionsResult.Decisions.Where(x => x.ItemNumber == itemNumber && x.Mrn == mrn).ToList();
 
-        if (decisions.Count == 0)
+        if (decisions.Count != 0)
+            return;
+        if (item.Documents == null || !item.Documents.Any())
         {
-            if (item.Documents == null || !item.Documents.Any())
+            HandleDocumentWithInvalidReference(mrn, checkCodes, decisionsResult, itemNumber);
+        }
+        else
+        {
+            foreach (var document in item.Documents)
             {
-                if (checkCodes is not null && checkCodes.Any())
-                {
-                    foreach (var checkCode in checkCodes)
-                    {
-                        decisionsResult.AddDecision(
-                            mrn,
-                            itemNumber,
-                            string.Empty,
-                            null,
-                            checkCode.Value,
-                            DecisionCode.X00,
-                            internalDecisionCode: DecisionInternalFurtherDetail.E87
-                        );
-                    }
-                }
-                else
-                {
-                    decisionsResult.AddDecision(
-                        mrn,
-                        itemNumber,
-                        string.Empty,
-                        null,
-                        null,
-                        DecisionCode.X00,
-                        internalDecisionCode: DecisionInternalFurtherDetail.E87
-                    );
-                }
+                decisionsResult.AddDecision(
+                    mrn,
+                    itemNumber,
+                    document.DocumentReference!.Value,
+                    document.DocumentCode,
+                    null,
+                    DecisionCode.X00,
+                    internalDecisionCode: DecisionInternalFurtherDetail.E89
+                );
             }
-            else
+        }
+    }
+
+    private static void HandleDocumentWithInvalidReference(
+        string mrn,
+        CheckCode[]? checkCodes,
+        DecisionResult decisionsResult,
+        int itemNumber
+    )
+    {
+        if (checkCodes is not null && checkCodes.Any())
+        {
+            foreach (var checkCode in checkCodes)
             {
-                foreach (var document in item.Documents)
-                {
-                    decisionsResult.AddDecision(
-                        mrn,
-                        itemNumber,
-                        document.DocumentReference!.Value,
-                        document.DocumentCode,
-                        null,
-                        DecisionCode.X00,
-                        internalDecisionCode: DecisionInternalFurtherDetail.E89
-                    );
-                }
+                decisionsResult.AddDecision(
+                    mrn,
+                    itemNumber,
+                    string.Empty,
+                    null,
+                    checkCode.Value,
+                    DecisionCode.X00,
+                    internalDecisionCode: DecisionInternalFurtherDetail.E87
+                );
             }
+        }
+        else
+        {
+            decisionsResult.AddDecision(
+                mrn,
+                itemNumber,
+                string.Empty,
+                null,
+                null,
+                DecisionCode.X00,
+                internalDecisionCode: DecisionInternalFurtherDetail.E87
+            );
         }
     }
 

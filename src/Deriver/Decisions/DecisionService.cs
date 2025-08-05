@@ -149,7 +149,12 @@ public class DecisionService(
         }
     }
 
-    private static void HandleItemsWithInvalidReference(string mrn, CheckCode[]? checkCodes, Commodity item, DecisionResult decisionsResult)
+    private static void HandleItemsWithInvalidReference(
+        string mrn,
+        CheckCode[]? checkCodes,
+        Commodity item,
+        DecisionResult decisionsResult
+    )
     {
         var itemNumber = item.ItemNumber!.Value;
         var decisions = decisionsResult.Decisions.Where(x => x.ItemNumber == itemNumber && x.Mrn == mrn).ToList();
@@ -168,9 +173,9 @@ public class DecisionService(
                             string.Empty,
                             checkCode.Value,
                             DecisionCode.X00,
-                            internalDecisionCode: DecisionInternalFurtherDetail.E87);
+                            internalDecisionCode: DecisionInternalFurtherDetail.E87
+                        );
                     }
-                  
                 }
                 else
                 {
@@ -179,12 +184,11 @@ public class DecisionService(
                         itemNumber,
                         string.Empty,
                         null,
-                    null,
+                        null,
                         DecisionCode.X00,
-                        internalDecisionCode: DecisionInternalFurtherDetail.E87);
+                        internalDecisionCode: DecisionInternalFurtherDetail.E87
+                    );
                 }
-               
-               
             }
             else
             {

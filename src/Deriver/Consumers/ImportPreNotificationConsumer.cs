@@ -27,6 +27,16 @@ public class ImportPreNotificationConsumer(
             message.Resource?.ImportPreNotification.GetVersion()
         );
 
+        if (message.Resource?.ImportPreNotification.Status == ImportNotificationStatus.Amend)
+        {
+            logger.LogInformation(
+                "Skipping processing for notification {ResourceId} with version {Version} due to AMEND status",
+                message.ResourceId,
+                message.Resource?.ImportPreNotification.GetVersion()
+            );
+            return;
+        }
+
         var clearanceRequests = await GetClearanceRequests(message.ResourceId, cancellationToken);
         if (clearanceRequests.Count == 0)
         {

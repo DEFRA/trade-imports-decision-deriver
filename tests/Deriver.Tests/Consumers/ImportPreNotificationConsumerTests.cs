@@ -257,4 +257,28 @@ public class ImportPreNotificationConsumerTests
         // ASSERT
         apiClient.ReceivedCalls().Count().Should().Be(1);
     }
+
+    [Fact]
+    public async Task GivenACreatedEvent_WithAmendStatus_ThenProcessingShouldBeSkipped()
+    {
+        var apiClient = Substitute.For<ITradeImportsDataApiClient>();
+        var decisionService = Substitute.For<IDecisionService>();
+        var consumer = new ImportPreNotificationConsumer(
+            NullLogger<ImportPreNotificationConsumer>.Instance,
+            decisionService,
+            apiClient,
+            new TestCorrelationIdGenerator("CorrelationId")
+        )
+        {
+            Context = new ConsumerContext(),
+        };
+
+        var amendEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
+        amendEvent.Resource!.ImportPreNotification.Status = ImportNotificationStatus.Amend;
+
+        await consumer.OnHandle(amendEvent, CancellationToken.None);
+
+        await apiClient.DidNotReceive().GetCustomsDeclarationsByChedId(Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await decisionService.DidNotReceive().Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>());
+    }
 }

@@ -4,6 +4,7 @@ public static class ConsignmentDecision
 {
     public const string NonAcceptable = "Non Acceptable";
     public const string AcceptableForInternalMarket = "Acceptable for Internal Market";
+    public const string AcceptableForNonInternalMarket = "Acceptable for Non Internal Market";
     public const string AcceptableIfChanneled = "Acceptable if Channeled";
     public const string AcceptableForTranshipment = "Acceptable for Transhipment";
     public const string AcceptableForTransit = "Acceptable for Transit";

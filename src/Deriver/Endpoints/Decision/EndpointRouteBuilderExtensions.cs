@@ -137,7 +137,7 @@ public static class EndpointRouteBuilderExtensions
             correlationIdGenerator
         );
 
-        var isDifferent = !DecisionExistsComparer.Default.Equals(newDecision, customsDeclaration.ClearanceDecision);
+        var isDifferent = !newDecision.IsSameAs(customsDeclaration.ClearanceDecision);
 
         customsDeclaration.ClearanceDecision = newDecision;
 

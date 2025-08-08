@@ -108,6 +108,19 @@ public class GetTests : EndpointTestBase, IClassFixture<WireMockContext>
                         Checks = [new ClearanceDecisionCheck() { CheckCode = "H218", DecisionCode = "X00" }],
                     },
                 ],
+                Results =
+                [
+                    new ClearanceDecisionResult()
+                    {
+                        ItemNumber = 1,
+                        ImportPreNotification = null,
+                        DocumentReference = "GBCHD2025.6244952",
+                        CheckCode = "H218",
+                        DecisionCode = "X00",
+                        DecisionReason = null,
+                        InternalDecisionCode = "E70",
+                    },
+                ],
             },
         };
 

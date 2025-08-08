@@ -138,6 +138,7 @@ public class ClearanceDecisionExtensionsTests
                     Checks = [new ClearanceDecisionCheck { CheckCode = "H202", DecisionCode = "C04" }],
                 },
             ],
+            Results = null,
         };
 
         var decision1 = new ClearanceDecision
@@ -155,6 +156,7 @@ public class ClearanceDecisionExtensionsTests
                     Checks = [new ClearanceDecisionCheck { CheckCode = "H202", DecisionCode = "C04" }],
                 },
             ],
+            Results = null,
         };
 
         var result = decision.IsSameAs(decision1);
@@ -360,9 +362,6 @@ public class ClearanceDecisionExtensionsTests
         result.Should().BeTrue();
     }
 
-    /// <summary>
-    /// //////////////////////////////////////
-    /// </summary>
     [Fact]
     public void ReferenceDifferentButValuesSames()
     {

@@ -50,7 +50,7 @@ public class ClearanceDecisionResultExistsComparerTests
     }
 
     [Fact]
-    public void ReferenceDifferentButValuesSames()
+    public void DifferentReferenceButValuesSames()
     {
         var item1 = new ClearanceDecisionResult
         {
@@ -80,7 +80,7 @@ public class ClearanceDecisionResultExistsComparerTests
     }
 
     [Fact]
-    public void ReferenceDifferentItemNumberDifferent()
+    public void ItemNumberDifferent()
     {
         var item1 = new ClearanceDecisionResult
         {
@@ -110,7 +110,7 @@ public class ClearanceDecisionResultExistsComparerTests
     }
 
     [Fact]
-    public void ReferenceDifferentDecisionCodeDifferent()
+    public void DecisionCodeDifferent()
     {
         var item1 = new ClearanceDecisionResult
         {
@@ -140,7 +140,7 @@ public class ClearanceDecisionResultExistsComparerTests
     }
 
     [Fact]
-    public void ReferenceDifferentDocumentReferenceDifferent()
+    public void DocumentReferenceDifferent()
     {
         var item1 = new ClearanceDecisionResult
         {
@@ -170,7 +170,7 @@ public class ClearanceDecisionResultExistsComparerTests
     }
 
     [Fact]
-    public void ReferenceDifferentCheckCodeDifferent()
+    public void CheckCodeDifferent()
     {
         var item1 = new ClearanceDecisionResult
         {
@@ -200,7 +200,7 @@ public class ClearanceDecisionResultExistsComparerTests
     }
 
     [Fact]
-    public void ReferenceDifferentDecisionReasonDifferent()
+    public void DecisionReasonDifferent()
     {
         var item1 = new ClearanceDecisionResult
         {
@@ -230,7 +230,7 @@ public class ClearanceDecisionResultExistsComparerTests
     }
 
     [Fact]
-    public void ReferenceDifferentImportPreNotificationDifferent()
+    public void ImportPreNotificationDifferent()
     {
         var item1 = new ClearanceDecisionResult
         {
@@ -260,7 +260,7 @@ public class ClearanceDecisionResultExistsComparerTests
     }
 
     [Fact]
-    public void ReferenceDifferentInternalDecisionCodeDifferent()
+    public void InternalDecisionCodeDifferent()
     {
         var item1 = new ClearanceDecisionResult
         {

@@ -79,6 +79,29 @@ public class ClearanceRequestConsumerTests
                 ],
             },
         };
+
+        var results = new List<ClearanceDecisionResult>();
+        var itemNumber = 1;
+        foreach (var commodity in customsDeclaration.ClearanceRequest!.Commodities!)
+        {
+            foreach (var document in commodity.Documents!)
+            {
+                results.Add(
+                    new ClearanceDecisionResult()
+                    {
+                        ItemNumber = itemNumber,
+                        DocumentReference = document.DocumentReference!.Value,
+                        CheckCode = "9115",
+                        DecisionCode = "C03",
+                    }
+                );
+            }
+
+            itemNumber++;
+        }
+
+        customsDeclaration.ClearanceDecision.Results = results.ToArray();
+
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
         var decisionService = Substitute.For<IDecisionService>();
         var consumer = new ClearanceRequestConsumer(

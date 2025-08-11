@@ -82,7 +82,7 @@ public class ImportPreNotificationConsumer(
 
             var newDecision = decisionResult.BuildClearanceDecision(mrn, customsDeclaration, correlationIdGenerator);
 
-            if (!DecisionExistsComparer.Default.Equals(newDecision, customsDeclaration.ClearanceDecision))
+            if (!newDecision.IsSameAs(customsDeclaration.ClearanceDecision))
             {
                 customsDeclaration.ClearanceDecision = newDecision;
 

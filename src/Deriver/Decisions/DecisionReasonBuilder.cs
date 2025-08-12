@@ -5,16 +5,15 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
 public static class DecisionReasonBuilder
 {
-    public static List<string> Build(Commodity item, DocumentDecisionResult maxDecisionResult)
+    public static List<string> Build(
+        Commodity item,
+        DocumentDecisionResult maxDecisionResult,
+        DocumentDecisionResult[] documentDecisions
+    )
     {
         var reasons = new List<string>();
 
-        if (maxDecisionResult.DecisionReason != null)
-        {
-            reasons.Add(maxDecisionResult.DecisionReason);
-        }
-
-        HandleNoLinkedNotifications(item, maxDecisionResult, reasons);
+        HandleNoLinkedNotifications(item, maxDecisionResult, documentDecisions, reasons);
         HandleHmiGmsDecisionReason(item, maxDecisionResult, reasons);
 
         return reasons;
@@ -23,19 +22,47 @@ public static class DecisionReasonBuilder
     private static void HandleNoLinkedNotifications(
         Commodity item,
         DocumentDecisionResult maxDecisionResult,
+        DocumentDecisionResult[] documentDecisions,
         List<string> reasons
     )
     {
-        if (item.Documents != null && item.Documents.Any() && maxDecisionResult.DecisionCode == DecisionCode.X00)
+        if (
+            item.Documents != null
+            && item.Documents.Any()
+            && maxDecisionResult.DecisionCode == DecisionCode.X00
+            && maxDecisionResult.CheckCode != "H220"
+        )
         {
-            var chedType = MapToChedType(item.Documents[0]);
-            var chedNumbers = string.Join(", ", item.Documents.Select(x => x.DocumentReference?.Value));
+            var chedType = MapToChedType(
+                new ImportDocument()
+                {
+                    DocumentReference = new ImportDocumentReference(maxDecisionResult.DocumentReference),
+                    DocumentCode = maxDecisionResult.DocumentCode,
+                }
+            );
+            var chedNumbers = string.Join(
+                ", ",
+                documentDecisions.Where(x => x.DecisionCode == DecisionCode.X00).Select(x => x.DocumentReference)
+            );
 
-            if (reasons.Count == 0)
+            switch (maxDecisionResult.DocumentCode)
             {
-                reasons.Add(
-                    $"A Customs Declaration has been submitted however no matching {chedType}(s) have been submitted to Port Health (for {chedType} number(s) {chedNumbers}). Please correct the {chedType} number(s) entered on your customs declaration."
-                );
+                case "C673":
+                case "C641":
+                    reasons.Add(
+                        "Clearance of the Customs Declaration has been withheld. Confirmation of the outcome of IUU catch certificate check (under Council Regulation 1005/2008) is required. To resolve this contact your local Port Health Authority (imports) or MMO (landings)."
+                    );
+                    break;
+                case "C640":
+                    reasons.Add(
+                        $"A Customs Declaration has been submitted however no matching {chedType}(s) have been submitted to Animal Health (for {chedType} number(s) {chedNumbers}). Please correct the {chedType} number(s) entered on your customs declaration."
+                    );
+                    break;
+                default:
+                    reasons.Add(
+                        $"A Customs Declaration has been submitted however no matching {chedType}(s) have been submitted to Port Health (for {chedType} number(s) {chedNumbers}). Please correct the {chedType} number(s) entered on your customs declaration."
+                    );
+                    break;
             }
         }
     }
@@ -46,16 +73,15 @@ public static class DecisionReasonBuilder
         List<string> reasons
     )
     {
-        if ((item.Documents == null || !item.Documents.Any()) && maxDecisionResult.DecisionCode == DecisionCode.X00)
+        if (
+            (item.Documents == null || !item.Documents.Any())
+            && maxDecisionResult.DecisionCode == DecisionCode.X00
+            && maxDecisionResult.CheckCode == "H220"
+        )
         {
-            var containsCheckCode = item.Checks != null && item.Checks.Any(x => x.CheckCode == "H220");
-
-            if (containsCheckCode && reasons.Count == 0)
-            {
-                reasons.Add(
-                    "A Customs Declaration with a GMS product has been selected for HMI inspection. In IPAFFS create a CHEDPP and amend your licence to reference it. If a CHEDPP exists, amend your licence to reference it. Failure to do so will delay your Customs release."
-                );
-            }
+            reasons.Add(
+                "A Customs Declaration with a GMS product has been selected for HMI inspection. In IPAFFS create a CHEDPP and amend your licence to reference it. If a CHEDPP exists, amend your licence to reference it. Failure to do so will delay your Customs release."
+            );
         }
     }
 

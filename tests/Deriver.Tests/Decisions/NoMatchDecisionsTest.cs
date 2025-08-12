@@ -27,7 +27,7 @@ public class NoMatchDecisionsTest
             "123",
             cr.Commodities[0].ItemNumber!.Value,
             cr.Commodities[0].Documents?[0].DocumentReference!.Value!,
-            cr.Commodities[0].Documents?[0].DocumentCode!
+            cr.Commodities[0].Documents?[0].DocumentReference!.Value!
         );
 
         var matchingService = Substitute.For<IMatchingService>();
@@ -55,7 +55,109 @@ public class NoMatchDecisionsTest
             .Decisions[0]
             .DecisionReason.Should()
             .Be(
-                "A Customs Declaration with a GMS product has been selected for HMI inspection. In IPAFFS create a CHEDPP and amend your licence to reference it. If a CHEDPP exists, amend your licence to reference it. Failure to do so will delay your Customs release"
+                "This customs declaration with a GMS product has been selected for HMI inspection. Either create a new CHEDPP or amend an existing one referencing the GMS product. Amend the customs declaration to reference the CHEDPP."
+            );
+
+        await Task.CompletedTask;
+    }
+
+    [Fact]
+    public async Task WhenClearanceRequest_HasNotMatch_AndH224Checks_ThenNoDecisionShouldBeGeneratedWithReason()
+    {
+        // Arrange
+        var cr = ClearanceRequestFixtures.ClearanceRequestFixture();
+        foreach (var commodity in cr.Commodities!)
+        {
+            foreach (var commodityCheck in commodity.Checks!)
+            {
+                commodityCheck.CheckCode = "H224";
+            }
+        }
+        var matchingResult = new MatchingResult();
+        matchingResult.AddDocumentNoMatch(
+            "123",
+            cr.Commodities[0].ItemNumber!.Value,
+            cr.Commodities[0].Documents?[0].DocumentReference!.Value!,
+            cr.Commodities[0].Documents?[0].DocumentReference!.Value!
+        );
+
+        var matchingService = Substitute.For<IMatchingService>();
+        matchingService
+            .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(matchingResult));
+
+        var sut = new DecisionService(
+            NullLogger<DecisionService>.Instance,
+            matchingService,
+            Array.Empty<IDecisionFinder>()
+        );
+
+        // Act
+        var decisionResult = await sut.Process(
+            new DecisionContext(new List<DecisionImportPreNotification>(), [new ClearanceRequestWrapper("123", cr)]),
+            CancellationToken.None
+        );
+
+        // Assert
+        decisionResult.Should().NotBeNull();
+        decisionResult.Decisions.Count.Should().Be(9);
+        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
+        decisionResult
+            .Decisions[0]
+            .DecisionReason.Should()
+            .Be(
+                "Customs declaration clearance withheld. Awaiting IUU check outcome. Contact Port Health Authority (imports) or Marine Management Organisation (landings)."
+            );
+
+        await Task.CompletedTask;
+    }
+
+    [Fact]
+    public async Task WhenClearanceRequest_HasNotMatch_AndChecks_ThenNoDecisionShouldBeGeneratedWithReason()
+    {
+        // Arrange
+        var cr = ClearanceRequestFixtures.ClearanceRequestFixture();
+        foreach (var commodity in cr.Commodities!)
+        {
+            foreach (var commodityCheck in commodity.Checks!)
+            {
+                commodityCheck.CheckCode = "H219";
+            }
+        }
+        var matchingResult = new MatchingResult();
+        matchingResult.AddDocumentNoMatch(
+            "123",
+            cr.Commodities[0].ItemNumber!.Value,
+            cr.Commodities[0].Documents?[0].DocumentReference!.Value!,
+            cr.Commodities[0].Documents?[0].DocumentReference!.Value!
+        );
+
+        var matchingService = Substitute.For<IMatchingService>();
+        matchingService
+            .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(matchingResult));
+
+        var sut = new DecisionService(
+            NullLogger<DecisionService>.Instance,
+            matchingService,
+            Array.Empty<IDecisionFinder>()
+        );
+
+        // Act
+        var decisionResult = await sut.Process(
+            new DecisionContext(new List<DecisionImportPreNotification>(), [new ClearanceRequestWrapper("123", cr)]),
+            CancellationToken.None
+        );
+
+        // Assert
+        decisionResult.Should().NotBeNull();
+        decisionResult.Decisions.Count.Should().Be(9);
+        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
+        decisionResult
+            .Decisions[0]
+            .DecisionReason.Should()
+            .Be(
+                "This IPAFFS pre-notification reference cannot be found in IPAFFS. Please check that the reference is correct."
             );
 
         await Task.CompletedTask;
@@ -83,7 +185,7 @@ public class NoMatchDecisionsTest
             "123",
             cr.Commodities[0].ItemNumber!.Value,
             cr.Commodities[0].Documents?[0].DocumentReference!.Value!,
-            cr.Commodities[0].Documents?[0].DocumentCode!
+            cr.Commodities[0].Documents?[0].DocumentReference!.Value!
         );
         matchingService
             .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())
@@ -122,7 +224,7 @@ public class NoMatchDecisionsTest
             "123",
             cr.Commodities[0].ItemNumber!.Value,
             cr.Commodities[0].Documents?[0].DocumentReference!.Value!,
-            cr.Commodities[0].Documents?[0].DocumentCode!
+            cr.Commodities[0].Documents?[0].DocumentReference!.Value!
         );
         matchingService
             .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())

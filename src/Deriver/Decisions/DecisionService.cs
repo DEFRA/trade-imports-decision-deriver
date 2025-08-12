@@ -121,16 +121,39 @@ public class DecisionService(
                     "A Customs Declaration with a GMS product has been selected for HMI inspection. In IPAFFS create a CHEDPP and amend your licence to reference it. If a CHEDPP exists, amend your licence to reference it. Failure to do so will delay your Customs release";
             }
 
-            decisionsResult.AddDecision(
-                noMatch.Mrn,
-                noMatch.ItemNumber,
-                noMatch.DocumentReference,
-                noMatch.DocumentCode,
-                checkCode,
-                DecisionCode.X00,
-                decisionReason: reason,
-                internalDecisionCode: DecisionInternalFurtherDetail.E70
-            );
+            if (checkCode is "H218" or "H219" or "H220")
+            {
+                switch (checkCode)
+                {
+                    case "H219" when noMatch.DocumentCode is "N851" or "9115":
+                    case "H218"
+                    or "H220" when noMatch.DocumentCode is "N002":
+                        decisionsResult.AddDecision(
+                            noMatch.Mrn,
+                            noMatch.ItemNumber,
+                            noMatch.DocumentReference,
+                            noMatch.DocumentCode,
+                            checkCode,
+                            DecisionCode.X00,
+                            decisionReason: reason,
+                            internalDecisionCode: DecisionInternalFurtherDetail.E70
+                        );
+                        break;
+                }
+            }
+            else
+            {
+                decisionsResult.AddDecision(
+                    noMatch.Mrn,
+                    noMatch.ItemNumber,
+                    noMatch.DocumentReference,
+                    noMatch.DocumentCode,
+                    checkCode,
+                    DecisionCode.X00,
+                    decisionReason: reason,
+                    internalDecisionCode: DecisionInternalFurtherDetail.E70
+                );
+            }
         }
     }
 

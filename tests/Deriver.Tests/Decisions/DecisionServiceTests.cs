@@ -643,6 +643,99 @@ public class DecisionServiceTests
         decisionResult.Decisions[1].DocumentCode.Should().Be("N002");
     }
 
+    [Fact]
+    public async Task When_processing_chedpp_with_both_phsi_and_hmi_with_H220_Then_should_return_expected_decisions()
+    {
+        // Arrange
+        var decisionContext = new DecisionContext(
+            [
+                new DecisionImportPreNotification()
+                {
+                    Id = "CHEDPP.GB.2025.9200009",
+                    Status = ImportNotificationStatus.Validated,
+                    ImportNotificationType = ImportNotificationType.Chedpp,
+                    UpdatedSource = DateTime.UtcNow,
+                    ConsignmentDecision = null,
+                    NotAcceptableAction = null,
+                    IuuCheckRequired = null,
+                    IuuOption = null,
+                    NotAcceptableReasons = null,
+                    CommodityChecks =
+                    [
+                        new DecisionCommodityCheck.Check() { Type = "PHSI_DOCUMENT", Status = "To do" },
+                        new DecisionCommodityCheck.Check() { Type = "PHSI_IDENTITY", Status = "To do" },
+                        new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "To do" },
+                        new DecisionCommodityCheck.Check() { Type = "HMI", Status = "Auto cleared" },
+                    ],
+                },
+            ],
+            [
+                new ClearanceRequestWrapper(
+                    "25GB99999999999021",
+                    new ClearanceRequest
+                    {
+                        Commodities =
+                        [
+                            new Commodity
+                            {
+                                ItemNumber = 1,
+                                Documents =
+                                [
+                                    new ImportDocument()
+                                    {
+                                        DocumentCode = "N851",
+                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
+                                        DocumentStatus = "JE",
+                                        DocumentControl = "P",
+                                    },
+                                    new ImportDocument()
+                                    {
+                                        DocumentCode = "N002",
+                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
+                                        DocumentStatus = "JE",
+                                        DocumentControl = "P",
+                                    },
+                                ],
+                                Checks =
+                                [
+                                    new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" },
+                                    new CommodityCheck { CheckCode = "H220", DepartmentCode = "HMI" },
+                                ],
+                            },
+                        ],
+                    }
+                ),
+            ]
+        );
+
+        var sut = new DecisionService(
+            NullLogger<DecisionService>.Instance,
+            new MatchingService(),
+            [
+                new ChedADecisionFinder(),
+                new ChedDDecisionFinder(),
+                new ChedPDecisionFinder(),
+                new ChedPPDecisionFinder(),
+                new IuuDecisionFinder(),
+            ]
+        );
+
+        // Act
+        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+
+        // Assert
+
+        decisionResult.Should().NotBeNull();
+        decisionResult.Decisions.Count.Should().Be(2);
+        decisionResult.Decisions[0].CheckCode.Should().Be("H219");
+        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.H01);
+        decisionResult.Decisions[0].DocumentCode.Should().Be("N851");
+
+        decisionResult.Decisions[1].CheckCode.Should().Be("H220");
+        decisionResult.Decisions[1].DecisionCode.Should().Be(DecisionCode.C03);
+        decisionResult.Decisions[1].DocumentCode.Should().Be("N002");
+    }
+
     private static DecisionContext CreateDecisionContext(
         string? importNotificationType,
         string[]? checkCodes,

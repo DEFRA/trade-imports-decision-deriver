@@ -43,7 +43,7 @@ public class ChedPpPhsiDecisionFinderTests
             string.IsNullOrEmpty(checkCode) ? null : new CheckCode { Value = checkCode },
             checkCode switch
             {
-                "H218" => "N002",
+                "H218" or "H220" => "N002",
                 "H219" => "N851",
                 _ => null,
             }

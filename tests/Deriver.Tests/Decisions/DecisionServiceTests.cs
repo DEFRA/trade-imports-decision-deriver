@@ -291,6 +291,12 @@ public class DecisionServiceTests
                     IuuCheckRequired = null,
                     IuuOption = null,
                     NotAcceptableReasons = null,
+                    CommodityChecks =
+                    [
+                        new DecisionCommodityCheck.Check() { Type = "PHSI_DOCUMENT", Status = "Non compliant" },
+                        new DecisionCommodityCheck.Check() { Type = "PHSI_IDENTITY", Status = "Auto cleared" },
+                        new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "Auto cleared" },
+                    ],
                 },
             ],
             [
@@ -366,7 +372,7 @@ public class DecisionServiceTests
         var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
 
         decisionResult.Decisions.Count.Should().Be(3);
-        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.N02);
+        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.N01);
         decisionResult.Decisions[1].DecisionCode.Should().Be(DecisionCode.C03);
         decisionResult.Decisions[2].DecisionCode.Should().Be(DecisionCode.C03);
     }

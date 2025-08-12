@@ -27,13 +27,16 @@ public class ChedPPDecisionFinder : DecisionFinder
                 DecisionCode.H02,
                 checkCode
             ),
-            ImportNotificationStatus.Validated => checkCode?.Value switch
+            ImportNotificationStatus.Validated or ImportNotificationStatus.Rejected => checkCode?.Value switch
             {
-                "H218" => ProcessHmi(notification, checkCode),
+                "H218" or "H220" => ProcessHmi(notification, checkCode),
                 "H219" => ProcessPhsi(notification, checkCode),
-                _ => new DecisionFinderResult(DecisionCode.C03, checkCode),
+                _ => new DecisionFinderResult(
+                    DecisionCode.X00,
+                    checkCode,
+                    InternalDecisionCode: DecisionInternalFurtherDetail.E99
+                ),
             },
-            ImportNotificationStatus.Rejected => new DecisionFinderResult(DecisionCode.N02, checkCode),
             ImportNotificationStatus.PartiallyRejected => new DecisionFinderResult(DecisionCode.H01, checkCode),
             _ => new DecisionFinderResult(
                 DecisionCode.X00,

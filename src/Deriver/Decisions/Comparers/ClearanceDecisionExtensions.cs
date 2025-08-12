@@ -33,6 +33,10 @@ public static class ClearanceDecisionExtensions
 
         return xResults
             .OrderBy(r => r.DocumentReference)
-            .SequenceEqual(yResults.OrderBy(r => r.DocumentReference), ClearanceDecisionResultExistsComparer.Default);
+            .ThenBy(r => r.DocumentCode)
+            .SequenceEqual(
+                yResults.OrderBy(r => r.DocumentReference).ThenBy(r => r.DocumentCode),
+                ClearanceDecisionResultExistsComparer.Default
+            );
     }
 }

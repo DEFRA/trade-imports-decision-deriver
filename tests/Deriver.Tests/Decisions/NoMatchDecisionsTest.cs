@@ -32,7 +32,7 @@ public class NoMatchDecisionsTest
             "123",
             cr.Commodities[0].ItemNumber!.Value,
             cr.Commodities[0].Documents?[0].DocumentReference!.Value!,
-            cr.Commodities[0].Documents?[0].DocumentReference!.Value!
+            cr.Commodities[0].Documents?[0].DocumentCode
         );
 
         var matchingService = Substitute.For<IMatchingService>();
@@ -77,13 +77,17 @@ public class NoMatchDecisionsTest
             {
                 commodityCheck.CheckCode = "H224";
             }
+            foreach (var document in commodity.Documents!)
+            {
+                document.DocumentCode = "9115";
+            }
         }
         var matchingResult = new MatchingResult();
         matchingResult.AddDocumentNoMatch(
             "123",
             cr.Commodities[0].ItemNumber!.Value,
             cr.Commodities[0].Documents?[0].DocumentReference!.Value!,
-            cr.Commodities[0].Documents?[0].DocumentReference!.Value!
+            cr.Commodities[0].Documents?[0].DocumentCode!
         );
 
         var matchingService = Substitute.For<IMatchingService>();
@@ -128,13 +132,17 @@ public class NoMatchDecisionsTest
             {
                 commodityCheck.CheckCode = "H219";
             }
+            foreach (var document in commodity.Documents!)
+            {
+                document.DocumentCode = "9115";
+            }
         }
         var matchingResult = new MatchingResult();
         matchingResult.AddDocumentNoMatch(
             "123",
             cr.Commodities[0].ItemNumber!.Value,
             cr.Commodities[0].Documents?[0].DocumentReference!.Value!,
-            cr.Commodities[0].Documents?[0].DocumentReference!.Value!
+            cr.Commodities[0].Documents?[0].DocumentCode
         );
 
         var matchingService = Substitute.For<IMatchingService>();

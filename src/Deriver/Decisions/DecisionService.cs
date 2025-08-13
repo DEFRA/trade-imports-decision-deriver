@@ -113,13 +113,15 @@ public class DecisionService(
     {
         foreach (var checkCode in checkCodes.Select(checkCode => checkCode.Value))
         {
-            string? reason = null;
-
-            if (checkCode is "H220")
+            string? reason = checkCode switch
             {
-                reason =
-                    "A Customs Declaration with a GMS product has been selected for HMI inspection. In IPAFFS create a CHEDPP and amend your licence to reference it. If a CHEDPP exists, amend your licence to reference it. Failure to do so will delay your Customs release";
-            }
+                "H220" =>
+                    "This customs declaration with a GMS product has been selected for HMI inspection. Either create a new CHEDPP or amend an existing one referencing the GMS product. Amend the customs declaration to reference the CHEDPP.",
+                "H224" =>
+                    "Customs declaration clearance withheld. Awaiting IUU check outcome. Contact Port Health Authority (imports) or Marine Management Organisation (landings).",
+                _ =>
+                    "This IPAFFS pre-notification reference cannot be found in IPAFFS. Please check that the reference is correct.",
+            };
 
             if (checkCode is "H218" or "H219" or "H220")
             {

@@ -74,7 +74,8 @@ public static class DecisionReasonBuilder
     )
     {
         if (
-            (item.Documents == null || !item.Documents.Any())
+            item.Documents != null
+            && item.Documents!.Any()
             && maxDecisionResult.DecisionCode == DecisionCode.X00
             && maxDecisionResult.CheckCode == "H220"
         )

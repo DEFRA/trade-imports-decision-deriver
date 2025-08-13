@@ -83,7 +83,18 @@ public class DecisionReasonBuilderTests
 
         // Act
         var result = DecisionReasonBuilder.Build(
-            new Commodity() { Checks = [new CommodityCheck() { CheckCode = "H220" }] },
+            new Commodity()
+            {
+                Documents =
+                [
+                    new ImportDocument()
+                    {
+                        DocumentReference = new ImportDocumentReference("Test1234567"),
+                        DocumentCode = "9115",
+                    },
+                ],
+                Checks = [new CommodityCheck() { CheckCode = "H220" }],
+            },
             documentDecisionResults[0],
             documentDecisionResults
         );

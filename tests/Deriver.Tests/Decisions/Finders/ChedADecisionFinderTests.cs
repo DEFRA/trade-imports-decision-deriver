@@ -36,7 +36,7 @@ public class ChedADecisionFinderTests
         };
         var sut = new ChedADecisionFinder();
 
-        var result = sut.CanFindDecision(notification, null);
+        var result = sut.CanFindDecision(notification, null, null);
 
         result.Should().Be(expectedResult);
     }

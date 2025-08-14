@@ -338,6 +338,7 @@ public class ClearanceDecisionExtensionsTests
                 {
                     ItemNumber = 2,
                     DecisionCode = "decisionCode2",
+                    DocumentCode = "docCode2",
                     DocumentReference = "docRef2",
                     CheckCode = "checkCode2",
                     DecisionReason = "decisionReason2",
@@ -348,6 +349,7 @@ public class ClearanceDecisionExtensionsTests
                 {
                     ItemNumber = 1,
                     DecisionCode = "decisionCode1",
+                    DocumentCode = "docCode1",
                     DocumentReference = "docRef1",
                     CheckCode = "checkCode1",
                     DecisionReason = "decisionReason1",

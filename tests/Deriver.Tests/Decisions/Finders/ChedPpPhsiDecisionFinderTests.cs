@@ -40,7 +40,13 @@ public class ChedPpPhsiDecisionFinderTests
 
         var result = sut.CanFindDecision(
             notification,
-            string.IsNullOrEmpty(checkCode) ? null : new CheckCode { Value = checkCode }
+            string.IsNullOrEmpty(checkCode) ? null : new CheckCode { Value = checkCode },
+            checkCode switch
+            {
+                "H218" or "H220" => "N002",
+                "H219" => "N851",
+                _ => null,
+            }
         );
 
         result.Should().Be(expectedResult);
@@ -55,7 +61,7 @@ public class ChedPpPhsiDecisionFinderTests
     [InlineData(ImportNotificationStatus.Submitted, DecisionCode.H02)]
     [InlineData(ImportNotificationStatus.Modify, DecisionCode.X00, DecisionInternalFurtherDetail.E99)]
     [InlineData(ImportNotificationStatus.PartiallyRejected, DecisionCode.H01)]
-    [InlineData(ImportNotificationStatus.Rejected, DecisionCode.N02)]
+    [InlineData(ImportNotificationStatus.Rejected, DecisionCode.X00, DecisionInternalFurtherDetail.E99)]
     [InlineData(ImportNotificationStatus.Replaced, DecisionCode.X00, DecisionInternalFurtherDetail.E72)]
     [InlineData(ImportNotificationStatus.SplitConsignment, DecisionCode.X00, DecisionInternalFurtherDetail.E75)]
     public void DecisionFinderTest(

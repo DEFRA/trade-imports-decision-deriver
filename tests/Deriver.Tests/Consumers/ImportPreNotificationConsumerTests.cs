@@ -33,7 +33,7 @@ public class ImportPreNotificationConsumerTests
             .Returns(new CustomsDeclarationsResponse([]));
 
         var decisionResult = new DecisionResult();
-        decisionResult.AddDecision("mrn", 1, "docref", "checkCode", DecisionCode.C03);
+        decisionResult.AddDecision("mrn", 1, "docref", "docCode", "checkCode", DecisionCode.C03);
         decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
 
         // ACT
@@ -79,7 +79,7 @@ public class ImportPreNotificationConsumerTests
             );
 
         var decisionResult = new DecisionResult();
-        decisionResult.AddDecision("mrn123", 1, "docref", "checkCode", DecisionCode.C03);
+        decisionResult.AddDecision("mrn123", 1, "docref", "docCode", "checkCode", DecisionCode.C03);
         decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
 
         // ACT
@@ -125,7 +125,7 @@ public class ImportPreNotificationConsumerTests
             );
 
         var decisionResult = new DecisionResult();
-        decisionResult.AddDecision("mrn123", 1, "docref", "checkCode", DecisionCode.C03);
+        decisionResult.AddDecision("mrn123", 1, "docref", "docCode", "checkCode", DecisionCode.C03);
         decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
 
         // ACT
@@ -219,6 +219,7 @@ public class ImportPreNotificationConsumerTests
                     customsDeclaration.MovementReferenceNumber,
                     commodity.ItemNumber!.Value!,
                     document.DocumentReference!.Value,
+                    document.DocumentCode,
                     commodity.Checks[0].CheckCode,
                     DecisionCode.C03
                 );

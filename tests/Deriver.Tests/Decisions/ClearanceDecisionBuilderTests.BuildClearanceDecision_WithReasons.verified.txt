@@ -44,6 +44,7 @@
     {
       ItemNumber: 1,
       DocumentReference: fixed-1,
+      DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00,
       DecisionReason: Some Reason
@@ -51,6 +52,7 @@
     {
       ItemNumber: 1,
       DocumentReference: fixed-2,
+      DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00,
       DecisionReason: Some Reason
@@ -58,6 +60,7 @@
     {
       ItemNumber: 1,
       DocumentReference: fixed-3,
+      DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00,
       DecisionReason: Some Reason
@@ -65,36 +68,42 @@
     {
       ItemNumber: 2,
       DocumentReference: fixed-4,
+      DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00
     },
     {
       ItemNumber: 2,
       DocumentReference: fixed-5,
+      DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00
     },
     {
       ItemNumber: 2,
       DocumentReference: fixed-6,
+      DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00
     },
     {
       ItemNumber: 3,
       DocumentReference: fixed-7,
+      DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00
     },
     {
       ItemNumber: 3,
       DocumentReference: fixed-8,
+      DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00
     },
     {
       ItemNumber: 3,
       DocumentReference: fixed-9,
+      DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00
     }

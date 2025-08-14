@@ -7,7 +7,11 @@ public abstract class DecisionFinder : IDecisionFinder
         CheckCode? checkCode
     );
 
-    public abstract bool CanFindDecision(DecisionImportPreNotification notification, CheckCode? checkCode);
+    public abstract bool CanFindDecision(
+        DecisionImportPreNotification notification,
+        CheckCode? checkCode,
+        string? documentCode
+    );
 
     public DecisionFinderResult FindDecision(DecisionImportPreNotification notification, CheckCode? checkCode)
     {

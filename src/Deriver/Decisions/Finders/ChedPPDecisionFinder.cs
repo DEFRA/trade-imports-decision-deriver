@@ -5,11 +5,16 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 // ReSharper disable once InconsistentNaming
 public class ChedPPDecisionFinder : DecisionFinder
 {
-    public override bool CanFindDecision(DecisionImportPreNotification notification, CheckCode? checkCode) =>
+    public override bool CanFindDecision(
+        DecisionImportPreNotification notification,
+        CheckCode? checkCode,
+        string? documentCode
+    ) =>
         notification.ImportNotificationType == ImportNotificationType.Chedpp
         && notification.Status != ImportNotificationStatus.Cancelled
         && notification.Status != ImportNotificationStatus.Replaced
-        && checkCode?.GetImportNotificationType() == ImportNotificationType.Chedpp;
+        && checkCode?.GetImportNotificationType() == ImportNotificationType.Chedpp
+        && ValidCheckCodeAndDocumentCodeMapping(checkCode, documentCode);
 
     protected override DecisionFinderResult FindDecisionInternal(
         DecisionImportPreNotification notification,
@@ -22,13 +27,16 @@ public class ChedPPDecisionFinder : DecisionFinder
                 DecisionCode.H02,
                 checkCode
             ),
-            ImportNotificationStatus.Validated => checkCode?.Value switch
+            ImportNotificationStatus.Validated or ImportNotificationStatus.Rejected => checkCode?.Value switch
             {
-                "H218" => ProcessHmi(notification, checkCode),
+                "H218" or "H220" => ProcessHmi(notification, checkCode),
                 "H219" => ProcessPhsi(notification, checkCode),
-                _ => new DecisionFinderResult(DecisionCode.C03, checkCode),
+                _ => new DecisionFinderResult(
+                    DecisionCode.X00,
+                    checkCode,
+                    InternalDecisionCode: DecisionInternalFurtherDetail.E99
+                ),
             },
-            ImportNotificationStatus.Rejected => new DecisionFinderResult(DecisionCode.N02, checkCode),
             ImportNotificationStatus.PartiallyRejected => new DecisionFinderResult(DecisionCode.H01, checkCode),
             _ => new DecisionFinderResult(
                 DecisionCode.X00,
@@ -94,5 +102,11 @@ public class ChedPPDecisionFinder : DecisionFinder
                 InternalDecisionCode: DecisionInternalFurtherDetail.E99
             ),
         };
+    }
+
+    private static bool ValidCheckCodeAndDocumentCodeMapping(CheckCode? checkCode, string? documentCode)
+    {
+        return (checkCode?.Value == "H219" && documentCode is "N851" or "9115")
+            || (checkCode?.Value is "H218" or "H220" && documentCode is "N002");
     }
 }

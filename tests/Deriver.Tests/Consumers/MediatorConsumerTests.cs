@@ -76,7 +76,7 @@ public class MediatorConsumerTests
             .Returns(new ImportPreNotificationsResponse([]));
 
         var decisionResult = new DecisionResult();
-        decisionResult.AddDecision("mrn", 1, "docref", "checkCode", DecisionCode.C03);
+        decisionResult.AddDecision("mrn", 1, "docref", "docCode", "checkCode", DecisionCode.C03);
         decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
 
         // ACT
@@ -132,7 +132,7 @@ public class MediatorConsumerTests
             );
 
         var decisionResult = new DecisionResult();
-        decisionResult.AddDecision("mrn", 1, "docref", "checkCode", DecisionCode.C03);
+        decisionResult.AddDecision("mrn", 1, "docref", "docCode", "checkCode", DecisionCode.C03);
         decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
 
         // ACT

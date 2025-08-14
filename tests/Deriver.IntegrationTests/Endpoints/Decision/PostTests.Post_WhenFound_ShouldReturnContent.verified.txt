@@ -30,6 +30,7 @@
         itemNumber: 1,
         importPreNotification: null,
         documentReference: GBCHD2025.6244952,
+        documentCode: N002,
         checkCode: H218,
         decisionCode: X00,
         decisionReason: null,

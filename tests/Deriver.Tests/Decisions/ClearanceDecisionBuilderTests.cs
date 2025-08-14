@@ -41,6 +41,7 @@ public class ClearanceDecisionBuilderTests
                     customsDeclaration.MovementReferenceNumber,
                     commodity.ItemNumber!.Value!,
                     document.DocumentReference!.Value,
+                    document.DocumentCode,
                     commodity.Checks[0].CheckCode,
                     DecisionCode.C03
                 );
@@ -82,6 +83,7 @@ public class ClearanceDecisionBuilderTests
                         customsDeclaration.MovementReferenceNumber,
                         commodity.ItemNumber!.Value!,
                         document.DocumentReference!.Value,
+                        document.DocumentCode,
                         commodity.Checks[0].CheckCode,
                         DecisionCode.X00,
                         decisionReason: "Some Reason"
@@ -93,6 +95,7 @@ public class ClearanceDecisionBuilderTests
                         customsDeclaration.MovementReferenceNumber,
                         commodity.ItemNumber!.Value!,
                         document.DocumentReference!.Value,
+                        document.DocumentCode,
                         commodity.Checks[0].CheckCode,
                         DecisionCode.X00
                     );
@@ -134,6 +137,7 @@ public class ClearanceDecisionBuilderTests
                     customsDeclaration.MovementReferenceNumber,
                     commodity.ItemNumber!.Value!,
                     document.DocumentReference!.Value,
+                    document.DocumentCode,
                     commodity.Checks[0].CheckCode,
                     DecisionCode.C03
                 );

@@ -37,7 +37,7 @@ public class ClearanceRequestConsumerTests
             .Returns(new ImportPreNotificationsResponse([]));
 
         var decisionResult = new DecisionResult();
-        decisionResult.AddDecision("mrn", 1, "docref", "checkCode", DecisionCode.C03);
+        decisionResult.AddDecision("mrn", 1, "docref", "docCode", "checkCode", DecisionCode.C03);
         decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
 
         // ACT
@@ -135,6 +135,7 @@ public class ClearanceRequestConsumerTests
                     customsDeclaration.MovementReferenceNumber,
                     commodity.ItemNumber!.Value!,
                     document.DocumentReference!.Value,
+                    document.DocumentCode,
                     commodity.Checks[0].CheckCode,
                     DecisionCode.C03
                 );
@@ -206,7 +207,7 @@ public class ClearanceRequestConsumerTests
             .Returns(new ImportPreNotificationsResponse([]));
 
         var decisionResult = new DecisionResult();
-        decisionResult.AddDecision("mrn", 1, "docref", "checkCode", DecisionCode.C03);
+        decisionResult.AddDecision("mrn", 1, "docref", "docCode", "checkCode", DecisionCode.C03);
         decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
 
         // ACT

@@ -59,7 +59,7 @@ public class DecisionService(
         MatchingResult matchingResult,
         Commodity item,
         ClearanceRequestWrapper wrapper,
-        CheckCode[]? checkCodes,
+        CheckCode[] checkCodes,
         DecisionResult decisionsResult
     )
     {
@@ -159,7 +159,7 @@ public class DecisionService(
 
     private static void HandleItemsWithInvalidReference(
         string mrn,
-        CheckCode[]? checkCodes,
+        CheckCode[] checkCodes,
         Commodity item,
         DecisionResult decisionsResult
     )
@@ -192,12 +192,12 @@ public class DecisionService(
 
     private static void HandleDocumentWithInvalidReference(
         string mrn,
-        CheckCode[]? checkCodes,
+        CheckCode[] checkCodes,
         DecisionResult decisionsResult,
         int itemNumber
     )
     {
-        if (checkCodes is not null && checkCodes.Any())
+        if (checkCodes.Any())
         {
             foreach (var checkCode in checkCodes)
             {
@@ -228,44 +228,37 @@ public class DecisionService(
 
     private DecisionFinderResult[] GetDecisions(
         DecisionImportPreNotification notification,
-        CheckCode[]? checkCodes,
+        CheckCode[] checkCodes,
         string? documentCode
     )
     {
         var results = new List<DecisionFinderResult>();
 
-        if (checkCodes == null)
+        var finders = GetDecisionsFindersForCheckCodes(notification, checkCodes, documentCode).ToList();
+
+        if (finders.Count == 0)
         {
-            results.AddRange(GetDecisionsForCheckCode(notification, null, documentCode, decisionFinders));
+            foreach (var checkCode in checkCodes)
+            {
+                logger.LogWarning(
+                    "No decision finder count for notification {Id} and check code {CheckCode}",
+                    notification.Id,
+                    checkCode
+                );
+                results.Add(
+                    new DecisionFinderResult(
+                        DecisionCode.X00,
+                        checkCode,
+                        InternalDecisionCode: DecisionInternalFurtherDetail.E90
+                    )
+                );
+            }
         }
         else
         {
-            var finders = GetDecisionsFindersForCheckCodes(notification, checkCodes, documentCode).ToList();
-
-            if (finders.Count == 0)
+            foreach (var checkCode in checkCodes)
             {
-                foreach (var checkCode in checkCodes)
-                {
-                    logger.LogWarning(
-                        "No decision finder count for notification {Id} and check code {CheckCode}",
-                        notification.Id,
-                        checkCode
-                    );
-                    results.Add(
-                        new DecisionFinderResult(
-                            DecisionCode.X00,
-                            checkCode,
-                            InternalDecisionCode: DecisionInternalFurtherDetail.E90
-                        )
-                    );
-                }
-            }
-            else
-            {
-                foreach (var checkCode in checkCodes)
-                {
-                    results.AddRange(GetDecisionsForCheckCode(notification, checkCode, documentCode, finders));
-                }
+                results.AddRange(GetDecisionsForCheckCode(notification, checkCode, documentCode, finders));
             }
         }
 

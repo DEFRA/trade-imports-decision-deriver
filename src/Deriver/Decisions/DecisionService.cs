@@ -59,7 +59,7 @@ public class DecisionService(
         MatchingResult matchingResult,
         Commodity item,
         ClearanceRequestWrapper wrapper,
-        CheckCode[]? checkCodes,
+        CheckCode[] checkCodes,
         DecisionResult decisionsResult
     )
     {
@@ -161,7 +161,7 @@ public class DecisionService(
 
     private static void HandleItemsWithInvalidReference(
         string mrn,
-        CheckCode[]? checkCodes,
+        CheckCode[] checkCodes,
         Commodity item,
         DecisionResult decisionsResult
     )
@@ -194,12 +194,12 @@ public class DecisionService(
 
     private static void HandleDocumentWithInvalidReference(
         string mrn,
-        CheckCode[]? checkCodes,
+        CheckCode[] checkCodes,
         DecisionResult decisionsResult,
         int itemNumber
     )
     {
-        if (checkCodes is not null && checkCodes.Any())
+        if (checkCodes.Any())
         {
             foreach (var checkCode in checkCodes)
             {

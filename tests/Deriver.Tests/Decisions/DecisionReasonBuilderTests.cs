@@ -40,6 +40,40 @@ public class DecisionReasonBuilderTests
     }
 
     [Fact]
+    public void WhenDecisionResultIsNotLinkedToCheck_AndIuu_AndHasDocuments_ThenShouldBeNotLinkedReason()
+    {
+        DocumentDecisionResult[] documentDecisionResults =
+        [
+            new(null, "Test", 1, "Test1234567", "C641", "H221", DecisionCode.X00, null, null),
+        ];
+        // Act
+        var result = DecisionReasonBuilder.Build(
+            new Commodity()
+            {
+                Documents =
+                [
+                    new ImportDocument()
+                    {
+                        DocumentReference = new ImportDocumentReference("Test1234567"),
+                        DocumentCode = "C641",
+                    },
+                ],
+                Checks = [new CommodityCheck()],
+            },
+            documentDecisionResults[0],
+            documentDecisionResults
+        );
+
+        // Assert
+        result.Count.Should().Be(1);
+        result[0]
+            .Should()
+            .Be(
+                "Clearance of the Customs Declaration has been withheld. Confirmation of the outcome of IUU catch certificate check (under Council Regulation 1005/2008) is required. To resolve this contact your local Port Health Authority (imports) or MMO (landings)."
+            );
+    }
+
+    [Fact]
     public void WhenDecisionResultIsNotLinkedToCheck_AndNotCheda_AndHasDocuments_ThenShouldBeNotLinkedReason()
     {
         DocumentDecisionResult[] documentDecisionResults =
@@ -125,5 +159,36 @@ public class DecisionReasonBuilderTests
 
         // Assert
         result.Count.Should().Be(0);
+    }
+
+    [Fact]
+    public void When_DocumentCode_IsInvalid_ThenShouldThrow()
+    {
+        DocumentDecisionResult[] documentDecisionResults =
+        [
+            new(null, "Test", 1, "Test Doc Ref", "Test Doc Code", "H224", DecisionCode.X00, null, null),
+        ];
+
+        // Act
+        Action act = () =>
+            DecisionReasonBuilder.Build(
+                new Commodity()
+                {
+                    Documents =
+                    [
+                        new ImportDocument()
+                        {
+                            DocumentReference = new ImportDocumentReference("Test1234567"),
+                            DocumentCode = "9115",
+                        },
+                    ],
+                    Checks = [new CommodityCheck() { CheckCode = "H224" }],
+                },
+                documentDecisionResults[0],
+                documentDecisionResults
+            );
+
+        // Assert
+        act.Should().Throw<ArgumentOutOfRangeException>();
     }
 }

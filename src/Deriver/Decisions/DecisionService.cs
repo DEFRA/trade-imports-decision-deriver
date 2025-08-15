@@ -230,44 +230,37 @@ public class DecisionService(
 
     private DecisionFinderResult[] GetDecisions(
         DecisionImportPreNotification notification,
-        CheckCode[]? checkCodes,
+        CheckCode[] checkCodes,
         string? documentCode
     )
     {
         var results = new List<DecisionFinderResult>();
 
-        if (checkCodes == null)
+        var finders = GetDecisionsFindersForCheckCodes(notification, checkCodes, documentCode).ToList();
+
+        if (finders.Count == 0)
         {
-            results.AddRange(GetDecisionsForCheckCode(notification, null, documentCode, decisionFinders));
+            foreach (var checkCode in checkCodes)
+            {
+                logger.LogWarning(
+                    "No decision finder count for notification {Id} and check code {CheckCode}",
+                    notification.Id,
+                    checkCode
+                );
+                results.Add(
+                    new DecisionFinderResult(
+                        DecisionCode.X00,
+                        checkCode,
+                        InternalDecisionCode: DecisionInternalFurtherDetail.E90
+                    )
+                );
+            }
         }
         else
         {
-            var finders = GetDecisionsFindersForCheckCodes(notification, checkCodes, documentCode).ToList();
-
-            if (finders.Count == 0)
+            foreach (var checkCode in checkCodes)
             {
-                foreach (var checkCode in checkCodes)
-                {
-                    logger.LogWarning(
-                        "No decision finder count for notification {Id} and check code {CheckCode}",
-                        notification.Id,
-                        checkCode
-                    );
-                    results.Add(
-                        new DecisionFinderResult(
-                            DecisionCode.X00,
-                            checkCode,
-                            InternalDecisionCode: DecisionInternalFurtherDetail.E90
-                        )
-                    );
-                }
-            }
-            else
-            {
-                foreach (var checkCode in checkCodes)
-                {
-                    results.AddRange(GetDecisionsForCheckCode(notification, checkCode, documentCode, finders));
-                }
+                results.AddRange(GetDecisionsForCheckCode(notification, checkCode, documentCode, finders));
             }
         }
 
@@ -289,7 +282,7 @@ public class DecisionService(
 
     private static IEnumerable<DecisionFinderResult> GetDecisionsForCheckCode(
         DecisionImportPreNotification notification,
-        CheckCode? checkCode,
+        CheckCode checkCode,
         string? documentCode,
         IEnumerable<IDecisionFinder> decisionFinders
     )

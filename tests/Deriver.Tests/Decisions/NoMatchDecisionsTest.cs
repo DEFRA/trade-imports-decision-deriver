@@ -198,7 +198,7 @@ public class NoMatchDecisionsTest
             "123",
             cr.Commodities[0].ItemNumber!.Value,
             cr.Commodities[0].Documents?[0].DocumentReference!.Value!,
-            cr.Commodities[0].Documents?[0].DocumentReference!.Value!
+            cr.Commodities[0].Documents?[0].DocumentCode!
         );
         matchingService
             .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())
@@ -237,7 +237,7 @@ public class NoMatchDecisionsTest
             "123",
             cr.Commodities[0].ItemNumber!.Value,
             cr.Commodities[0].Documents?[0].DocumentReference!.Value!,
-            cr.Commodities[0].Documents?[0].DocumentReference!.Value!
+            cr.Commodities[0].Documents?[0].DocumentCode!
         );
         matchingService
             .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())

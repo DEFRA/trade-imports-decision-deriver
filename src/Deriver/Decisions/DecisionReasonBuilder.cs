@@ -5,6 +5,15 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
 public static class DecisionReasonBuilder
 {
+    private static string IuuErrorMessage =
+        "Clearance of the Customs Declaration has been withheld. Confirmation of the outcome of IUU catch certificate check (under Council Regulation 1005/2008) is required. To resolve this contact your local Port Health Authority (imports) or MMO (landings).";
+
+    private static string PortHealthErrorMessage(string chedType, string chedNumbers) =>
+        $"A Customs Declaration has been submitted however no matching {chedType}(s) have been submitted to Port Health (for {chedType} number(s) {chedNumbers}). Please correct the {chedType} number(s) entered on your customs declaration.";
+
+    private static string AnimalHealthErrorMessage(string chedType, string chedNumbers) =>
+        $"A Customs Declaration has been submitted however no matching {chedType}(s) have been submitted to Animal Health (for {chedType} number(s) {chedNumbers}). Please correct the {chedType} number(s) entered on your customs declaration.";
+
     public static List<string> Build(
         Commodity item,
         DocumentDecisionResult maxDecisionResult,
@@ -49,19 +58,20 @@ public static class DecisionReasonBuilder
             {
                 case "C673":
                 case "C641":
+                    reasons.Add(IuuErrorMessage);
+                    break;
+                case "N853":
                     reasons.Add(
-                        "Clearance of the Customs Declaration has been withheld. Confirmation of the outcome of IUU catch certificate check (under Council Regulation 1005/2008) is required. To resolve this contact your local Port Health Authority (imports) or MMO (landings)."
+                        maxDecisionResult.CheckCode == "H224"
+                            ? IuuErrorMessage
+                            : PortHealthErrorMessage(chedType, chedNumbers)
                     );
                     break;
                 case "C640":
-                    reasons.Add(
-                        $"A Customs Declaration has been submitted however no matching {chedType}(s) have been submitted to Animal Health (for {chedType} number(s) {chedNumbers}). Please correct the {chedType} number(s) entered on your customs declaration."
-                    );
+                    reasons.Add(AnimalHealthErrorMessage(chedType, chedNumbers));
                     break;
                 default:
-                    reasons.Add(
-                        $"A Customs Declaration has been submitted however no matching {chedType}(s) have been submitted to Port Health (for {chedType} number(s) {chedNumbers}). Please correct the {chedType} number(s) entered on your customs declaration."
-                    );
+                    reasons.Add(PortHealthErrorMessage(chedType, chedNumbers));
                     break;
             }
         }

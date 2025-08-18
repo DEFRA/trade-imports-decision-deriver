@@ -10,7 +10,7 @@
           CheckCode: 9115,
           DecisionCode: X00,
           DecisionReasons: [
-            Some Reason
+            A Customs Declaration has been submitted however no matching CHEDPP(s) have been submitted to Port Health for CHEDPP number(s) fixed-1, fixed-2, fixed-3.
           ]
         }
       ]
@@ -22,7 +22,7 @@
           CheckCode: 9115,
           DecisionCode: X00,
           DecisionReasons: [
-            A Customs Declaration has been submitted however no matching CHEDPP(s) have been submitted to Port Health (for CHEDPP number(s) fixed-4, fixed-5, fixed-6). Please correct the CHEDPP number(s) entered on your customs declaration.
+            A Customs Declaration has been submitted however no matching CHEDPP(s) have been submitted to Port Health for CHEDPP number(s) fixed-4, fixed-5, fixed-6.
           ]
         }
       ]
@@ -34,7 +34,7 @@
           CheckCode: 9115,
           DecisionCode: X00,
           DecisionReasons: [
-            A Customs Declaration has been submitted however no matching CHEDPP(s) have been submitted to Port Health (for CHEDPP number(s) fixed-7, fixed-8, fixed-9). Please correct the CHEDPP number(s) entered on your customs declaration.
+            A Customs Declaration has been submitted however no matching CHEDPP(s) have been submitted to Port Health for CHEDPP number(s) fixed-7, fixed-8, fixed-9.
           ]
         }
       ]

@@ -55,7 +55,7 @@ public static class ClearanceDecisionBuilder
                     yield return new ClearanceDecisionItem
                     {
                         ItemNumber = itemDecisions.Key,
-                        Checks = BuildChecks(commodity, itemDecisions).ToArray(),
+                        Checks = BuildChecks(clearanceRequest, commodity, itemDecisions).ToArray(),
                     };
                 }
             }
@@ -63,6 +63,7 @@ public static class ClearanceDecisionBuilder
     }
 
     private static IEnumerable<ClearanceDecisionCheck> BuildChecks(
+        ClearanceRequest clearanceRequest,
         Commodity item,
         IGrouping<int, DocumentDecisionResult> itemDecisions
     )
@@ -76,13 +77,17 @@ public static class ClearanceDecisionBuilder
                 .Where(x => x.CheckCode == null || x.CheckCode == checkCode)
                 .OrderByDescending(x => x.DecisionCode)
                 .FirstOrDefault();
+
+            var documentResultsForItem = itemDecisions.Where(x => x.ItemNumber == item.ItemNumber).ToArray();
             if (maxDecisionResult is not null)
             {
                 yield return new ClearanceDecisionCheck
                 {
                     CheckCode = checkCode,
                     DecisionCode = maxDecisionResult.DecisionCode.ToString(),
-                    DecisionReasons = DecisionReasonBuilder.Build(item, maxDecisionResult!).ToArray(),
+                    DecisionReasons = DecisionReasonBuilder
+                        .Build(clearanceRequest, item, maxDecisionResult!, documentResultsForItem)
+                        .ToArray(),
                     DecisionInternalFurtherDetail = maxDecisionResult.InternalDecisionCode.HasValue
                         ? [maxDecisionResult.InternalDecisionCode.Value.ToString()]
                         : null,

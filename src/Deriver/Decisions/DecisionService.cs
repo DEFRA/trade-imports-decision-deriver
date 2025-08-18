@@ -127,9 +127,9 @@ public class DecisionService(
             {
                 switch (checkCode)
                 {
-                    case "H219" when noMatch.DocumentCode is "N851" or "9115":
+                    case "H219" when noMatch.DocumentCode is "N851" or "9115" or "C085":
                     case "H218"
-                    or "H220" when noMatch.DocumentCode is "N002":
+                    or "H220" when noMatch.DocumentCode is "N002" or "C085":
                         decisionsResult.AddDecision(
                             noMatch.Mrn,
                             noMatch.ItemNumber,

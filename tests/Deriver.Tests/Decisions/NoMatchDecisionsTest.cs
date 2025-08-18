@@ -319,4 +319,60 @@ public class NoMatchDecisionsTest
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
         decisionResult.Decisions[1].DecisionCode.Should().Be(DecisionCode.X00);
     }
+
+    [Fact]
+    public async Task When_processing_chedpp_with_new_c085_with_no_notification()
+    {
+        var decisionContext = new DecisionContext(
+            [],
+            [
+                new ClearanceRequestWrapper(
+                    "25GB99999999999021",
+                    new ClearanceRequest
+                    {
+                        Commodities =
+                        [
+                            new Commodity
+                            {
+                                ItemNumber = 1,
+                                Documents =
+                                [
+                                    new ImportDocument()
+                                    {
+                                        DocumentCode = "C085",
+                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
+                                        DocumentStatus = "JE",
+                                        DocumentControl = "P",
+                                    },
+                                   
+                                ],
+                                Checks =
+                                [
+                                    new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" }
+                                ],
+                            },
+                        ],
+                    }
+                ),
+            ]
+        );
+
+        var sut = new DecisionService(
+            NullLogger<DecisionService>.Instance,
+            new MatchingService(),
+            [
+                new ChedADecisionFinder(),
+                new ChedDDecisionFinder(),
+                new ChedPDecisionFinder(),
+                new ChedPPDecisionFinder(),
+                new IuuDecisionFinder(),
+            ]
+        );
+
+        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+
+        decisionResult.Decisions.Count.Should().Be(1);
+        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
+        decisionResult.Decisions[0].DecisionReason.Should().Be("This IPAFFS pre-notification reference cannot be found in IPAFFS. Please check that the reference is correct.");
+    }
 }

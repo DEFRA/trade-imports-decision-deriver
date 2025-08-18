@@ -344,12 +344,8 @@ public class NoMatchDecisionsTest
                                         DocumentStatus = "JE",
                                         DocumentControl = "P",
                                     },
-                                   
                                 ],
-                                Checks =
-                                [
-                                    new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" }
-                                ],
+                                Checks = [new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" }],
                             },
                         ],
                     }
@@ -373,6 +369,11 @@ public class NoMatchDecisionsTest
 
         decisionResult.Decisions.Count.Should().Be(1);
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
-        decisionResult.Decisions[0].DecisionReason.Should().Be("This IPAFFS pre-notification reference cannot be found in IPAFFS. Please check that the reference is correct.");
+        decisionResult
+            .Decisions[0]
+            .DecisionReason.Should()
+            .Be(
+                "This IPAFFS pre-notification reference cannot be found in IPAFFS. Please check that the reference is correct."
+            );
     }
 }

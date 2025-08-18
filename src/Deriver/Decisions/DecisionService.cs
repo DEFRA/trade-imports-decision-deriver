@@ -116,7 +116,7 @@ public class DecisionService(
             string? reason = checkCode switch
             {
                 "H220" =>
-                    "This customs declaration with a GMS product has been selected for HMI inspection. Either create a new CHEDPP or amend an existing one referencing the GMS product. Amend the customs declaration to reference the CHEDPP.",
+                    "This customs declaration with a GMS product has been selected for HMI inspection. Either create a new CHED PP or amend an existing one referencing the GMS product. Amend the customs declaration to reference the CHED PP.",
                 "H224" =>
                     "Customs declaration clearance withheld. Awaiting IUU check outcome. Contact Port Health Authority (imports) or Marine Management Organisation (landings).",
                 _ =>

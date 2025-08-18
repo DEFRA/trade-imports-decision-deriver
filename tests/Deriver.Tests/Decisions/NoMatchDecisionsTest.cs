@@ -60,7 +60,7 @@ public class NoMatchDecisionsTest
             .Decisions[0]
             .DecisionReason.Should()
             .Be(
-                "This customs declaration with a GMS product has been selected for HMI inspection. Either create a new CHEDPP or amend an existing one referencing the GMS product. Amend the customs declaration to reference the CHEDPP."
+                "This customs declaration with a GMS product has been selected for HMI inspection. Either create a new CHED PP or amend an existing one referencing the GMS product. Amend the customs declaration to reference the CHED PP."
             );
 
         await Task.CompletedTask;

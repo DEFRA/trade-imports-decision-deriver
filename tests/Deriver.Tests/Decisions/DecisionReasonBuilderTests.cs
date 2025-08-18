@@ -14,6 +14,7 @@ public class DecisionReasonBuilderTests
         ];
         // Act
         var result = DecisionReasonBuilder.Build(
+            new ClearanceRequest(),
             new Commodity()
             {
                 Documents =
@@ -32,11 +33,7 @@ public class DecisionReasonBuilderTests
 
         // Assert
         result.Count.Should().Be(1);
-        result[0]
-            .Should()
-            .Be(
-                "A Customs Declaration has been submitted however no matching CVEDA(s) have been submitted to Animal Health (for CVEDA number(s) Test1234567). Please correct the CVEDA number(s) entered on your customs declaration."
-            );
+        result[0].Should().Be(DecisionReasonBuilder.AnimalHealthErrorMessage("CVEDA", "Test1234567"));
     }
 
     [Fact]
@@ -48,6 +45,7 @@ public class DecisionReasonBuilderTests
         ];
         // Act
         var result = DecisionReasonBuilder.Build(
+            new ClearanceRequest(),
             new Commodity()
             {
                 Documents =
@@ -66,11 +64,7 @@ public class DecisionReasonBuilderTests
 
         // Assert
         result.Count.Should().Be(1);
-        result[0]
-            .Should()
-            .Be(
-                "Clearance of the Customs Declaration has been withheld. Confirmation of the outcome of IUU catch certificate check (under Council Regulation 1005/2008) is required. To resolve this contact your local Port Health Authority (imports) or MMO (landings)."
-            );
+        result[0].Should().Be(DecisionReasonBuilder.IuuErrorMessage);
     }
 
     [Fact]
@@ -82,6 +76,7 @@ public class DecisionReasonBuilderTests
         ];
         // Act
         var result = DecisionReasonBuilder.Build(
+            new ClearanceRequest(),
             new Commodity()
             {
                 Documents =
@@ -100,11 +95,7 @@ public class DecisionReasonBuilderTests
 
         // Assert
         result.Count.Should().Be(1);
-        result[0]
-            .Should()
-            .Be(
-                "A Customs Declaration has been submitted however no matching CHEDPP(s) have been submitted to Port Health (for CHEDPP number(s) Test1234567). Please correct the CHEDPP number(s) entered on your customs declaration."
-            );
+        result[0].Should().Be(DecisionReasonBuilder.PortHealthErrorMessage("CHEDPP", "Test1234567"));
     }
 
     [Fact]
@@ -116,29 +107,37 @@ public class DecisionReasonBuilderTests
         ];
 
         // Act
-        var result = DecisionReasonBuilder.Build(
-            new Commodity()
-            {
-                Documents =
-                [
-                    new ImportDocument()
-                    {
-                        DocumentReference = new ImportDocumentReference("Test1234567"),
-                        DocumentCode = "9115",
-                    },
-                ],
-                Checks = [new CommodityCheck() { CheckCode = "H220" }],
-            },
-            documentDecisionResults[0],
-            documentDecisionResults
-        );
+        var cr = new ClearanceRequest() { DeclarationUcr = "TestUcr" };
+        var item = new Commodity()
+        {
+            ItemNumber = 7,
+            NetMass = (decimal?)42.3,
+            TaricCommodityCode = "test-code",
+            GoodsDescription = "test-description",
+            Documents =
+            [
+                new ImportDocument()
+                {
+                    DocumentReference = new ImportDocumentReference("Test1234567"),
+                    DocumentCode = "9115",
+                },
+            ],
+            Checks = [new CommodityCheck() { CheckCode = "H220" }],
+        };
+        var result = DecisionReasonBuilder.Build(cr, item, documentDecisionResults[0], documentDecisionResults);
 
         // Assert
         result.Count.Should().Be(1);
         result[0]
             .Should()
             .Be(
-                "A Customs Declaration with a GMS product has been selected for HMI inspection. In IPAFFS create a CHEDPP and amend your licence to reference it. If a CHEDPP exists, amend your licence to reference it. Failure to do so will delay your Customs release."
+                DecisionReasonBuilder.GmsErrorMessage(
+                    cr.DeclarationUcr,
+                    item.ItemNumber,
+                    item.NetMass,
+                    item.TaricCommodityCode,
+                    item.GoodsDescription
+                )
             );
     }
 
@@ -152,6 +151,7 @@ public class DecisionReasonBuilderTests
 
         // Act
         var result = DecisionReasonBuilder.Build(
+            new ClearanceRequest(),
             new Commodity() { Checks = [new CommodityCheck() { CheckCode = "H221" }] },
             documentDecisionResults[0],
             documentDecisionResults
@@ -172,6 +172,7 @@ public class DecisionReasonBuilderTests
         // Act
         Action act = () =>
             DecisionReasonBuilder.Build(
+                new ClearanceRequest(),
                 new Commodity()
                 {
                     Documents =

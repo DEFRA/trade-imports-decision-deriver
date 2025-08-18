@@ -1,20 +1,31 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
+using Defra.TradeImportsDataApi.Domain.Gvms;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
 public static class DecisionReasonBuilder
 {
-    private static string IuuErrorMessage =
+    public static readonly string IuuErrorMessage =
         "Clearance of the Customs Declaration has been withheld. Confirmation of the outcome of IUU catch certificate check (under Council Regulation 1005/2008) is required. To resolve this contact your local Port Health Authority (imports) or MMO (landings).";
 
-    private static string PortHealthErrorMessage(string chedType, string chedNumbers) =>
-        $"A Customs Declaration has been submitted however no matching {chedType}(s) have been submitted to Port Health (for {chedType} number(s) {chedNumbers}). Please correct the {chedType} number(s) entered on your customs declaration.";
+    public static string PortHealthErrorMessage(string chedType, string chedNumbers) =>
+        $"A Customs Declaration has been submitted however no matching {chedType}(s) have been submitted to Port Health for {chedType} number(s) {chedNumbers}.";
 
-    private static string AnimalHealthErrorMessage(string chedType, string chedNumbers) =>
-        $"A Customs Declaration has been submitted however no matching {chedType}(s) have been submitted to Animal Health (for {chedType} number(s) {chedNumbers}). Please correct the {chedType} number(s) entered on your customs declaration.";
+    public static string AnimalHealthErrorMessage(string chedType, string chedNumbers) =>
+        $"A Customs Declaration has been submitted however no matching {chedType}(s) have been submitted to Animal Health for {chedType} number(s) {chedNumbers}.";
+
+    public static string GmsErrorMessage(
+        string? ucr,
+        int? itemNumber,
+        decimal? netMass,
+        string? taricCode,
+        string? goodsDescription
+    ) =>
+        $"A Customs Declaration with a GMS product has been selected for HMI inspection. If using PEACH then raise a GMS application. If using IPAFFS then create a CHEDPP and amend your licence to reference it. If a CHEDPP exists amend your licence to reference it. Failure to do so will delay your Customs release. The selected item was declared on a Customs Declaration with a Declaration UCR of {ucr} and Item Number {itemNumber} with a weight of {netMass} and is TARIC Code {taricCode} with a description of {goodsDescription}.";
 
     public static List<string> Build(
+        ClearanceRequest clearanceRequest,
         Commodity item,
         DocumentDecisionResult maxDecisionResult,
         DocumentDecisionResult[] documentDecisions
@@ -23,7 +34,7 @@ public static class DecisionReasonBuilder
         var reasons = new List<string>();
 
         HandleNoLinkedNotifications(item, maxDecisionResult, documentDecisions, reasons);
-        HandleHmiGmsDecisionReason(item, maxDecisionResult, reasons);
+        HandleHmiGmsDecisionReason(clearanceRequest, item, maxDecisionResult, reasons);
 
         return reasons;
     }
@@ -51,7 +62,10 @@ public static class DecisionReasonBuilder
             );
             var chedNumbers = string.Join(
                 ", ",
-                documentDecisions.Where(x => x.DecisionCode == DecisionCode.X00).Select(x => x.DocumentReference)
+                documentDecisions
+                    .Where(x => x.DecisionCode == DecisionCode.X00)
+                    .Select(x => x.DocumentReference)
+                    .Distinct()
             );
 
             switch (maxDecisionResult.DocumentCode)
@@ -78,6 +92,7 @@ public static class DecisionReasonBuilder
     }
 
     private static void HandleHmiGmsDecisionReason(
+        ClearanceRequest clearanceRequest,
         Commodity item,
         DocumentDecisionResult maxDecisionResult,
         List<string> reasons
@@ -91,7 +106,13 @@ public static class DecisionReasonBuilder
         )
         {
             reasons.Add(
-                "A Customs Declaration with a GMS product has been selected for HMI inspection. In IPAFFS create a CHEDPP and amend your licence to reference it. If a CHEDPP exists, amend your licence to reference it. Failure to do so will delay your Customs release."
+                GmsErrorMessage(
+                    clearanceRequest.DeclarationUcr,
+                    item.ItemNumber,
+                    item.NetMass,
+                    item.TaricCommodityCode,
+                    item.GoodsDescription
+                )
             );
         }
     }

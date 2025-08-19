@@ -36,10 +36,8 @@ public class ChedDDecisionFinder : DecisionFinder
         {
             return notification.ConsignmentDecision switch
             {
-                ConsignmentDecision.AcceptableForInternalMarket => new DecisionFinderResult(
-                    DecisionCode.C03,
-                    checkCode
-                ),
+                ConsignmentDecision.AcceptableForInternalMarket or ConsignmentDecision.AcceptableForNonInternalMarket =>
+                    new DecisionFinderResult(DecisionCode.C03, checkCode),
                 _ => new DecisionFinderResult(
                     DecisionCode.X00,
                     checkCode,

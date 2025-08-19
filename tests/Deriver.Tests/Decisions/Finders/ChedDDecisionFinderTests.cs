@@ -43,6 +43,7 @@ public class ChedDDecisionFinderTests
 
     [Theory]
     [InlineData(ConsignmentDecision.AcceptableForInternalMarket, null, new[] { "Other" }, DecisionCode.C03)]
+    [InlineData(ConsignmentDecision.AcceptableForNonInternalMarket, null, new[] { "Other" }, DecisionCode.C03)]
     [InlineData(
         ConsignmentDecision.AcceptableForTranshipment,
         null,

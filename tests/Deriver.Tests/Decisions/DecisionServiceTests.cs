@@ -901,7 +901,6 @@ public class DecisionServiceTests
         var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
 
         // Assert
-
         decisionResult.Should().NotBeNull();
         decisionResult.Decisions.Count.Should().Be(3);
         decisionResult.Decisions[0].CheckCode.Should().Be("H219");

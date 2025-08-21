@@ -106,7 +106,7 @@ public class ChedPPDecisionFinder : DecisionFinder
 
     private static bool ValidCheckCodeAndDocumentCodeMapping(CheckCode? checkCode, string? documentCode)
     {
-        return (checkCode?.Value == "H219" && documentCode is "N851" or "9115")
-            || (checkCode?.Value is "H218" or "H220" && documentCode is "N002");
+        return (checkCode?.Value == "H219" && documentCode is "N851" or "9115" or "C085")
+            || (checkCode?.Value is "H218" or "H220" && documentCode is "N002" or "C085");
     }
 }

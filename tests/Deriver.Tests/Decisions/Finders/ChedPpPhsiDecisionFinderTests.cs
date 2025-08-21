@@ -9,25 +9,30 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions.Finders;
 public class ChedPpPhsiDecisionFinderTests
 {
     [Theory]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H220")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Amend, true, "H220")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.InProgress, true, "H220")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Modify, true, "H220")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.PartiallyRejected, true, "H220")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Rejected, true, "H220")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.SplitConsignment, true, "H220")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Validated, true, "H220")]
-    [InlineData(ImportNotificationType.Cveda, ImportNotificationStatus.Submitted, false, "H219")]
-    [InlineData(ImportNotificationType.Ced, ImportNotificationStatus.Submitted, false, "H219")]
-    [InlineData(ImportNotificationType.Cvedp, ImportNotificationStatus.Submitted, false, "H219")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H219")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H218")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, false, null)]
+    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H220", "N002")]
+    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H220", "C085")]
+    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Amend, true, "H220", "N002")]
+    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.InProgress, true, "H220", "N002")]
+    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Modify, true, "H220", "N002")]
+    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.PartiallyRejected, true, "H220", "N002")]
+    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Rejected, true, "H220", "N002")]
+    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.SplitConsignment, true, "H220", "N002")]
+    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Validated, true, "H220", "N002")]
+    [InlineData(ImportNotificationType.Cveda, ImportNotificationStatus.Submitted, false, "H219", "N851")]
+    [InlineData(ImportNotificationType.Ced, ImportNotificationStatus.Submitted, false, "H219", "N851")]
+    [InlineData(ImportNotificationType.Cvedp, ImportNotificationStatus.Submitted, false, "H219", "N851")]
+    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H219", "N851")]
+    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H219", "C085")]
+    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H219", "9115")]
+    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H218", "N002")]
+    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H218", "C085")]
+    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, false, null, null)]
     public void CanFindDecisionTest(
         string? importNotificationType,
         string notificationStatus,
         bool expectedResult,
-        string? checkCode
+        string? checkCode,
+        string? documentCode
     )
     {
         var notification = new DecisionImportPreNotification
@@ -41,12 +46,7 @@ public class ChedPpPhsiDecisionFinderTests
         var result = sut.CanFindDecision(
             notification,
             string.IsNullOrEmpty(checkCode) ? null : new CheckCode { Value = checkCode },
-            checkCode switch
-            {
-                "H218" or "H220" => "N002",
-                "H219" => "N851",
-                _ => null,
-            }
+            documentCode
         );
 
         result.Should().Be(expectedResult);

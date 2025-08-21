@@ -376,4 +376,84 @@ public class NoMatchDecisionsTest
                 "This IPAFFS pre-notification reference cannot be found in IPAFFS. Please check that the reference is correct."
             );
     }
+
+    [Fact]
+    public async Task When_processing_chedpp_with_phsi_and_all_three_document_codes_Then_should_return_expected_decisions()
+    {
+        // Arrange
+        var decisionContext = new DecisionContext(
+            [],
+            [
+                new ClearanceRequestWrapper(
+                    "25GB99999999999021",
+                    new ClearanceRequest
+                    {
+                        Commodities =
+                        [
+                            new Commodity
+                            {
+                                ItemNumber = 1,
+                                Documents =
+                                [
+                                    new ImportDocument()
+                                    {
+                                        DocumentCode = "N851",
+                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
+                                        DocumentStatus = "JE",
+                                        DocumentControl = "P",
+                                    },
+                                    new ImportDocument()
+                                    {
+                                        DocumentCode = "C085",
+                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200019"),
+                                        DocumentStatus = "JE",
+                                        DocumentControl = "P",
+                                    },
+                                    new ImportDocument()
+                                    {
+                                        DocumentCode = "9115",
+                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200029"),
+                                        DocumentStatus = "JE",
+                                        DocumentControl = "P",
+                                    },
+                                ],
+                                Checks = [new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" }],
+                            },
+                        ],
+                    }
+                ),
+            ]
+        );
+
+        var sut = new DecisionService(
+            NullLogger<DecisionService>.Instance,
+            new MatchingService(),
+            [
+                new ChedADecisionFinder(),
+                new ChedDDecisionFinder(),
+                new ChedPDecisionFinder(),
+                new ChedPPDecisionFinder(),
+                new IuuDecisionFinder(),
+            ]
+        );
+
+        // Act
+        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+
+        // Assert
+
+        decisionResult.Should().NotBeNull();
+        decisionResult.Decisions.Count.Should().Be(3);
+        decisionResult.Decisions[0].CheckCode.Should().Be("H219");
+        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
+        decisionResult.Decisions[0].DocumentCode.Should().Be("N851");
+
+        decisionResult.Decisions[1].CheckCode.Should().Be("H219");
+        decisionResult.Decisions[1].DecisionCode.Should().Be(DecisionCode.X00);
+        decisionResult.Decisions[1].DocumentCode.Should().Be("C085");
+
+        decisionResult.Decisions[2].CheckCode.Should().Be("H219");
+        decisionResult.Decisions[2].DecisionCode.Should().Be(DecisionCode.X00);
+        decisionResult.Decisions[2].DocumentCode.Should().Be("9115");
+    }
 }

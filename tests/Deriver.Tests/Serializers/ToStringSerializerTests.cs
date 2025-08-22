@@ -1,5 +1,6 @@
 using System.Text;
 using Defra.TradeImportsDecisionDeriver.Deriver.Serializers;
+using SlimMessageBus.Host.Serialization;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Serializers;
 
@@ -10,12 +11,18 @@ public class ToStringSerializerTests
     [Fact]
     public void Deserialize_String_Returns_String()
     {
-        _toStringSerializer.Deserialize(null!, "sosig").Should().Be("sosig");
+        ((IMessageSerializer<string>)_toStringSerializer)
+            .Deserialize(null!, null!, "sosig", null!)
+            .Should()
+            .Be("sosig");
     }
 
     [Fact]
-    public void Deserialize_Byte_Returns_String()
+    public void Deserialize_Byte_ThrowsNotImplementedException()
     {
-        _toStringSerializer.Deserialize(null!, "sosig"u8.ToArray()).Should().Be("sosig");
+        ((IMessageSerializer<byte[]>)_toStringSerializer)
+            .Deserialize(null!, null!, "sosig"u8.ToArray(), null!)
+            .Should()
+            .Be("sosig");
     }
 }

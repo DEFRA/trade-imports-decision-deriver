@@ -42,7 +42,7 @@ public class CdpCredentialsSqsClientProvider : ISqsClientProvider, IDisposable
 
     #region ISqsClientProvider
 
-    public AmazonSQSClient Client => _client;
+    public IAmazonSQS Client => _client;
 
     public Task EnsureClientAuthenticated() => Task.CompletedTask;
 

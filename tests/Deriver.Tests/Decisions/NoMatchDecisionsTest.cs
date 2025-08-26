@@ -169,9 +169,7 @@ public class NoMatchDecisionsTest
         decisionResult
             .Decisions[0]
             .DecisionReason.Should()
-            .Be(
-                "This CHED reference cannot be found in IPAFFS. Please check that the reference is correct."
-            );
+            .Be("This CHED reference cannot be found in IPAFFS. Please check that the reference is correct.");
 
         await Task.CompletedTask;
     }
@@ -372,9 +370,7 @@ public class NoMatchDecisionsTest
         decisionResult
             .Decisions[0]
             .DecisionReason.Should()
-            .Be(
-                "This CHED reference cannot be found in IPAFFS. Please check that the reference is correct."
-            );
+            .Be("This CHED reference cannot be found in IPAFFS. Please check that the reference is correct.");
     }
 
     [Fact]

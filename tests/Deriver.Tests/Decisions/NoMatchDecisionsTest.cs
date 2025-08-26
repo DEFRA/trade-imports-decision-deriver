@@ -170,7 +170,7 @@ public class NoMatchDecisionsTest
             .Decisions[0]
             .DecisionReason.Should()
             .Be(
-                "This IPAFFS pre-notification reference cannot be found in IPAFFS. Please check that the reference is correct."
+                "This CHED reference cannot be found in IPAFFS. Please check that the reference is correct."
             );
 
         await Task.CompletedTask;
@@ -373,7 +373,7 @@ public class NoMatchDecisionsTest
             .Decisions[0]
             .DecisionReason.Should()
             .Be(
-                "This IPAFFS pre-notification reference cannot be found in IPAFFS. Please check that the reference is correct."
+                "This CHED reference cannot be found in IPAFFS. Please check that the reference is correct."
             );
     }
 

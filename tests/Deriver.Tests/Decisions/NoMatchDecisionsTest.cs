@@ -456,4 +456,60 @@ public class NoMatchDecisionsTest
         decisionResult.Decisions[2].DecisionCode.Should().Be(DecisionCode.X00);
         decisionResult.Decisions[2].DocumentCode.Should().Be("9115");
     }
+
+    [Fact]
+    public async Task When_processing_chedpp_with_phsi_and_all_three_document_codes_Then_should_return_expected_decisions1()
+    {
+        // Arrange
+        var decisionContext = new DecisionContext(
+            [],
+            [
+                new ClearanceRequestWrapper(
+                    "25GB99999999999021",
+                    new ClearanceRequest
+                    {
+                        Commodities =
+                        [
+                            new Commodity
+                            {
+                                ItemNumber = 1,
+
+                                Checks = [new CommodityCheck { CheckCode = "H220", DepartmentCode = "HMI" }],
+                            },
+                        ],
+                    }
+                ),
+            ]
+        );
+
+        var sut = new DecisionService(
+            NullLogger<DecisionService>.Instance,
+            new MatchingService(),
+            [
+                new ChedADecisionFinder(),
+                new ChedDDecisionFinder(),
+                new ChedPDecisionFinder(),
+                new ChedPPDecisionFinder(),
+                new IuuDecisionFinder(),
+            ]
+        );
+
+        // Act
+        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+
+        // Assert
+
+        decisionResult.Should().NotBeNull();
+        decisionResult.Decisions.Count.Should().Be(1);
+        decisionResult.Decisions[0].CheckCode.Should().Be("H220");
+        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
+        decisionResult.Decisions[0].DocumentCode.Should().Be(null);
+        decisionResult.Decisions[0].DocumentReference.Should().Be(String.Empty);
+        decisionResult
+            .Decisions[0]
+            .DecisionReason.Should()
+            .Be(
+                "This customs declaration with a GMS product has been selected for HMI inspection. Either create a new CHED PP or amend an existing one referencing the GMS product. Amend the customs declaration to reference the CHED PP."
+            );
+    }
 }

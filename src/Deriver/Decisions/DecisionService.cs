@@ -159,8 +159,7 @@ public class DecisionService(
                 "This customs declaration with a GMS product has been selected for HMI inspection. Either create a new CHED PP or amend an existing one referencing the GMS product. Amend the customs declaration to reference the CHED PP.",
             "H224" =>
                 "Customs declaration clearance withheld. Awaiting IUU check outcome. Contact Port Health Authority (imports) or Marine Management Organisation (landings).",
-            _ =>
-                "This CHED reference cannot be found in IPAFFS. Please check that the reference is correct.",
+            _ => "This CHED reference cannot be found in IPAFFS. Please check that the reference is correct.",
         };
         return reason;
     }

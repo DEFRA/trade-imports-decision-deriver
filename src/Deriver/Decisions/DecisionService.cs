@@ -160,7 +160,7 @@ public class DecisionService(
             "H224" =>
                 "Customs declaration clearance withheld. Awaiting IUU check outcome. Contact Port Health Authority (imports) or Marine Management Organisation (landings).",
             _ =>
-                "This IPAFFS pre-notification reference cannot be found in IPAFFS. Please check that the reference is correct.",
+                "This CHED reference cannot be found in IPAFFS. Please check that the reference is correct.",
         };
         return reason;
     }

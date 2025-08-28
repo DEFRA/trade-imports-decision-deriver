@@ -100,6 +100,7 @@ public class GetTests : EndpointTestBase, IClassFixture<WireMockContext>
         {
             ClearanceDecision = new ClearanceDecision()
             {
+                ExternalVersionNumber = customsDeclaration.ClearanceRequest?.ExternalVersion,
                 Items =
                 [
                     new ClearanceDecisionItem()

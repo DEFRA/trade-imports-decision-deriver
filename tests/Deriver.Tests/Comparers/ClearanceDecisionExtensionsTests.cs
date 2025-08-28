@@ -365,6 +365,98 @@ public class ClearanceDecisionExtensionsTests
     }
 
     [Fact]
+    public void ResultsAreSameButDifferentExternalVersions()
+    {
+        var decision = new ClearanceDecision
+        {
+            ExternalVersionNumber = 1,
+            Items =
+            [
+                new ClearanceDecisionItem
+                {
+                    ItemNumber = 1,
+                    Checks = [new ClearanceDecisionCheck { CheckCode = "H201", DecisionCode = "C03" }],
+                },
+                new ClearanceDecisionItem
+                {
+                    ItemNumber = 2,
+                    Checks = [new ClearanceDecisionCheck { CheckCode = "H202", DecisionCode = "C04" }],
+                },
+            ],
+            Results =
+            [
+                new ClearanceDecisionResult
+                {
+                    ItemNumber = 1,
+                    DecisionCode = "decisionCode1",
+                    DocumentReference = "docRef1",
+                    CheckCode = "checkCode1",
+                    DecisionReason = "decisionReason1",
+                    ImportPreNotification = "notification1",
+                    InternalDecisionCode = "internalDecisionCode1",
+                },
+                new ClearanceDecisionResult
+                {
+                    ItemNumber = 2,
+                    DecisionCode = "decisionCode2",
+                    DocumentReference = "docRef2",
+                    CheckCode = "checkCode2",
+                    DecisionReason = "decisionReason2",
+                    ImportPreNotification = "notification2",
+                    InternalDecisionCode = "internalDecisionCode2",
+                },
+            ],
+        };
+
+        var decision1 = new ClearanceDecision
+        {
+            ExternalVersionNumber = 2,
+            Items =
+            [
+                new ClearanceDecisionItem
+                {
+                    ItemNumber = 1,
+                    Checks = [new ClearanceDecisionCheck { CheckCode = "H201", DecisionCode = "C03" }],
+                },
+                new ClearanceDecisionItem
+                {
+                    ItemNumber = 2,
+                    Checks = [new ClearanceDecisionCheck { CheckCode = "H202", DecisionCode = "C04" }],
+                },
+            ],
+            Results =
+            [
+                new ClearanceDecisionResult
+                {
+                    ItemNumber = 2,
+                    DecisionCode = "decisionCode2",
+                    DocumentCode = "docCode2",
+                    DocumentReference = "docRef2",
+                    CheckCode = "checkCode2",
+                    DecisionReason = "decisionReason2",
+                    ImportPreNotification = "notification2",
+                    InternalDecisionCode = "internalDecisionCode2",
+                },
+                new ClearanceDecisionResult
+                {
+                    ItemNumber = 1,
+                    DecisionCode = "decisionCode1",
+                    DocumentCode = "docCode1",
+                    DocumentReference = "docRef1",
+                    CheckCode = "checkCode1",
+                    DecisionReason = "decisionReason1",
+                    ImportPreNotification = "notification1",
+                    InternalDecisionCode = "internalDecisionCode1",
+                },
+            ],
+        };
+
+        var result = decision.IsSameAs(decision1);
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
     public void ReferenceDifferentButValuesSames()
     {
         var item1 = new ClearanceDecisionResult

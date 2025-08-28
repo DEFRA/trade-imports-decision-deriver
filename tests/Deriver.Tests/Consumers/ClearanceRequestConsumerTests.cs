@@ -58,7 +58,7 @@ public class ClearanceRequestConsumerTests
             ClearanceDecision = new ClearanceDecision()
             {
                 DecisionNumber = 4,
-                ExternalVersionNumber = 22,
+                ExternalVersionNumber = customsDeclaration.ClearanceRequest?.ExternalVersion,
                 Items =
                 [
                     new ClearanceDecisionItem()

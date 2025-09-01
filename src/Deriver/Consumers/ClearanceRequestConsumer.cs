@@ -39,7 +39,12 @@ public class ClearanceRequestConsumer(
 
         if (message.Resource?.ClearanceRequest?.GetVersion() != clearanceRequest?.ClearanceRequest.GetVersion())
         {
-            logger.LogInformation("ClearanceRequest ResourceEvent version does not match API response");
+            logger.LogInformation(
+                message.Resource?.ClearanceRequest?.MessageSentAt.TrimMicroseconds()
+                > clearanceRequest?.ClearanceRequest?.MessageSentAt.TrimMicroseconds()
+                    ? "ClearanceRequest ResourceEvent version does not match API response : ResourceEvent is newer"
+                    : "ClearanceRequest ResourceEvent version does not match API response : APi response is newer"
+            );
         }
 
         if (WasFinalisedBeforeClearanceRequest(clearanceRequest))

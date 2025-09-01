@@ -147,7 +147,7 @@ public class ImportPreNotificationConsumer(
                                 message.Resource?.ImportPreNotification.UpdatedSource.TrimMicroseconds()
                                 > notificationResponse.UpdatedSource.TrimMicroseconds()
                                     ? "ImportPreNotification ResourceEvent version does not match API response : ResourceEvent is newer"
-                                    : "ImportPreNotification ResourceEvent version does not match API response : APi response is newer"
+                                    : "ImportPreNotification ResourceEvent version does not match API response : API response is newer"
                             );
                         }
                     }

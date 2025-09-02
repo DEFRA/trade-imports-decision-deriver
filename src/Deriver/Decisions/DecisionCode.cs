@@ -35,7 +35,7 @@ public enum DecisionInternalFurtherDetail
     E85, // Missing PHSI check
     E86, // No HMI check
     E87, // No Documents
-    E88, // NO LONGER USED
+    E88, // No PartTwo
     E89, // Item with document references where none are valid format
     E90, // No Decision Finder found
     E94, // IUU not indicated in PartTwo?.ControlAuthority?.IuuCheckRequired but "H224" requested in Items[]?.Checks[]?.CheckCode

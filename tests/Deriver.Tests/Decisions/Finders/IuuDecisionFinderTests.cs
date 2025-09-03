@@ -71,6 +71,7 @@ public class IuuDecisionFinderTests
             Id = "Test",
             IuuCheckRequired = iuuCheckRequired,
             IuuOption = iuuOption,
+            HasPartTwo = true,
         };
         var sut = new IuuDecisionFinder();
 

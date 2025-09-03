@@ -70,7 +70,12 @@ public class ChedPpPhsiDecisionFinderTests
         DecisionInternalFurtherDetail? expectedFurtherDetail = null
     )
     {
-        var notification = new DecisionImportPreNotification { Id = "Test", Status = status };
+        var notification = new DecisionImportPreNotification
+        {
+            Id = "Test",
+            Status = status,
+            HasPartTwo = true,
+        };
         var sut = new ChedPPDecisionFinder();
 
         var result = sut.FindDecision(notification, null);
@@ -96,6 +101,7 @@ public class ChedPpPhsiDecisionFinderTests
         {
             Id = "Test",
             Status = ImportNotificationStatus.Validated,
+            HasPartTwo = true,
         };
         if (!string.IsNullOrEmpty(status))
         {
@@ -160,6 +166,7 @@ public class ChedPpPhsiDecisionFinderTests
         {
             Id = "Test",
             Status = ImportNotificationStatus.Validated,
+            HasPartTwo = true,
         };
         var checks = new List<DecisionCommodityCheck.Check>();
         if (!string.IsNullOrEmpty(documentStatus))
@@ -184,5 +191,21 @@ public class ChedPpPhsiDecisionFinderTests
         var result = sut.FindDecision(notification, new CheckCode() { Value = "H219" });
 
         result.DecisionCode.Should().Be(expectedCode);
+    }
+
+    [Fact]
+    public void WhenMissingPartTwo_DecisionShouldBeX00()
+    {
+        var notification = new DecisionImportPreNotification
+        {
+            Id = "TEst",
+            Status = ImportNotificationStatus.Submitted,
+        };
+        var sut = new ChedPPDecisionFinder();
+
+        var result = sut.FindDecision(notification, null);
+
+        result.DecisionCode.Should().Be(DecisionCode.X00);
+        result.InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E88);
     }
 }

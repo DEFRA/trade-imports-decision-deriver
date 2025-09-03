@@ -19,6 +19,7 @@ public static class ImportPreNotificationExtensions
             IuuOption = notification.PartTwo?.ControlAuthority?.IuuOption,
             NotAcceptableReasons = notification.PartTwo?.Decision?.NotAcceptableReasons,
             InspectionRequired = notification.PartTwo?.InspectionRequired,
+            HasPartTwo = notification.PartTwo != null,
         };
 
         var commodityChecks = new List<DecisionCommodityCheck>();

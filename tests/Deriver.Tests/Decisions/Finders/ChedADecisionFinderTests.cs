@@ -166,6 +166,7 @@ public class ChedADecisionFinderTests
             ConsignmentDecision = decision,
             NotAcceptableAction = notAcceptableAction,
             NotAcceptableReasons = notAcceptableReasons,
+            HasPartTwo = true,
         };
         var sut = new ChedADecisionFinder();
 
@@ -184,6 +185,7 @@ public class ChedADecisionFinderTests
             Id = "TEst",
             Status = ImportNotificationStatus.InProgress,
             InspectionRequired = InspectionRequired.NotRequired,
+            HasPartTwo = true,
         };
         var sut = new ChedADecisionFinder();
 
@@ -201,6 +203,7 @@ public class ChedADecisionFinderTests
             Status = ImportNotificationStatus.InProgress,
             InspectionRequired = InspectionRequired.Required,
             Commodities = [new DecisionCommodityComplement { HmiDecision = CommodityRiskResultHmiDecision.Required }],
+            HasPartTwo = true,
         };
         var sut = new ChedADecisionFinder();
 
@@ -218,6 +221,7 @@ public class ChedADecisionFinderTests
             Status = ImportNotificationStatus.PartiallyRejected,
             InspectionRequired = InspectionRequired.Required,
             Commodities = [new DecisionCommodityComplement { HmiDecision = CommodityRiskResultHmiDecision.Required }],
+            HasPartTwo = true,
         };
         var sut = new ChedADecisionFinder();
 
@@ -225,5 +229,21 @@ public class ChedADecisionFinderTests
 
         result.DecisionCode.Should().Be(DecisionCode.X00);
         result.InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E74);
+    }
+
+    [Fact]
+    public void WhenMissingPartTwo_DecisionShouldBeX00()
+    {
+        var notification = new DecisionImportPreNotification
+        {
+            Id = "TEst",
+            Status = ImportNotificationStatus.Submitted,
+        };
+        var sut = new ChedADecisionFinder();
+
+        var result = sut.FindDecision(notification, null);
+
+        result.DecisionCode.Should().Be(DecisionCode.X00);
+        result.InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E88);
     }
 }

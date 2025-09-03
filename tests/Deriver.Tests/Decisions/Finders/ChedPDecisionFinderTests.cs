@@ -163,6 +163,7 @@ public class ChedPDecisionFinderTests
             ConsignmentDecision = decision,
             NotAcceptableAction = notAcceptableAction,
             NotAcceptableReasons = notAcceptableReasons,
+            HasPartTwo = true,
         };
         var sut = new ChedPDecisionFinder();
 
@@ -182,6 +183,7 @@ public class ChedPDecisionFinderTests
             Status = ImportNotificationStatus.PartiallyRejected,
             InspectionRequired = InspectionRequired.Required,
             Commodities = [new DecisionCommodityComplement { HmiDecision = CommodityRiskResultHmiDecision.Required }],
+            HasPartTwo = true,
         };
         var sut = new ChedPDecisionFinder();
 
@@ -189,5 +191,21 @@ public class ChedPDecisionFinderTests
 
         result.DecisionCode.Should().Be(DecisionCode.X00);
         result.InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E74);
+    }
+
+    [Fact]
+    public void WhenMissingPartTwo_DecisionShouldBeX00()
+    {
+        var notification = new DecisionImportPreNotification
+        {
+            Id = "TEst",
+            Status = ImportNotificationStatus.Submitted,
+        };
+        var sut = new ChedPDecisionFinder();
+
+        var result = sut.FindDecision(notification, null);
+
+        result.DecisionCode.Should().Be(DecisionCode.X00);
+        result.InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E88);
     }
 }

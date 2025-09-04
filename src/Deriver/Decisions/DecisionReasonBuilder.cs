@@ -98,12 +98,7 @@ public static class DecisionReasonBuilder
         List<string> reasons
     )
     {
-        if (
-            item.Documents != null
-            && item.Documents!.Any()
-            && maxDecisionResult.DecisionCode == DecisionCode.X00
-            && maxDecisionResult.CheckCode == "H220"
-        )
+        if (maxDecisionResult is { DecisionCode: DecisionCode.X00, CheckCode: "H220" })
         {
             reasons.Add(
                 GmsErrorMessage(

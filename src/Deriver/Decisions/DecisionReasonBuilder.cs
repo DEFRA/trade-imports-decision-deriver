@@ -53,6 +53,11 @@ public static class DecisionReasonBuilder
             && maxDecisionResult.CheckCode != "H220"
         )
         {
+            if (maxDecisionResult.InternalDecisionCode == DecisionInternalFurtherDetail.E83)
+            {
+                return;
+            }
+
             var chedType = MapToChedType(
                 new ImportDocument()
                 {

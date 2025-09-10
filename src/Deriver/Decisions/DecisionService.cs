@@ -18,7 +18,6 @@ public class DecisionService(
             cancellationToken
         );
         var decisionResult = await DeriveDecision(decisionContext, matchResult);
-
         return decisionResult;
     }
 
@@ -48,6 +47,7 @@ public class DecisionService(
                 HandleNoMatches(matchingResult, item, wrapper, checkCodes, decisionsResult);
                 HandleMatches(decisionContext, matchingResult, item, wrapper, checkCodes, decisionsResult);
                 HandleItemsWithInvalidReference(wrapper.MovementReferenceNumber!, checkCodes, item, decisionsResult);
+                HandleOrphanChecks(decisionsResult, item, checkCodes, wrapper);
             }
         }
 
@@ -88,6 +88,35 @@ public class DecisionService(
                 );
             }
         }
+    }
+
+    private static void HandleOrphanChecks(
+        DecisionResult decisionsResult,
+        Commodity item,
+        CheckCode[] checkCodes,
+        ClearanceRequestWrapper wrapper
+    )
+    {
+        var decisionChecks = decisionsResult
+            .Decisions.Where(x => x.ItemNumber == item.ItemNumber)
+            .Select(x => x.CheckCode)
+            .Distinct()
+            .ToArray();
+
+        var orphanCheckCodes = checkCodes.Select(x => x.Value).Except(decisionChecks).ToArray();
+        foreach (var checkCode in orphanCheckCodes)
+        {
+            decisionsResult.AddDecision(
+                wrapper.MovementReferenceNumber!,
+                item.ItemNumber!.Value,
+                string.Empty,
+                null,
+                checkCode,
+                DecisionCode.X00,
+                internalDecisionCode: DecisionInternalFurtherDetail.E83
+            );
+        }
+        Console.Write(orphanCheckCodes);
     }
 
     private static void HandleNoMatches(
@@ -249,16 +278,10 @@ public class DecisionService(
             foreach (var checkCode in checkCodes)
             {
                 logger.LogWarning(
-                    "No decision finder count for notification {Id} and check code {CheckCode}",
+                    "No decision finder count for notification {Id} and check code {CheckCode} and document code {DocumentCode}",
                     notification.Id,
-                    checkCode
-                );
-                results.Add(
-                    new DecisionFinderResult(
-                        DecisionCode.X00,
-                        checkCode,
-                        InternalDecisionCode: DecisionInternalFurtherDetail.E90
-                    )
+                    checkCode,
+                    documentCode
                 );
             }
         }

@@ -32,6 +32,7 @@ public enum DecisionInternalFurtherDetail
     E74, // Partially Rejected
     E75, // Split Consignment
     E80, // NO LONGER USED
+    E84, // Wrong Ched type
     E85, // Missing PHSI check
     E86, // No HMI check
     E87, // No Documents

@@ -1,0 +1,8 @@
+﻿{
+  DecisionCode: X00,
+  CheckCode: {
+    Value: value
+  },
+  DecisionReason: This CHED has been cancelled. Update the customs declaration with a new reference.,
+  InternalDecisionCode: E71
+}

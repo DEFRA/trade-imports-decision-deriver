@@ -43,7 +43,9 @@ public record DecisionResult
     public IReadOnlyList<DocumentDecisionResult> Decisions => _results.AsReadOnly();
 }
 
-[DebuggerDisplay("{ItemNumber} : {DocumentReference} : {DocumentCode} : {CheckCode} : {DecisionCode} : {InternalDecisionCode}")]
+[DebuggerDisplay(
+    "{ItemNumber} : {DocumentReference} : {DocumentCode} : {CheckCode} : {DecisionCode} : {InternalDecisionCode}"
+)]
 public record DocumentDecisionResult(
     DecisionImportPreNotification? PreNotification,
     string Mrn,

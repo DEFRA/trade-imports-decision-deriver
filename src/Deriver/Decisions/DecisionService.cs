@@ -317,7 +317,10 @@ public class DecisionService(
         IEnumerable<IDecisionFinder> decisionFinders
     )
     {
-        var finders = decisionFinders.DistinctBy(x => x.GetType()).Where(x => x.CanFindDecision(notification, checkCode, documentCode)).ToArray();
+        var finders = decisionFinders
+            .DistinctBy(x => x.GetType())
+            .Where(x => x.CanFindDecision(notification, checkCode, documentCode))
+            .ToArray();
 
         foreach (var finder in finders)
         {

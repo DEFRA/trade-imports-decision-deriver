@@ -16,6 +16,7 @@ public class ChedPPDecisionFinder : DecisionFinder
         && checkCode.IsValidDocumentCode(documentCode);
 
     protected override string ChedType => ImportNotificationType.Chedpp;
+
     protected override DecisionFinderResult FindDecisionInternal(
         DecisionImportPreNotification notification,
         CheckCode? checkCode

@@ -113,10 +113,10 @@ public class DecisionService(
                 null,
                 checkCode,
                 DecisionCode.X00,
+                decisionReason: GetReasonFromCheckCode(checkCode!),
                 internalDecisionCode: DecisionInternalFurtherDetail.E83
             );
         }
-        Console.Write(orphanCheckCodes);
     }
 
     private static void HandleNoMatches(

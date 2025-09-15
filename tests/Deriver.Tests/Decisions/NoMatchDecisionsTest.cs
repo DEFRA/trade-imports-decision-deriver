@@ -587,21 +587,17 @@ public class NoMatchDecisionsTest
         // Assert
 
         decisionResult.Should().NotBeNull();
-        decisionResult.Decisions.Count.Should().Be(4);
+        decisionResult.Decisions.Count.Should().Be(3);
         decisionResult.Decisions[0].CheckCode.Should().Be("H222");
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.C03);
         decisionResult.Decisions[0].DocumentCode.Should().Be("N853");
 
-        decisionResult.Decisions[1].CheckCode.Should().Be("H222");
-        decisionResult.Decisions[1].DecisionCode.Should().Be(DecisionCode.C03);
-        decisionResult.Decisions[1].DocumentCode.Should().Be("C678");
+        decisionResult.Decisions[1].CheckCode.Should().Be("H223");
+        decisionResult.Decisions[1].DecisionCode.Should().Be(DecisionCode.X00);
+        decisionResult.Decisions[1].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E84);
 
-        decisionResult.Decisions[2].CheckCode.Should().Be("H223");
+        decisionResult.Decisions[2].CheckCode.Should().Be("H219");
         decisionResult.Decisions[2].DecisionCode.Should().Be(DecisionCode.X00);
         decisionResult.Decisions[2].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E83);
-
-        decisionResult.Decisions[3].CheckCode.Should().Be("H219");
-        decisionResult.Decisions[3].DecisionCode.Should().Be(DecisionCode.X00);
-        decisionResult.Decisions[3].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E83);
     }
 }

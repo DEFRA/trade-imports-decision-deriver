@@ -130,15 +130,7 @@ public class DecisionReasonBuilderTests
         result.Count.Should().Be(1);
         result[0]
             .Should()
-            .Be(
-                DecisionReasonBuilder.GmsErrorMessage(
-                    cr.DeclarationUcr,
-                    item.ItemNumber,
-                    item.NetMass,
-                    item.TaricCommodityCode,
-                    item.GoodsDescription
-                )
-            );
+            .Be(DecisionReasonBuilder.GmsErrorMessage(item.ItemNumber, item.TaricCommodityCode, item.GoodsDescription));
     }
 
     [Fact]
@@ -166,15 +158,7 @@ public class DecisionReasonBuilderTests
         result.Count.Should().Be(1);
         result[0]
             .Should()
-            .Be(
-                DecisionReasonBuilder.GmsErrorMessage(
-                    cr.DeclarationUcr,
-                    item.ItemNumber,
-                    item.NetMass,
-                    item.TaricCommodityCode,
-                    item.GoodsDescription
-                )
-            );
+            .Be(DecisionReasonBuilder.GmsErrorMessage(item.ItemNumber, item.TaricCommodityCode, item.GoodsDescription));
     }
 
     [Fact]

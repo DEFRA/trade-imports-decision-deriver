@@ -20,13 +20,13 @@ public class IuuDecisionFinderTests
     [InlineData(ImportNotificationType.Cvedp, "H224", "C085", false)]
     [InlineData(ImportNotificationType.Cvedp, "H224", "N002", false)]
     [InlineData(ImportNotificationType.Cvedp, "H224", "9115", false)]
-    [InlineData(ImportNotificationType.Cvedp, "H224", "N853", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H224", "N853", true)]
     [InlineData(ImportNotificationType.Cvedp, "H224", "C640", false)]
     [InlineData(ImportNotificationType.Cvedp, "H224", "C678", false)]
     [InlineData(ImportNotificationType.Cvedp, "H224", "N852", false)]
-    [InlineData(ImportNotificationType.Cvedp, "H224", "C641", true)]
-    [InlineData(ImportNotificationType.Cvedp, "H224", "C673", true)]
-    [InlineData(ImportNotificationType.Cvedp, "H224", "C674", true)]
+    [InlineData(ImportNotificationType.Cvedp, "H224", "C641", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H224", "C673", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H224", "C674", false)]
     public void CanFindDecisionTest(
         string? importNotificationType,
         string checkCode,

@@ -36,7 +36,7 @@ public class CheckCode
         return Value switch
         {
             "H218" or "H220" => documentCode is "C085" or "N002",
-            "H219" => documentCode is "C085" or "N002" or "9115" or "N851",
+            "H219" => documentCode is "C085" or "9115" or "N851",
             "H221" => documentCode is "C640",
             "H222" => documentCode is "N853",
             "H223" => documentCode is "C678" or "N852",

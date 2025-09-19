@@ -718,18 +718,14 @@ public class DecisionServiceTests
         // Assert
 
         decisionResult.Should().NotBeNull();
-        decisionResult.Decisions.Count.Should().Be(3);
+        decisionResult.Decisions.Count.Should().Be(2);
         decisionResult.Decisions[0].CheckCode.Should().Be("H219");
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.C03);
         decisionResult.Decisions[0].DocumentCode.Should().Be("N851");
 
-        decisionResult.Decisions[1].CheckCode.Should().Be("H219");
-        decisionResult.Decisions[1].DecisionCode.Should().Be(DecisionCode.C03);
+        decisionResult.Decisions[1].CheckCode.Should().Be("H218");
+        decisionResult.Decisions[1].DecisionCode.Should().Be(DecisionCode.H01);
         decisionResult.Decisions[1].DocumentCode.Should().Be("N002");
-
-        decisionResult.Decisions[2].CheckCode.Should().Be("H218");
-        decisionResult.Decisions[2].DecisionCode.Should().Be(DecisionCode.H01);
-        decisionResult.Decisions[2].DocumentCode.Should().Be("N002");
     }
 
     [Fact]
@@ -816,18 +812,14 @@ public class DecisionServiceTests
         // Assert
 
         decisionResult.Should().NotBeNull();
-        decisionResult.Decisions.Count.Should().Be(3);
+        decisionResult.Decisions.Count.Should().Be(2);
         decisionResult.Decisions[0].CheckCode.Should().Be("H219");
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.H01);
         decisionResult.Decisions[0].DocumentCode.Should().Be("N851");
 
-        decisionResult.Decisions[1].CheckCode.Should().Be("H219");
-        decisionResult.Decisions[1].DecisionCode.Should().Be(DecisionCode.H01);
+        decisionResult.Decisions[1].CheckCode.Should().Be("H220");
+        decisionResult.Decisions[1].DecisionCode.Should().Be(DecisionCode.C03);
         decisionResult.Decisions[1].DocumentCode.Should().Be("N002");
-
-        decisionResult.Decisions[2].CheckCode.Should().Be("H220");
-        decisionResult.Decisions[2].DecisionCode.Should().Be(DecisionCode.C03);
-        decisionResult.Decisions[2].DocumentCode.Should().Be("N002");
     }
 
     [Fact]

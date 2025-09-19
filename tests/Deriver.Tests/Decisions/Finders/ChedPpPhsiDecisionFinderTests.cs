@@ -20,7 +20,7 @@ public class ChedPpPhsiDecisionFinderTests
     [InlineData(ImportNotificationType.Chedpp, "H218", "C673", false)]
     [InlineData(ImportNotificationType.Chedpp, "H218", "C674", false)]
     [InlineData(ImportNotificationType.Chedpp, "H219", "C085", true)]
-    [InlineData(ImportNotificationType.Chedpp, "H219", "N002", true)]
+    [InlineData(ImportNotificationType.Chedpp, "H219", "N002", false)]
     [InlineData(ImportNotificationType.Chedpp, "H219", "9115", true)]
     [InlineData(ImportNotificationType.Chedpp, "H219", "N853", false)]
     [InlineData(ImportNotificationType.Chedpp, "H219", "C640", false)]

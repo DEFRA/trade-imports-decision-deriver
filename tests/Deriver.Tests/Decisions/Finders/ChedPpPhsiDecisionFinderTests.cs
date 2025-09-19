@@ -9,36 +9,86 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions.Finders;
 public class ChedPpPhsiDecisionFinderTests
 {
     [Theory]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H220", "N002")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H220", "C085")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Amend, true, "H220", "N002")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.InProgress, true, "H220", "N002")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Modify, true, "H220", "N002")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.PartiallyRejected, true, "H220", "N002")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Rejected, true, "H220", "N002")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.SplitConsignment, true, "H220", "N002")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Validated, true, "H220", "N002")]
-    [InlineData(ImportNotificationType.Cveda, ImportNotificationStatus.Submitted, false, "H219", "N851")]
-    [InlineData(ImportNotificationType.Ced, ImportNotificationStatus.Submitted, false, "H219", "N851")]
-    [InlineData(ImportNotificationType.Cvedp, ImportNotificationStatus.Submitted, false, "H219", "N851")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H219", "N851")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H219", "C085")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H219", "9115")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H218", "N002")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, true, "H218", "C085")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, false, null, null)]
+    [InlineData(ImportNotificationType.Chedpp, "H218", "C085", true)]
+    [InlineData(ImportNotificationType.Chedpp, "H218", "N002", true)]
+    [InlineData(ImportNotificationType.Chedpp, "H218", "9115", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H218", "N853", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H218", "C640", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H218", "C678", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H218", "N852", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H218", "C641", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H218", "C673", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H218", "C674", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H219", "C085", true)]
+    [InlineData(ImportNotificationType.Chedpp, "H219", "N002", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H219", "9115", true)]
+    [InlineData(ImportNotificationType.Chedpp, "H219", "N853", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H219", "C640", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H219", "C678", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H219", "N852", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H219", "C641", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H219", "C673", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H219", "C674", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H220", "C085", true)]
+    [InlineData(ImportNotificationType.Chedpp, "H220", "N002", true)]
+    [InlineData(ImportNotificationType.Chedpp, "H220", "9115", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H220", "N853", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H220", "C640", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H220", "C678", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H220", "N852", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H220", "C641", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H220", "C673", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H220", "C674", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H221", "C085", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H221", "N002", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H221", "9115", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H221", "N853", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H221", "C640", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H221", "C678", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H221", "N852", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H221", "C641", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H221", "C673", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H221", "C674", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H222", "C085", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H222", "N002", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H222", "9115", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H222", "N853", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H222", "C640", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H222", "C678", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H222", "N852", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H222", "C641", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H222", "C673", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H222", "C674", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H223", "C085", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H223", "N002", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H223", "9115", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H223", "N853", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H223", "C640", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H223", "C678", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H223", "N852", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H223", "C641", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H223", "C673", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H223", "C674", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H224", "C085", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H224", "N002", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H224", "9115", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H224", "N853", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H224", "C640", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H224", "C678", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H224", "N852", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H224", "C641", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H224", "C673", false)]
+    [InlineData(ImportNotificationType.Chedpp, "H224", "C674", false)]
     public void CanFindDecisionTest(
         string? importNotificationType,
-        string notificationStatus,
-        bool expectedResult,
-        string? checkCode,
-        string? documentCode
+        string checkCode,
+        string documentCode,
+        bool expectedResult
     )
     {
         var notification = new DecisionImportPreNotification
         {
             Id = "Test",
-            Status = notificationStatus,
             ImportNotificationType = importNotificationType,
         };
         var sut = new ChedPPDecisionFinder();
@@ -73,6 +123,7 @@ public class ChedPpPhsiDecisionFinderTests
         var notification = new DecisionImportPreNotification
         {
             Id = "Test",
+            ImportNotificationType = ImportNotificationType.Chedpp,
             Status = status,
             HasPartTwo = true,
         };
@@ -100,6 +151,7 @@ public class ChedPpPhsiDecisionFinderTests
         var notification = new DecisionImportPreNotification
         {
             Id = "Test",
+            ImportNotificationType = ImportNotificationType.Chedpp,
             Status = ImportNotificationStatus.Validated,
             HasPartTwo = true,
         };
@@ -165,6 +217,7 @@ public class ChedPpPhsiDecisionFinderTests
         var notification = new DecisionImportPreNotification
         {
             Id = "Test",
+            ImportNotificationType = ImportNotificationType.Chedpp,
             Status = ImportNotificationStatus.Validated,
             HasPartTwo = true,
         };
@@ -199,6 +252,7 @@ public class ChedPpPhsiDecisionFinderTests
         var notification = new DecisionImportPreNotification
         {
             Id = "TEst",
+            ImportNotificationType = ImportNotificationType.Chedpp,
             Status = ImportNotificationStatus.Submitted,
         };
         var sut = new ChedPPDecisionFinder();

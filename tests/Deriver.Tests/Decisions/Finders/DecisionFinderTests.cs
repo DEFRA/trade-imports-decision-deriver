@@ -57,6 +57,8 @@ public class DecisionFinderTests
             throw new NotImplementedException();
         }
 
+        protected override string ChedType { get; } = null!;
+
         public override bool CanFindDecision(
             DecisionImportPreNotification notification,
             CheckCode? checkCode,

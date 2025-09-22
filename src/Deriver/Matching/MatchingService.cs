@@ -46,7 +46,7 @@ public class MatchingService : IMatchingService
         MatchingResult matchingResult
     )
     {
-        if (documentGroup == null || !ImportDocumentReference.IsValid(documentCode!))
+        if (documentGroup == null)
             return;
 
         var notification = matchingContext.Notifications.Find(x =>

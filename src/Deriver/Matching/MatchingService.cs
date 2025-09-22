@@ -46,7 +46,10 @@ public class MatchingService : IMatchingService
         MatchingResult matchingResult
     )
     {
-        if (documentGroup == null)
+        if (
+            documentGroup == null
+            || string.IsNullOrEmpty(ChedReferenceRegexes.DocumentReferenceIdentifier().Match(documentGroup.Value).Value)
+        )
             return;
 
         var notification = matchingContext.Notifications.Find(x =>

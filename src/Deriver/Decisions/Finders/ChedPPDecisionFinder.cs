@@ -38,7 +38,7 @@ public class ChedPPDecisionFinder : DecisionFinder
                     InternalDecisionCode: DecisionInternalFurtherDetail.E99
                 ),
             },
-            ImportNotificationStatus.PartiallyRejected => new DecisionFinderResult(DecisionCode.H01, checkCode),
+            ImportNotificationStatus.PartiallyRejected => new DecisionFinderResult(DecisionCode.H01, checkCode, InternalDecisionCode: DecisionInternalFurtherDetail.E74),
             _ => new DecisionFinderResult(
                 DecisionCode.X00,
                 checkCode,

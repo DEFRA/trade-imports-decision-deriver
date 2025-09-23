@@ -8,7 +8,10 @@ public class IuuDecisionFinder : DecisionFinder
         DecisionImportPreNotification notification,
         CheckCode? checkCode,
         string? documentCode
-    ) => notification.ImportNotificationType == ImportNotificationType.Cvedp && checkCode != null && checkCode.IsIuu();
+    ) =>
+        checkCode?.GetImportNotificationType() == ChedType
+        && checkCode.IsValidDocumentCode(documentCode)
+        && checkCode.IsIuu();
 
     protected override DecisionFinderResult FindDecisionInternal(
         DecisionImportPreNotification notification,
@@ -50,4 +53,6 @@ public class IuuDecisionFinder : DecisionFinder
             ),
         };
     }
+
+    protected override string ChedType => ImportNotificationType.Cvedp;
 }

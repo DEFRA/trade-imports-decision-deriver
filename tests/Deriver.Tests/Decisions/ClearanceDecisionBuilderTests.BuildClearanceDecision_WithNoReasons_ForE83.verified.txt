@@ -1,0 +1,117 @@
+﻿{
+  CorrelationId: correlationId,
+  ExternalVersionNumber: 22,
+  DecisionNumber: 5,
+  Items: [
+    {
+      ItemNumber: 1,
+      Checks: [
+        {
+          CheckCode: 9115,
+          DecisionCode: X00,
+          DecisionInternalFurtherDetail: [
+            E83
+          ]
+        }
+      ]
+    },
+    {
+      ItemNumber: 2,
+      Checks: [
+        {
+          CheckCode: 9115,
+          DecisionCode: X00,
+          DecisionInternalFurtherDetail: [
+            E83
+          ]
+        }
+      ]
+    },
+    {
+      ItemNumber: 3,
+      Checks: [
+        {
+          CheckCode: 9115,
+          DecisionCode: X00,
+          DecisionInternalFurtherDetail: [
+            E83
+          ]
+        }
+      ]
+    }
+  ],
+  Results: [
+    {
+      ItemNumber: 1,
+      DocumentReference: docref_1_1,
+      DocumentCode: 9115,
+      CheckCode: 9115,
+      DecisionCode: X00,
+      InternalDecisionCode: E83
+    },
+    {
+      ItemNumber: 1,
+      DocumentReference: docref_1_2,
+      DocumentCode: 9115,
+      CheckCode: 9115,
+      DecisionCode: X00,
+      InternalDecisionCode: E83
+    },
+    {
+      ItemNumber: 1,
+      DocumentReference: docref_1_3,
+      DocumentCode: 9115,
+      CheckCode: 9115,
+      DecisionCode: X00,
+      InternalDecisionCode: E83
+    },
+    {
+      ItemNumber: 2,
+      DocumentReference: docref_2_1,
+      DocumentCode: 9115,
+      CheckCode: 9115,
+      DecisionCode: X00,
+      InternalDecisionCode: E83
+    },
+    {
+      ItemNumber: 2,
+      DocumentReference: docref_2_2,
+      DocumentCode: 9115,
+      CheckCode: 9115,
+      DecisionCode: X00,
+      InternalDecisionCode: E83
+    },
+    {
+      ItemNumber: 2,
+      DocumentReference: docref_2_3,
+      DocumentCode: 9115,
+      CheckCode: 9115,
+      DecisionCode: X00,
+      InternalDecisionCode: E83
+    },
+    {
+      ItemNumber: 3,
+      DocumentReference: docref_3_1,
+      DocumentCode: 9115,
+      CheckCode: 9115,
+      DecisionCode: X00,
+      InternalDecisionCode: E83
+    },
+    {
+      ItemNumber: 3,
+      DocumentReference: docref_3_2,
+      DocumentCode: 9115,
+      CheckCode: 9115,
+      DecisionCode: X00,
+      InternalDecisionCode: E83
+    },
+    {
+      ItemNumber: 3,
+      DocumentReference: docref_3_3,
+      DocumentCode: 9115,
+      CheckCode: 9115,
+      DecisionCode: X00,
+      InternalDecisionCode: E83
+    }
+  ]
+}

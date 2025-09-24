@@ -16,7 +16,7 @@ public static class DecisionReasonBuilder
         $"A Customs Declaration has been submitted however no matching {chedType}(s) have been submitted to Animal Health for {chedType} number(s) {chedNumbers}.";
 
     public static string GmsErrorMessage(int? itemNumber, string? taricCode, string? goodsDescription) =>
-        $"Item number {itemNumber} has been selected for HMI inspection. In IPAFFS either create a new CHEDPP with this item or amend an existing CHEDPP to include this item. The item selected has a TARIC code of {taricCode} and a description of {goodsDescription}.";
+        $"Item number {itemNumber} has been selected for HMI GMS inspection. In IPAFFS either create a new CHEDPP with this item or amend an existing CHEDPP to include this item. The item selected has a TARIC code of {taricCode} and a description of {goodsDescription}.";
 
     public static List<string> Build(
         ClearanceRequest clearanceRequest,

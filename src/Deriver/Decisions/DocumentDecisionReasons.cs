@@ -18,7 +18,7 @@ public static class DocumentDecisionReasons
     public const string UnknownError = "An unknown error has occurred.";
 
     public const string GmsInspection =
-        "This customs declaration with a GMS product has been selected for HMI inspection. Either create a new CHED PP or amend an existing one referencing the GMS product. Amend the customs declaration to reference the CHED PP..";
+        "This customs declaration with a GMS product has been selected for HMI inspection. Either create a new CHED PP or amend an existing one referencing the GMS product. Amend the customs declaration to reference the CHED PP.";
 
     public const string CancelledChed =
         "This CHED has been cancelled. Update the customs declaration with a new reference.";

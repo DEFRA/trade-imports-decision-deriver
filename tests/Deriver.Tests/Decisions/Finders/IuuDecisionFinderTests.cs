@@ -51,24 +51,17 @@ public class IuuDecisionFinderTests
     }
 
     [Theory]
-    [InlineData(true, ControlAuthorityIuuOption.IUUOK, DecisionCode.C07, null, "IUU Compliant")]
-    [InlineData(true, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00, null, "IUU Not compliant")]
-    [InlineData(true, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08, null, "IUU Not applicable")]
-    [InlineData(true, null, DecisionCode.X00, null, "IUU Awaiting decision")]
-    [InlineData(true, "999", DecisionCode.X00, DecisionInternalFurtherDetail.E95, "IUU Data error")]
-    [InlineData(
-        false,
-        ControlAuthorityIuuOption.IUUOK,
-        DecisionCode.X00,
-        DecisionInternalFurtherDetail.E94,
-        "IUU Data error"
-    )]
+    [InlineData(true, ControlAuthorityIuuOption.IUUOK, DecisionCode.C07, null)]
+    [InlineData(true, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00, null)]
+    [InlineData(true, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08, null)]
+    [InlineData(true, null, DecisionCode.X00, DecisionInternalFurtherDetail.E93)]
+    [InlineData(true, "999", DecisionCode.X00, DecisionInternalFurtherDetail.E94)]
+    [InlineData(false, ControlAuthorityIuuOption.IUUOK, DecisionCode.X00, DecisionInternalFurtherDetail.E94)]
     public void FindDecisionTest(
         bool iuuCheckRequired,
         string? iuuOption,
         DecisionCode expectedDecisionCode,
-        DecisionInternalFurtherDetail? expectedFurtherDetail = null,
-        string? expectedDecisionReason = null
+        DecisionInternalFurtherDetail? expectedFurtherDetail = null
     )
     {
         var notification = new DecisionImportPreNotification
@@ -85,7 +78,6 @@ public class IuuDecisionFinderTests
 
         result.DecisionCode.Should().Be(expectedDecisionCode);
         result.InternalDecisionCode.Should().Be(expectedFurtherDetail);
-        result.DecisionReason.Should().StartWith(expectedDecisionReason);
         result.CheckCode?.Value.Should().Be(CheckCode.IuuCheckCode);
     }
 }

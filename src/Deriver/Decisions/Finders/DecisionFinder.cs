@@ -40,13 +40,11 @@ public abstract class DecisionFinder : IDecisionFinder
             ImportNotificationStatus.Cancelled => new DecisionFinderResult(
                 DecisionCode.X00,
                 checkCode,
-                DecisionReason: "This CHED has been cancelled. Update the customs declaration with a new reference.",
                 InternalDecisionCode: DecisionInternalFurtherDetail.E71
             ),
             ImportNotificationStatus.Replaced => new DecisionFinderResult(
                 DecisionCode.X00,
                 checkCode,
-                DecisionReason: "This CHED has been replaced. Update the customs declaration with a new reference.",
                 InternalDecisionCode: DecisionInternalFurtherDetail.E72
             ),
             ImportNotificationStatus.Deleted => new DecisionFinderResult(

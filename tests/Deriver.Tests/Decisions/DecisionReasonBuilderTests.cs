@@ -10,7 +10,7 @@ public class DecisionReasonBuilderTests
     {
         DocumentDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test1234567", "C640", "H221", DecisionCode.X00, null, null),
+            new(null, "Test", 1, "Test1234567", "C640", "H221", DecisionCode.X00, null),
         ];
         // Act
         var result = DecisionReasonBuilder.Build(
@@ -41,7 +41,7 @@ public class DecisionReasonBuilderTests
     {
         DocumentDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test1234567", "C641", "H221", DecisionCode.X00, null, null),
+            new(null, "Test", 1, "Test1234567", "C641", "H221", DecisionCode.X00),
         ];
         // Act
         var result = DecisionReasonBuilder.Build(
@@ -72,7 +72,7 @@ public class DecisionReasonBuilderTests
     {
         DocumentDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test1234567", "9115", "H221", DecisionCode.X00, null, null),
+            new(null, "Test", 1, "Test1234567", "9115", "H221", DecisionCode.X00),
         ];
         // Act
         var result = DecisionReasonBuilder.Build(
@@ -103,7 +103,7 @@ public class DecisionReasonBuilderTests
     {
         DocumentDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test Doc Ref", "Test Doc Code", "H220", DecisionCode.X00, null, null),
+            new(null, "Test", 1, "Test Doc Ref", "Test Doc Code", "H220", DecisionCode.X00),
         ];
 
         // Act
@@ -136,10 +136,7 @@ public class DecisionReasonBuilderTests
     [Fact]
     public void WhenDecisionResultIsNotLinkedToChed_AndHasNoDocuments_AndCheckCodeIsH220_ThenShouldBeHmiGmsReason()
     {
-        DocumentDecisionResult[] documentDecisionResults =
-        [
-            new(null, "Test", 1, "", "", "H220", DecisionCode.X00, null, null),
-        ];
+        DocumentDecisionResult[] documentDecisionResults = [new(null, "Test", 1, "", "", "H220", DecisionCode.X00)];
 
         // Act
         var cr = new ClearanceRequest() { DeclarationUcr = "TestUcr" };
@@ -166,7 +163,7 @@ public class DecisionReasonBuilderTests
     {
         DocumentDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test Doc Ref", "Test Doc Code", "H221", DecisionCode.X00, null, null),
+            new(null, "Test", 1, "Test Doc Ref", "Test Doc Code", "H221", DecisionCode.X00),
         ];
 
         // Act
@@ -186,7 +183,7 @@ public class DecisionReasonBuilderTests
     {
         DocumentDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test Doc Ref", "Test Doc Code", "H224", DecisionCode.X00, null, null),
+            new(null, "Test", 1, "Test Doc Ref", "Test Doc Code", "H224", DecisionCode.X00),
         ];
 
         // Act

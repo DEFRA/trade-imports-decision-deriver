@@ -119,7 +119,7 @@ public class GetTests : EndpointTestBase, IClassFixture<WireMockContext>
                         CheckCode = "H218",
                         DecisionCode = "X00",
                         DecisionReason =
-                            "This CHED reference cannot be found in IPAFFS. Please check that the reference is correct.",
+                            "CHED reference GBCHD2025.6244952 cannot be found in IPAFFS. Check that the reference is correct.",
                         InternalDecisionCode = "E70",
                     },
                 ],

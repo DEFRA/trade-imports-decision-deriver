@@ -83,7 +83,6 @@ public class DecisionService(
                     decisionCode.CheckCode?.Value,
                     decisionCode.DecisionCode,
                     notification,
-                    decisionCode.DecisionReason,
                     decisionCode.InternalDecisionCode
                 );
             }
@@ -113,7 +112,6 @@ public class DecisionService(
                 null,
                 checkCode,
                 DecisionCode.X00,
-                decisionReason: GetReasonFromCheckCode(checkCode!),
                 internalDecisionCode: DecisionInternalFurtherDetail.E83
             );
         }
@@ -142,8 +140,6 @@ public class DecisionService(
     {
         foreach (var checkCode in checkCodes.Select(checkCode => checkCode.Value))
         {
-            var reason = GetReasonFromCheckCode(checkCode);
-
             if (checkCode is "H218" or "H219" or "H220")
             {
                 switch (checkCode)
@@ -158,7 +154,6 @@ public class DecisionService(
                             noMatch.DocumentCode,
                             checkCode,
                             DecisionCode.X00,
-                            decisionReason: reason,
                             internalDecisionCode: DecisionInternalFurtherDetail.E70
                         );
                         break;
@@ -173,24 +168,10 @@ public class DecisionService(
                     noMatch.DocumentCode,
                     checkCode,
                     DecisionCode.X00,
-                    decisionReason: reason,
                     internalDecisionCode: DecisionInternalFurtherDetail.E70
                 );
             }
         }
-    }
-
-    private static string GetReasonFromCheckCode(string checkCode)
-    {
-        string? reason = checkCode switch
-        {
-            "H220" =>
-                "This customs declaration with a GMS product has been selected for HMI inspection. Either create a new CHED PP or amend an existing one referencing the GMS product. Amend the customs declaration to reference the CHED PP.",
-            "H224" =>
-                "Customs declaration clearance withheld. Awaiting IUU check outcome. Contact Port Health Authority (imports) or Marine Management Organisation (landings).",
-            _ => "This CHED reference cannot be found in IPAFFS. Please check that the reference is correct.",
-        };
-        return reason;
     }
 
     private static void HandleItemsWithInvalidReference(
@@ -244,7 +225,6 @@ public class DecisionService(
                     null,
                     checkCode,
                     DecisionCode.X00,
-                    decisionReason: GetReasonFromCheckCode(checkCode),
                     internalDecisionCode: DecisionInternalFurtherDetail.E87
                 );
             }

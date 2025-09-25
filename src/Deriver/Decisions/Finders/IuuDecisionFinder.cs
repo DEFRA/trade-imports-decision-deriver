@@ -22,35 +22,13 @@ public class IuuDecisionFinder : DecisionFinder
         {
             true => notification.IuuOption switch
             {
-                ControlAuthorityIuuOption.IUUOK => new DecisionFinderResult(
-                    DecisionCode.C07,
-                    checkCode,
-                    "IUU Compliant"
-                ),
-                ControlAuthorityIuuOption.IUUNotCompliant => new DecisionFinderResult(
-                    DecisionCode.X00,
-                    checkCode,
-                    "IUU Not compliant - Contact Port Health Authority (imports) or Marine Management Organisation (landings)."
-                ),
-                ControlAuthorityIuuOption.IUUNA => new DecisionFinderResult(
-                    DecisionCode.C08,
-                    checkCode,
-                    "IUU Not applicable"
-                ),
-                null => new DecisionFinderResult(DecisionCode.X00, checkCode, "IUU Awaiting decision"),
-                _ => new DecisionFinderResult(
-                    DecisionCode.X00,
-                    checkCode,
-                    "IUU Data error",
-                    DecisionInternalFurtherDetail.E95
-                ),
+                ControlAuthorityIuuOption.IUUOK => new DecisionFinderResult(DecisionCode.C07, checkCode),
+                ControlAuthorityIuuOption.IUUNotCompliant => new DecisionFinderResult(DecisionCode.X00, checkCode),
+                ControlAuthorityIuuOption.IUUNA => new DecisionFinderResult(DecisionCode.C08, checkCode),
+                null => new DecisionFinderResult(DecisionCode.X00, checkCode, DecisionInternalFurtherDetail.E93),
+                _ => new DecisionFinderResult(DecisionCode.X00, checkCode, DecisionInternalFurtherDetail.E94),
             },
-            false => new DecisionFinderResult(
-                DecisionCode.X00,
-                checkCode,
-                "IUU Data error",
-                DecisionInternalFurtherDetail.E94
-            ),
+            false => new DecisionFinderResult(DecisionCode.X00, checkCode, DecisionInternalFurtherDetail.E94),
         };
     }
 

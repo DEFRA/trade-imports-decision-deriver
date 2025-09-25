@@ -33,7 +33,7 @@
         documentCode: N002,
         checkCode: H218,
         decisionCode: X00,
-        decisionReason: This CHED reference cannot be found in IPAFFS. Please check that the reference is correct.,
+        decisionReason: CHED reference GBCHD2025.6244952 cannot be found in IPAFFS. Check that the reference is correct.,
         internalDecisionCode: E70
       }
     ]

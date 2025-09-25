@@ -86,7 +86,7 @@ public class ClearanceDecisionBuilderTests
                         document.DocumentCode,
                         commodity.Checks[0].CheckCode,
                         DecisionCode.X00,
-                        decisionReason: "Some Reason"
+                        internalDecisionCode: DecisionInternalFurtherDetail.E71
                     );
                 }
                 else

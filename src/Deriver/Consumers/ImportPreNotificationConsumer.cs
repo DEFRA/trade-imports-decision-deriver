@@ -27,13 +27,6 @@ public class ImportPreNotificationConsumer(
             message.Resource?.ImportPreNotification.GetVersion()
         );
 
-        if (message.Resource?.ImportPreNotification.Status == ImportNotificationStatus.Amend)
-        {
-            logger.LogInformation("No decision derived, Import Notification in AMEND state");
-
-            return;
-        }
-
         var clearanceRequests = await GetClearanceRequests(message.ResourceId, cancellationToken);
         if (clearanceRequests.Count == 0)
         {

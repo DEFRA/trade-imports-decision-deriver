@@ -92,11 +92,7 @@ public record DocumentDecisionResult(
                 "H218" or "H220" => DocumentDecisionReasons.HmiCheckRequired,
                 _ => null,
             },
-            DecisionInternalFurtherDetail.E87 => CheckCode switch
-            {
-                "H220" => DocumentDecisionReasons.GmsInspection,
-                _ => null,
-            },
+            DecisionInternalFurtherDetail.E87 => DocumentDecisionReasons.GmsInspection,
             DecisionInternalFurtherDetail.E92 => DocumentDecisionReasons.IuuNotCompliant,
             DecisionInternalFurtherDetail.E93 => DocumentDecisionReasons.IuuAwaitingDecision,
             DecisionInternalFurtherDetail.E94 => DocumentDecisionReasons.IuuDataError,

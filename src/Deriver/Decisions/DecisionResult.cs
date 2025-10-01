@@ -70,12 +70,33 @@ public record DocumentDecisionResult(
             DecisionInternalFurtherDetail.E71 => DocumentDecisionReasons.CancelledChed,
             DecisionInternalFurtherDetail.E72 => DocumentDecisionReasons.ReplacedChed,
             DecisionInternalFurtherDetail.E73 => DocumentDecisionReasons.DeletedChed,
-            DecisionInternalFurtherDetail.E74 => DocumentDecisionReasons.SplitChed,
-            DecisionInternalFurtherDetail.E75 => DocumentDecisionReasons.UpdateCrToReferenceSplitChed,
+            DecisionInternalFurtherDetail.E74 => CheckCode switch
+            {
+                "H218" or "H219" or "H220" => DocumentDecisionReasons.SplitChed,
+                _ => null,
+            },
+            DecisionInternalFurtherDetail.E75 => CheckCode switch
+            {
+                "H218" or "H219" or "H220" => DocumentDecisionReasons.UpdateCrToReferenceSplitChed,
+                _ => null,
+            },
+            DecisionInternalFurtherDetail.E83 => DocumentDecisionReasons.OrphanCheckCode,
             DecisionInternalFurtherDetail.E84 => DocumentDecisionReasons.CreateNewIpaffsNotification,
-            DecisionInternalFurtherDetail.E85 => DocumentDecisionReasons.PhsiCheckRequired,
-            DecisionInternalFurtherDetail.E86 => DocumentDecisionReasons.HmiCheckRequired,
-            DecisionInternalFurtherDetail.E87 => DocumentDecisionReasons.GmsInspection,
+            DecisionInternalFurtherDetail.E85 => CheckCode switch
+            {
+                "H219" => DocumentDecisionReasons.PhsiCheckRequired,
+                _ => null,
+            },
+            DecisionInternalFurtherDetail.E86 => CheckCode switch
+            {
+                "H218" or "H220" => DocumentDecisionReasons.HmiCheckRequired,
+                _ => null,
+            },
+            DecisionInternalFurtherDetail.E87 => CheckCode switch
+            {
+                "H220" => DocumentDecisionReasons.GmsInspection,
+                _ => null,
+            },
             DecisionInternalFurtherDetail.E92 => DocumentDecisionReasons.IuuNotCompliant,
             DecisionInternalFurtherDetail.E93 => DocumentDecisionReasons.IuuAwaitingDecision,
             DecisionInternalFurtherDetail.E94 => DocumentDecisionReasons.IuuDataError,

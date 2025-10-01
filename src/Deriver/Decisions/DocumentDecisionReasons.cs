@@ -18,7 +18,10 @@ public static class DocumentDecisionReasons
     public const string UnknownError = "An unknown error has occurred.";
 
     public const string GmsInspection =
-        "This customs declaration with a GMS product has been selected for HMI inspection. Either create a new CHED PP or amend an existing one referencing the GMS product. Amend the customs declaration to reference the CHED PP.";
+        "This customs declaration with a HMI-GMS item has been selected for HMI-GMS inspection. Create a new CHED PP referencing the HMI-GMS item and amend the Customs Declaration to reference the CHED PP.";
+
+    public const string OrphanCheckCode =
+        "BTMS does not have the right information to provide a decision for this check code as a Document Reference / CHED has not been provided for this item.";
 
     public const string CancelledChed =
         "This CHED has been cancelled. Update the customs declaration with a new reference.";

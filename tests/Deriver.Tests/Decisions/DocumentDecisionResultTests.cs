@@ -22,7 +22,11 @@ public class DocumentDecisionResultTests
     [InlineData("H224", DecisionInternalFurtherDetail.E93, DocumentDecisionReasons.IuuAwaitingDecision)]
     [InlineData("H224", DecisionInternalFurtherDetail.E94, DocumentDecisionReasons.IuuDataError)]
     [InlineData("H224", DecisionInternalFurtherDetail.E99, DocumentDecisionReasons.UnknownError)]
-    public void DocumentReasonTests(string checkCode, DecisionInternalFurtherDetail internalCode, string? expectedReason)
+    public void DocumentReasonTests(
+        string checkCode,
+        DecisionInternalFurtherDetail internalCode,
+        string? expectedReason
+    )
     {
         var sut = new DocumentDecisionResult(
             null,

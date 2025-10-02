@@ -3,6 +3,5 @@
   CheckCode: {
     Value: value
   },
-  DecisionReason: This CHED has been replaced. Update the customs declaration with a new reference.,
   InternalDecisionCode: E72
 }

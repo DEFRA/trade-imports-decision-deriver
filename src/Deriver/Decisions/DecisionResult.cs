@@ -21,7 +21,6 @@ public record DecisionResult
         string? checkCode,
         DecisionCode decisionCode,
         DecisionImportPreNotification? preNotification = null,
-        string? decisionReason = null,
         DecisionInternalFurtherDetail? internalDecisionCode = null
     )
     {
@@ -34,7 +33,6 @@ public record DecisionResult
                 documentCode,
                 checkCode,
                 decisionCode,
-                decisionReason,
                 internalDecisionCode
             )
         );
@@ -54,13 +52,58 @@ public record DocumentDecisionResult(
     string? DocumentCode,
     string? CheckCode,
     DecisionCode DecisionCode,
-    string? DecisionReason,
     DecisionInternalFurtherDetail? InternalDecisionCode = null
-);
+)
+{
+    public string? DecisionReason => GetDecisionReason();
+
+    private string? GetDecisionReason()
+    {
+        return InternalDecisionCode switch
+        {
+            DecisionInternalFurtherDetail.E70 => CheckCode switch
+            {
+                "H220" => DocumentDecisionReasons.GmsInspection,
+                "H224" => DocumentDecisionReasons.IuuAwaitingOutcome,
+                _ => DocumentDecisionReasons.ChedNotFound(DocumentReference),
+            },
+            DecisionInternalFurtherDetail.E71 => DocumentDecisionReasons.CancelledChed,
+            DecisionInternalFurtherDetail.E72 => DocumentDecisionReasons.ReplacedChed,
+            DecisionInternalFurtherDetail.E73 => DocumentDecisionReasons.DeletedChed,
+            DecisionInternalFurtherDetail.E74 => CheckCode switch
+            {
+                "H218" or "H219" or "H220" => DocumentDecisionReasons.SplitChed,
+                _ => null,
+            },
+            DecisionInternalFurtherDetail.E75 => CheckCode switch
+            {
+                "H218" or "H219" or "H220" => DocumentDecisionReasons.UpdateCrToReferenceSplitChed,
+                _ => null,
+            },
+            DecisionInternalFurtherDetail.E83 => DocumentDecisionReasons.OrphanCheckCode,
+            DecisionInternalFurtherDetail.E84 => DocumentDecisionReasons.CreateNewIpaffsNotification,
+            DecisionInternalFurtherDetail.E85 => CheckCode switch
+            {
+                "H219" => DocumentDecisionReasons.PhsiCheckRequired,
+                _ => null,
+            },
+            DecisionInternalFurtherDetail.E86 => CheckCode switch
+            {
+                "H218" or "H220" => DocumentDecisionReasons.HmiCheckRequired,
+                _ => null,
+            },
+            DecisionInternalFurtherDetail.E87 => DocumentDecisionReasons.GmsInspection,
+            DecisionInternalFurtherDetail.E92 => DocumentDecisionReasons.IuuNotCompliant,
+            DecisionInternalFurtherDetail.E93 => DocumentDecisionReasons.IuuAwaitingDecision,
+            DecisionInternalFurtherDetail.E94 => DocumentDecisionReasons.IuuDataError,
+            DecisionInternalFurtherDetail.E99 => DocumentDecisionReasons.UnknownError,
+            _ => null,
+        };
+    }
+}
 
 public record DecisionFinderResult(
     DecisionCode DecisionCode,
     CheckCode? CheckCode,
-    string? DecisionReason = null,
     DecisionInternalFurtherDetail? InternalDecisionCode = null
 );

@@ -56,12 +56,7 @@ public class NoMatchDecisionsTest
         decisionResult.Should().NotBeNull();
         decisionResult.Decisions.Count.Should().Be(11);
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
-        decisionResult
-            .Decisions[0]
-            .DecisionReason.Should()
-            .Be(
-                "This customs declaration with a GMS product has been selected for HMI inspection. Either create a new CHED PP or amend an existing one referencing the GMS product. Amend the customs declaration to reference the CHED PP."
-            );
+        decisionResult.Decisions[0].DecisionReason.Should().Be(DocumentDecisionReasons.GmsInspection);
 
         await Task.CompletedTask;
     }
@@ -135,6 +130,7 @@ public class NoMatchDecisionsTest
             foreach (var document in commodity.Documents!)
             {
                 document.DocumentCode = "9115";
+                document.DocumentReference = new ImportDocumentReference("Test.1234567");
             }
         }
         var matchingResult = new MatchingResult();
@@ -169,7 +165,7 @@ public class NoMatchDecisionsTest
         decisionResult
             .Decisions[0]
             .DecisionReason.Should()
-            .Be("This CHED reference cannot be found in IPAFFS. Please check that the reference is correct.");
+            .Be("CHED reference Test.1234567 cannot be found in IPAFFS. Check that the reference is correct.");
 
         await Task.CompletedTask;
     }
@@ -370,7 +366,7 @@ public class NoMatchDecisionsTest
         decisionResult
             .Decisions[0]
             .DecisionReason.Should()
-            .Be("This CHED reference cannot be found in IPAFFS. Please check that the reference is correct.");
+            .Be("CHED reference GBCHD2025.9200009 cannot be found in IPAFFS. Check that the reference is correct.");
     }
 
     [Fact]
@@ -501,12 +497,7 @@ public class NoMatchDecisionsTest
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
         decisionResult.Decisions[0].DocumentCode.Should().Be(null);
         decisionResult.Decisions[0].DocumentReference.Should().Be(String.Empty);
-        decisionResult
-            .Decisions[0]
-            .DecisionReason.Should()
-            .Be(
-                "This customs declaration with a GMS product has been selected for HMI inspection. Either create a new CHED PP or amend an existing one referencing the GMS product. Amend the customs declaration to reference the CHED PP."
-            );
+        decisionResult.Decisions[0].DecisionReason.Should().Be(DocumentDecisionReasons.GmsInspection);
     }
 
     [Fact]

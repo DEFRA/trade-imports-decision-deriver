@@ -46,11 +46,19 @@ public class MatchingService : IMatchingService
         MatchingResult matchingResult
     )
     {
-        if (
-            documentGroup == null
-            || string.IsNullOrEmpty(ChedReferenceRegexes.DocumentReferenceIdentifier().Match(documentGroup.Value).Value)
-        )
+        if (documentGroup == null)
             return;
+
+        if (string.IsNullOrEmpty(ChedReferenceRegexes.DocumentReferenceIdentifier().Match(documentGroup.Value).Value))
+        {
+            matchingResult.AddDocumentNoMatch(
+                wrapper.MovementReferenceNumber,
+                item.ItemNumber!.Value,
+                documentGroup.Value,
+                documentCode
+            );
+            return;
+        }
 
         var notification = matchingContext.Notifications.Find(x =>
             new ImportDocumentReference(x.Id!).GetIdentifier(documentCode!)

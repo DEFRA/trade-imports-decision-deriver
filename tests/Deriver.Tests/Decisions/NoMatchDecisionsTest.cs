@@ -54,7 +54,7 @@ public class NoMatchDecisionsTest
 
         // Assert
         decisionResult.Should().NotBeNull();
-        decisionResult.Decisions.Count.Should().Be(11);
+        decisionResult.Decisions.Count.Should().Be(5);
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
         decisionResult.Decisions[0].DecisionReason.Should().Be(DocumentDecisionReasons.GmsInspection);
 
@@ -104,7 +104,7 @@ public class NoMatchDecisionsTest
 
         // Assert
         decisionResult.Should().NotBeNull();
-        decisionResult.Decisions.Count.Should().Be(11);
+        decisionResult.Decisions.Count.Should().Be(5);
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
         decisionResult
             .Decisions[0]
@@ -160,7 +160,7 @@ public class NoMatchDecisionsTest
 
         // Assert
         decisionResult.Should().NotBeNull();
-        decisionResult.Decisions.Count.Should().Be(11);
+        decisionResult.Decisions.Count.Should().Be(5);
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
         decisionResult
             .Decisions[0]

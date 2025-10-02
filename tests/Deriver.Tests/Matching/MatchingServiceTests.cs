@@ -36,7 +36,7 @@ public class MatchingServiceTests
     }
 
     [Fact]
-    public async Task SimpleIgnoreMatchTest()
+    public async Task SimpleInvalidNoMatchTest()
     {
         // Arrange
         var clearanceRequestWrapper = GenerateSimpleClearanceRequestWrapper();
@@ -55,8 +55,8 @@ public class MatchingServiceTests
         var matchResult = await sut.Process(context, CancellationToken.None);
 
         // Assert
-        matchResult.NoMatches.Count.Should().Be(0);
-        matchResult.NoMatches.Count.Should().Be(0);
+        matchResult.NoMatches.Count.Should().Be(9);
+        matchResult.Matches.Count.Should().Be(0);
     }
 
     [Fact]

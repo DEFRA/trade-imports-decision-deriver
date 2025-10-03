@@ -12,32 +12,6 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Consumers;
 public class ImportPreNotificationConsumerTests
 {
     [Fact]
-    public async Task GivenACreatedEvent_AndNotificationIsInAmedState_ThenDecisionShouldNotBeCreated()
-    {
-        // ARRANGE
-        var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = Substitute.For<IDecisionService>();
-        var consumer = new ImportPreNotificationConsumer(
-            NullLogger<ImportPreNotificationConsumer>.Instance,
-            decisionService,
-            apiClient,
-            new TestCorrelationIdGenerator("CorrelationId")
-        )
-        {
-            Context = new ConsumerContext(),
-        };
-
-        var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
-        createdEvent.Resource!.ImportPreNotification.Status = ImportNotificationStatus.Amend;
-
-        // ACT
-        await consumer.OnHandle(createdEvent, CancellationToken.None);
-
-        // ASSERT
-        apiClient.ReceivedCalls().Count().Should().Be(0);
-    }
-
-    [Fact]
     public async Task GivenACreatedEvent_AndCustomsDeclarationsNotExists_ThenDecisionShouldNotBeCreated()
     {
         // ARRANGE

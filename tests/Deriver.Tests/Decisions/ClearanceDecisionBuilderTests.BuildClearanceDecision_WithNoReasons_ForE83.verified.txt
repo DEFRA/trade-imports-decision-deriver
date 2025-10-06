@@ -47,6 +47,7 @@
       DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00,
+      DecisionReason: BTMS does not have the right information to provide a decision for this check code as a Document Reference / CHED has not been provided for this item.,
       InternalDecisionCode: E83
     },
     {
@@ -55,6 +56,7 @@
       DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00,
+      DecisionReason: BTMS does not have the right information to provide a decision for this check code as a Document Reference / CHED has not been provided for this item.,
       InternalDecisionCode: E83
     },
     {
@@ -63,6 +65,7 @@
       DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00,
+      DecisionReason: BTMS does not have the right information to provide a decision for this check code as a Document Reference / CHED has not been provided for this item.,
       InternalDecisionCode: E83
     },
     {
@@ -71,6 +74,7 @@
       DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00,
+      DecisionReason: BTMS does not have the right information to provide a decision for this check code as a Document Reference / CHED has not been provided for this item.,
       InternalDecisionCode: E83
     },
     {
@@ -79,6 +83,7 @@
       DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00,
+      DecisionReason: BTMS does not have the right information to provide a decision for this check code as a Document Reference / CHED has not been provided for this item.,
       InternalDecisionCode: E83
     },
     {
@@ -87,6 +92,7 @@
       DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00,
+      DecisionReason: BTMS does not have the right information to provide a decision for this check code as a Document Reference / CHED has not been provided for this item.,
       InternalDecisionCode: E83
     },
     {
@@ -95,6 +101,7 @@
       DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00,
+      DecisionReason: BTMS does not have the right information to provide a decision for this check code as a Document Reference / CHED has not been provided for this item.,
       InternalDecisionCode: E83
     },
     {
@@ -103,6 +110,7 @@
       DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00,
+      DecisionReason: BTMS does not have the right information to provide a decision for this check code as a Document Reference / CHED has not been provided for this item.,
       InternalDecisionCode: E83
     },
     {
@@ -111,6 +119,7 @@
       DocumentCode: 9115,
       CheckCode: 9115,
       DecisionCode: X00,
+      DecisionReason: BTMS does not have the right information to provide a decision for this check code as a Document Reference / CHED has not been provided for this item.,
       InternalDecisionCode: E83
     }
   ]

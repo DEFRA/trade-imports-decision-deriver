@@ -202,7 +202,7 @@ public class ChedPDecisionFinderTests
     }
 
     [Fact]
-    public void WhenMissingPartTwo_DecisionShouldBeX00()
+    public void WhenMissingPartTwo_DecisionShouldBeH01()
     {
         var notification = new DecisionImportPreNotification
         {
@@ -214,7 +214,7 @@ public class ChedPDecisionFinderTests
 
         var result = sut.FindDecision(notification, null);
 
-        result.DecisionCode.Should().Be(DecisionCode.X00);
+        result.DecisionCode.Should().Be(DecisionCode.H01);
         result.InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E88);
     }
 }

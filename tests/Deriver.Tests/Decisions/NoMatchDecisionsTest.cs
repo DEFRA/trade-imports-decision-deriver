@@ -56,7 +56,10 @@ public class NoMatchDecisionsTest
         decisionResult.Should().NotBeNull();
         decisionResult.Decisions.Count.Should().Be(11);
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
-        decisionResult.Decisions[0].DecisionReason.Should().Be(DocumentDecisionReasons.GmsInspection);
+        decisionResult
+            .Decisions[0]
+            .DecisionReason.Should()
+            .Be(DocumentDecisionReasons.ChedNotFound(decisionResult.Decisions[0].DocumentReference));
 
         await Task.CompletedTask;
     }
@@ -106,12 +109,7 @@ public class NoMatchDecisionsTest
         decisionResult.Should().NotBeNull();
         decisionResult.Decisions.Count.Should().Be(11);
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
-        decisionResult
-            .Decisions[0]
-            .DecisionReason.Should()
-            .Be(
-                "Customs declaration clearance withheld. Awaiting IUU check outcome. Contact Port Health Authority (imports) or Marine Management Organisation (landings)."
-            );
+        decisionResult.Decisions[0].DecisionReason.Should().BeNull();
 
         await Task.CompletedTask;
     }

@@ -5,8 +5,12 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions;
 public class DocumentDecisionResultTests
 {
     [Theory]
-    [InlineData("H220", DecisionInternalFurtherDetail.E70, DocumentDecisionReasons.GmsInspection)]
-    [InlineData("H224", DecisionInternalFurtherDetail.E70, DocumentDecisionReasons.IuuAwaitingOutcome)]
+    [InlineData(
+        "H220",
+        DecisionInternalFurtherDetail.E70,
+        "CHED reference test-ref cannot be found in IPAFFS. Check that the reference is correct."
+    )]
+    [InlineData("H224", DecisionInternalFurtherDetail.E70, null)]
     [InlineData("H224", DecisionInternalFurtherDetail.E71, DocumentDecisionReasons.CancelledChed)]
     [InlineData("H224", DecisionInternalFurtherDetail.E72, DocumentDecisionReasons.ReplacedChed)]
     [InlineData("H224", DecisionInternalFurtherDetail.E73, DocumentDecisionReasons.DeletedChed)]

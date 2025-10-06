@@ -139,11 +139,15 @@ public class DecisionService(
 
     private static void HandleNoMatch(CheckCode[] checkCodes, DecisionResult decisionsResult, DocumentNoMatch noMatch)
     {
-        foreach (var checkCode in checkCodes.Select(checkCode => checkCode.Value))
+        foreach (var checkCode in checkCodes.Select(checkCode => checkCode))
         {
-            if (checkCode is "H218" or "H219" or "H220")
+            if (!checkCode.IsValidDocumentCode(noMatch.DocumentCode))
             {
-                switch (checkCode)
+                continue;
+            }
+            if (checkCode.Value is "H218" or "H219" or "H220")
+            {
+                switch (checkCode.Value)
                 {
                     case "H219" when noMatch.DocumentCode is "N851" or "9115" or "C085":
                     case "H218"
@@ -153,7 +157,7 @@ public class DecisionService(
                             noMatch.ItemNumber,
                             noMatch.DocumentReference,
                             noMatch.DocumentCode,
-                            checkCode,
+                            checkCode.Value,
                             DecisionCode.X00,
                             internalDecisionCode: DecisionInternalFurtherDetail.E70
                         );
@@ -167,7 +171,7 @@ public class DecisionService(
                     noMatch.ItemNumber,
                     noMatch.DocumentReference,
                     noMatch.DocumentCode,
-                    checkCode,
+                    checkCode.Value,
                     DecisionCode.X00,
                     internalDecisionCode: DecisionInternalFurtherDetail.E70
                 );

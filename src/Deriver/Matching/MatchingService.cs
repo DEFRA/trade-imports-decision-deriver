@@ -46,7 +46,7 @@ public class MatchingService : IMatchingService
         MatchingResult matchingResult
     )
     {
-        if (documentGroup == null)
+        if (documentGroup == null || IsIuuDocumentCode(documentCode))
             return;
 
         if (string.IsNullOrEmpty(ChedReferenceRegexes.DocumentReferenceIdentifier().Match(documentGroup.Value).Value))
@@ -84,5 +84,10 @@ public class MatchingService : IMatchingService
                 documentCode
             );
         }
+    }
+
+    private static bool IsIuuDocumentCode(string? documentCode)
+    {
+        return documentCode == "C673" || documentCode == "C674" || documentCode == "C641";
     }
 }

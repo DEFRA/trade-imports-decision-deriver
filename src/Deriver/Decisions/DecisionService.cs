@@ -116,9 +116,7 @@ public class DecisionService(
                 null,
                 checkCode,
                 DecisionCode.X00,
-                internalDecisionCode: (item.Documents == null || item.Documents.Any()) && checkCode == "H220"
-                    ? DecisionInternalFurtherDetail.E87
-                    : DecisionInternalFurtherDetail.E83
+                internalDecisionCode: internalFurtherDetail
             );
         }
     }

@@ -495,7 +495,7 @@ public class NoMatchDecisionsTest
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
         decisionResult.Decisions[0].DocumentCode.Should().Be(null);
         decisionResult.Decisions[0].DocumentReference.Should().Be(String.Empty);
-        decisionResult.Decisions[0].DecisionReason.Should().Be(DocumentDecisionReasons.GmsInspection);
+        decisionResult.Decisions[0].DecisionReason.Should().Be(DocumentDecisionReasons.OrphanCheckCode);
     }
 
     [Fact]

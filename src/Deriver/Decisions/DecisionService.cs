@@ -46,7 +46,6 @@ public class DecisionService(
 
                 HandleNoMatches(matchingResult, item, wrapper, checkCodes, decisionsResult);
                 HandleMatches(decisionContext, matchingResult, item, wrapper, checkCodes, decisionsResult);
-                HandleItemsWithInvalidReference(wrapper.MovementReferenceNumber!, checkCodes, item, decisionsResult);
                 HandleOrphanChecks(decisionsResult, item, checkCodes, wrapper);
             }
         }
@@ -112,7 +111,9 @@ public class DecisionService(
                 null,
                 checkCode,
                 DecisionCode.X00,
-                internalDecisionCode: DecisionInternalFurtherDetail.E83
+                internalDecisionCode: (item.Documents == null || item.Documents.Any()) && checkCode == "H220"
+                    ? DecisionInternalFurtherDetail.E87
+                    : DecisionInternalFurtherDetail.E83
             );
         }
     }
@@ -138,11 +139,15 @@ public class DecisionService(
 
     private static void HandleNoMatch(CheckCode[] checkCodes, DecisionResult decisionsResult, DocumentNoMatch noMatch)
     {
-        foreach (var checkCode in checkCodes.Select(checkCode => checkCode.Value))
+        foreach (var checkCode in checkCodes.Select(checkCode => checkCode))
         {
-            if (checkCode is "H218" or "H219" or "H220")
+            if (!checkCode.IsValidDocumentCode(noMatch.DocumentCode))
             {
-                switch (checkCode)
+                continue;
+            }
+            if (checkCode.Value is "H218" or "H219" or "H220")
+            {
+                switch (checkCode.Value)
                 {
                     case "H219" when noMatch.DocumentCode is "N851" or "9115" or "C085":
                     case "H218"
@@ -152,7 +157,7 @@ public class DecisionService(
                             noMatch.ItemNumber,
                             noMatch.DocumentReference,
                             noMatch.DocumentCode,
-                            checkCode,
+                            checkCode.Value,
                             DecisionCode.X00,
                             internalDecisionCode: DecisionInternalFurtherDetail.E70
                         );
@@ -166,80 +171,11 @@ public class DecisionService(
                     noMatch.ItemNumber,
                     noMatch.DocumentReference,
                     noMatch.DocumentCode,
-                    checkCode,
+                    checkCode.Value,
                     DecisionCode.X00,
                     internalDecisionCode: DecisionInternalFurtherDetail.E70
                 );
             }
-        }
-    }
-
-    private static void HandleItemsWithInvalidReference(
-        string mrn,
-        CheckCode[] checkCodes,
-        Commodity item,
-        DecisionResult decisionsResult
-    )
-    {
-        var itemNumber = item.ItemNumber!.Value;
-        var decisions = decisionsResult.Decisions.Where(x => x.ItemNumber == itemNumber && x.Mrn == mrn).ToList();
-
-        if (decisions.Count != 0)
-            return;
-        if (item.Documents == null || !item.Documents.Any())
-        {
-            HandleDocumentWithInvalidReference(mrn, checkCodes, decisionsResult, itemNumber);
-        }
-        else
-        {
-            foreach (var document in item.Documents)
-            {
-                decisionsResult.AddDecision(
-                    mrn,
-                    itemNumber,
-                    document.DocumentReference!.Value,
-                    document.DocumentCode,
-                    null,
-                    DecisionCode.X00,
-                    internalDecisionCode: DecisionInternalFurtherDetail.E89
-                );
-            }
-        }
-    }
-
-    private static void HandleDocumentWithInvalidReference(
-        string mrn,
-        CheckCode[] checkCodes,
-        DecisionResult decisionsResult,
-        int itemNumber
-    )
-    {
-        if (checkCodes.Any())
-        {
-            foreach (var checkCode in checkCodes.Select(x => x.Value))
-            {
-                decisionsResult.AddDecision(
-                    mrn,
-                    itemNumber,
-                    string.Empty,
-                    null,
-                    checkCode,
-                    DecisionCode.X00,
-                    internalDecisionCode: DecisionInternalFurtherDetail.E87
-                );
-            }
-        }
-        else
-        {
-            decisionsResult.AddDecision(
-                mrn,
-                itemNumber,
-                string.Empty,
-                null,
-                null,
-                DecisionCode.X00,
-                internalDecisionCode: DecisionInternalFurtherDetail.E87
-            );
         }
     }
 

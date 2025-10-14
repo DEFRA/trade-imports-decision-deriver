@@ -54,7 +54,7 @@ public class NoMatchDecisionsTest
 
         // Assert
         decisionResult.Should().NotBeNull();
-        decisionResult.Decisions.Count.Should().Be(11);
+        decisionResult.Decisions.Count.Should().Be(5);
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
         decisionResult.Decisions[0].DecisionReason.Should().Be(DocumentDecisionReasons.GmsInspection);
 
@@ -104,14 +104,9 @@ public class NoMatchDecisionsTest
 
         // Assert
         decisionResult.Should().NotBeNull();
-        decisionResult.Decisions.Count.Should().Be(11);
+        decisionResult.Decisions.Count.Should().Be(3);
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
-        decisionResult
-            .Decisions[0]
-            .DecisionReason.Should()
-            .Be(
-                "Customs declaration clearance withheld. Awaiting IUU check outcome. Contact Port Health Authority (imports) or Marine Management Organisation (landings)."
-            );
+        decisionResult.Decisions[0].DecisionReason.Should().Be(DocumentDecisionReasons.OrphanCheckCode);
 
         await Task.CompletedTask;
     }
@@ -160,7 +155,7 @@ public class NoMatchDecisionsTest
 
         // Assert
         decisionResult.Should().NotBeNull();
-        decisionResult.Decisions.Count.Should().Be(11);
+        decisionResult.Decisions.Count.Should().Be(5);
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
         decisionResult
             .Decisions[0]
@@ -590,5 +585,80 @@ public class NoMatchDecisionsTest
         decisionResult.Decisions[2].CheckCode.Should().Be("H219");
         decisionResult.Decisions[2].DecisionCode.Should().Be(DecisionCode.X00);
         decisionResult.Decisions[2].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E83);
+    }
+
+    [Fact]
+    public async Task When_processing_iuu_check_codes_Then_should_return_expected_decisions()
+    {
+        // Arrange
+        var decisionContext = new DecisionContext(
+            [],
+            [
+                new ClearanceRequestWrapper(
+                    "25GB99999999999021",
+                    new ClearanceRequest
+                    {
+                        Commodities =
+                        [
+                            new Commodity
+                            {
+                                ItemNumber = 1,
+                                Documents =
+                                [
+                                    new ImportDocument()
+                                    {
+                                        DocumentCode = "N853",
+                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
+                                        DocumentStatus = "JE",
+                                        DocumentControl = "P",
+                                    },
+                                    new ImportDocument()
+                                    {
+                                        DocumentCode = "C673",
+                                        DocumentReference = new ImportDocumentReference("GBIUU-VARIOUS"),
+                                        DocumentStatus = "JE",
+                                        DocumentControl = "P",
+                                    },
+                                ],
+                                Checks =
+                                [
+                                    new CommodityCheck { CheckCode = "H222", DepartmentCode = "PHA" },
+                                    new CommodityCheck { CheckCode = "H224", DepartmentCode = "PHA" },
+                                ],
+                            },
+                        ],
+                    }
+                ),
+            ]
+        );
+
+        var sut = new DecisionService(
+            NullLogger<DecisionService>.Instance,
+            new MatchingService(),
+            [
+                new ChedADecisionFinder(),
+                new ChedDDecisionFinder(),
+                new ChedPDecisionFinder(),
+                new ChedPPDecisionFinder(),
+                new IuuDecisionFinder(),
+            ]
+        );
+
+        // Act
+        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+
+        // Assert
+
+        decisionResult.Should().NotBeNull();
+        decisionResult.Decisions.Count.Should().Be(2);
+        decisionResult.Decisions[0].CheckCode.Should().Be("H222");
+        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
+        decisionResult.Decisions[0].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E70);
+        decisionResult.Decisions[0].DocumentCode.Should().Be("N853");
+
+        decisionResult.Decisions[1].CheckCode.Should().Be("H224");
+        decisionResult.Decisions[1].DecisionCode.Should().Be(DecisionCode.X00);
+        decisionResult.Decisions[1].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E70);
+        decisionResult.Decisions[1].DocumentCode.Should().Be("N853");
     }
 }

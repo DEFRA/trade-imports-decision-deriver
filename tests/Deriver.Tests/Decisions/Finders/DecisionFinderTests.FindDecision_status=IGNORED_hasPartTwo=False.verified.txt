@@ -1,5 +1,5 @@
 ﻿{
-  DecisionCode: X00,
+  DecisionCode: H01,
   CheckCode: {
     Value: value
   },

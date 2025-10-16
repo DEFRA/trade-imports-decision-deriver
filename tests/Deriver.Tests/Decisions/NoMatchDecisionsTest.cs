@@ -56,7 +56,10 @@ public class NoMatchDecisionsTest
         decisionResult.Should().NotBeNull();
         decisionResult.Decisions.Count.Should().Be(5);
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
-        decisionResult.Decisions[0].DecisionReason.Should().Be(DocumentDecisionReasons.GmsInspection);
+        decisionResult
+            .Decisions[0]
+            .DecisionReason.Should()
+            .Be(DocumentDecisionReasons.ChedNotFound(decisionResult.Decisions[0].DocumentReference));
 
         await Task.CompletedTask;
     }
@@ -492,7 +495,7 @@ public class NoMatchDecisionsTest
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
         decisionResult.Decisions[0].DocumentCode.Should().Be(null);
         decisionResult.Decisions[0].DocumentReference.Should().Be(String.Empty);
-        decisionResult.Decisions[0].DecisionReason.Should().Be(DocumentDecisionReasons.GmsInspection);
+        decisionResult.Decisions[0].DecisionReason.Should().Be(DocumentDecisionReasons.OrphanCheckCode);
     }
 
     [Fact]

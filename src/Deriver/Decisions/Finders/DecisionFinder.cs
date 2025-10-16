@@ -29,7 +29,7 @@ public abstract class DecisionFinder : IDecisionFinder
         if (!notification.HasPartTwo)
         {
             return new DecisionFinderResult(
-                DecisionCode.X00,
+                DecisionCode.H01,
                 checkCode,
                 InternalDecisionCode: DecisionInternalFurtherDetail.E88
             );

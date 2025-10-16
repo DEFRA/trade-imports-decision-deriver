@@ -104,6 +104,11 @@ public class DecisionService(
         var orphanCheckCodes = checkCodes.Select(x => x.Value).Except(decisionChecks).ToArray();
         foreach (var checkCode in orphanCheckCodes)
         {
+            var internalFurtherDetail =
+                checkCode == "H220" && checkCodes.Any(x => x.Value == "H219")
+                    ? DecisionInternalFurtherDetail.E82
+                    : DecisionInternalFurtherDetail.E83;
+
             decisionsResult.AddDecision(
                 wrapper.MovementReferenceNumber!,
                 item.ItemNumber!.Value,
@@ -111,9 +116,7 @@ public class DecisionService(
                 null,
                 checkCode,
                 DecisionCode.X00,
-                internalDecisionCode: (item.Documents == null || item.Documents.Any()) && checkCode == "H220"
-                    ? DecisionInternalFurtherDetail.E87
-                    : DecisionInternalFurtherDetail.E83
+                internalDecisionCode: internalFurtherDetail
             );
         }
     }

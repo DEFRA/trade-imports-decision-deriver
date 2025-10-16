@@ -63,8 +63,7 @@ public record DocumentDecisionResult(
         {
             DecisionInternalFurtherDetail.E70 => CheckCode switch
             {
-                "H220" => DocumentDecisionReasons.GmsInspection,
-                "H224" => DocumentDecisionReasons.IuuAwaitingOutcome,
+                "H224" => null,
                 _ => DocumentDecisionReasons.ChedNotFound(DocumentReference),
             },
             DecisionInternalFurtherDetail.E71 => DocumentDecisionReasons.CancelledChed,

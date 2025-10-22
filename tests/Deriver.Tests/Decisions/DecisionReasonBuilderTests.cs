@@ -10,7 +10,7 @@ public class DecisionReasonBuilderTests
     {
         DocumentDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test1234567", "C640", "H221", DecisionCode.X00, null, null),
+            new(null, "Test", 1, "Test1234567", "C640", "H221", DecisionCode.X00, null),
         ];
         // Act
         var result = DecisionReasonBuilder.Build(
@@ -41,7 +41,7 @@ public class DecisionReasonBuilderTests
     {
         DocumentDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test1234567", "C641", "H221", DecisionCode.X00, null, null),
+            new(null, "Test", 1, "Test1234567", "C641", "H221", DecisionCode.X00),
         ];
         // Act
         var result = DecisionReasonBuilder.Build(
@@ -72,7 +72,7 @@ public class DecisionReasonBuilderTests
     {
         DocumentDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test1234567", "9115", "H221", DecisionCode.X00, null, null),
+            new(null, "Test", 1, "Test1234567", "9115", "H221", DecisionCode.X00),
         ];
         // Act
         var result = DecisionReasonBuilder.Build(
@@ -99,11 +99,11 @@ public class DecisionReasonBuilderTests
     }
 
     [Fact]
-    public void WhenDecisionResultIsNotLinkedToChed_AndHasNoDocuments_AndCheckCodeIsH220_ThenShouldBeHmiGmsReason()
+    public void WhenDecisionResultIsNotLinkedToChed_AndHasInvalidDocuments_AndCheckCodeIsH220_ThenShouldBeHmiGmsReason()
     {
         DocumentDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test Doc Ref", "Test Doc Code", "H220", DecisionCode.X00, null, null),
+            new(null, "Test", 1, "Test Doc Ref", "Test Doc Code", "H220", DecisionCode.X00),
         ];
 
         // Act
@@ -130,15 +130,32 @@ public class DecisionReasonBuilderTests
         result.Count.Should().Be(1);
         result[0]
             .Should()
-            .Be(
-                DecisionReasonBuilder.GmsErrorMessage(
-                    cr.DeclarationUcr,
-                    item.ItemNumber,
-                    item.NetMass,
-                    item.TaricCommodityCode,
-                    item.GoodsDescription
-                )
-            );
+            .Be(DecisionReasonBuilder.GmsErrorMessage(item.ItemNumber, item.TaricCommodityCode, item.GoodsDescription));
+    }
+
+    [Fact]
+    public void WhenDecisionResultIsNotLinkedToChed_AndHasNoDocuments_AndCheckCodeIsH220_ThenShouldBeHmiGmsReason()
+    {
+        DocumentDecisionResult[] documentDecisionResults = [new(null, "Test", 1, "", "", "H220", DecisionCode.X00)];
+
+        // Act
+        var cr = new ClearanceRequest() { DeclarationUcr = "TestUcr" };
+        var item = new Commodity()
+        {
+            ItemNumber = 7,
+            NetMass = (decimal?)42.3,
+            TaricCommodityCode = "test-code",
+            GoodsDescription = "test-description",
+            Documents = [],
+            Checks = [new CommodityCheck() { CheckCode = "H220" }],
+        };
+        var result = DecisionReasonBuilder.Build(cr, item, documentDecisionResults[0], documentDecisionResults);
+
+        // Assert
+        result.Count.Should().Be(1);
+        result[0]
+            .Should()
+            .Be(DecisionReasonBuilder.GmsErrorMessage(item.ItemNumber, item.TaricCommodityCode, item.GoodsDescription));
     }
 
     [Fact]
@@ -146,7 +163,7 @@ public class DecisionReasonBuilderTests
     {
         DocumentDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test Doc Ref", "Test Doc Code", "H221", DecisionCode.X00, null, null),
+            new(null, "Test", 1, "Test Doc Ref", "Test Doc Code", "H221", DecisionCode.X00),
         ];
 
         // Act
@@ -166,7 +183,7 @@ public class DecisionReasonBuilderTests
     {
         DocumentDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test Doc Ref", "Test Doc Code", "H224", DecisionCode.X00, null, null),
+            new(null, "Test", 1, "Test Doc Ref", "Test Doc Code", "H224", DecisionCode.X00),
         ];
 
         // Act

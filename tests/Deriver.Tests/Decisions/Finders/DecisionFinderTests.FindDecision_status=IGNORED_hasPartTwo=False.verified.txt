@@ -1,0 +1,7 @@
+﻿{
+  DecisionCode: H01,
+  CheckCode: {
+    Value: value
+  },
+  InternalDecisionCode: E88
+}

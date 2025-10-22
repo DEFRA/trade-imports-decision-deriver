@@ -111,7 +111,7 @@ public class DecisionServiceTests
 
         decisionResult.Decisions.Should().HaveCount(1);
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
-        decisionResult.Decisions[0].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E87);
+        decisionResult.Decisions[0].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E83);
         decisionResult.Decisions[0].CheckCode.Should().Be("H221");
     }
 
@@ -162,7 +162,7 @@ public class DecisionServiceTests
 
         decisionResult.Decisions.Should().HaveCount(1);
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
-        decisionResult.Decisions[0].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E87);
+        decisionResult.Decisions[0].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E83);
     }
 
     [Fact]
@@ -199,6 +199,7 @@ public class DecisionServiceTests
                         new DecisionCommodityCheck.Check() { Type = "PHSI_IDENTITY", Status = "Auto cleared" },
                         new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "Auto cleared" },
                     ],
+                    HasPartTwo = true,
                 },
             ],
             [
@@ -279,6 +280,7 @@ public class DecisionServiceTests
                         new DecisionCommodityCheck.Check() { Type = "PHSI_IDENTITY", Status = "Auto cleared" },
                         new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "Auto cleared" },
                     ],
+                    HasPartTwo = true,
                 },
                 new DecisionImportPreNotification()
                 {
@@ -297,6 +299,7 @@ public class DecisionServiceTests
                         new DecisionCommodityCheck.Check() { Type = "PHSI_IDENTITY", Status = "Auto cleared" },
                         new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "Auto cleared" },
                     ],
+                    HasPartTwo = true,
                 },
             ],
             [
@@ -655,6 +658,7 @@ public class DecisionServiceTests
                         new DecisionCommodityCheck.Check() { Type = "PHSI_IDENTITY", Status = "Auto cleared" },
                         new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "Auto cleared" },
                     ],
+                    HasPartTwo = true,
                 },
             ],
             [
@@ -748,6 +752,7 @@ public class DecisionServiceTests
                         new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "To do" },
                         new DecisionCommodityCheck.Check() { Type = "HMI", Status = "Auto cleared" },
                     ],
+                    HasPartTwo = true,
                 },
             ],
             [
@@ -841,6 +846,7 @@ public class DecisionServiceTests
                         new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "To do" },
                         new DecisionCommodityCheck.Check() { Type = "HMI", Status = "Auto cleared" },
                     ],
+                    HasPartTwo = true,
                 },
             ],
             [
@@ -1024,6 +1030,7 @@ public class DecisionServiceTests
                         },
                     ],
                     CommodityChecks = commodityChecks.ToArray(),
+                    HasPartTwo = true,
                 },
             ],
             [

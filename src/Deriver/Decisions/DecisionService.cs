@@ -241,6 +241,11 @@ public class DecisionService(
             .Where(x => x.CanFindDecision(notification, checkCode, documentCode))
             .ToArray();
 
+        if (finders.Length > 1)
+        {
+            finders = finders.Where(f => f.ChedType == checkCode.GetImportNotificationType()).ToArray();
+        }
+
         foreach (var finder in finders)
         {
             yield return finder.FindDecision(notification, checkCode);

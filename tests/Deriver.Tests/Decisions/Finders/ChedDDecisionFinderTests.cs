@@ -7,36 +7,38 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions.Finders;
 public class ChedDDecisionFinderTests
 {
     [Theory]
-    [InlineData(null, ImportNotificationType.Ced, ImportNotificationStatus.Submitted, true)]
-    [InlineData(null, ImportNotificationType.Ced, ImportNotificationStatus.Amend, true)]
-    [InlineData(null, ImportNotificationType.Ced, ImportNotificationStatus.InProgress, true)]
-    [InlineData(null, ImportNotificationType.Ced, ImportNotificationStatus.Modify, true)]
-    [InlineData(null, ImportNotificationType.Ced, ImportNotificationStatus.PartiallyRejected, true)]
-    [InlineData(null, ImportNotificationType.Ced, ImportNotificationStatus.Rejected, true)]
-    [InlineData(null, ImportNotificationType.Ced, ImportNotificationStatus.SplitConsignment, true)]
-    [InlineData(null, ImportNotificationType.Ced, ImportNotificationStatus.Validated, true)]
-    [InlineData(null, ImportNotificationType.Cveda, ImportNotificationStatus.Submitted, false)]
-    [InlineData(null, ImportNotificationType.Cvedp, ImportNotificationStatus.Submitted, false)]
-    [InlineData(null, ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, false)]
-    [InlineData(false, ImportNotificationType.Ced, ImportNotificationStatus.Submitted, true)]
-    [InlineData(true, ImportNotificationType.Ced, ImportNotificationStatus.Submitted, false)]
+    [InlineData(null, ImportNotificationType.Ced, "H223", "C678", true)]
+    [InlineData(null, ImportNotificationType.Ced, "H223", "N852", true)]
+    [InlineData(null, ImportNotificationType.Ced, "H223", "C085", false)]
+    [InlineData(null, ImportNotificationType.Ced, "H223", "N002", false)]
+    [InlineData(null, ImportNotificationType.Ced, "H223", "N851", false)]
+    [InlineData(null, ImportNotificationType.Ced, "H223", "9115", false)]
+    [InlineData(null, ImportNotificationType.Ced, "H223", "C640", false)]
+    [InlineData(null, ImportNotificationType.Ced, "H223", "N853", false)]
+    [InlineData(null, ImportNotificationType.Ced, "H223", "C641", false)]
+    [InlineData(null, ImportNotificationType.Ced, "H223", "C673", false)]
+    [InlineData(null, ImportNotificationType.Ced, "H223", "C674", false)]
+    [InlineData(null, ImportNotificationType.Cvedp, "H223", "C678", true)]
+    [InlineData(null, ImportNotificationType.Chedpp, "H223", "C678", true)]
+    [InlineData(null, ImportNotificationType.Cveda, "H223", "C678", true)]
+    [InlineData(true, ImportNotificationType.Ced, "H223", "C678", false)]
     public void CanFindDecisionTest(
         bool? iuuCheckRequired,
         string? importNotificationType,
-        string notificationStatus,
+        string checkCode,
+        string documentCode,
         bool expectedResult
     )
     {
         var notification = new DecisionImportPreNotification
         {
             Id = "Test",
-            Status = notificationStatus,
             ImportNotificationType = importNotificationType,
             IuuCheckRequired = iuuCheckRequired,
         };
         var sut = new ChedDDecisionFinder();
 
-        var result = sut.CanFindDecision(notification, new CheckCode { Value = "H223" }, null);
+        var result = sut.CanFindDecision(notification, new CheckCode { Value = checkCode }, documentCode);
 
         result.Should().Be(expectedResult);
     }
@@ -182,9 +184,11 @@ public class ChedDDecisionFinderTests
         var notification = new DecisionImportPreNotification
         {
             Id = "Test",
+            ImportNotificationType = ImportNotificationType.Ced,
             ConsignmentDecision = decision,
             NotAcceptableAction = notAcceptableAction,
             NotAcceptableReasons = notAcceptableReasons,
+            HasPartTwo = true,
         };
         var sut = new ChedDDecisionFinder();
 
@@ -201,9 +205,11 @@ public class ChedDDecisionFinderTests
         var notification = new DecisionImportPreNotification
         {
             Id = "TEst",
+            ImportNotificationType = ImportNotificationType.Ced,
             Status = ImportNotificationStatus.PartiallyRejected,
             InspectionRequired = InspectionRequired.Required,
             Commodities = [new DecisionCommodityComplement { HmiDecision = CommodityRiskResultHmiDecision.Required }],
+            HasPartTwo = true,
         };
         var sut = new ChedDDecisionFinder();
 
@@ -211,5 +217,22 @@ public class ChedDDecisionFinderTests
 
         result.DecisionCode.Should().Be(DecisionCode.X00);
         result.InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E74);
+    }
+
+    [Fact]
+    public void WhenMissingPartTwo_DecisionShouldBeH01()
+    {
+        var notification = new DecisionImportPreNotification
+        {
+            Id = "TEst",
+            ImportNotificationType = ImportNotificationType.Ced,
+            Status = ImportNotificationStatus.Submitted,
+        };
+        var sut = new ChedDDecisionFinder();
+
+        var result = sut.FindDecision(notification, null);
+
+        result.DecisionCode.Should().Be(DecisionCode.H01);
+        result.InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E88);
     }
 }

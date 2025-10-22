@@ -18,7 +18,6 @@ public class DecisionService(
             cancellationToken
         );
         var decisionResult = await DeriveDecision(decisionContext, matchResult);
-
         return decisionResult;
     }
 
@@ -47,7 +46,7 @@ public class DecisionService(
 
                 HandleNoMatches(matchingResult, item, wrapper, checkCodes, decisionsResult);
                 HandleMatches(decisionContext, matchingResult, item, wrapper, checkCodes, decisionsResult);
-                HandleItemsWithInvalidReference(wrapper.MovementReferenceNumber!, checkCodes, item, decisionsResult);
+                HandleOrphanChecks(decisionsResult, item, checkCodes, wrapper);
             }
         }
 
@@ -83,10 +82,42 @@ public class DecisionService(
                     decisionCode.CheckCode?.Value,
                     decisionCode.DecisionCode,
                     notification,
-                    decisionCode.DecisionReason,
                     decisionCode.InternalDecisionCode
                 );
             }
+        }
+    }
+
+    private static void HandleOrphanChecks(
+        DecisionResult decisionsResult,
+        Commodity item,
+        CheckCode[] checkCodes,
+        ClearanceRequestWrapper wrapper
+    )
+    {
+        var decisionChecks = decisionsResult
+            .Decisions.Where(x => x.ItemNumber == item.ItemNumber)
+            .Select(x => x.CheckCode)
+            .Distinct()
+            .ToArray();
+
+        var orphanCheckCodes = checkCodes.Select(x => x.Value).Except(decisionChecks).ToArray();
+        foreach (var checkCode in orphanCheckCodes)
+        {
+            var internalFurtherDetail =
+                checkCode == "H220" && checkCodes.Any(x => x.Value == "H219")
+                    ? DecisionInternalFurtherDetail.E82
+                    : DecisionInternalFurtherDetail.E83;
+
+            decisionsResult.AddDecision(
+                wrapper.MovementReferenceNumber!,
+                item.ItemNumber!.Value,
+                string.Empty,
+                null,
+                checkCode,
+                DecisionCode.X00,
+                internalDecisionCode: internalFurtherDetail
+            );
         }
     }
 
@@ -111,21 +142,15 @@ public class DecisionService(
 
     private static void HandleNoMatch(CheckCode[] checkCodes, DecisionResult decisionsResult, DocumentNoMatch noMatch)
     {
-        foreach (var checkCode in checkCodes.Select(checkCode => checkCode.Value))
+        foreach (var checkCode in checkCodes.Select(checkCode => checkCode))
         {
-            string? reason = checkCode switch
+            if (!checkCode.IsValidDocumentCode(noMatch.DocumentCode))
             {
-                "H220" =>
-                    "This customs declaration with a GMS product has been selected for HMI inspection. Either create a new CHED PP or amend an existing one referencing the GMS product. Amend the customs declaration to reference the CHED PP.",
-                "H224" =>
-                    "Customs declaration clearance withheld. Awaiting IUU check outcome. Contact Port Health Authority (imports) or Marine Management Organisation (landings).",
-                _ =>
-                    "This IPAFFS pre-notification reference cannot be found in IPAFFS. Please check that the reference is correct.",
-            };
-
-            if (checkCode is "H218" or "H219" or "H220")
+                continue;
+            }
+            if (checkCode.Value is "H218" or "H219" or "H220")
             {
-                switch (checkCode)
+                switch (checkCode.Value)
                 {
                     case "H219" when noMatch.DocumentCode is "N851" or "9115" or "C085":
                     case "H218"
@@ -135,9 +160,8 @@ public class DecisionService(
                             noMatch.ItemNumber,
                             noMatch.DocumentReference,
                             noMatch.DocumentCode,
-                            checkCode,
+                            checkCode.Value,
                             DecisionCode.X00,
-                            decisionReason: reason,
                             internalDecisionCode: DecisionInternalFurtherDetail.E70
                         );
                         break;
@@ -150,81 +174,11 @@ public class DecisionService(
                     noMatch.ItemNumber,
                     noMatch.DocumentReference,
                     noMatch.DocumentCode,
-                    checkCode,
+                    checkCode.Value,
                     DecisionCode.X00,
-                    decisionReason: reason,
                     internalDecisionCode: DecisionInternalFurtherDetail.E70
                 );
             }
-        }
-    }
-
-    private static void HandleItemsWithInvalidReference(
-        string mrn,
-        CheckCode[] checkCodes,
-        Commodity item,
-        DecisionResult decisionsResult
-    )
-    {
-        var itemNumber = item.ItemNumber!.Value;
-        var decisions = decisionsResult.Decisions.Where(x => x.ItemNumber == itemNumber && x.Mrn == mrn).ToList();
-
-        if (decisions.Count != 0)
-            return;
-        if (item.Documents == null || !item.Documents.Any())
-        {
-            HandleDocumentWithInvalidReference(mrn, checkCodes, decisionsResult, itemNumber);
-        }
-        else
-        {
-            foreach (var document in item.Documents)
-            {
-                decisionsResult.AddDecision(
-                    mrn,
-                    itemNumber,
-                    document.DocumentReference!.Value,
-                    document.DocumentCode,
-                    null,
-                    DecisionCode.X00,
-                    internalDecisionCode: DecisionInternalFurtherDetail.E89
-                );
-            }
-        }
-    }
-
-    private static void HandleDocumentWithInvalidReference(
-        string mrn,
-        CheckCode[] checkCodes,
-        DecisionResult decisionsResult,
-        int itemNumber
-    )
-    {
-        if (checkCodes.Any())
-        {
-            foreach (var checkCode in checkCodes)
-            {
-                decisionsResult.AddDecision(
-                    mrn,
-                    itemNumber,
-                    string.Empty,
-                    null,
-                    checkCode.Value,
-                    DecisionCode.X00,
-                    internalDecisionCode: DecisionInternalFurtherDetail.E87
-                );
-            }
-        }
-        else
-        {
-            decisionsResult.AddDecision(
-                mrn,
-                itemNumber,
-                string.Empty,
-                null,
-                null,
-                DecisionCode.X00,
-                internalDecisionCode: DecisionInternalFurtherDetail.E87
-            );
         }
     }
 
@@ -243,16 +197,10 @@ public class DecisionService(
             foreach (var checkCode in checkCodes)
             {
                 logger.LogWarning(
-                    "No decision finder count for notification {Id} and check code {CheckCode}",
+                    "No decision finder count for notification {Id} and check code {CheckCode} and document code {DocumentCode}",
                     notification.Id,
-                    checkCode
-                );
-                results.Add(
-                    new DecisionFinderResult(
-                        DecisionCode.X00,
-                        checkCode,
-                        InternalDecisionCode: DecisionInternalFurtherDetail.E90
-                    )
+                    checkCode,
+                    documentCode
                 );
             }
         }
@@ -268,11 +216,12 @@ public class DecisionService(
 
         foreach (var result in results)
             logger.LogInformation(
-                "Decision finder result {ItemNum} of {NumItems} for notification {Id} decision {Decision}, DecisionEnum {DecisionEnum}, NotAcceptableAction {NotAcceptableAction}",
+                "Decision finder result {ItemNum} of {NumItems} for notification {Id} decision {Decision}, InternalCode {InternalCode} DecisionEnum {DecisionEnum}, NotAcceptableAction {NotAcceptableAction}",
                 item++,
                 results.Count,
                 notification.Id,
-                result.DecisionCode.ToString(),
+                result.DecisionCode,
+                result.InternalDecisionCode,
                 notification.ConsignmentDecision,
                 notification.NotAcceptableAction
             );
@@ -287,7 +236,10 @@ public class DecisionService(
         IEnumerable<IDecisionFinder> decisionFinders
     )
     {
-        var finders = decisionFinders.Where(x => x.CanFindDecision(notification, checkCode, documentCode)).ToArray();
+        var finders = decisionFinders
+            .DistinctBy(x => x.GetType())
+            .Where(x => x.CanFindDecision(notification, checkCode, documentCode))
+            .ToArray();
 
         foreach (var finder in finders)
         {

@@ -7,6 +7,8 @@ public abstract class DecisionFinder : IDecisionFinder
         CheckCode? checkCode
     );
 
+    protected abstract string ChedType { get; }
+
     public abstract bool CanFindDecision(
         DecisionImportPreNotification notification,
         CheckCode? checkCode,
@@ -15,6 +17,24 @@ public abstract class DecisionFinder : IDecisionFinder
 
     public DecisionFinderResult FindDecision(DecisionImportPreNotification notification, CheckCode? checkCode)
     {
+        if (notification.ImportNotificationType != ChedType)
+        {
+            return new DecisionFinderResult(
+                DecisionCode.X00,
+                checkCode,
+                InternalDecisionCode: DecisionInternalFurtherDetail.E84
+            );
+        }
+
+        if (!notification.HasPartTwo)
+        {
+            return new DecisionFinderResult(
+                DecisionCode.H01,
+                checkCode,
+                InternalDecisionCode: DecisionInternalFurtherDetail.E88
+            );
+        }
+
         return notification.Status switch
         {
             ImportNotificationStatus.Cancelled => new DecisionFinderResult(

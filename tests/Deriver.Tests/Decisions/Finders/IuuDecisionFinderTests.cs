@@ -7,31 +7,36 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions.Finders;
 public class IuuDecisionFinderTests
 {
     [Theory]
-    [InlineData(ImportNotificationType.Cvedp, ImportNotificationStatus.Submitted, true, "H224")]
-    [InlineData(ImportNotificationType.Cvedp, ImportNotificationStatus.Amend, true, "H224")]
-    [InlineData(ImportNotificationType.Cvedp, ImportNotificationStatus.InProgress, true, "H224")]
-    [InlineData(ImportNotificationType.Cvedp, ImportNotificationStatus.Modify, true, "H224")]
-    [InlineData(ImportNotificationType.Cvedp, ImportNotificationStatus.PartiallyRejected, true, "H224")]
-    [InlineData(ImportNotificationType.Cvedp, ImportNotificationStatus.Rejected, true, "H224")]
-    [InlineData(ImportNotificationType.Cvedp, ImportNotificationStatus.SplitConsignment, true, "H224")]
-    [InlineData(ImportNotificationType.Cvedp, ImportNotificationStatus.Validated, true, "H224")]
-    [InlineData(ImportNotificationType.Cvedp, ImportNotificationStatus.Submitted, false, "H222")]
-    [InlineData(ImportNotificationType.Cvedp, ImportNotificationStatus.Submitted, false, null)]
-    [InlineData(ImportNotificationType.Cveda, ImportNotificationStatus.Submitted, false, "H224")]
-    [InlineData(ImportNotificationType.Ced, ImportNotificationStatus.Submitted, false, "H224")]
-    [InlineData(ImportNotificationType.Chedpp, ImportNotificationStatus.Submitted, false, "H224")]
-    [InlineData(null, ImportNotificationStatus.Submitted, false, "H224")]
+    [InlineData(ImportNotificationType.Cvedp, "H222", "C085", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H222", "N002", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H222", "9115", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H222", "N853", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H222", "C640", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H222", "C678", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H222", "N852", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H222", "C641", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H222", "C673", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H222", "C674", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H224", "C085", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H224", "N002", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H224", "9115", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H224", "N853", true)]
+    [InlineData(ImportNotificationType.Cvedp, "H224", "C640", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H224", "C678", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H224", "N852", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H224", "C641", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H224", "C673", false)]
+    [InlineData(ImportNotificationType.Cvedp, "H224", "C674", false)]
     public void CanFindDecisionTest(
         string? importNotificationType,
-        string notificationStatus,
-        bool expectedResult,
-        string? checkCode
+        string checkCode,
+        string documentCode,
+        bool expectedResult
     )
     {
         var notification = new DecisionImportPreNotification
         {
             Id = "Test",
-            Status = notificationStatus,
             ImportNotificationType = importNotificationType,
         };
         var sut = new IuuDecisionFinder();
@@ -39,38 +44,33 @@ public class IuuDecisionFinderTests
         var result = sut.CanFindDecision(
             notification,
             string.IsNullOrEmpty(checkCode) ? null : new CheckCode { Value = checkCode },
-            null
+            documentCode
         );
 
         result.Should().Be(expectedResult);
     }
 
     [Theory]
-    [InlineData(true, ControlAuthorityIuuOption.IUUOK, DecisionCode.C07, null, "IUU Compliant")]
-    [InlineData(true, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00, null, "IUU Not compliant")]
-    [InlineData(true, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08, null, "IUU Not applicable")]
-    [InlineData(true, null, DecisionCode.X00, null, "IUU Awaiting decision")]
-    [InlineData(true, "999", DecisionCode.X00, DecisionInternalFurtherDetail.E95, "IUU Data error")]
-    [InlineData(
-        false,
-        ControlAuthorityIuuOption.IUUOK,
-        DecisionCode.X00,
-        DecisionInternalFurtherDetail.E94,
-        "IUU Data error"
-    )]
+    [InlineData(true, ControlAuthorityIuuOption.IUUOK, DecisionCode.C07, null)]
+    [InlineData(true, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00, null)]
+    [InlineData(true, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08, null)]
+    [InlineData(true, null, DecisionCode.X00, DecisionInternalFurtherDetail.E93)]
+    [InlineData(true, "999", DecisionCode.X00, DecisionInternalFurtherDetail.E94)]
+    [InlineData(false, ControlAuthorityIuuOption.IUUOK, DecisionCode.X00, DecisionInternalFurtherDetail.E94)]
     public void FindDecisionTest(
         bool iuuCheckRequired,
         string? iuuOption,
         DecisionCode expectedDecisionCode,
-        DecisionInternalFurtherDetail? expectedFurtherDetail = null,
-        string? expectedDecisionReason = null
+        DecisionInternalFurtherDetail? expectedFurtherDetail = null
     )
     {
         var notification = new DecisionImportPreNotification
         {
             Id = "Test",
+            ImportNotificationType = ImportNotificationType.Cvedp,
             IuuCheckRequired = iuuCheckRequired,
             IuuOption = iuuOption,
+            HasPartTwo = true,
         };
         var sut = new IuuDecisionFinder();
 
@@ -78,7 +78,6 @@ public class IuuDecisionFinderTests
 
         result.DecisionCode.Should().Be(expectedDecisionCode);
         result.InternalDecisionCode.Should().Be(expectedFurtherDetail);
-        result.DecisionReason.Should().StartWith(expectedDecisionReason);
         result.CheckCode?.Value.Should().Be(CheckCode.IuuCheckCode);
     }
 }

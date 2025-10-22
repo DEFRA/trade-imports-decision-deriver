@@ -7,25 +7,47 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Serializers;
 public class ToStringSerializer : IMessageSerializer, IMessageSerializer<string>, IMessageSerializerProvider
 {
     [ExcludeFromCodeCoverage]
-    public byte[] Serialize(Type t, object message)
+    string IMessageSerializer<string>.Serialize(
+        Type messageType,
+        IDictionary<string, object> headers,
+        object message,
+        object transportMessage
+    )
     {
-        throw new NotImplementedException();
+        return message.ToString()!;
     }
 
-    public object Deserialize(Type t, string payload)
+    [ExcludeFromCodeCoverage]
+    object IMessageSerializer<string>.Deserialize(
+        Type messageType,
+        IReadOnlyDictionary<string, object> headers,
+        string payload,
+        object transportMessage
+    )
     {
         return payload;
     }
 
-    public object Deserialize(Type t, byte[] payload)
+    [ExcludeFromCodeCoverage]
+    byte[] IMessageSerializer<byte[]>.Serialize(
+        Type messageType,
+        IDictionary<string, object> headers,
+        object message,
+        object transportMessage
+    )
     {
-        return Encoding.UTF8.GetString(payload);
+        throw new NotImplementedException();
     }
 
     [ExcludeFromCodeCoverage]
-    string IMessageSerializer<string>.Serialize(Type t, object message)
+    object IMessageSerializer<byte[]>.Deserialize(
+        Type messageType,
+        IReadOnlyDictionary<string, object> headers,
+        byte[] payload,
+        object transportMessage
+    )
     {
-        return message.ToString()!;
+        return Encoding.UTF8.GetString(payload);
     }
 
     [ExcludeFromCodeCoverage]

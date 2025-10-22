@@ -28,6 +28,9 @@ public static class ClearanceDecisionExtensions
         if (x.Results is not null && y.Results is null)
             return false;
 
+        if (x.ExternalVersionNumber != y.ExternalVersionNumber)
+            return false;
+
         ClearanceDecisionResult[] xResults = x.Results!;
         ClearanceDecisionResult[] yResults = y.Results!;
 

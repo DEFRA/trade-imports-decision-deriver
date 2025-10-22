@@ -15,14 +15,8 @@ public static class DecisionReasonBuilder
     public static string AnimalHealthErrorMessage(string chedType, string chedNumbers) =>
         $"A Customs Declaration has been submitted however no matching {chedType}(s) have been submitted to Animal Health for {chedType} number(s) {chedNumbers}.";
 
-    public static string GmsErrorMessage(
-        string? ucr,
-        int? itemNumber,
-        decimal? netMass,
-        string? taricCode,
-        string? goodsDescription
-    ) =>
-        $"A Customs Declaration with a GMS product has been selected for HMI inspection. If using PEACH then raise a GMS application. If using IPAFFS then create a CHEDPP and amend your licence to reference it. If a CHEDPP exists amend your licence to reference it. Failure to do so will delay your Customs release. The selected item was declared on a Customs Declaration with a Declaration UCR of {ucr} and Item Number {itemNumber} with a weight of {netMass} and is TARIC Code {taricCode} with a description of {goodsDescription}.";
+    public static string GmsErrorMessage(int? itemNumber, string? taricCode, string? goodsDescription) =>
+        $"Item number {itemNumber} has been selected for HMI GMS inspection. In IPAFFS either create a new CHEDPP with this item or amend an existing CHEDPP to include this item. The item selected has a TARIC code of {taricCode} and a description of {goodsDescription}.";
 
     public static List<string> Build(
         ClearanceRequest clearanceRequest,
@@ -34,7 +28,7 @@ public static class DecisionReasonBuilder
         var reasons = new List<string>();
 
         HandleNoLinkedNotifications(item, maxDecisionResult, documentDecisions, reasons);
-        HandleHmiGmsDecisionReason(clearanceRequest, item, maxDecisionResult, reasons);
+        HandleHmiGmsDecisionReason(item, maxDecisionResult, reasons);
 
         return reasons;
     }
@@ -53,6 +47,11 @@ public static class DecisionReasonBuilder
             && maxDecisionResult.CheckCode != "H220"
         )
         {
+            if (maxDecisionResult.InternalDecisionCode == DecisionInternalFurtherDetail.E83)
+            {
+                return;
+            }
+
             var chedType = MapToChedType(
                 new ImportDocument()
                 {
@@ -92,28 +91,14 @@ public static class DecisionReasonBuilder
     }
 
     private static void HandleHmiGmsDecisionReason(
-        ClearanceRequest clearanceRequest,
         Commodity item,
         DocumentDecisionResult maxDecisionResult,
         List<string> reasons
     )
     {
-        if (
-            item.Documents != null
-            && item.Documents!.Any()
-            && maxDecisionResult.DecisionCode == DecisionCode.X00
-            && maxDecisionResult.CheckCode == "H220"
-        )
+        if (maxDecisionResult is { DecisionCode: DecisionCode.X00, CheckCode: "H220" })
         {
-            reasons.Add(
-                GmsErrorMessage(
-                    clearanceRequest.DeclarationUcr,
-                    item.ItemNumber,
-                    item.NetMass,
-                    item.TaricCommodityCode,
-                    item.GoodsDescription
-                )
-            );
+            reasons.Add(GmsErrorMessage(item.ItemNumber, item.TaricCommodityCode, item.GoodsDescription));
         }
     }
 

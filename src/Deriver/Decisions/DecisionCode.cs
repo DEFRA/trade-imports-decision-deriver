@@ -32,14 +32,19 @@ public enum DecisionInternalFurtherDetail
     E74, // Partially Rejected
     E75, // Split Consignment
     E80, // NO LONGER USED
+    E82, // Orphan Check code for GMS (Has check codes H220 and H219)
+    E83, // Orphan Check code
+    E84, // Wrong Ched type
     E85, // Missing PHSI check
     E86, // No HMI check
     E87, // No Documents
-    E88, // NO LONGER USED
-    E89, // Item with document references where none are valid format
-    E90, // No Decision Finder found
+    E88, // No PartTwo
+    E89, // [OBSOLETE] Item with document references where none are valid format
+    E90, // [OBSOLETE] No Decision Finder found
+    E92, // IUU Not compliant
+    E93, // IUU Awaiting decision
     E94, // IUU not indicated in PartTwo?.ControlAuthority?.IuuCheckRequired but "H224" requested in Items[]?.Checks[]?.CheckCode
-    E95, // Unexpected value in PartTwo?.Decision?.IuuOption
+    E95, // [OBSOLETE] Unexpected value in PartTwo?.Decision?.IuuOption
     E96, // Unexpected value in PartTwo?.Decision?.DecisionEnum
     E97, // Unexpected value in PartTwo?.Decision?.NotAcceptableAction
 

@@ -20,15 +20,6 @@ public class ChedADecisionFinder : DecisionFinder
         CheckCode? checkCode
     )
     {
-        if (notification.Status == ImportNotificationStatus.PartiallyRejected)
-        {
-            return new DecisionFinderResult(
-                DecisionCode.X00,
-                checkCode,
-                InternalDecisionCode: DecisionInternalFurtherDetail.E74
-            );
-        }
-
         if (TryGetHoldDecision(notification, out var code))
         {
             return new DecisionFinderResult(code!.Value, checkCode);

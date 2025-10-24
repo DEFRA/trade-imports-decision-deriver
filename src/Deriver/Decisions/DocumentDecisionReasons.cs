@@ -20,6 +20,9 @@ public static class DocumentDecisionReasons
     public const string GmsInspection =
         "This customs declaration with a HMI-GMS item has been selected for HMI-GMS inspection. Create a new CHED PP referencing the HMI-GMS item and amend the Customs Declaration to reference the CHED PP.";
 
+    public const string GmsInspectionAmend =
+        "This customs declaration with a HMI-GMS item has been selected for HMI-GMS inspection. Amend the customs declaration so that it has a N002 documentCode and reference the CHED PP.";
+
     public const string OrphanCheckCode =
         "BTMS does not have the right information to provide a decision for this check code as a Document Reference / CHED has not been provided for this item.";
 

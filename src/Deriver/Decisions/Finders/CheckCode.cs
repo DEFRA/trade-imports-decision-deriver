@@ -1,39 +1,6 @@
-using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
-
-public interface ICheckCodeDecisionFinder
-{
-    DecisionFinderResult[] FindDecision(DecisionImportPreNotification notification, CheckCode checkCode);
-}
-
-public class H221DecisionFinder : ICheckCodeDecisionFinder
-{
-    public DecisionFinderResult[] FindDecision(DecisionContext context, Commodity commodity, CheckCode checkCode)
-    {
-        var documentCodes = checkCode.GetDocumentCodes();
-        if (commodity.Documents != null)
-        {
-            var documents = commodity.Documents.Where(x => documentCodes.Contains(x.DocumentCode));
-        }
-
-        context.Notifications.
-        
-        if (notification.Status == ImportNotificationStatus.PartiallyRejected)
-        {
-            return new[]
-            {
-                new DecisionFinderResult(
-                    DecisionCode.X00,
-                    checkCode,
-                    InternalDecisionCode: DecisionInternalFurtherDetail.E74
-                )
-            };
-        }
-        return Array.Empty<DecisionFinderResult>();
-    }
-}
 
 public class CheckCode
 {
@@ -66,19 +33,14 @@ public class CheckCode
             return false;
         }
 
-        return GetDocumentCodes().Contains(documentCode);
-    }
-
-    public string[] GetDocumentCodes()
-    {
         return Value switch
         {
-            "H218" or "H220" => ["C085", "N002"],
-            "H219" =>  ["C085" , "9115" , "N851"],
-            "H221" =>  ["C640"],
-            "H222" or "H224" =>  ["N853"],
-            "H223" => ["C678" , "N852"],
-            _ => [],
+            "H218" or "H220" => documentCode is "C085" or "N002",
+            "H219" => documentCode is "C085" or "9115" or "N851",
+            "H221" => documentCode is "C640",
+            "H222" or "H224" => documentCode is "N853",
+            "H223" => documentCode is "C678" or "N852",
+            _ => false,
         };
     }
 

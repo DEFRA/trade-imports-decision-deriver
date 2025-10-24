@@ -936,8 +936,9 @@ public class DecisionServiceTests
                     UpdatedSource = DateTime.UtcNow,
                     ConsignmentDecision = ConsignmentDecision.AcceptableForInternalMarket,
                     NotAcceptableAction = null,
-                    IuuCheckRequired = null,
-                    IuuOption = null,
+                    IuuCheckRequired = true,
+                    InspectionRequired = "Not required",
+                    IuuOption = "IUUOK",
                     NotAcceptableReasons = null,
                     CommodityChecks =
                     [

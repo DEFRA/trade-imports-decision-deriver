@@ -32,5 +32,5 @@ public class IuuDecisionFinder : DecisionFinder
         };
     }
 
-    protected override string ChedType => ImportNotificationType.Cvedp;
+    public override string ChedType => ImportNotificationType.Cvedp;
 }

@@ -12,10 +12,10 @@ public class ChedPPDecisionFinder : DecisionFinder
     ) =>
         notification.Status != ImportNotificationStatus.Cancelled
         && notification.Status != ImportNotificationStatus.Replaced
-        && checkCode?.GetImportNotificationType() == ChedType
+        && checkCode != null
         && checkCode.IsValidDocumentCode(documentCode);
 
-    protected override string ChedType => ImportNotificationType.Chedpp;
+    public override string ChedType => ImportNotificationType.Chedpp;
 
     protected override DecisionFinderResult FindDecisionInternal(
         DecisionImportPreNotification notification,

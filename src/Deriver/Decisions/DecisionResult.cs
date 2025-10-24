@@ -79,7 +79,7 @@ public record DocumentDecisionResult(
                 "H218" or "H219" or "H220" => DocumentDecisionReasons.UpdateCrToReferenceSplitChed,
                 _ => null,
             },
-            DecisionInternalFurtherDetail.E82 => DocumentDecisionReasons.GmsInspection,
+            DecisionInternalFurtherDetail.E82 => DocumentDecisionReasons.GmsInspectionAmend,
             DecisionInternalFurtherDetail.E83 => DocumentDecisionReasons.OrphanCheckCode,
             DecisionInternalFurtherDetail.E84 => DocumentDecisionReasons.CreateNewIpaffsNotification,
             DecisionInternalFurtherDetail.E85 => CheckCode switch

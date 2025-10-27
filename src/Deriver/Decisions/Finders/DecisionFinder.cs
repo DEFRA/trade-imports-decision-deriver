@@ -7,7 +7,7 @@ public abstract class DecisionFinder : IDecisionFinder
         CheckCode? checkCode
     );
 
-    protected abstract string ChedType { get; }
+    public abstract string ChedType { get; }
 
     public abstract bool CanFindDecision(
         DecisionImportPreNotification notification,

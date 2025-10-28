@@ -448,7 +448,7 @@ public class NoMatchDecisionsTest
     }
 
     [Fact]
-    public async Task When_processing_chedpp_with_phsi_and_all_three_document_codes_Then_should_return_expected_decisions1()
+    public async Task When_processing_H220_without_H219_Then_should_return_expected_decisions()
     {
         // Arrange
         var decisionContext = new DecisionContext(
@@ -495,6 +495,115 @@ public class NoMatchDecisionsTest
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
         decisionResult.Decisions[0].DocumentCode.Should().Be(null);
         decisionResult.Decisions[0].DocumentReference.Should().Be(String.Empty);
+        decisionResult.Decisions[0].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E87);
+        decisionResult.Decisions[0].DecisionReason.Should().Be(DocumentDecisionReasons.GmsInspection);
+    }
+
+    [Fact]
+    public async Task When_processing_H220_with_H219_Then_should_return_expected_decisions()
+    {
+        // Arrange
+        var decisionContext = new DecisionContext(
+            [],
+            [
+                new ClearanceRequestWrapper(
+                    "25GB99999999999021",
+                    new ClearanceRequest
+                    {
+                        Commodities =
+                        [
+                            new Commodity
+                            {
+                                ItemNumber = 1,
+
+                                Checks =
+                                [
+                                    new CommodityCheck { CheckCode = "H220", DepartmentCode = "HMI" },
+                                    new CommodityCheck { CheckCode = "H219", DepartmentCode = "HMI" },
+                                ],
+                            },
+                        ],
+                    }
+                ),
+            ]
+        );
+
+        var sut = new DecisionService(
+            NullLogger<DecisionService>.Instance,
+            new MatchingService(),
+            [
+                new ChedADecisionFinder(),
+                new ChedDDecisionFinder(),
+                new ChedPDecisionFinder(),
+                new ChedPPDecisionFinder(),
+                new IuuDecisionFinder(),
+            ]
+        );
+
+        // Act
+        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+
+        // Assert
+
+        decisionResult.Should().NotBeNull();
+        decisionResult.Decisions.Count.Should().Be(2);
+        decisionResult.Decisions[0].CheckCode.Should().Be("H220");
+        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
+        decisionResult.Decisions[0].DocumentCode.Should().Be(null);
+        decisionResult.Decisions[0].DocumentReference.Should().Be(String.Empty);
+        decisionResult.Decisions[0].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E82);
+        decisionResult.Decisions[0].DecisionReason.Should().Be(DocumentDecisionReasons.GmsInspectionAmend);
+    }
+
+    [Fact]
+    public async Task When_processing_orphan_H221__Then_should_return_expected_decisions()
+    {
+        // Arrange
+        var decisionContext = new DecisionContext(
+            [],
+            [
+                new ClearanceRequestWrapper(
+                    "25GB99999999999021",
+                    new ClearanceRequest
+                    {
+                        Commodities =
+                        [
+                            new Commodity
+                            {
+                                ItemNumber = 1,
+
+                                Checks = [new CommodityCheck { CheckCode = "H221", DepartmentCode = "HMI" }],
+                            },
+                        ],
+                    }
+                ),
+            ]
+        );
+
+        var sut = new DecisionService(
+            NullLogger<DecisionService>.Instance,
+            new MatchingService(),
+            [
+                new ChedADecisionFinder(),
+                new ChedDDecisionFinder(),
+                new ChedPDecisionFinder(),
+                new ChedPPDecisionFinder(),
+                new IuuDecisionFinder(),
+            ]
+        );
+
+        // Act
+        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+
+        // Assert
+
+        decisionResult.Should().NotBeNull();
+        decisionResult.Decisions.Count.Should().Be(1);
+        decisionResult.Decisions[0].CheckCode.Should().Be("H221");
+        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
+        decisionResult.Decisions[0].DocumentCode.Should().Be(null);
+        decisionResult.Decisions[0].DocumentReference.Should().Be(String.Empty);
+        decisionResult.Decisions[0].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E83);
         decisionResult.Decisions[0].DecisionReason.Should().Be(DocumentDecisionReasons.OrphanCheckCode);
     }
 

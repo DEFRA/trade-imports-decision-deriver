@@ -104,10 +104,13 @@ public class DecisionService(
         var orphanCheckCodes = checkCodes.Select(x => x.Value).Except(decisionChecks).ToArray();
         foreach (var checkCode in orphanCheckCodes)
         {
-            var internalFurtherDetail =
-                checkCode == "H220" && checkCodes.Any(x => x.Value == "H219")
+            var internalFurtherDetail = DecisionInternalFurtherDetail.E83;
+            if (checkCode == "H220")
+            {
+                internalFurtherDetail = checkCodes.Any(x => x.Value == "H219")
                     ? DecisionInternalFurtherDetail.E82
-                    : DecisionInternalFurtherDetail.E83;
+                    : DecisionInternalFurtherDetail.E87;
+            }
 
             decisionsResult.AddDecision(
                 wrapper.MovementReferenceNumber!,
@@ -240,6 +243,20 @@ public class DecisionService(
             .DistinctBy(x => x.GetType())
             .Where(x => x.CanFindDecision(notification, checkCode, documentCode))
             .ToArray();
+
+        if (finders.Length > 1)
+        {
+            finders = finders.Where(f => f.ChedType == checkCode.GetImportNotificationType()).ToArray();
+
+            if (finders.Length == 0)
+            {
+                yield return new DecisionFinderResult(
+                    DecisionCode.X00,
+                    checkCode,
+                    InternalDecisionCode: DecisionInternalFurtherDetail.E84
+                );
+            }
+        }
 
         foreach (var finder in finders)
         {

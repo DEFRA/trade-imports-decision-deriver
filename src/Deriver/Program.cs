@@ -40,10 +40,6 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
 {
     var integrationTest = args.Contains("--integrationTest=true");
 
-    builder.Configuration.AddJsonFile(
-        $"appsettings.cdp.{Environment.GetEnvironmentVariable("ENVIRONMENT")?.ToLower()}.json",
-        integrationTest
-    );
     builder.Configuration.AddEnvironmentVariables();
 
     // Must happen before Mongo and Http client connections

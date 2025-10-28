@@ -16,7 +16,7 @@ public class DocumentDecisionResultTests
     [InlineData("H224", DecisionInternalFurtherDetail.E73, DocumentDecisionReasons.DeletedChed)]
     [InlineData("H220", DecisionInternalFurtherDetail.E74, DocumentDecisionReasons.SplitChed)]
     [InlineData("H220", DecisionInternalFurtherDetail.E75, DocumentDecisionReasons.UpdateCrToReferenceSplitChed)]
-    [InlineData("H220", DecisionInternalFurtherDetail.E82, DocumentDecisionReasons.GmsInspection)]
+    [InlineData("H220", DecisionInternalFurtherDetail.E82, DocumentDecisionReasons.GmsInspectionAmend)]
     [InlineData("H224", DecisionInternalFurtherDetail.E84, DocumentDecisionReasons.CreateNewIpaffsNotification)]
     [InlineData("H219", DecisionInternalFurtherDetail.E85, DocumentDecisionReasons.PhsiCheckRequired)]
     [InlineData("H224", DecisionInternalFurtherDetail.E85, null)]

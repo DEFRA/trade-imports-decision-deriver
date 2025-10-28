@@ -8,12 +8,9 @@ public class ChedPDecisionFinder : DecisionFinder
         DecisionImportPreNotification notification,
         CheckCode? checkCode,
         string? documentCode
-    ) =>
-        ((checkCode is null) || (checkCode.GetImportNotificationType() == ChedType && !checkCode.IsIuu()))
-        && checkCode != null
-        && checkCode.IsValidDocumentCode(documentCode);
+    ) => (checkCode is null || !checkCode.IsIuu()) && checkCode != null && checkCode.IsValidDocumentCode(documentCode);
 
-    protected override string ChedType => ImportNotificationType.Cvedp;
+    public override string ChedType => ImportNotificationType.Cvedp;
 
     protected override DecisionFinderResult FindDecisionInternal(
         DecisionImportPreNotification notification,

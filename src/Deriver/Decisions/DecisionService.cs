@@ -104,16 +104,12 @@ public class DecisionService(
         var orphanCheckCodes = checkCodes.Select(x => x.Value).Except(decisionChecks).ToArray();
         foreach (var checkCode in orphanCheckCodes)
         {
-            DecisionInternalFurtherDetail internalFurtherDetail;
+            var internalFurtherDetail = DecisionInternalFurtherDetail.E83;
             if (checkCode == "H220")
             {
                 internalFurtherDetail = checkCodes.Any(x => x.Value == "H219")
                     ? DecisionInternalFurtherDetail.E82
                     : DecisionInternalFurtherDetail.E87;
-            }
-            else
-            {
-                internalFurtherDetail = DecisionInternalFurtherDetail.E83;
             }
 
             decisionsResult.AddDecision(

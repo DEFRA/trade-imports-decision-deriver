@@ -10,11 +10,12 @@ public class ChedPPDecisionFinder : DecisionFinder
         CheckCode? checkCode,
         string? documentCode
     ) =>
-        notification.ImportNotificationType == ImportNotificationType.Chedpp
-        && notification.Status != ImportNotificationStatus.Cancelled
+        notification.Status != ImportNotificationStatus.Cancelled
         && notification.Status != ImportNotificationStatus.Replaced
-        && checkCode?.GetImportNotificationType() == ImportNotificationType.Chedpp
-        && ValidCheckCodeAndDocumentCodeMapping(checkCode, documentCode);
+        && checkCode != null
+        && checkCode.IsValidDocumentCode(documentCode);
+
+    public override string ChedType => ImportNotificationType.Chedpp;
 
     protected override DecisionFinderResult FindDecisionInternal(
         DecisionImportPreNotification notification,
@@ -37,7 +38,11 @@ public class ChedPPDecisionFinder : DecisionFinder
                     InternalDecisionCode: DecisionInternalFurtherDetail.E99
                 ),
             },
-            ImportNotificationStatus.PartiallyRejected => new DecisionFinderResult(DecisionCode.H01, checkCode),
+            ImportNotificationStatus.PartiallyRejected => new DecisionFinderResult(
+                DecisionCode.H01,
+                checkCode,
+                InternalDecisionCode: DecisionInternalFurtherDetail.E74
+            ),
             _ => new DecisionFinderResult(
                 DecisionCode.X00,
                 checkCode,
@@ -102,11 +107,5 @@ public class ChedPPDecisionFinder : DecisionFinder
                 InternalDecisionCode: DecisionInternalFurtherDetail.E99
             ),
         };
-    }
-
-    private static bool ValidCheckCodeAndDocumentCodeMapping(CheckCode? checkCode, string? documentCode)
-    {
-        return (checkCode?.Value == "H219" && documentCode is "N851" or "9115" or "C085")
-            || (checkCode?.Value is "H218" or "H220" && documentCode is "N002" or "C085");
     }
 }

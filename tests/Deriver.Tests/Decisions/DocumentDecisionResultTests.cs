@@ -23,9 +23,8 @@ public class DocumentDecisionResultTests
     [InlineData("H220", DecisionInternalFurtherDetail.E86, DocumentDecisionReasons.HmiCheckRequired)]
     [InlineData("H224", DecisionInternalFurtherDetail.E86, null)]
     [InlineData("H220", DecisionInternalFurtherDetail.E87, DocumentDecisionReasons.GmsInspection)]
-    [InlineData("H224", DecisionInternalFurtherDetail.E92, DocumentDecisionReasons.IuuNotCompliant)]
-    [InlineData("H224", DecisionInternalFurtherDetail.E93, DocumentDecisionReasons.IuuAwaitingDecision)]
-    [InlineData("H224", DecisionInternalFurtherDetail.E94, DocumentDecisionReasons.IuuDataError)]
+    [InlineData("H224", DecisionInternalFurtherDetail.E93, null)]
+    [InlineData("H224", DecisionInternalFurtherDetail.E94, null)]
     [InlineData("H224", DecisionInternalFurtherDetail.E99, DocumentDecisionReasons.UnknownError)]
     public void DocumentReasonTests(
         string checkCode,

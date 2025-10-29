@@ -26,7 +26,7 @@
     <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Verify.Xunit" Version="31.0.4" />
+    <PackageReference Include="Verify.Xunit" Version="31.2.0" />
     <PackageReference Include="WireMock.Net.FluentAssertions" Version="1.15.0" />
     <ProjectReference Include="..\..\src\Deriver\Deriver.csproj" />
     <ProjectReference Include="..\TestFixtures\TestFixtures.csproj" />

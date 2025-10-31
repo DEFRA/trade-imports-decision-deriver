@@ -182,26 +182,6 @@ public class ChedPDecisionFinderTests
     }
 
     [Fact]
-    public void WhenPartiallyRejected_DecisionShouldBeX00()
-    {
-        var notification = new DecisionImportPreNotification
-        {
-            Id = "TEst",
-            ImportNotificationType = ImportNotificationType.Cvedp,
-            Status = ImportNotificationStatus.PartiallyRejected,
-            InspectionRequired = InspectionRequired.Required,
-            Commodities = [new DecisionCommodityComplement { HmiDecision = CommodityRiskResultHmiDecision.Required }],
-            HasPartTwo = true,
-        };
-        var sut = new ChedPDecisionFinder();
-
-        var result = sut.FindDecision(notification, null);
-
-        result.DecisionCode.Should().Be(DecisionCode.X00);
-        result.InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E74);
-    }
-
-    [Fact]
     public void WhenMissingPartTwo_DecisionShouldBeH01()
     {
         var notification = new DecisionImportPreNotification

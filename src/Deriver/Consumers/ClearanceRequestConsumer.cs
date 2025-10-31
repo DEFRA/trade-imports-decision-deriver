@@ -3,7 +3,6 @@ using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
-using Defra.TradeImportsDecisionDeriver.Deriver.Entities;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
@@ -16,9 +15,9 @@ public class ClearanceRequestConsumer(
     IDecisionService decisionService,
     ITradeImportsDataApiClient apiClient,
     ICorrelationIdGenerator correlationIdGenerator
-) : IConsumer<ResourceEvent<CustomsDeclarationEntity>>, IConsumerWithContext
+) : IConsumer<ResourceEvent<CustomsDeclarationEvent>>, IConsumerWithContext
 {
-    public async Task OnHandle(ResourceEvent<CustomsDeclarationEntity> message, CancellationToken cancellationToken)
+    public async Task OnHandle(ResourceEvent<CustomsDeclarationEvent> message, CancellationToken cancellationToken)
     {
         logger.LogInformation(
             "Received clearance request {ResourceId} of sub type {SubResourceType} with Etag {Etag} and resource version {Version}",

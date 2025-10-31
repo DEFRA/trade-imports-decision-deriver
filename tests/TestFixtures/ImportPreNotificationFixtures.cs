@@ -3,7 +3,6 @@ using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
-using Defra.TradeImportsDecisionDeriver.Deriver.Entities;
 
 namespace Defra.TradeImportsDecisionDeriver.TestFixtures;
 
@@ -11,13 +10,13 @@ public static class ImportPreNotificationFixtures
 {
     private const string Ched = "CHEDP.GB.2025.1234567";
 
-    public static ResourceEvent<ImportPreNotificationEntity> ImportPreNotificationCreatedFixture()
+    public static ResourceEvent<ImportPreNotificationEvent> ImportPreNotificationCreatedFixture()
     {
         var fixture = new Fixture();
         fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
 
         return fixture
-            .Build<ResourceEvent<ImportPreNotificationEntity>>()
+            .Build<ResourceEvent<ImportPreNotificationEvent>>()
             .With(i => i.Operation, "Created")
             .With(i => i.ResourceType, ResourceEventResourceTypes.ImportPreNotification)
             .With(i => i.ResourceId, Ched)
@@ -25,12 +24,12 @@ public static class ImportPreNotificationFixtures
             .Create();
     }
 
-    public static ImportPreNotificationEntity ImportPreNotificationEntityFixture(
+    public static ImportPreNotificationEvent ImportPreNotificationEntityFixture(
         string chedId,
         string? status = ImportNotificationStatus.InProgress
     )
     {
-        return new ImportPreNotificationEntity()
+        return new ImportPreNotificationEvent()
         {
             Id = chedId,
             ImportPreNotification = ImportPreNotificationFixture(chedId, status),

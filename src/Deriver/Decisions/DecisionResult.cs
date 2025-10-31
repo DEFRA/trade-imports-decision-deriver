@@ -93,9 +93,6 @@ public record DocumentDecisionResult(
                 _ => null,
             },
             DecisionInternalFurtherDetail.E87 => DocumentDecisionReasons.GmsInspection,
-            DecisionInternalFurtherDetail.E92 => DocumentDecisionReasons.IuuNotCompliant,
-            DecisionInternalFurtherDetail.E93 => DocumentDecisionReasons.IuuAwaitingDecision,
-            DecisionInternalFurtherDetail.E94 => DocumentDecisionReasons.IuuDataError,
             DecisionInternalFurtherDetail.E99 => DocumentDecisionReasons.UnknownError,
             _ => null,
         };

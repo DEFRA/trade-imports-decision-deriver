@@ -41,7 +41,7 @@ public enum DecisionInternalFurtherDetail
     E88, // No PartTwo
     E89, // [OBSOLETE] Item with document references where none are valid format
     E90, // [OBSOLETE] No Decision Finder found
-    E92, // IUU Not compliant
+    E92, // [OBSOLETE] IUU Not compliant
     E93, // IUU Awaiting decision
     E94, // IUU not indicated in PartTwo?.ControlAuthority?.IuuCheckRequired but "H224" requested in Items[]?.Checks[]?.CheckCode
     E95, // [OBSOLETE] Unexpected value in PartTwo?.Decision?.IuuOption

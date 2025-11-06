@@ -31,7 +31,7 @@ public enum DecisionInternalFurtherDetail
     E73, // Deleted
     E74, // Partially Rejected
     E75, // Split Consignment
-    E80, // NO LONGER USED
+    E80, // Amend 
     E82, // Orphan Check code for GMS (Has check codes H220 and H219)
     E83, // Orphan Check code
     E84, // Wrong Ched type

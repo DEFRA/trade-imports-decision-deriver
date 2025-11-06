@@ -37,6 +37,7 @@ public abstract class DecisionFinder : IDecisionFinder
 
         return notification.Status switch
         {
+            ImportNotificationStatus.Amend => GetAmendResult(notification, checkCode),
             ImportNotificationStatus.Cancelled => new DecisionFinderResult(
                 DecisionCode.X00,
                 checkCode,
@@ -63,7 +64,12 @@ public abstract class DecisionFinder : IDecisionFinder
 
     protected static bool TryGetHoldDecision(DecisionImportPreNotification notification, out DecisionCode? decisionCode)
     {
-        if (notification.Status is ImportNotificationStatus.Submitted or ImportNotificationStatus.InProgress)
+        if (
+            notification.Status
+            is ImportNotificationStatus.Submitted
+                or ImportNotificationStatus.InProgress
+                or ImportNotificationStatus.Amend
+        )
         {
             if (notification.InspectionRequired is InspectionRequired.NotRequired or InspectionRequired.Inconclusive)
             {
@@ -84,5 +90,27 @@ public abstract class DecisionFinder : IDecisionFinder
 
         decisionCode = null;
         return false;
+    }
+
+    protected static DecisionFinderResult GetAmendResult(
+        DecisionImportPreNotification notification,
+        CheckCode? checkCode
+    )
+    {
+        if (notification.InspectionRequired is InspectionRequired.NotRequired or InspectionRequired.Inconclusive)
+        {
+            return new DecisionFinderResult(DecisionCode.H01, checkCode, DecisionInternalFurtherDetail.E80);
+        }
+
+        if (
+            notification.InspectionRequired == InspectionRequired.Required
+            || notification.Commodities.Any(x => x.HmiDecision == CommodityRiskResultHmiDecision.Required)
+            || notification.Commodities.Any(x => x.PhsiDecision == CommodityRiskResultPhsiDecision.Required)
+        )
+        {
+            return new DecisionFinderResult(DecisionCode.H02, checkCode, DecisionInternalFurtherDetail.E80);
+        }
+
+        return new DecisionFinderResult(DecisionCode.H01, checkCode, DecisionInternalFurtherDetail.E99);
     }
 }

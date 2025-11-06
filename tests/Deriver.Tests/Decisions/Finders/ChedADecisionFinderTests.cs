@@ -172,14 +172,17 @@ public class ChedADecisionFinderTests
         result.CheckCode.Should().BeNull();
     }
 
-    [Fact]
-    public void WhenInspectionNotRequired_DecisionShouldBeHold()
+    [Theory]
+    [InlineData(ImportNotificationStatus.Submitted)]
+    [InlineData(ImportNotificationStatus.InProgress)]
+    [InlineData(ImportNotificationStatus.Amend)]
+    public void WhenInspectionNotRequired_DecisionShouldBeHold(string notificationStatus)
     {
         var notification = new DecisionImportPreNotification
         {
             Id = "TEst",
             ImportNotificationType = ImportNotificationType.Cveda,
-            Status = ImportNotificationStatus.InProgress,
+            Status = notificationStatus,
             InspectionRequired = InspectionRequired.NotRequired,
             HasPartTwo = true,
         };
@@ -190,14 +193,17 @@ public class ChedADecisionFinderTests
         result.DecisionCode.Should().Be(DecisionCode.H01);
     }
 
-    [Fact]
-    public void WhenInspectionRequired_DecisionShouldBeHold()
+    [Theory]
+    [InlineData(ImportNotificationStatus.Submitted)]
+    [InlineData(ImportNotificationStatus.InProgress)]
+    [InlineData(ImportNotificationStatus.Amend)]
+    public void WhenInspectionRequired_DecisionShouldBeHold(string notificationStatus)
     {
         var notification = new DecisionImportPreNotification
         {
             Id = "TEst",
             ImportNotificationType = ImportNotificationType.Cveda,
-            Status = ImportNotificationStatus.InProgress,
+            Status = notificationStatus,
             InspectionRequired = InspectionRequired.Required,
             Commodities = [new DecisionCommodityComplement { HmiDecision = CommodityRiskResultHmiDecision.Required }],
             HasPartTwo = true,

@@ -77,11 +77,7 @@ public abstract class DecisionFinder : IDecisionFinder
                 return true;
             }
 
-            if (
-                notification.InspectionRequired == InspectionRequired.Required
-                || notification.Commodities.Any(x => x.HmiDecision == CommodityRiskResultHmiDecision.Required)
-                || notification.Commodities.Any(x => x.PhsiDecision == CommodityRiskResultPhsiDecision.Required)
-            )
+            if (IsInspectionRequired(notification))
             {
                 decisionCode = DecisionCode.H02;
                 return true;
@@ -90,6 +86,13 @@ public abstract class DecisionFinder : IDecisionFinder
 
         decisionCode = null;
         return false;
+    }
+
+    private static bool IsInspectionRequired(DecisionImportPreNotification notification)
+    {
+        return notification.InspectionRequired == InspectionRequired.Required
+            || notification.Commodities.Any(x => x.HmiDecision == CommodityRiskResultHmiDecision.Required)
+            || notification.Commodities.Any(x => x.PhsiDecision == CommodityRiskResultPhsiDecision.Required);
     }
 
     protected static DecisionFinderResult GetAmendResult(
@@ -102,15 +105,8 @@ public abstract class DecisionFinder : IDecisionFinder
             return new DecisionFinderResult(DecisionCode.H01, checkCode, DecisionInternalFurtherDetail.E80);
         }
 
-        if (
-            notification.InspectionRequired == InspectionRequired.Required
-            || notification.Commodities.Any(x => x.HmiDecision == CommodityRiskResultHmiDecision.Required)
-            || notification.Commodities.Any(x => x.PhsiDecision == CommodityRiskResultPhsiDecision.Required)
-        )
-        {
-            return new DecisionFinderResult(DecisionCode.H02, checkCode, DecisionInternalFurtherDetail.E80);
-        }
-
-        return new DecisionFinderResult(DecisionCode.H01, checkCode, DecisionInternalFurtherDetail.E99);
+        return IsInspectionRequired(notification)
+            ? new DecisionFinderResult(DecisionCode.H02, checkCode, DecisionInternalFurtherDetail.E80)
+            : new DecisionFinderResult(DecisionCode.H01, checkCode, DecisionInternalFurtherDetail.E99);
     }
 }

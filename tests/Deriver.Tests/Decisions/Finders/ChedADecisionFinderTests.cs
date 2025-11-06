@@ -204,7 +204,7 @@ public class ChedADecisionFinderTests
             Id = "TEst",
             ImportNotificationType = ImportNotificationType.Cveda,
             Status = notificationStatus,
-            InspectionRequired = InspectionRequired.Required,
+            InspectionRequired = null,
             Commodities = [new DecisionCommodityComplement { HmiDecision = CommodityRiskResultHmiDecision.Required }],
             HasPartTwo = true,
         };

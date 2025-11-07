@@ -103,7 +103,7 @@ public class ChedPpPhsiDecisionFinderTests
     }
 
     [Theory]
-    [InlineData(ImportNotificationStatus.Amend, DecisionCode.X00, DecisionInternalFurtherDetail.E99)]
+    [InlineData(ImportNotificationStatus.Amend, DecisionCode.H01, DecisionInternalFurtherDetail.E99)]
     [InlineData(ImportNotificationStatus.Cancelled, DecisionCode.X00, DecisionInternalFurtherDetail.E71)]
     [InlineData(ImportNotificationStatus.Deleted, DecisionCode.X00, DecisionInternalFurtherDetail.E73)]
     [InlineData(ImportNotificationStatus.Draft, DecisionCode.X00, DecisionInternalFurtherDetail.E99)]
@@ -244,6 +244,45 @@ public class ChedPpPhsiDecisionFinderTests
         var result = sut.FindDecision(notification, new CheckCode() { Value = "H219" });
 
         result.DecisionCode.Should().Be(expectedCode);
+    }
+
+    [Theory]
+    [InlineData(ImportNotificationStatus.Amend)]
+    public void WhenInspectionNotRequired_DecisionShouldBeHold(string notificationStatus)
+    {
+        var notification = new DecisionImportPreNotification
+        {
+            Id = "TEst",
+            ImportNotificationType = ImportNotificationType.Chedpp,
+            Status = notificationStatus,
+            InspectionRequired = InspectionRequired.NotRequired,
+            HasPartTwo = true,
+        };
+        var sut = new ChedPPDecisionFinder();
+
+        var result = sut.FindDecision(notification, new CheckCode() { Value = "H221" });
+
+        result.DecisionCode.Should().Be(DecisionCode.H01);
+    }
+
+    [Theory]
+    [InlineData(ImportNotificationStatus.Amend)]
+    public void WhenInspectionRequired_DecisionShouldBeHold(string notificationStatus)
+    {
+        var notification = new DecisionImportPreNotification
+        {
+            Id = "TEst",
+            ImportNotificationType = ImportNotificationType.Chedpp,
+            Status = notificationStatus,
+            InspectionRequired = InspectionRequired.Required,
+            Commodities = [new DecisionCommodityComplement { HmiDecision = CommodityRiskResultHmiDecision.Required }],
+            HasPartTwo = true,
+        };
+        var sut = new ChedPPDecisionFinder();
+
+        var result = sut.FindDecision(notification, new CheckCode() { Value = "H221" });
+
+        result.DecisionCode.Should().Be(DecisionCode.H02);
     }
 
     [Fact]

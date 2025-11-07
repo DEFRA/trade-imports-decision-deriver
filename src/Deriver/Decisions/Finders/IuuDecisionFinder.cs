@@ -27,7 +27,7 @@ public class IuuDecisionFinder : DecisionFinder
                 ControlAuthorityIuuOption.IUUNA => new DecisionFinderResult(DecisionCode.C08, checkCode),
                 _ => new DecisionFinderResult(DecisionCode.H02, checkCode, DecisionInternalFurtherDetail.E93),
             },
-            false => new DecisionFinderResult(DecisionCode.X00, checkCode, DecisionInternalFurtherDetail.E94),
+            false => new DecisionFinderResult(DecisionCode.H02, checkCode, DecisionInternalFurtherDetail.E94),
         };
     }
 

@@ -54,9 +54,9 @@ public class IuuDecisionFinderTests
     [InlineData(true, ControlAuthorityIuuOption.IUUOK, DecisionCode.C07, null)]
     [InlineData(true, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00, null)]
     [InlineData(true, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08, null)]
-    [InlineData(true, null, DecisionCode.X00, DecisionInternalFurtherDetail.E93)]
-    [InlineData(true, "999", DecisionCode.X00, DecisionInternalFurtherDetail.E94)]
-    [InlineData(false, ControlAuthorityIuuOption.IUUOK, DecisionCode.X00, DecisionInternalFurtherDetail.E94)]
+    [InlineData(true, null, DecisionCode.H02, DecisionInternalFurtherDetail.E93)]
+    [InlineData(true, "999", DecisionCode.H02, DecisionInternalFurtherDetail.E93)]
+    [InlineData(false, ControlAuthorityIuuOption.IUUOK, DecisionCode.H02, DecisionInternalFurtherDetail.E94)]
     public void FindDecisionTest(
         bool iuuCheckRequired,
         string? iuuOption,

@@ -25,10 +25,9 @@ public class IuuDecisionFinder : DecisionFinder
                 ControlAuthorityIuuOption.IUUOK => new DecisionFinderResult(DecisionCode.C07, checkCode),
                 ControlAuthorityIuuOption.IUUNotCompliant => new DecisionFinderResult(DecisionCode.X00, checkCode),
                 ControlAuthorityIuuOption.IUUNA => new DecisionFinderResult(DecisionCode.C08, checkCode),
-                null => new DecisionFinderResult(DecisionCode.X00, checkCode, DecisionInternalFurtherDetail.E93),
-                _ => new DecisionFinderResult(DecisionCode.X00, checkCode, DecisionInternalFurtherDetail.E94),
+                _ => new DecisionFinderResult(DecisionCode.H02, checkCode, DecisionInternalFurtherDetail.E93),
             },
-            false => new DecisionFinderResult(DecisionCode.X00, checkCode, DecisionInternalFurtherDetail.E94),
+            false => new DecisionFinderResult(DecisionCode.H02, checkCode, DecisionInternalFurtherDetail.E94),
         };
     }
 

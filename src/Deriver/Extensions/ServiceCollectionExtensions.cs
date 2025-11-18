@@ -1,4 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
+using Amazon.SimpleNotificationService;
+using Amazon.SQS;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
@@ -7,6 +9,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
 using Defra.TradeImportsDecisionDeriver.Deriver.Serializers;
+using Defra.TradeImportsDecisionDeriver.Deriver.Services.Admin;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -74,6 +77,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ConsumerMetrics>();
         services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(MetricsInterceptor<>));
 
+        services.AddOptions<AwsSqsOptions>().Bind(configuration).ValidateDataAnnotations();
+
         var autoStartConsumers = configuration.GetValue<bool>("AUTO_START_CONSUMERS");
 
         if (autoStartConsumers)
@@ -113,7 +118,9 @@ public static class ServiceCollectionExtensions
     )
     {
         services.AddOptions<DataApiOptions>().BindConfiguration(DataApiOptions.SectionName).ValidateDataAnnotations();
-
+        services.AddSingleton<ISqsDeadLetterService, SqsDeadLetterService>();
+        ////services.AddDefaultAWSOptions(configuration.GetAWSOptions());
+        services.AddAWSService<IAmazonSQS>();
         return services;
     }
 }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -31,5 +31,13 @@
     <ProjectReference Include="..\..\src\Deriver\Deriver.csproj" />
     <ProjectReference Include="..\TestFixtures\TestFixtures.csproj" />
     <ProjectReference Include="..\Testing\Testing.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Fixtures\CustomsDeclarationClearanceDecisionResourceEvent.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Fixtures\CustomsDeclarationProcessingErrorResourceEvent.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

@@ -1,13 +1,15 @@
+using System.Diagnostics.CodeAnalysis;
 using Defra.TradeImportsDecisionDeriver.Deriver.Authentication;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Services.Admin;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Endpoints.Admin;
 
-[ExcludeFromCodeCoverage(Justification = "This is covered by Integration tests, which doesn't pick up on code coverage")]
+[ExcludeFromCodeCoverage(
+    Justification = "This is covered by Integration tests, which doesn't pick up on code coverage"
+)]
 public static class EndpointRouteBuilderExtensions
 {
     public static void MapAdminEndpoints(this IEndpointRouteBuilder app)

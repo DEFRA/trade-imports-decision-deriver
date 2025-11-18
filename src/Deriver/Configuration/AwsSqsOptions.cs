@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 
 [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
+[ExcludeFromCodeCoverage]
 public class AwsSqsOptions
 {
     [Required]

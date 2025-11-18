@@ -36,8 +36,5 @@
     <None Update="Fixtures\CustomsDeclarationClearanceDecisionResourceEvent.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Fixtures\CustomsDeclarationProcessingErrorResourceEvent.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 </Project>

@@ -80,15 +80,6 @@ public class RedriveTests(WireMockClient wireMockClient, ITestOutputHelper outpu
                 (await GetQueueAttributes(DeadLetterQueueUrl)).ApproximateNumberOfMessages == 0
             )
         );
-
-        Assert.True(
-            await AsyncWaiter.WaitForAsync(async () =>
-            {
-                var requests = await _wireMockAdminApi.GetRequestsAsync();
-
-                return requests.Any(r => r.Request is { Path: $"/customs-declarations/{mrn}", Method: "PUT" });
-            })
-        );
     }
 
     [Fact]

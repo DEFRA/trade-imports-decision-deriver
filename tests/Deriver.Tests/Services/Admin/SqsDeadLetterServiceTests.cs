@@ -1,4 +1,5 @@
 using System.Net;
+using Amazon.Runtime;
 using Amazon.SQS;
 using Amazon.SQS.Model;
 using Amazon.SQS.Util;
@@ -72,7 +73,25 @@ public class SqsDeadLetterServiceTests
             .StartMessageMoveTaskAsync(Arg.Any<StartMessageMoveTaskRequest>())
             .Returns(
                 Task.FromResult(
-                    new StartMessageMoveTaskResponse { HttpStatusCode = HttpStatusCode.InternalServerError }
+                    new StartMessageMoveTaskResponse
+                    {
+                        HttpStatusCode = HttpStatusCode.InternalServerError,
+                        ResponseMetadata = new ResponseMetadata() { Metadata = { } },
+                    }
+                )
+            );
+
+        _amazonSqs
+            .GetQueueAttributesAsync(Arg.Any<GetQueueAttributesRequest>())
+            .Returns(
+                Task.FromResult(
+                    new GetQueueAttributesResponse
+                    {
+                        Attributes = new Dictionary<string, string>()
+                        {
+                            { SQSConstants.ATTRIBUTE_QUEUE_ARN, "queueArn" },
+                        },
+                    }
                 )
             );
 

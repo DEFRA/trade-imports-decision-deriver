@@ -4,7 +4,6 @@ using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
-using Defra.TradeImportsDecisionDeriver.Deriver.Entities;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
@@ -17,9 +16,9 @@ public class ImportPreNotificationConsumer(
     IDecisionService decisionService,
     ITradeImportsDataApiClient apiClient,
     ICorrelationIdGenerator correlationIdGenerator
-) : IConsumer<ResourceEvent<ImportPreNotificationEntity>>, IConsumerWithContext
+) : IConsumer<ResourceEvent<ImportPreNotificationEvent>>, IConsumerWithContext
 {
-    public async Task OnHandle(ResourceEvent<ImportPreNotificationEntity> message, CancellationToken cancellationToken)
+    public async Task OnHandle(ResourceEvent<ImportPreNotificationEvent> message, CancellationToken cancellationToken)
     {
         logger.LogInformation(
             "Received notification {ResourceId} with version {Version}",
@@ -115,7 +114,7 @@ public class ImportPreNotificationConsumer(
     }
 
     private async Task<List<DecisionImportPreNotification>> GetNotifications(
-        ResourceEvent<ImportPreNotificationEntity> message,
+        ResourceEvent<ImportPreNotificationEvent> message,
         string[] mrns
     )
     {

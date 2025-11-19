@@ -145,7 +145,7 @@ public class SqsDeadLetterService(IAmazonSQS amazonSqs, ILogger<SqsDeadLetterSer
                 };
 
                 var response = await amazonSqs.ReceiveMessageAsync(request, cancellationToken);
-                if (response.Messages.Count == 0)
+                if (response.Messages is null || response.Messages.Count == 0)
                 {
                     logger.LogInformation("Dead letter queue is empty, {Removed} message(s) removed", removed);
 

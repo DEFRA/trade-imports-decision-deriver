@@ -4,8 +4,8 @@
   "subResourceType": "ClearanceDecision",
   "operation": "Created",
   "resource": {
-    "Id": "25GB0XX00XXXXX0000",
-    "ClearanceDecision": {
+    "id": "25GB0XX00XXXXX0000",
+    "clearanceDecision": {
       "correlationId": "111",
       "created": "2025-09-08T09:00:00.000",
       "externalVersionNumber": 1,

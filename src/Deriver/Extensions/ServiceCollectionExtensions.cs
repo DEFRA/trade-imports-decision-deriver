@@ -119,7 +119,6 @@ public static class ServiceCollectionExtensions
     {
         services.AddOptions<DataApiOptions>().BindConfiguration(DataApiOptions.SectionName).ValidateDataAnnotations();
         services.AddSingleton<ISqsDeadLetterService, SqsDeadLetterService>();
-        ////services.AddDefaultAWSOptions(configuration.GetAWSOptions());
         services.AddAWSService<IAmazonSQS>();
         return services;
     }

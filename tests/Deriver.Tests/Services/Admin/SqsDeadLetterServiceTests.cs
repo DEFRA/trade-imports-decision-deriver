@@ -242,9 +242,38 @@ public class SqsDeadLetterServiceTests
     [Fact]
     public async Task When_drain_successful_Then_return_as_expected()
     {
+        const string messageId = "messageId";
+        const string receiptHandle = "receiptHandle";
         _amazonSqs
-            .PurgeQueueAsync(Arg.Is<PurgeQueueRequest>(x => x.QueueUrl == DeadLetterQueueUrl))
-            .Returns(Task.FromResult(new PurgeQueueResponse() { HttpStatusCode = HttpStatusCode.OK }));
+            .ReceiveMessageAsync(Arg.Is<ReceiveMessageRequest>(x => x.QueueUrl == DeadLetterQueueUrl))
+            .Returns(
+                Task.FromResult(
+                    new ReceiveMessageResponse
+                    {
+                        Messages = [new Message { MessageId = messageId, ReceiptHandle = receiptHandle }],
+                    }
+                ),
+                Task.FromResult(new ReceiveMessageResponse { Messages = [] })
+            );
+        _amazonSqs
+            .DeleteMessageBatchAsync(
+                Arg.Is<DeleteMessageBatchRequest>(x =>
+                    x.QueueUrl == DeadLetterQueueUrl
+                    && x.Entries.Count == 1
+                    && x.Entries[0].Id == "0"
+                    && x.Entries[0].ReceiptHandle == receiptHandle
+                )
+            )
+            .Returns(
+                Task.FromResult(
+                    new DeleteMessageBatchResponse
+                    {
+                        HttpStatusCode = HttpStatusCode.OK,
+                        Failed = [],
+                        Successful = [],
+                    }
+                )
+            );
 
         var result = await _resourceEventsDeadLetterService.Drain(QueueNameDeadLetter, CancellationToken.None);
 

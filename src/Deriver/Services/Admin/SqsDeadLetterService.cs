@@ -134,14 +134,56 @@ public class SqsDeadLetterService(IAmazonSQS amazonSqs, ILogger<SqsDeadLetterSer
             var queueUrl = await GetQueueUrl(queueName, cancellationToken);
             var removed = 0;
 
-            var request = new PurgeQueueRequest { QueueUrl = queueUrl };
-
-            var response = await amazonSqs.PurgeQueueAsync(request, cancellationToken);
-            if (response.HttpStatusCode == HttpStatusCode.OK)
+            while (!cancellationToken.IsCancellationRequested)
             {
-                logger.LogInformation("Dead letter queue is empty, {Removed} message(s) removed", removed);
+                var request = new ReceiveMessageRequest
+                {
+                    QueueUrl = queueUrl,
+                    MaxNumberOfMessages = 10,
+                    WaitTimeSeconds = 0,
+                    VisibilityTimeout = 60,
+                };
 
-                return true;
+                var response = await amazonSqs.ReceiveMessageAsync(request, cancellationToken);
+                if (response.Messages.Count == 0)
+                {
+                    logger.LogInformation("Dead letter queue is empty, {Removed} message(s) removed", removed);
+
+                    return true;
+                }
+
+                var deleteRequest = new DeleteMessageBatchRequest
+                {
+                    QueueUrl = queueUrl,
+                    Entries = response
+                        .Messages.Select(
+                            (message, index) =>
+                                new DeleteMessageBatchRequestEntry
+                                {
+                                    Id = index.ToString(),
+                                    ReceiptHandle = message.ReceiptHandle,
+                                }
+                        )
+                        .ToList(),
+                };
+
+                var deleteResponse = await amazonSqs.DeleteMessageBatchAsync(deleteRequest, cancellationToken);
+                if (deleteResponse.HttpStatusCode != HttpStatusCode.OK || deleteResponse.Failed.Count > 0)
+                {
+                    logger.LogWarning("Failed to remove a batch of message(s), stopping");
+
+                    return false;
+                }
+
+                removed += deleteResponse.Successful.Count;
+
+                logger.LogInformation(
+                    "Removed batch of {Total} message(s), total so far {Removed}",
+                    deleteResponse.Successful.Count,
+                    removed
+                );
+
+                await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
             }
 
             logger.LogInformation("Drain operation cancelled, total messages removed so far {Removed}", removed);

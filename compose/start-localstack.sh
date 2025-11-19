@@ -16,9 +16,14 @@ export AWS_SECRET_ACCESS_KEY=test
 
 # SQS queues
 aws --endpoint-url=http://localhost:4566 sqs create-queue --queue-name trade_imports_data_upserted_decision_deriver
+aws --endpoint-url=http://localhost:4566 sqs create-queue --queue-name trade_imports_data_upserted_decision_deriver-deadletter
+
+aws --endpoint-url=http://localhost:4566 sqs set-queue-attributes --queue-url "http://localhost:4566/000000000000/trade_imports_data_upserted_decision_deriver" --attributes '{"RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:eu-west-2:000000000000:trade_imports_data_upserted_decision_deriver-deadletter\",\"maxReceiveCount\":\"1\"}"}'
+
 
 function is_ready() {
     aws --endpoint-url=http://localhost:4566 sqs get-queue-url --queue-name trade_imports_data_upserted_decision_deriver || return 1
+    aws --endpoint-url=http://localhost:4566 sqs get-queue-url --queue-name trade_imports_data_upserted_decision_deriver-deadletter || return 1
     return 0
 }
 

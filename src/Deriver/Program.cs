@@ -1,4 +1,5 @@
 using Defra.TradeImportsDecisionDeriver.Deriver.Authentication;
+using Defra.TradeImportsDecisionDeriver.Deriver.Endpoints.Admin;
 using Defra.TradeImportsDecisionDeriver.Deriver.Endpoints.Decision;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Health;
@@ -65,6 +66,7 @@ static WebApplication BuildWebApplication(WebApplicationBuilder builder)
     app.UseAuthorization();
     app.MapHealth();
     app.MapDecisionEndpoints();
+    app.MapAdminEndpoints();
     app.UseStatusCodePages();
     app.UseExceptionHandler(
         new ExceptionHandlerOptions

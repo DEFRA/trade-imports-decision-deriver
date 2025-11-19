@@ -25,6 +25,10 @@ public static class ServiceCollectionExtensions
             .AddPolicy(
                 PolicyNames.Write,
                 builder => builder.RequireAuthenticatedUser().RequireClaim(Claims.Scope, Scopes.Write)
+            )
+            .AddPolicy(
+                PolicyNames.Execute,
+                builder => builder.RequireAuthenticatedUser().RequireClaim(Claims.Scope, Scopes.Execute)
             );
 
         return services;

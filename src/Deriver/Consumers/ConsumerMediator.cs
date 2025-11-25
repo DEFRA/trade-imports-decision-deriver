@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
@@ -21,17 +20,15 @@ public class ConsumerMediator(
 
     public Task OnHandle(string received, CancellationToken cancellationToken)
     {
-        var message = MessageDeserializer.Deserialize<JsonElement>(received, Context.Headers.GetContentEncoding());
-
         switch (Context.GetResourceType())
         {
             case ResourceEventResourceTypes.CustomsDeclaration:
             {
-                return HandleCustomsDeclaration(message, cancellationToken);
+                return HandleCustomsDeclaration(received, cancellationToken);
             }
             case ResourceEventResourceTypes.ImportPreNotification:
             {
-                return HandleNotification(message, cancellationToken);
+                return HandleNotification(received, cancellationToken);
             }
         }
 
@@ -40,7 +37,7 @@ public class ConsumerMediator(
         return Task.CompletedTask;
     }
 
-    private Task HandleNotification(JsonElement message, CancellationToken cancellationToken)
+    private Task HandleNotification(string message, CancellationToken cancellationToken)
     {
         var consumer = new ImportPreNotificationConsumer(
             loggerFactory.CreateLogger<ImportPreNotificationConsumer>(),
@@ -52,12 +49,15 @@ public class ConsumerMediator(
             Context = Context,
         };
 
-        var @event = message.Deserialize<ResourceEvent<ImportPreNotificationEvent>>();
+        var @event = MessageDeserializer.Deserialize<ResourceEvent<ImportPreNotificationEvent>>(
+            message,
+            Context.Headers.GetContentEncoding()
+        );
 
         return consumer.OnHandle(@event!, cancellationToken);
     }
 
-    private Task HandleCustomsDeclaration(JsonElement message, CancellationToken cancellationToken)
+    private Task HandleCustomsDeclaration(string message, CancellationToken cancellationToken)
     {
         var consumer = new ClearanceRequestConsumer(
             loggerFactory.CreateLogger<ClearanceRequestConsumer>(),
@@ -69,7 +69,10 @@ public class ConsumerMediator(
             Context = Context,
         };
 
-        var @event = message.Deserialize<ResourceEvent<CustomsDeclarationEvent>>();
+        var @event = MessageDeserializer.Deserialize<ResourceEvent<CustomsDeclarationEvent>>(
+            message,
+            Context.Headers.GetContentEncoding()
+        );
 
         return consumer.OnHandle(@event!, cancellationToken);
     }

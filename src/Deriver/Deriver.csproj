@@ -15,7 +15,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Defra.TradeImportsDataApi.Api.Client" Version="0.36.0" />
+    <PackageReference Include="Defra.TradeImportsDataApi.Api.Client" Version="0.37.0" />
     <PackageReference Include="Elastic.CommonSchema.Serilog" Version="9.0.0" />
     <PackageReference Include="Elastic.Serilog.Enrichers.Web" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.HeaderPropagation" Version="9.0.10" />

@@ -31,10 +31,14 @@ updates:
     allow:
       - dependency-type: direct
     registries: "*"    
+    reviewers:
+      - DEFRA/trade-data-matching
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: daily
       time: "00:00"
-      timezone: "Europe/London"
+      timezone: "Europe/London"# 👇 Add your team/people here
+    reviewers:
+      - DEFRA/trade-data-matching

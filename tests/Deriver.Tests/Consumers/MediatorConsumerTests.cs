@@ -120,15 +120,13 @@ public class MediatorConsumerTests
         apiClient
             .GetImportPreNotificationsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
             .Returns(
-                new ImportPreNotificationsResponse(
-                    [
-                        new ImportPreNotificationResponse(
-                            ImportPreNotificationFixtures.ImportPreNotificationFixture("test")!,
-                            DateTime.Now,
-                            DateTime.Now
-                        ),
-                    ]
-                )
+                new ImportPreNotificationsResponse([
+                    new ImportPreNotificationResponse(
+                        ImportPreNotificationFixtures.ImportPreNotificationFixture("test")!,
+                        DateTime.Now,
+                        DateTime.Now
+                    ),
+                ])
             );
 
         var decisionResult = new DecisionResult();

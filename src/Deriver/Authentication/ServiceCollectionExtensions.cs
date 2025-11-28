@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Microsoft.AspNetCore.Authentication;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Authentication;
 
+[ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddAuthenticationAuthorization(this IServiceCollection services)
@@ -25,6 +27,10 @@ public static class ServiceCollectionExtensions
             .AddPolicy(
                 PolicyNames.Write,
                 builder => builder.RequireAuthenticatedUser().RequireClaim(Claims.Scope, Scopes.Write)
+            )
+            .AddPolicy(
+                PolicyNames.Execute,
+                builder => builder.RequireAuthenticatedUser().RequireClaim(Claims.Scope, Scopes.Execute)
             );
 
         return services;

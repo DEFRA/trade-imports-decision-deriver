@@ -67,15 +67,13 @@ public class ImportPreNotificationConsumerTests
         apiClient
             .GetImportPreNotificationsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
             .Returns(
-                new ImportPreNotificationsResponse(
-                    [
-                        new ImportPreNotificationResponse(
-                            ImportPreNotificationFixtures.ImportPreNotificationFixture("test")!,
-                            DateTime.Now,
-                            DateTime.Now
-                        ),
-                    ]
-                )
+                new ImportPreNotificationsResponse([
+                    new ImportPreNotificationResponse(
+                        ImportPreNotificationFixtures.ImportPreNotificationFixture("test")!,
+                        DateTime.Now,
+                        DateTime.Now
+                    ),
+                ])
             );
 
         var decisionResult = new DecisionResult();
@@ -113,15 +111,13 @@ public class ImportPreNotificationConsumerTests
         apiClient
             .GetImportPreNotificationsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
             .Returns(
-                new ImportPreNotificationsResponse(
-                    [
-                        new ImportPreNotificationResponse(
-                            ImportPreNotificationFixtures.ImportPreNotificationFixture(createdEvent.ResourceId)!,
-                            DateTime.Now,
-                            DateTime.Now
-                        ),
-                    ]
-                )
+                new ImportPreNotificationsResponse([
+                    new ImportPreNotificationResponse(
+                        ImportPreNotificationFixtures.ImportPreNotificationFixture(createdEvent.ResourceId)!,
+                        DateTime.Now,
+                        DateTime.Now
+                    ),
+                ])
             );
 
         var decisionResult = new DecisionResult();
@@ -239,9 +235,9 @@ public class ImportPreNotificationConsumerTests
         apiClient
             .GetImportPreNotificationsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
             .Returns(
-                new ImportPreNotificationsResponse(
-                    [new ImportPreNotificationResponse(notification, DateTime.Now, DateTime.Now)]
-                )
+                new ImportPreNotificationsResponse([
+                    new ImportPreNotificationResponse(notification, DateTime.Now, DateTime.Now),
+                ])
             );
 
         decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);

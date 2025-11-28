@@ -199,6 +199,49 @@ public class ChedDDecisionFinderTests
         result.CheckCode.Should().BeNull();
     }
 
+    [Theory]
+    [InlineData(ImportNotificationStatus.Submitted)]
+    [InlineData(ImportNotificationStatus.InProgress)]
+    [InlineData(ImportNotificationStatus.Amend)]
+    public void WhenInspectionNotRequired_DecisionShouldBeHold(string notificationStatus)
+    {
+        var notification = new DecisionImportPreNotification
+        {
+            Id = "TEst",
+            ImportNotificationType = ImportNotificationType.Ced,
+            Status = notificationStatus,
+            InspectionRequired = InspectionRequired.NotRequired,
+            HasPartTwo = true,
+        };
+        var sut = new ChedDDecisionFinder();
+
+        var result = sut.FindDecision(notification, new CheckCode() { Value = "H221" });
+
+        result.DecisionCode.Should().Be(DecisionCode.H01);
+    }
+
+    [Theory]
+    [InlineData(ImportNotificationStatus.Submitted)]
+    [InlineData(ImportNotificationStatus.InProgress)]
+    [InlineData(ImportNotificationStatus.Amend)]
+    public void WhenInspectionRequired_DecisionShouldBeHold(string notificationStatus)
+    {
+        var notification = new DecisionImportPreNotification
+        {
+            Id = "TEst",
+            ImportNotificationType = ImportNotificationType.Ced,
+            Status = notificationStatus,
+            InspectionRequired = InspectionRequired.Required,
+            Commodities = [new DecisionCommodityComplement { HmiDecision = CommodityRiskResultHmiDecision.Required }],
+            HasPartTwo = true,
+        };
+        var sut = new ChedDDecisionFinder();
+
+        var result = sut.FindDecision(notification, new CheckCode() { Value = "H221" });
+
+        result.DecisionCode.Should().Be(DecisionCode.H02);
+    }
+
     [Fact]
     public void WhenMissingPartTwo_DecisionShouldBeH01()
     {

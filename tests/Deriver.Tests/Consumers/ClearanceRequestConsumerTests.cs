@@ -241,15 +241,13 @@ public class ClearanceRequestConsumerTests
         apiClient
             .GetImportPreNotificationsByMrn(createdEvent.ResourceId, Arg.Any<CancellationToken>())
             .Returns(
-                new ImportPreNotificationsResponse(
-                    [
-                        new ImportPreNotificationResponse(
-                            new ImportPreNotification { ReferenceNumber = "chedRef" },
-                            DateTime.UtcNow,
-                            DateTime.UtcNow
-                        ),
-                    ]
-                )
+                new ImportPreNotificationsResponse([
+                    new ImportPreNotificationResponse(
+                        new ImportPreNotification { ReferenceNumber = "chedRef" },
+                        DateTime.UtcNow,
+                        DateTime.UtcNow
+                    ),
+                ])
             );
 
         var decisionResult = new DecisionResult();

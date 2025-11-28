@@ -23,7 +23,7 @@ public class ClearanceRequestConsumer(
             "Received clearance request {ResourceId} of sub type {SubResourceType} with Etag {Etag} and resource version {Version}",
             message.ResourceId,
             message.SubResourceType,
-            message.ETag,
+            message.Etag,
             message.Resource?.ClearanceRequest?.GetVersion()
         );
 

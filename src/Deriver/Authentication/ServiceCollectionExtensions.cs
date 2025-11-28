@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Microsoft.AspNetCore.Authentication;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Authentication;
 
+[ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddAuthenticationAuthorization(this IServiceCollection services)

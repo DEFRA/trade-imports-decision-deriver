@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using Defra.TradeImportsDataApi.Api.Client;
+using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.IntegrationTests.Clients;
 using Defra.TradeImportsDecisionDeriver.Deriver.IntegrationTests.TestUtils;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
@@ -55,7 +56,11 @@ public class RedriveTests(WireMockClient wireMockClient, ITestOutputHelper outpu
             mrn,
             resourceEvent,
             DeadLetterQueueUrl,
-            WithResourceEventAttributes("CustomsDeclaration", "ClearanceDecision", mrn),
+            WithResourceEventAttributes<ResourceEvent<CustomsDeclarationEvent>>(
+                "CustomsDeclaration",
+                "ClearanceDecision",
+                mrn
+            ),
             false
         );
 
@@ -97,7 +102,11 @@ public class RedriveTests(WireMockClient wireMockClient, ITestOutputHelper outpu
             mrn,
             resourceEvent,
             DeadLetterQueueUrl,
-            WithResourceEventAttributes("CustomsDeclaration", "ClearanceDecision", mrn),
+            WithResourceEventAttributes<ResourceEvent<CustomsDeclarationEvent>>(
+                "CustomsDeclaration",
+                "ClearanceDecision",
+                mrn
+            ),
             false
         );
 
@@ -138,7 +147,11 @@ public class RedriveTests(WireMockClient wireMockClient, ITestOutputHelper outpu
             mrn,
             resourceEvent,
             DeadLetterQueueUrl,
-            WithResourceEventAttributes("CustomsDeclaration", "ClearanceDecision", mrn),
+            WithResourceEventAttributes<ResourceEvent<CustomsDeclarationEvent>>(
+                "CustomsDeclaration",
+                "ClearanceDecision",
+                mrn
+            ),
             false
         );
 

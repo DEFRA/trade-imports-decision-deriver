@@ -7,10 +7,12 @@ using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.IntegrationTests.Clients;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
+using SlimMessageBus.Host;
 using WireMock.Admin.Mappings;
 using WireMock.Client;
 using WireMock.Client.Extensions;
 using Xunit.Abstractions;
+using Assert = Xunit.Assert;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.IntegrationTests.Consumers;
@@ -21,13 +23,21 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output, WireMock
 {
     private readonly IWireMockAdminApi _wireMockAdminApi = wireMockClient.WireMockAdminApi;
 
-    private static Dictionary<string, MessageAttributeValue> WithInboundHmrcMessageType(
+    private static Dictionary<string, MessageAttributeValue> WithInboundHmrcMessageType<T>(
         string resourceType,
         string subResourceType
     )
     {
         return new Dictionary<string, MessageAttributeValue>
         {
+            {
+                "MessageType",
+                new MessageAttributeValue
+                {
+                    DataType = "String",
+                    StringValue = new AssemblyQualifiedNameMessageTypeResolver().ToName(typeof(T)),
+                }
+            },
             {
                 MessageBusHeaders.ResourceType,
                 new MessageAttributeValue { DataType = "String", StringValue = resourceType }
@@ -82,7 +92,7 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output, WireMock
 
         var traceId = Guid.NewGuid().ToString("N");
         const string traceHeader = "x-cdp-request-id";
-        var properties = WithInboundHmrcMessageType(
+        var properties = WithInboundHmrcMessageType<ResourceEvent<CustomsDeclarationEvent>>(
             ResourceEventResourceTypes.CustomsDeclaration,
             ResourceEventSubResourceTypes.ClearanceDecision
         );
@@ -153,7 +163,7 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output, WireMock
         await gzipStream.FlushAsync();
         var message = Convert.ToBase64String(memoryStream.ToArray());
 
-        var headers = WithInboundHmrcMessageType(
+        var headers = WithInboundHmrcMessageType<ResourceEvent<CustomsDeclarationEvent>>(
             ResourceEventResourceTypes.CustomsDeclaration,
             ResourceEventSubResourceTypes.ClearanceDecision
         );

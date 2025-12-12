@@ -1,3 +1,4 @@
+using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 
@@ -22,6 +23,7 @@ public class DecisionFinderTests
                 Status = status,
                 HasPartTwo = hasPartTwo,
             },
+            new Commodity(),
             new CheckCode { Value = "value" }
         );
 
@@ -41,6 +43,7 @@ public class DecisionFinderTests
                     Status = "IGNORED",
                     HasPartTwo = true,
                 },
+                new Commodity(),
                 new CheckCode { Value = "value" }
             );
 

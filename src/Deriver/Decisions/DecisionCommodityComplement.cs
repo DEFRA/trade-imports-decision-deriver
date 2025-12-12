@@ -4,6 +4,18 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
 public class DecisionCommodityComplement
 {
+    [JsonPropertyName("id")]
+    public int? Id { get; set; }
+
+    [JsonPropertyName("commodityId")]
+    public string? CommodityCode { get; set; }
+
+    [JsonPropertyName("quantity")]
+    public int? Quantity { get; set; }
+
+    [JsonPropertyName("weight")]
+    public decimal? Weight { get; set; }
+
     [JsonPropertyName("hmiDecision")]
     public string? HmiDecision { get; set; }
 

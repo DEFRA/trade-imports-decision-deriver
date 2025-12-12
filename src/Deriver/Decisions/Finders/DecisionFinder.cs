@@ -1,3 +1,5 @@
+using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
+
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 
 public abstract class DecisionFinder : IDecisionFinder
@@ -15,7 +17,11 @@ public abstract class DecisionFinder : IDecisionFinder
         string? documentCode
     );
 
-    public DecisionFinderResult FindDecision(DecisionImportPreNotification notification, CheckCode? checkCode)
+    public DecisionFinderResult FindDecision(
+        DecisionImportPreNotification notification,
+        Commodity commodity,
+        CheckCode? checkCode
+    )
     {
         if (notification.ImportNotificationType != ChedType)
         {
@@ -35,7 +41,7 @@ public abstract class DecisionFinder : IDecisionFinder
             );
         }
 
-        return notification.Status switch
+        var result = notification.Status switch
         {
             ImportNotificationStatus.Amend => GetAmendResult(notification, checkCode),
             ImportNotificationStatus.Cancelled => new DecisionFinderResult(
@@ -60,6 +66,8 @@ public abstract class DecisionFinder : IDecisionFinder
             ),
             _ => FindDecisionInternal(notification, checkCode),
         };
+
+        return result;
     }
 
     protected static bool TryGetHoldDecision(DecisionImportPreNotification notification, out DecisionCode? decisionCode)

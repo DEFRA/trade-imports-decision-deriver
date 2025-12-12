@@ -43,7 +43,7 @@ public class DecisionServiceTests
             .CanFindDecision(decisionContext.Notifications[0], Arg.Any<CheckCode>(), Arg.Any<string>())
             .Returns(true);
         chedAFinder
-            .FindDecision(decisionContext.Notifications[0], Arg.Any<CheckCode>())
+            .FindDecision(decisionContext.Notifications[0], Arg.Any<Commodity>(), Arg.Any<CheckCode>())
             .Returns(new DecisionFinderResult(expectedDecisionCode, new CheckCode { Value = checkCode[0] }));
 
         var sut = new DecisionService(
@@ -281,6 +281,15 @@ public class DecisionServiceTests
                         new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "Auto cleared" },
                     ],
                     HasPartTwo = true,
+                    Commodities =
+                    [
+                        new DecisionCommodityComplement()
+                        {
+                            Id = 1,
+                            Weight = 56,
+                            CommodityCode = "020711",
+                        },
+                    ],
                 },
                 new DecisionImportPreNotification()
                 {
@@ -948,6 +957,15 @@ public class DecisionServiceTests
                         new DecisionCommodityCheck.Check() { Type = "HMI", Status = "Auto cleared" },
                     ],
                     HasPartTwo = true,
+                    Commodities =
+                    [
+                        new DecisionCommodityComplement()
+                        {
+                            Id = 1,
+                            Weight = 56,
+                            CommodityCode = "020711",
+                        },
+                    ],
                 },
             ],
             [
@@ -960,6 +978,8 @@ public class DecisionServiceTests
                             new Commodity
                             {
                                 ItemNumber = 1,
+                                TaricCommodityCode = "0207119000",
+                                NetMass = 56,
                                 Documents =
                                 [
                                     new ImportDocument()

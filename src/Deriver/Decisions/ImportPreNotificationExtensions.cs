@@ -82,17 +82,15 @@ public static class ImportPreNotificationExtensions
 
                 if (parameters.KeyDataPairs != null)
                 {
-                    decisionCommodityComplement.Weight =
-                        parameters.KeyDataPairs
-                            .Where(x => x.Key == "netweight")
-                            .Select(x => decimal.TryParse(x.Data, out var v) ? v : (decimal?)null)
-                            .FirstOrDefault();
+                    decisionCommodityComplement.Weight = parameters
+                        .KeyDataPairs.Where(x => x.Key == "netweight")
+                        .Select(x => decimal.TryParse(x.Data, out var v) ? v : (decimal?)null)
+                        .FirstOrDefault();
 
-                    decisionCommodityComplement.Quantity =
-                        parameters.KeyDataPairs
-                            .Where(x => x.Key == "number_package")
-                            .Select(x => int.TryParse(x.Data, out var v) ? v : (int?)null)
-                            .FirstOrDefault();
+                    decisionCommodityComplement.Quantity = parameters
+                        .KeyDataPairs.Where(x => x.Key == "number_package")
+                        .Select(x => int.TryParse(x.Data, out var v) ? v : (int?)null)
+                        .FirstOrDefault();
                 }
 
                 if (

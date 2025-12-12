@@ -62,7 +62,7 @@ public static class ImportPreNotificationFixtures
                     .Build<ComplementParameterSets>()
                     .With(x => x.UniqueComplementId, id.ToString)
                     .With(x => x.ComplementId, id)
-                    .With(x => x.KeyDataPairs, [new KeyDataPair() { Key = "netweight", Data = "23.5"}])
+                    .With(x => x.KeyDataPairs, [new KeyDataPair() { Key = "netweight", Data = "23.5" }])
                     .Create()
             )
             .ToArray();

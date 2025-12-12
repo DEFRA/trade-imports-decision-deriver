@@ -8,9 +8,15 @@ public static class DecisionCodeExtensions
     {
         return decisionCode switch
         {
-            DecisionCode.C02 or DecisionCode.C03 or DecisionCode.C05 or DecisionCode.C06 or DecisionCode.C07
-                or DecisionCode.C08 or DecisionCode.H01 or DecisionCode.H02 => true,
-            _ => false
+            DecisionCode.C02
+            or DecisionCode.C03
+            or DecisionCode.C05
+            or DecisionCode.C06
+            or DecisionCode.C07
+            or DecisionCode.C08
+            or DecisionCode.H01
+            or DecisionCode.H02 => true,
+            _ => false,
         };
     }
 }

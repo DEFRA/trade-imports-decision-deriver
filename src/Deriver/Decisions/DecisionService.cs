@@ -70,7 +70,7 @@ public class DecisionService(
         foreach (var match in matches)
         {
             var notification = decisionContext.Notifications.First(x => x.Id == match.ImportPreNotificationId);
-            var decisionCodes = GetDecisions(notification, checkCodes, match.DocumentCode);
+            var decisionCodes = GetDecisions(notification, item, checkCodes, match.DocumentCode);
 
             foreach (var decisionCode in decisionCodes)
             {
@@ -186,6 +186,7 @@ public class DecisionService(
 
     private DecisionFinderResult[] GetDecisions(
         DecisionImportPreNotification notification,
+        Commodity commodity,
         CheckCode[] checkCodes,
         string? documentCode
     )
@@ -210,7 +211,7 @@ public class DecisionService(
         {
             foreach (var checkCode in checkCodes)
             {
-                results.AddRange(GetDecisionsForCheckCode(notification, checkCode, documentCode, finders));
+                results.AddRange(GetDecisionsForCheckCode(notification, commodity, checkCode, documentCode, finders));
             }
         }
 
@@ -233,6 +234,7 @@ public class DecisionService(
 
     private static IEnumerable<DecisionFinderResult> GetDecisionsForCheckCode(
         DecisionImportPreNotification notification,
+        Commodity commodity,
         CheckCode checkCode,
         string? documentCode,
         IEnumerable<IDecisionFinder> decisionFinders
@@ -259,7 +261,7 @@ public class DecisionService(
 
         foreach (var finder in finders)
         {
-            yield return finder.FindDecision(notification, checkCode);
+            yield return finder.FindDecision(notification, commodity, checkCode);
         }
     }
 

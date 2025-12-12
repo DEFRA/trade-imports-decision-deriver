@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Amazon.SimpleNotificationService;
 using Amazon.SQS;
 using Defra.TradeImportsDataApi.Api.Client;
+using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
@@ -12,10 +13,12 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Serializers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Services.Admin;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
+using Elastic.CommonSchema;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Options;
 using Polly;
+using Scrutor;
 using SlimMessageBus.Host;
 using SlimMessageBus.Host.AmazonSQS;
 using SlimMessageBus.Host.Interceptor;
@@ -69,6 +72,15 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDecisionFinder, ChedPPDecisionFinder>();
         services.AddScoped<IDecisionFinder, IuuDecisionFinder>();
 
+        services.Decorate<IDecisionFinder, CommodityCodeDecisionFinder>();
+        services.Decorate<IDecisionFinder>(
+            (inner, provider) =>
+                new CommodityWeightOrQualityDecisionFinder(
+                    inner,
+                    provider.GetRequiredService<ILogger<CommodityWeightOrQualityDecisionFinder>>()
+                )
+        );
+
         services.AddSingleton<ICorrelationIdGenerator, CorrelationIdGenerator>();
 
         // Order of interceptors is important here
@@ -102,6 +114,9 @@ public static class ServiceCollectionExtensions
                         configuration
                     );
                 });
+
+                mbb.Produce<ResourceEvent<CustomsDeclarationEvent>>(x => x.ToTopic().DefaultTopic("topic name"));
+
                 mbb.AutoStartConsumersEnabled(autoStartConsumers)
                     .Consume<string>(x =>
                         x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(consumersPerHost)

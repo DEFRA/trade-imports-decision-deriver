@@ -69,9 +69,30 @@ public static class ImportPreNotificationExtensions
         decisionNotification.Commodities = commodities
             .CommodityComplements.Select(commodityComplement =>
             {
+                var decisionCommodityComplement = new DecisionCommodityComplement
+                {
+                    Id = commodityComplement.ComplementId,
+                    CommodityCode = commodityComplement.CommodityId,
+                };
+
                 if (!complementParameters.TryGetValue(commodityComplement.ComplementId!.Value, out var parameters))
                 {
-                    return new DecisionCommodityComplement();
+                    return decisionCommodityComplement;
+                }
+
+                if (parameters.KeyDataPairs != null)
+                {
+                    decisionCommodityComplement.Weight =
+                        parameters.KeyDataPairs
+                            .Where(x => x.Key == "netweight")
+                            .Select(x => decimal.TryParse(x.Data, out var v) ? v : (decimal?)null)
+                            .FirstOrDefault();
+
+                    decisionCommodityComplement.Quantity =
+                        parameters.KeyDataPairs
+                            .Where(x => x.Key == "number_package")
+                            .Select(x => int.TryParse(x.Data, out var v) ? v : (int?)null)
+                            .FirstOrDefault();
                 }
 
                 if (
@@ -80,14 +101,11 @@ public static class ImportPreNotificationExtensions
                     && complementRiskAssessments.TryGetValue(parameters.UniqueComplementId, out var riskAssessmentValue)
                 )
                 {
-                    return new DecisionCommodityComplement
-                    {
-                        HmiDecision = riskAssessmentValue.HmiDecision,
-                        PhsiDecision = riskAssessmentValue.PhsiDecision,
-                    };
+                    decisionCommodityComplement.HmiDecision = riskAssessmentValue.HmiDecision;
+                    decisionCommodityComplement.PhsiDecision = riskAssessmentValue.PhsiDecision;
                 }
 
-                return new DecisionCommodityComplement();
+                return decisionCommodityComplement;
             })
             .ToArray();
 

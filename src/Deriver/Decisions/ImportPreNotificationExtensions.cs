@@ -1,4 +1,3 @@
-using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
@@ -68,45 +67,53 @@ public static class ImportPreNotificationExtensions
 
         decisionNotification.Commodities = commodities
             .CommodityComplements.Select(commodityComplement =>
-            {
-                var decisionCommodityComplement = new DecisionCommodityComplement
-                {
-                    Id = commodityComplement.ComplementId,
-                    CommodityCode = commodityComplement.CommodityId,
-                };
-
-                if (!complementParameters.TryGetValue(commodityComplement.ComplementId!.Value, out var parameters))
-                {
-                    return decisionCommodityComplement;
-                }
-
-                if (parameters.KeyDataPairs != null)
-                {
-                    decisionCommodityComplement.Weight = parameters
-                        .KeyDataPairs.Where(x => x.Key == "netweight")
-                        .Select(x => decimal.TryParse(x.Data, out var v) ? v : (decimal?)null)
-                        .FirstOrDefault();
-
-                    decisionCommodityComplement.Quantity = parameters
-                        .KeyDataPairs.Where(x => x.Key == "number_package")
-                        .Select(x => int.TryParse(x.Data, out var v) ? v : (int?)null)
-                        .FirstOrDefault();
-                }
-
-                if (
-                    complementRiskAssessments.Count != 0
-                    && parameters.UniqueComplementId is not null
-                    && complementRiskAssessments.TryGetValue(parameters.UniqueComplementId, out var riskAssessmentValue)
-                )
-                {
-                    decisionCommodityComplement.HmiDecision = riskAssessmentValue.HmiDecision;
-                    decisionCommodityComplement.PhsiDecision = riskAssessmentValue.PhsiDecision;
-                }
-
-                return decisionCommodityComplement;
-            })
+                CreateDecisionCommodityComplement(commodityComplement, complementParameters, complementRiskAssessments)
+            )
             .ToArray();
 
         return decisionNotification;
+    }
+
+    private static DecisionCommodityComplement CreateDecisionCommodityComplement(
+        CommodityComplements commodityComplement,
+        Dictionary<int, ComplementParameterSets> complementParameters,
+        Dictionary<string, CommodityRiskResult> complementRiskAssessments
+    )
+    {
+        var decisionCommodityComplement = new DecisionCommodityComplement
+        {
+            Id = commodityComplement.ComplementId,
+            CommodityCode = commodityComplement.CommodityId,
+        };
+
+        if (!complementParameters.TryGetValue(commodityComplement.ComplementId!.Value, out var parameters))
+        {
+            return decisionCommodityComplement;
+        }
+
+        if (parameters.KeyDataPairs != null)
+        {
+            decisionCommodityComplement.Weight = parameters
+                .KeyDataPairs.Where(x => x.Key == "netweight")
+                .Select(x => decimal.TryParse(x.Data, out var v) ? v : (decimal?)null)
+                .FirstOrDefault();
+
+            decisionCommodityComplement.Quantity = parameters
+                .KeyDataPairs.Where(x => x.Key == "number_package")
+                .Select(x => int.TryParse(x.Data, out var v) ? v : (int?)null)
+                .FirstOrDefault();
+        }
+
+        if (
+            complementRiskAssessments.Count != 0
+            && parameters.UniqueComplementId is not null
+            && complementRiskAssessments.TryGetValue(parameters.UniqueComplementId, out var riskAssessmentValue)
+        )
+        {
+            decisionCommodityComplement.HmiDecision = riskAssessmentValue.HmiDecision;
+            decisionCommodityComplement.PhsiDecision = riskAssessmentValue.PhsiDecision;
+        }
+
+        return decisionCommodityComplement;
     }
 }

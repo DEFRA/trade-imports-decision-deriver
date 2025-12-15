@@ -75,9 +75,9 @@ public static class ServiceCollectionExtensions
         services.Decorate<IDecisionFinder, CommodityCodeDecisionFinder>();
         services.Decorate<IDecisionFinder>(
             (inner, provider) =>
-                new CommodityWeightOrQualityDecisionFinder(
+                new CommodityWeightOrQuantityDecisionFinder(
                     inner,
-                    provider.GetRequiredService<ILogger<CommodityWeightOrQualityDecisionFinder>>()
+                    provider.GetRequiredService<ILogger<CommodityWeightOrQuantityDecisionFinder>>()
                 )
         );
 

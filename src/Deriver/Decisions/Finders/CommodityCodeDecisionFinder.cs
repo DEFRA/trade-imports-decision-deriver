@@ -9,6 +9,7 @@ public class CommodityCodeDecisionFinder(
 ) : IDecisionFinder
 {
     public string ChedType => innerDecisionFinder.ChedType;
+    public Type FinderType => innerDecisionFinder.FinderType;
 
     public bool CanFindDecision(DecisionImportPreNotification notification, CheckCode? checkCode, string? documentCode)
     {

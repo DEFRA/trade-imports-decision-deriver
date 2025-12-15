@@ -241,7 +241,7 @@ public class DecisionService(
     )
     {
         var finders = decisionFinders
-            .DistinctBy(x => x.GetType())
+            .DistinctBy(x => x.FinderType)
             .Where(x => x.CanFindDecision(notification, checkCode, documentCode))
             .ToArray();
 

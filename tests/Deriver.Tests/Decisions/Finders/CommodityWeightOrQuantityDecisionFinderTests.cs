@@ -6,7 +6,7 @@ using NSubstitute;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions.Finders;
 
-public class CommodityWeightOrQualityDecisionFinderTests
+public class CommodityWeightOrQuantityDecisionFinderTests
 {
     private static string GetFormattedMessageFromLoggerCall(ILogger logger, int callIndex = 0)
     {
@@ -27,8 +27,8 @@ public class CommodityWeightOrQualityDecisionFinderTests
     {
         var inner = Substitute.For<IDecisionFinder>();
         inner.ChedType.Returns("CHEDX");
-        var logger = Substitute.For<ILogger<CommodityWeightOrQualityDecisionFinder>>();
-        var sut = new CommodityWeightOrQualityDecisionFinder(inner, logger);
+        var logger = Substitute.For<ILogger<CommodityWeightOrQuantityDecisionFinder>>();
+        var sut = new CommodityWeightOrQuantityDecisionFinder(inner, logger);
 
         sut.ChedType.Should().Be("CHEDX");
     }
@@ -44,8 +44,8 @@ public class CommodityWeightOrQualityDecisionFinderTests
         };
         inner.CanFindDecision(notif, Arg.Any<CheckCode?>(), Arg.Any<string?>()).Returns(true);
 
-        var logger = Substitute.For<ILogger<CommodityWeightOrQualityDecisionFinder>>();
-        var sut = new CommodityWeightOrQualityDecisionFinder(inner, logger);
+        var logger = Substitute.For<ILogger<CommodityWeightOrQuantityDecisionFinder>>();
+        var sut = new CommodityWeightOrQuantityDecisionFinder(inner, logger);
 
         var result = sut.CanFindDecision(notif, null, null);
 
@@ -60,8 +60,8 @@ public class CommodityWeightOrQualityDecisionFinderTests
         inner
             .FindDecision(Arg.Any<DecisionImportPreNotification>(), Arg.Any<Commodity>(), Arg.Any<CheckCode?>())
             .Returns(new DecisionFinderResult(DecisionCode.X00, null));
-        var logger = Substitute.For<ILogger<CommodityWeightOrQualityDecisionFinder>>();
-        var sut = new CommodityWeightOrQualityDecisionFinder(inner, logger);
+        var logger = Substitute.For<ILogger<CommodityWeightOrQuantityDecisionFinder>>();
+        var sut = new CommodityWeightOrQuantityDecisionFinder(inner, logger);
 
         var notification = new DecisionImportPreNotification
         {
@@ -85,8 +85,8 @@ public class CommodityWeightOrQualityDecisionFinderTests
             .FindDecision(Arg.Any<DecisionImportPreNotification>(), Arg.Any<Commodity>(), Arg.Any<CheckCode?>())
             .Returns(new DecisionFinderResult(DecisionCode.C03, null));
 
-        var logger = Substitute.For<ILogger<CommodityWeightOrQualityDecisionFinder>>();
-        var sut = new CommodityWeightOrQualityDecisionFinder(inner, logger);
+        var logger = Substitute.For<ILogger<CommodityWeightOrQuantityDecisionFinder>>();
+        var sut = new CommodityWeightOrQuantityDecisionFinder(inner, logger);
 
         var notification = new DecisionImportPreNotification
         {
@@ -118,8 +118,8 @@ public class CommodityWeightOrQualityDecisionFinderTests
             .FindDecision(Arg.Any<DecisionImportPreNotification>(), Arg.Any<Commodity>(), Arg.Any<CheckCode?>())
             .Returns(new DecisionFinderResult(DecisionCode.C03, null));
 
-        var logger = Substitute.For<ILogger<CommodityWeightOrQualityDecisionFinder>>();
-        var sut = new CommodityWeightOrQualityDecisionFinder(inner, logger);
+        var logger = Substitute.For<ILogger<CommodityWeightOrQuantityDecisionFinder>>();
+        var sut = new CommodityWeightOrQuantityDecisionFinder(inner, logger);
 
         var notification = new DecisionImportPreNotification
         {
@@ -150,8 +150,8 @@ public class CommodityWeightOrQualityDecisionFinderTests
             .FindDecision(Arg.Any<DecisionImportPreNotification>(), Arg.Any<Commodity>(), Arg.Any<CheckCode?>())
             .Returns(new DecisionFinderResult(DecisionCode.C03, null));
 
-        var logger = Substitute.For<ILogger<CommodityWeightOrQualityDecisionFinder>>();
-        var sut = new CommodityWeightOrQualityDecisionFinder(inner, logger);
+        var logger = Substitute.For<ILogger<CommodityWeightOrQuantityDecisionFinder>>();
+        var sut = new CommodityWeightOrQuantityDecisionFinder(inner, logger);
 
         var notification = new DecisionImportPreNotification
         {
@@ -183,8 +183,8 @@ public class CommodityWeightOrQualityDecisionFinderTests
             .FindDecision(Arg.Any<DecisionImportPreNotification>(), Arg.Any<Commodity>(), Arg.Any<CheckCode?>())
             .Returns(new DecisionFinderResult(DecisionCode.C03, null));
 
-        var logger = Substitute.For<ILogger<CommodityWeightOrQualityDecisionFinder>>();
-        var sut = new CommodityWeightOrQualityDecisionFinder(inner, logger);
+        var logger = Substitute.For<ILogger<CommodityWeightOrQuantityDecisionFinder>>();
+        var sut = new CommodityWeightOrQuantityDecisionFinder(inner, logger);
 
         var notification = new DecisionImportPreNotification
         {

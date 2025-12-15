@@ -9,6 +9,7 @@ public abstract class DecisionFinder : IDecisionFinder
         CheckCode? checkCode
     );
 
+    public virtual Type FinderType => GetType();
     public abstract string ChedType { get; }
 
     public abstract bool CanFindDecision(

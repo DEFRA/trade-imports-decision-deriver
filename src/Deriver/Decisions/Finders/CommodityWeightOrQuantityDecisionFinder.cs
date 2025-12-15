@@ -3,11 +3,12 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 
-public class CommodityWeightOrQualityDecisionFinder(
+public class CommodityWeightOrQuantityDecisionFinder(
     IDecisionFinder innerDecisionFinder,
-    ILogger<CommodityWeightOrQualityDecisionFinder> logger
+    ILogger<CommodityWeightOrQuantityDecisionFinder> logger
 ) : IDecisionFinder
 {
+    public Type FinderType => innerDecisionFinder.FinderType;
     public string ChedType => innerDecisionFinder.ChedType;
 
     public bool CanFindDecision(DecisionImportPreNotification notification, CheckCode? checkCode, string? documentCode)

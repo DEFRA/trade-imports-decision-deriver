@@ -51,10 +51,41 @@ public class DecisionServiceTests
             matchingService,
             [
                 chedAFinder,
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedADecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedDDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new IuuDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
             ]
         );
 
@@ -99,11 +130,41 @@ public class DecisionServiceTests
             NullLogger<DecisionService>.Instance,
             matchingService,
             [
-                new ChedADecisionFinder(),
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedADecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedDDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new IuuDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
             ]
         );
 
@@ -150,11 +211,41 @@ public class DecisionServiceTests
             NullLogger<DecisionService>.Instance,
             matchingService,
             [
-                new ChedADecisionFinder(),
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedADecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedDDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new IuuDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
             ]
         );
 
@@ -245,11 +336,41 @@ public class DecisionServiceTests
             NullLogger<DecisionService>.Instance,
             new MatchingService(),
             [
-                new ChedADecisionFinder(),
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedADecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedDDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new IuuDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
             ]
         );
 
@@ -807,11 +928,41 @@ public class DecisionServiceTests
             NullLogger<DecisionService>.Instance,
             new MatchingService(),
             [
-                new ChedADecisionFinder(),
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedADecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedDDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new IuuDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
             ]
         );
 
@@ -904,11 +1055,41 @@ public class DecisionServiceTests
             NullLogger<DecisionService>.Instance,
             new MatchingService(),
             [
-                new ChedADecisionFinder(),
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedADecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedDDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new IuuDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
             ]
         );
 
@@ -1013,11 +1194,41 @@ public class DecisionServiceTests
             NullLogger<DecisionService>.Instance,
             new MatchingService(),
             [
-                new ChedADecisionFinder(),
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedADecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedDDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new IuuDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
             ]
         );
 

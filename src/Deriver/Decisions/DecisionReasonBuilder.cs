@@ -1,7 +1,6 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Gvms;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
@@ -24,21 +23,6 @@ public static class DecisionReasonBuilder
         Commodity item,
         DocumentDecisionResult maxDecisionResult,
         DocumentDecisionResult[] documentDecisions
-    )
-    {
-        var reasons = new List<string>();
-
-        HandleNoLinkedNotifications(item, maxDecisionResult, documentDecisions, reasons);
-        HandleHmiGmsDecisionReason(item, maxDecisionResult, reasons);
-
-        return reasons;
-    }
-
-    public static List<string> Build(
-        ClearanceRequest clearanceRequest,
-        Commodity item,
-        CheckDecisionResult maxDecisionResult,
-        CheckDecisionResult[] documentDecisions
     )
     {
         var reasons = new List<string>();

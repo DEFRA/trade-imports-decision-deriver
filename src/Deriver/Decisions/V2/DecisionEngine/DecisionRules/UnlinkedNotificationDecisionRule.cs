@@ -1,5 +1,3 @@
-using static Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionCommodityCheck;
-
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine.DecisionRules;
 
 public sealed class UnlinkedNotificationDecisionRule : IDecisionRule

@@ -57,15 +57,13 @@ public class ImportPreNotificationConsumerTests
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
         var decisionService = Substitute.For<IDecisionService>();
+        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             decisionService,
             apiClient,
             new TestCorrelationIdGenerator("CorrelationId"),
-            new DecisionServiceV2(
-                new Deriver.Decisions.V2.ClearanceDecisionBuilder(new CorrelationIdGenerator()),
-                new CheckProcessor(new TestDecisionRulesEngineFactory())
-            )
+            decisionServicev2
         );
 
         var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
@@ -105,15 +103,13 @@ public class ImportPreNotificationConsumerTests
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
         var decisionService = Substitute.For<IDecisionService>();
+        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             decisionService,
             apiClient,
             new TestCorrelationIdGenerator("CorrelationId"),
-            new DecisionServiceV2(
-                new Deriver.Decisions.V2.ClearanceDecisionBuilder(new CorrelationIdGenerator()),
-                new CheckProcessor(new TestDecisionRulesEngineFactory())
-            )
+            decisionServicev2
         );
 
         var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
@@ -153,15 +149,13 @@ public class ImportPreNotificationConsumerTests
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
         var decisionService = Substitute.For<IDecisionService>();
+        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             decisionService,
             apiClient,
             new TestCorrelationIdGenerator("CorrelationId"),
-            new DecisionServiceV2(
-                new Deriver.Decisions.V2.ClearanceDecisionBuilder(new CorrelationIdGenerator()),
-                new CheckProcessor(new TestDecisionRulesEngineFactory())
-            )
+            decisionServicev2
         );
 
         var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
@@ -275,15 +269,13 @@ public class ImportPreNotificationConsumerTests
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
         var decisionService = Substitute.For<IDecisionService>();
+        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             decisionService,
             apiClient,
             new TestCorrelationIdGenerator("CorrelationId"),
-            new DecisionServiceV2(
-                new Deriver.Decisions.V2.ClearanceDecisionBuilder(new CorrelationIdGenerator()),
-                new CheckProcessor(new TestDecisionRulesEngineFactory())
-            )
+            decisionServicev2
         );
 
         var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();

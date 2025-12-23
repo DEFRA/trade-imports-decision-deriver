@@ -7,6 +7,9 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine.DecisionRules;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
 using Defra.TradeImportsDecisionDeriver.Deriver.Serializers;
@@ -81,7 +84,26 @@ public static class ServiceCollectionExtensions
                 )
         );
 
+        //V2 of Decision Making
         services.AddSingleton<ICorrelationIdGenerator, CorrelationIdGenerator>();
+        services.AddSingleton<IDecisionServiceV2, DecisionServiceV2>();
+        services.AddSingleton<ICheckProcessor, CheckProcessor>();
+        services.AddSingleton<IDecisionRulesEngineFactory, DecisionRulesEngineFactory>();
+
+        // Register all IDecisionRule implementations
+        services.AddSingleton<IDecisionRule, UnlinkedNotificationDecisionRule>();
+        services.AddSingleton<IDecisionRule, WrongChedTypeDecisionRule>();
+        services.AddSingleton<IDecisionRule, MissingPartTwoDecisionRule>();
+        services.AddSingleton<IDecisionRule, TerminalStatusDecisionRule>();
+        services.AddSingleton<IDecisionRule, AmendDecisionRule>();
+        services.AddSingleton<IDecisionRule, InspectionRequiredDecisionRule>();
+        services.AddSingleton<IDecisionRule, CvedaDecisionRule>();
+        services.AddSingleton<IDecisionRule, CvedpIuuCheckRule>();
+        services.AddSingleton<IDecisionRule, CvedpDecisionRule>();
+        services.AddSingleton<IDecisionRule, ChedppDecisionRule>();
+        services.AddSingleton<IDecisionRule, CedDecisionRule>();
+        services.AddSingleton<IDecisionRule, CommodityCodeValidationRule>();
+        services.AddSingleton<IDecisionRule, CommodityWeightOrQuantityValidationRule>();
 
         // Order of interceptors is important here
         services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(TraceContextInterceptor<>));

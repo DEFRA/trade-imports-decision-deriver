@@ -1,8 +1,12 @@
+using System.Text.Json;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
+using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
@@ -14,7 +18,8 @@ public class ClearanceRequestConsumer(
     ILogger<ClearanceRequestConsumer> logger,
     IDecisionService decisionService,
     ITradeImportsDataApiClient apiClient,
-    ICorrelationIdGenerator correlationIdGenerator
+    ICorrelationIdGenerator correlationIdGenerator,
+    IDecisionServiceV2 decisionServiceV2
 ) : IConsumer<ResourceEvent<CustomsDeclarationEvent>>, IConsumerWithContext
 {
     public async Task OnHandle(ResourceEvent<CustomsDeclarationEvent> message, CancellationToken cancellationToken)
@@ -62,6 +67,77 @@ public class ClearanceRequestConsumer(
             .ImportPreNotifications.Select(x => x.ImportPreNotification)
             .ToList();
 
+        var (v1Result, v1Elapsed) = await TimingExtensions.TimeAsync(() =>
+            RunV1(message, cancellationToken, preNotifications, clearanceRequest)
+        );
+
+        var (v2Result, v2Elapsed) = TimingExtensions.Time(() => RunV2(message, preNotifications, clearanceRequest));
+
+        logger.LogInformation("V1 Took {V1Elapsed} - V2 took {V2Elapsed}", v1Elapsed, v2Elapsed);
+
+        if (!v1Result.ClearanceDecision.IsSameAs(v2Result))
+        {
+            logger.LogInformation(
+                "V1 {V1} - V2 {V2}",
+                JsonSerializer.Serialize(v1Result),
+                JsonSerializer.Serialize(v2Result)
+            );
+        }
+
+        if (v1Result.ShouldPersist)
+        {
+            var customsDeclaration = new CustomsDeclaration
+            {
+                ClearanceDecision = v1Result.ClearanceDecision,
+                Finalisation = clearanceRequest?.Finalisation,
+                ClearanceRequest = clearanceRequest?.ClearanceRequest,
+                ExternalErrors = clearanceRequest?.ExternalErrors,
+            };
+
+            await apiClient.PutCustomsDeclaration(
+                message.ResourceId,
+                customsDeclaration,
+                clearanceRequest?.ETag,
+                cancellationToken
+            );
+        }
+        else
+        {
+            logger.LogInformation("Decision already exists, not persisting");
+        }
+    }
+
+    private ClearanceDecision? RunV2(
+        ResourceEvent<CustomsDeclarationEvent> message,
+        List<ImportPreNotification> preNotifications,
+        CustomsDeclarationResponse? clearanceRequest
+    )
+    {
+        var newResults = decisionServiceV2.Process(
+            new DecisionContextV2(
+                preNotifications.Select(x => x.ToDecisionImportPreNotification()).ToList(),
+                [
+                    new CustomsDeclarationWrapper(
+                        message.ResourceId,
+                        new CustomsDeclaration()
+                        {
+                            ClearanceDecision = clearanceRequest?.ClearanceDecision,
+                            ClearanceRequest = clearanceRequest?.ClearanceRequest,
+                        }
+                    ),
+                ]
+            )
+        );
+        return newResults.FirstOrDefault().Decision;
+    }
+
+    private async Task<(ClearanceDecision? ClearanceDecision, bool ShouldPersist)> RunV1(
+        ResourceEvent<CustomsDeclarationEvent> message,
+        CancellationToken cancellationToken,
+        List<ImportPreNotification> preNotifications,
+        CustomsDeclarationResponse? clearanceRequest
+    )
+    {
         var decisionContext = new DecisionContext(
             preNotifications.Select(x => x.ToDecisionImportPreNotification()).ToList(),
             [new ClearanceRequestWrapper(message.ResourceId, clearanceRequest!.ClearanceRequest!)]
@@ -72,18 +148,17 @@ public class ClearanceRequestConsumer(
         {
             logger.LogInformation("No decision derived");
 
-            return;
+            return (null, false);
         }
 
         logger.LogInformation("Decision derived");
 
-        await PersistDecision(clearanceRequest, decisionResult, cancellationToken);
+        return BuildDecision(clearanceRequest, decisionResult);
     }
 
-    private async Task PersistDecision(
+    private (ClearanceDecision ClearanceDecision, bool ShouldPersist) BuildDecision(
         CustomsDeclarationResponse existingCustomsDeclaration,
-        DecisionResult decisionResult,
-        CancellationToken cancellationToken
+        DecisionResult decisionResult
     )
     {
         var customsDeclaration = new CustomsDeclaration
@@ -100,21 +175,8 @@ public class ClearanceRequestConsumer(
             correlationIdGenerator
         );
 
-        if (!newDecision.IsSameAs(customsDeclaration.ClearanceDecision))
-        {
-            customsDeclaration.ClearanceDecision = newDecision;
-
-            await apiClient.PutCustomsDeclaration(
-                existingCustomsDeclaration.MovementReferenceNumber,
-                customsDeclaration,
-                existingCustomsDeclaration.ETag,
-                cancellationToken
-            );
-        }
-        else
-        {
-            logger.LogInformation("Decision already exists, not persisting");
-        }
+        var shouldPersist = !newDecision.IsSameAs(existingCustomsDeclaration.ClearanceDecision);
+        return (newDecision, shouldPersist);
     }
 
     public IConsumerContext Context { get; set; } = null!;

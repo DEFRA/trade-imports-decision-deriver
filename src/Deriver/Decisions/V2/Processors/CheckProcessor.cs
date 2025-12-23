@@ -45,8 +45,8 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
 
             foundValidDocument = true;
 
-            var documentCode = document?.DocumentCode!;
-            var documentIdentifier = document?.GetDocumentReferenceIdentifier();
+            var documentCode = document.DocumentCode!;
+            var documentIdentifier = document.GetDocumentReferenceIdentifier();
 
             var notifications = FindDecisionImportPreNotification(
                 context.Notifications,
@@ -71,7 +71,7 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                         notification,
                         clearanceRequest.MovementReferenceNumber,
                         commodity.ItemNumber!.Value,
-                        document?.DocumentReference?.Value,
+                        document.DocumentReference?.Value,
                         documentCode,
                         checkCodeValue,
                         result.Code,

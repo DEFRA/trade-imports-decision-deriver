@@ -7,6 +7,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine.DecisionRules;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
@@ -26,6 +27,7 @@ using SlimMessageBus.Host;
 using SlimMessageBus.Host.AmazonSQS;
 using SlimMessageBus.Host.Interceptor;
 using SlimMessageBus.Host.Serialization;
+using ClearanceDecisionBuilder = Defra.TradeImportsDecisionDeriver.Deriver.Decisions.ClearanceDecisionBuilder;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
@@ -89,21 +91,26 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IDecisionServiceV2, DecisionServiceV2>();
         services.AddSingleton<ICheckProcessor, CheckProcessor>();
         services.AddSingleton<IDecisionRulesEngineFactory, DecisionRulesEngineFactory>();
+        services.AddSingleton<
+            IClearanceDecisionBuilder,
+            Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.ClearanceDecisionBuilder
+        >();
 
         // Register all IDecisionRule implementations
-        services.AddSingleton<IDecisionRule, UnlinkedNotificationDecisionRule>();
-        services.AddSingleton<IDecisionRule, WrongChedTypeDecisionRule>();
-        services.AddSingleton<IDecisionRule, MissingPartTwoDecisionRule>();
-        services.AddSingleton<IDecisionRule, TerminalStatusDecisionRule>();
-        services.AddSingleton<IDecisionRule, AmendDecisionRule>();
-        services.AddSingleton<IDecisionRule, InspectionRequiredDecisionRule>();
-        services.AddSingleton<IDecisionRule, CvedaDecisionRule>();
-        services.AddSingleton<IDecisionRule, CvedpIuuCheckRule>();
-        services.AddSingleton<IDecisionRule, CvedpDecisionRule>();
-        services.AddSingleton<IDecisionRule, ChedppDecisionRule>();
-        services.AddSingleton<IDecisionRule, CedDecisionRule>();
-        services.AddSingleton<IDecisionRule, CommodityCodeValidationRule>();
-        services.AddSingleton<IDecisionRule, CommodityWeightOrQuantityValidationRule>();
+        services.AddSingleton<OrphanCheckCodeDecisionRule>();
+        services.AddSingleton<UnlinkedNotificationDecisionRule>();
+        services.AddSingleton<WrongChedTypeDecisionRule>();
+        services.AddSingleton<MissingPartTwoDecisionRule>();
+        services.AddSingleton<TerminalStatusDecisionRule>();
+        services.AddSingleton<AmendDecisionRule>();
+        services.AddSingleton<InspectionRequiredDecisionRule>();
+        services.AddSingleton<CvedaDecisionRule>();
+        services.AddSingleton<CvedpIuuCheckRule>();
+        services.AddSingleton<CvedpDecisionRule>();
+        services.AddSingleton<ChedppDecisionRule>();
+        services.AddSingleton<CedDecisionRule>();
+        services.AddSingleton<CommodityCodeValidationRule>();
+        services.AddSingleton<CommodityWeightOrQuantityValidationRule>();
 
         // Order of interceptors is important here
         services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(TraceContextInterceptor<>));

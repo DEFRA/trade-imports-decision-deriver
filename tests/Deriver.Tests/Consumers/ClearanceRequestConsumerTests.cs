@@ -3,9 +3,16 @@ using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine.DecisionRules;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
+using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using ClearanceDecisionBuilder = Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.ClearanceDecisionBuilder;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Consumers;
 
@@ -19,11 +26,13 @@ public class ClearanceRequestConsumerTests
         customsDeclaration = customsDeclaration with { Finalisation = null };
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
         var decisionService = Substitute.For<IDecisionService>();
+        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             decisionService,
             apiClient,
-            new TestCorrelationIdGenerator("CorrelationId")
+            new TestCorrelationIdGenerator("CorrelationId"),
+            decisionServicev2
         );
 
         var createdEvent = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();
@@ -104,11 +113,13 @@ public class ClearanceRequestConsumerTests
 
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
         var decisionService = Substitute.For<IDecisionService>();
+        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             decisionService,
             apiClient,
-            new TestCorrelationIdGenerator("CorrelationId")
+            new TestCorrelationIdGenerator("CorrelationId"),
+            decisionServicev2
         );
 
         var createdEvent = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();
@@ -163,7 +174,11 @@ public class ClearanceRequestConsumerTests
             NullLogger<ClearanceRequestConsumer>.Instance,
             decisionService,
             apiClient,
-            new TestCorrelationIdGenerator("CorrelationId")
+            new TestCorrelationIdGenerator("CorrelationId"),
+            new DecisionServiceV2(
+                new Deriver.Decisions.V2.ClearanceDecisionBuilder(new CorrelationIdGenerator()),
+                new CheckProcessor(new TestDecisionRulesEngineFactory())
+            )
         );
 
         var createdEvent = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();
@@ -189,11 +204,13 @@ public class ClearanceRequestConsumerTests
         customsDeclaration.Finalisation!.MessageSentAt = DateTime.UtcNow;
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
         var decisionService = Substitute.For<IDecisionService>();
+        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             decisionService,
             apiClient,
-            new TestCorrelationIdGenerator("CorrelationId")
+            new TestCorrelationIdGenerator("CorrelationId"),
+            decisionServicev2
         );
 
         var createdEvent = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();
@@ -209,6 +226,14 @@ public class ClearanceRequestConsumerTests
         var decisionResult = new DecisionResult();
         decisionResult.AddDecision("mrn", 1, "docref", "docCode", "checkCode", DecisionCode.C03);
         decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
+        decisionServicev2
+            .Process(Arg.Any<DecisionContextV2>())
+            .Returns(
+                new List<(string, ClearanceDecision)>()
+                {
+                    new ValueTuple<string, ClearanceDecision>("mrn", new ClearanceDecision() { Items = [] }),
+                }
+            );
 
         // ACT
         await consumer.OnHandle(createdEvent, CancellationToken.None);
@@ -225,11 +250,13 @@ public class ClearanceRequestConsumerTests
         customsDeclaration = customsDeclaration with { Finalisation = null };
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
         var decisionService = Substitute.For<IDecisionService>();
+        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             decisionService,
             apiClient,
-            new TestCorrelationIdGenerator("CorrelationId")
+            new TestCorrelationIdGenerator("CorrelationId"),
+            decisionServicev2
         );
 
         var createdEvent = ClearanceRequestFixtures.ClearanceRequestCreatedFixture();

@@ -1,3 +1,4 @@
+using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
@@ -174,7 +175,7 @@ public class ChedPDecisionFinderTests
         };
         var sut = new ChedPDecisionFinder();
 
-        var result = sut.FindDecision(notification, null);
+        var result = sut.FindDecision(notification, new Commodity(), null);
 
         result.DecisionCode.Should().Be(expectedCode);
         result.InternalDecisionCode.Should().Be(expectedFurtherDetail);
@@ -197,7 +198,7 @@ public class ChedPDecisionFinderTests
         };
         var sut = new ChedPDecisionFinder();
 
-        var result = sut.FindDecision(notification, new CheckCode() { Value = "H221" });
+        var result = sut.FindDecision(notification, new Commodity(), new CheckCode() { Value = "H221" });
 
         result.DecisionCode.Should().Be(DecisionCode.H01);
     }
@@ -219,7 +220,7 @@ public class ChedPDecisionFinderTests
         };
         var sut = new ChedPDecisionFinder();
 
-        var result = sut.FindDecision(notification, new CheckCode() { Value = "H221" });
+        var result = sut.FindDecision(notification, new Commodity(), new CheckCode() { Value = "H221" });
 
         result.DecisionCode.Should().Be(DecisionCode.H02);
     }
@@ -235,7 +236,7 @@ public class ChedPDecisionFinderTests
         };
         var sut = new ChedPDecisionFinder();
 
-        var result = sut.FindDecision(notification, null);
+        var result = sut.FindDecision(notification, new Commodity(), null);
 
         result.DecisionCode.Should().Be(DecisionCode.H01);
         result.InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E88);

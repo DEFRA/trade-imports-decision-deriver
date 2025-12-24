@@ -2,11 +2,19 @@ using System.Linq;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
+using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
+using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
+using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Xunit.Abstractions;
+using ClearanceDecisionBuilder = Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.ClearanceDecisionBuilder;
 
 // ReSharper disable InconsistentNaming
 
@@ -43,7 +51,7 @@ public class DecisionServiceTests
             .CanFindDecision(decisionContext.Notifications[0], Arg.Any<CheckCode>(), Arg.Any<string>())
             .Returns(true);
         chedAFinder
-            .FindDecision(decisionContext.Notifications[0], Arg.Any<CheckCode>())
+            .FindDecision(decisionContext.Notifications[0], Arg.Any<Commodity>(), Arg.Any<CheckCode>())
             .Returns(new DecisionFinderResult(expectedDecisionCode, new CheckCode { Value = checkCode[0] }));
 
         var sut = new DecisionService(
@@ -51,10 +59,41 @@ public class DecisionServiceTests
             matchingService,
             [
                 chedAFinder,
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedADecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedDDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new IuuDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
             ]
         );
 
@@ -95,19 +134,7 @@ public class DecisionServiceTests
             ]
         );
 
-        var sut = new DecisionService(
-            NullLogger<DecisionService>.Instance,
-            matchingService,
-            [
-                new ChedADecisionFinder(),
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
-            ]
-        );
-
-        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+        var decisionResult = await RunBothVersions(decisionContext);
 
         decisionResult.Decisions.Should().HaveCount(1);
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
@@ -146,19 +173,7 @@ public class DecisionServiceTests
             ]
         );
 
-        var sut = new DecisionService(
-            NullLogger<DecisionService>.Instance,
-            matchingService,
-            [
-                new ChedADecisionFinder(),
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
-            ]
-        );
-
-        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+        var decisionResult = await RunBothVersions(decisionContext);
 
         decisionResult.Decisions.Should().HaveCount(1);
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
@@ -241,19 +256,7 @@ public class DecisionServiceTests
             ]
         );
 
-        var sut = new DecisionService(
-            NullLogger<DecisionService>.Instance,
-            new MatchingService(),
-            [
-                new ChedADecisionFinder(),
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
-            ]
-        );
-
-        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+        var decisionResult = await RunBothVersions(decisionContext);
 
         decisionResult.Decisions.Max(x => x.DecisionCode).Should().Be(DecisionCode.H01);
     }
@@ -281,6 +284,15 @@ public class DecisionServiceTests
                         new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "Auto cleared" },
                     ],
                     HasPartTwo = true,
+                    Commodities =
+                    [
+                        new DecisionCommodityComplement()
+                        {
+                            Id = 1,
+                            Weight = 56,
+                            CommodityCode = "020711",
+                        },
+                    ],
                 },
                 new DecisionImportPreNotification()
                 {
@@ -360,19 +372,7 @@ public class DecisionServiceTests
             ]
         );
 
-        var sut = new DecisionService(
-            NullLogger<DecisionService>.Instance,
-            new MatchingService(),
-            [
-                new ChedADecisionFinder(),
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
-            ]
-        );
-
-        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+        var decisionResult = await RunBothVersions(decisionContext);
 
         decisionResult.Decisions.Count.Should().Be(3);
         decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.N01);
@@ -444,19 +444,7 @@ public class DecisionServiceTests
             ]
         );
 
-        var sut = new DecisionService(
-            NullLogger<DecisionService>.Instance,
-            new MatchingService(),
-            [
-                new ChedADecisionFinder(),
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
-            ]
-        );
-
-        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+        var decisionResult = await RunBothVersions(decisionContext);
 
         decisionResult.Decisions.Max(x => x.DecisionCode).Should().Be(DecisionCode.X00);
     }
@@ -582,20 +570,8 @@ public class DecisionServiceTests
             hmiStatus
         );
 
-        var sut = new DecisionService(
-            NullLogger<DecisionService>.Instance,
-            matchingService,
-            [
-                new ChedADecisionFinder(),
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
-            ]
-        );
-
         // Act
-        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+        var decisionResult = await RunBothVersions(decisionContext);
 
         // Assert
         decisionResult.Decisions.Should().NotBeEmpty();
@@ -700,20 +676,8 @@ public class DecisionServiceTests
             ]
         );
 
-        var sut = new DecisionService(
-            NullLogger<DecisionService>.Instance,
-            new MatchingService(),
-            [
-                new ChedADecisionFinder(),
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
-            ]
-        );
-
         // Act
-        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+        var decisionResult = await RunBothVersions(decisionContext);
 
         // Assert
 
@@ -794,20 +758,8 @@ public class DecisionServiceTests
             ]
         );
 
-        var sut = new DecisionService(
-            NullLogger<DecisionService>.Instance,
-            new MatchingService(),
-            [
-                new ChedADecisionFinder(),
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
-            ]
-        );
-
         // Act
-        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+        var decisionResult = await RunBothVersions(decisionContext);
 
         // Assert
 
@@ -891,20 +843,8 @@ public class DecisionServiceTests
             ]
         );
 
-        var sut = new DecisionService(
-            NullLogger<DecisionService>.Instance,
-            new MatchingService(),
-            [
-                new ChedADecisionFinder(),
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
-            ]
-        );
-
         // Act
-        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+        var decisionResult = await RunBothVersions(decisionContext);
 
         // Assert
         decisionResult.Should().NotBeNull();
@@ -920,6 +860,93 @@ public class DecisionServiceTests
         decisionResult.Decisions[2].CheckCode.Should().Be("H219");
         decisionResult.Decisions[2].DecisionCode.Should().Be(DecisionCode.H01);
         decisionResult.Decisions[2].DocumentCode.Should().Be("9115");
+    }
+
+    private async Task<DecisionResult> RunBothVersions(DecisionContext decisionContext)
+    {
+        var sut = new DecisionService(
+            NullLogger<DecisionService>.Instance,
+            new MatchingService(),
+            [
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedADecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedDDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new IuuDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+            ]
+        );
+
+        var (decisionResult, v1Elapsed) = await TimingExtensions.TimeAsync(() =>
+            sut.Process(decisionContext, CancellationToken.None)
+        );
+
+        var v1Decision = decisionResult.BuildClearanceDecision(
+            decisionContext.ClearanceRequests[0].MovementReferenceNumber,
+            new CustomsDeclaration() { ClearanceRequest = decisionContext.ClearanceRequests[0].ClearanceRequest },
+            new TestCorrelationIdGenerator("TEST")
+        );
+
+        var decisionServiceV2 = new DecisionServiceV2(
+            new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
+            new CheckProcessor(new TestDecisionRulesEngineFactory())
+        );
+
+        var (newDecisionResult, v2Elapsed) = TimingExtensions.Time(() =>
+            decisionServiceV2
+                .Process(
+                    new DecisionContextV2(
+                        decisionContext.Notifications,
+                        [
+                            new CustomsDeclarationWrapper(
+                                decisionContext.ClearanceRequests[0].MovementReferenceNumber,
+                                new CustomsDeclaration()
+                                {
+                                    ClearanceRequest = decisionContext.ClearanceRequests[0].ClearanceRequest,
+                                }
+                            ),
+                        ]
+                    )
+                )
+                .ToList()
+        );
+
+        v1Decision.IsSameAs(newDecisionResult[0].Decision).Should().BeTrue();
+
+        var percentIncrease = (v1Elapsed - v2Elapsed).TotalMilliseconds / v1Elapsed.TotalMilliseconds * 100;
+        output.WriteLine($"V1 {v1Elapsed}");
+        output.WriteLine($"V2 {v2Elapsed}");
+        output.WriteLine($"V2 {percentIncrease}% quicker");
+        return decisionResult;
     }
 
     [Fact]
@@ -948,6 +975,15 @@ public class DecisionServiceTests
                         new DecisionCommodityCheck.Check() { Type = "HMI", Status = "Auto cleared" },
                     ],
                     HasPartTwo = true,
+                    Commodities =
+                    [
+                        new DecisionCommodityComplement()
+                        {
+                            Id = 1,
+                            Weight = 56,
+                            CommodityCode = "020711",
+                        },
+                    ],
                 },
             ],
             [
@@ -960,6 +996,8 @@ public class DecisionServiceTests
                             new Commodity
                             {
                                 ItemNumber = 1,
+                                TaricCommodityCode = "0207119000",
+                                NetMass = 56,
                                 Documents =
                                 [
                                     new ImportDocument()
@@ -993,11 +1031,41 @@ public class DecisionServiceTests
             NullLogger<DecisionService>.Instance,
             new MatchingService(),
             [
-                new ChedADecisionFinder(),
-                new ChedDDecisionFinder(),
-                new ChedPDecisionFinder(),
-                new ChedPPDecisionFinder(),
-                new IuuDecisionFinder(),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedADecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedDDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new ChedPPDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
+                new CommodityWeightOrQuantityDecisionFinder(
+                    new CommodityCodeDecisionFinder(
+                        new IuuDecisionFinder(),
+                        NullLogger<CommodityCodeDecisionFinder>.Instance
+                    ),
+                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
+                ),
             ]
         );
 

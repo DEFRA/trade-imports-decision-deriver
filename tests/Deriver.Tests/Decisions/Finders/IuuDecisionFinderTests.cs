@@ -1,3 +1,4 @@
+using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
@@ -74,7 +75,7 @@ public class IuuDecisionFinderTests
         };
         var sut = new IuuDecisionFinder();
 
-        var result = sut.FindDecision(notification, new CheckCode { Value = CheckCode.IuuCheckCode });
+        var result = sut.FindDecision(notification, new Commodity(), new CheckCode { Value = CheckCode.IuuCheckCode });
 
         result.DecisionCode.Should().Be(expectedDecisionCode);
         result.InternalDecisionCode.Should().Be(expectedFurtherDetail);

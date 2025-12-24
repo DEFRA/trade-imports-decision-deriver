@@ -62,6 +62,14 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output, WireMock
         );
         customsDeclarationResponse = customsDeclarationResponse with { Finalisation = null };
 
+        foreach (var commodity in customsDeclarationResponse.ClearanceRequest?.Commodities!)
+        {
+            foreach (var check in commodity.Checks!)
+            {
+                check.CheckCode = "H219";
+            }
+        }
+
         var createPath = $"/customs-declarations/{customsDeclaration.ResourceId}";
         var mappingBuilder = _wireMockAdminApi.GetMappingBuilder();
 
@@ -127,6 +135,14 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output, WireMock
             customsDeclaration.ResourceId
         );
         customsDeclarationResponse = customsDeclarationResponse with { Finalisation = null };
+
+        foreach (var commodity in customsDeclarationResponse?.ClearanceRequest?.Commodities!)
+        {
+            foreach (var check in commodity.Checks!)
+            {
+                check.CheckCode = "H219";
+            }
+        }
 
         var createPath = $"/customs-declarations/{customsDeclaration.ResourceId}";
         var mappingBuilder = _wireMockAdminApi.GetMappingBuilder();

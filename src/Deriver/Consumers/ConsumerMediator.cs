@@ -1,6 +1,7 @@
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
@@ -13,7 +14,8 @@ public class ConsumerMediator(
     ILoggerFactory loggerFactory,
     IDecisionService decisionService,
     ITradeImportsDataApiClient apiClient,
-    ICorrelationIdGenerator correlationIdGenerator
+    ICorrelationIdGenerator correlationIdGenerator,
+    IDecisionServiceV2 decisionServiceV2
 ) : IConsumer<string>, IConsumerWithContext
 {
     private readonly ILogger<ConsumerMediator> _logger = loggerFactory.CreateLogger<ConsumerMediator>();
@@ -43,7 +45,8 @@ public class ConsumerMediator(
             loggerFactory.CreateLogger<ImportPreNotificationConsumer>(),
             decisionService,
             apiClient,
-            correlationIdGenerator
+            correlationIdGenerator,
+            decisionServiceV2
         )
         {
             Context = Context,
@@ -63,7 +66,8 @@ public class ConsumerMediator(
             loggerFactory.CreateLogger<ClearanceRequestConsumer>(),
             decisionService,
             apiClient,
-            correlationIdGenerator
+            correlationIdGenerator,
+            decisionServiceV2
         )
         {
             Context = Context,

@@ -20,3 +20,11 @@ public record ClearanceRequestWrapper(string MovementReferenceNumber, ClearanceR
         return $"{MovementReferenceNumber}_{ClearanceRequest.GetVersion()}";
     }
 }
+
+public record CustomsDeclarationWrapper(string MovementReferenceNumber, CustomsDeclaration CustomsDeclaration)
+{
+    public string GetVersion()
+    {
+        return $"{MovementReferenceNumber}_{CustomsDeclaration.ClearanceRequest.GetVersion()}";
+    }
+}

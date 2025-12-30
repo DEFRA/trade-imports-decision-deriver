@@ -1,4 +1,4 @@
-﻿using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
+using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
 
@@ -41,8 +41,7 @@ public static class DecisionReasonBuilderV2
     )
     {
         if (
-            item.Documents != null
-            && item.Documents.Any()
+            item.Documents is { Length: > 0 }
             && maxDecisionResult.DecisionCode == DecisionCode.X00
             && maxDecisionResult.CheckCode != "H220"
         )

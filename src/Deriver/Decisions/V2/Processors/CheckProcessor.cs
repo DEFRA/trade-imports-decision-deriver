@@ -65,7 +65,7 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                     document
                 );
 
-                var result = decisionEngine.Resolve(resolverContext);
+                var result = decisionEngine.Run(resolverContext);
                 output.Add(
                     new CheckDecisionResult(
                         notification,
@@ -92,7 +92,7 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                 null
             );
 
-            var result = decisionEngine.Resolve(resolverContext);
+            var result = decisionEngine.Run(resolverContext);
             output.Add(
                 new CheckDecisionResult(
                     null,

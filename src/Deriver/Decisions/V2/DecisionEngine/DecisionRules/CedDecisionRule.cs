@@ -2,7 +2,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine.
 
 public sealed class CedDecisionRule : IDecisionRule
 {
-    public DecisionResolutionResult Execute(DecisionResolutionContext context, DecisionRuleDelegate next)
+    public DecisionEngineResult Execute(DecisionResolutionContext context, DecisionRuleDelegate next)
     {
         var notification = context.Notification;
 
@@ -11,8 +11,8 @@ public sealed class CedDecisionRule : IDecisionRule
             return notification.ConsignmentDecision switch
             {
                 ConsignmentDecision.AcceptableForInternalMarket or ConsignmentDecision.AcceptableForNonInternalMarket =>
-                    new DecisionResolutionResult(DecisionCode.C03),
-                _ => new DecisionResolutionResult(DecisionCode.X00, DecisionInternalFurtherDetail.E96),
+                    new DecisionEngineResult(DecisionCode.C03),
+                _ => new DecisionEngineResult(DecisionCode.X00, DecisionInternalFurtherDetail.E96),
             };
         }
 
@@ -20,19 +20,19 @@ public sealed class CedDecisionRule : IDecisionRule
         {
             return notification.NotAcceptableAction switch
             {
-                DecisionNotAcceptableAction.Destruction => new DecisionResolutionResult(DecisionCode.N02),
-                DecisionNotAcceptableAction.Redispatching => new DecisionResolutionResult(DecisionCode.N04),
-                DecisionNotAcceptableAction.Transformation => new DecisionResolutionResult(DecisionCode.N03),
-                DecisionNotAcceptableAction.Other => new DecisionResolutionResult(DecisionCode.N07),
-                _ => new DecisionResolutionResult(DecisionCode.X00, DecisionInternalFurtherDetail.E97),
+                DecisionNotAcceptableAction.Destruction => new DecisionEngineResult(DecisionCode.N02),
+                DecisionNotAcceptableAction.Redispatching => new DecisionEngineResult(DecisionCode.N04),
+                DecisionNotAcceptableAction.Transformation => new DecisionEngineResult(DecisionCode.N03),
+                DecisionNotAcceptableAction.Other => new DecisionEngineResult(DecisionCode.N07),
+                _ => new DecisionEngineResult(DecisionCode.X00, DecisionInternalFurtherDetail.E97),
             };
         }
 
         if (notification.NotAcceptableReasons?.Length > 0)
         {
-            return new DecisionResolutionResult(DecisionCode.N04);
+            return new DecisionEngineResult(DecisionCode.N04);
         }
 
-        return new DecisionResolutionResult(DecisionCode.X00, DecisionInternalFurtherDetail.E99);
+        return new DecisionEngineResult(DecisionCode.X00, DecisionInternalFurtherDetail.E99);
     }
 }

@@ -2,7 +2,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine;
 
 public sealed class DecisionRulesEngine(IReadOnlyList<IDecisionRule> rules, ILogger<DecisionRulesEngine> logger)
 {
-    public DecisionResolutionResult Resolve(DecisionResolutionContext context)
+    public DecisionEngineResult Run(DecisionResolutionContext context)
     {
         var pipeline = BuildRules(rules);
         context.Logger = logger;
@@ -11,7 +11,7 @@ public sealed class DecisionRulesEngine(IReadOnlyList<IDecisionRule> rules, ILog
 
     private static DecisionRuleDelegate BuildRules(IReadOnlyList<IDecisionRule> rules)
     {
-        DecisionRuleDelegate pipeline = _ => DecisionResolutionResult.UnknownDecision;
+        DecisionRuleDelegate pipeline = _ => DecisionEngineResult.UnknownDecision;
 
         for (int i = rules.Count - 1; i >= 0; i--)
         {

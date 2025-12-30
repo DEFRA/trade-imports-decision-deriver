@@ -25,7 +25,7 @@ public class CommodityWeightOrQuantityValidationRuleTests
     public void Execute_WhenResultCodeIsNotReleaseOrHold_ReturnsResultFromNextDelegate()
     {
         // Arrange
-        var result = new DecisionResolutionResult(DecisionCode.X00, DecisionInternalFurtherDetail.E99);
+        var result = new DecisionEngineResult(DecisionCode.X00, DecisionInternalFurtherDetail.E99);
         _mockNext(Arg.Any<DecisionResolutionContext>()).Returns(result);
 
         var c = new DecisionResolutionContext(
@@ -90,7 +90,7 @@ public class CommodityWeightOrQuantityValidationRuleTests
 
         ////_mockContext.Commodity.Returns(commodity);
         ////_mockContext.Notification.Commodities.Returns(commodities);
-        var result = new DecisionResolutionResult(DecisionCode.H01);
+        var result = new DecisionEngineResult(DecisionCode.H01);
         _mockNext(Arg.Any<DecisionResolutionContext>()).Returns(result);
 
         // Act
@@ -144,7 +144,7 @@ public class CommodityWeightOrQuantityValidationRuleTests
 
         ////_mockContext.Commodity.Returns(commodity);
         ////_mockContext.Notification.Commodities.Returns(commodities);
-        var result = new DecisionResolutionResult(DecisionCode.H01);
+        var result = new DecisionEngineResult(DecisionCode.H01);
         _mockNext(Arg.Any<DecisionResolutionContext>()).Returns(result);
 
         // Act
@@ -198,7 +198,7 @@ public class CommodityWeightOrQuantityValidationRuleTests
 
         ////_mockContext.Commodity.Returns(commodity);
         ////_mockContext.Notification.Commodities.Returns(commodities);
-        var result = new DecisionResolutionResult(DecisionCode.H01);
+        var result = new DecisionEngineResult(DecisionCode.H01);
         _mockNext(Arg.Any<DecisionResolutionContext>()).Returns(result);
 
         // Act
@@ -252,7 +252,7 @@ public class CommodityWeightOrQuantityValidationRuleTests
 
         ////_mockContext.Commodity.Returns(commodity);
         ////_mockContext.Notification.Commodities.Returns(commodities);
-        var result = new DecisionResolutionResult(DecisionCode.H01);
+        var result = new DecisionEngineResult(DecisionCode.H01);
         _mockNext(Arg.Any<DecisionResolutionContext>()).Returns(result);
 
         // Act
@@ -303,7 +303,7 @@ public class CommodityWeightOrQuantityValidationRuleTests
         ////var commodities = new List<DecisionCommodityComplement>(); // Empty commodities
         ////_mockContext.Commodity.Returns(commodity);
         ////_mockContext.Notification.Commodities.Returns(commodities);
-        var result = new DecisionResolutionResult(DecisionCode.H01);
+        var result = new DecisionEngineResult(DecisionCode.H01);
         _mockNext(Arg.Any<DecisionResolutionContext>()).Returns(result);
 
         // Act

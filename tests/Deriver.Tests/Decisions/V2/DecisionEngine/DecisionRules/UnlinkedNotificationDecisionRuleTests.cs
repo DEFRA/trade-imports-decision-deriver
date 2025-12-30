@@ -19,7 +19,7 @@ public class UnlinkedNotificationDecisionRuleTests
     // Initialize the rule and mock objects
 
     [Fact]
-    public void Execute_WhenNotificationIsNull_ReturnsUnlinkedDecisionResolutionResult()
+    public void Execute_WhenNotificationIsNull_ReturnsUnlinkedDecisionEngineResult()
     {
         // Arrange
         var c = new DecisionResolutionContext(
@@ -38,7 +38,7 @@ public class UnlinkedNotificationDecisionRuleTests
         var result = _rule.Execute(c, _mockNext);
 
         // Assert using FluentAssertions
-        result.Should().Be(DecisionResolutionResult.Unlinked);
+        result.Should().Be(DecisionEngineResult.Unlinked);
 
         // Verify the next delegate was NOT called
         _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionResolutionContext>());
@@ -61,7 +61,7 @@ public class UnlinkedNotificationDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = new DecisionResolutionResult(DecisionCode.C02, DecisionInternalFurtherDetail.E84);
+        var expectedResult = new DecisionEngineResult(DecisionCode.C02, DecisionInternalFurtherDetail.E84);
         _mockNext.Invoke(Arg.Any<DecisionResolutionContext>()).Returns(expectedResult);
 
         // Act

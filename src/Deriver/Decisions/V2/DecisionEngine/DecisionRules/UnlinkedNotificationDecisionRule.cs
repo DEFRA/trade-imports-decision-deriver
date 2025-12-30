@@ -2,11 +2,11 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine.
 
 public sealed class UnlinkedNotificationDecisionRule : IDecisionRule
 {
-    public DecisionResolutionResult Execute(DecisionResolutionContext context, DecisionRuleDelegate next)
+    public DecisionEngineResult Execute(DecisionResolutionContext context, DecisionRuleDelegate next)
     {
         if (context.Notification is null)
         {
-            return DecisionResolutionResult.Unlinked;
+            return DecisionEngineResult.Unlinked;
         }
 
         return next(context);

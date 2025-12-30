@@ -5,7 +5,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine.
 
 public sealed class CommodityWeightOrQuantityValidationRule : IDecisionRule
 {
-    public DecisionResolutionResult Execute(DecisionResolutionContext context, DecisionRuleDelegate next)
+    public DecisionEngineResult Execute(DecisionResolutionContext context, DecisionRuleDelegate next)
     {
         var result = next(context);
 

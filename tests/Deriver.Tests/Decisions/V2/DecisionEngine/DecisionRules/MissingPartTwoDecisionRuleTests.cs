@@ -19,7 +19,7 @@ public class MissingPartTwoDecisionRuleTests
     // Initialize the rule and mock objects
 
     [Fact]
-    public void Execute_WhenHasPartTwoIsFalse_ReturnsExpectedDecisionResolutionResult()
+    public void Execute_WhenHasPartTwoIsFalse_ReturnsExpectedDecisionEngineResult()
     {
         // Arrange
         var notification = DecisionImportPreNotificationBuilder.Create().WithId("Test").WithHasPartTwo(false).Build();
@@ -63,7 +63,7 @@ public class MissingPartTwoDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = new DecisionResolutionResult(DecisionCode.C02, DecisionInternalFurtherDetail.E84);
+        var expectedResult = new DecisionEngineResult(DecisionCode.C02, DecisionInternalFurtherDetail.E84);
         _mockNext.Invoke(Arg.Any<DecisionResolutionContext>()).Returns(expectedResult);
 
         // Act

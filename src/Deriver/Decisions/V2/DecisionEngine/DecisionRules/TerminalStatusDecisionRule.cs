@@ -2,25 +2,25 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine.
 
 public sealed class TerminalStatusDecisionRule : IDecisionRule
 {
-    public DecisionResolutionResult Execute(DecisionResolutionContext context, DecisionRuleDelegate next)
+    public DecisionEngineResult Execute(DecisionResolutionContext context, DecisionRuleDelegate next)
     {
         var notification = context.Notification;
 
         var result = notification.Status switch
         {
-            ImportNotificationStatus.Cancelled => new DecisionResolutionResult(
+            ImportNotificationStatus.Cancelled => new DecisionEngineResult(
                 DecisionCode.X00,
                 DecisionInternalFurtherDetail.E71
             ),
-            ImportNotificationStatus.Replaced => new DecisionResolutionResult(
+            ImportNotificationStatus.Replaced => new DecisionEngineResult(
                 DecisionCode.X00,
                 DecisionInternalFurtherDetail.E72
             ),
-            ImportNotificationStatus.Deleted => new DecisionResolutionResult(
+            ImportNotificationStatus.Deleted => new DecisionEngineResult(
                 DecisionCode.X00,
                 DecisionInternalFurtherDetail.E73
             ),
-            ImportNotificationStatus.SplitConsignment => new DecisionResolutionResult(
+            ImportNotificationStatus.SplitConsignment => new DecisionEngineResult(
                 DecisionCode.X00,
                 DecisionInternalFurtherDetail.E75
             ),

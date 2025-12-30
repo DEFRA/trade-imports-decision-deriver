@@ -97,27 +97,11 @@ public sealed class DecisionImportPreNotificationBuilder
         return this;
     }
 
-    public DecisionImportPreNotificationBuilder AddCommodity(DecisionCommodityComplement commodity)
-    {
-        if (commodity is null)
-            throw new ArgumentNullException(nameof(commodity));
-        _commodities.Add(commodity);
-        return this;
-    }
-
     public DecisionImportPreNotificationBuilder AddCommodity(Action<DecisionCommodityComplementBuilder> configure)
     {
         var b = new DecisionCommodityComplementBuilder();
         configure(b);
         _commodities.Add(b.Build());
-        return this;
-    }
-
-    public DecisionImportPreNotificationBuilder AddCommodityCheck(DecisionCommodityCheck.Check check)
-    {
-        if (check is null)
-            throw new ArgumentNullException(nameof(check));
-        _commodityChecks.Add(check);
         return this;
     }
 

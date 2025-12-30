@@ -14,10 +14,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
 
     public DecisionRulesEngine Get(string? notificationType)
     {
-        if (notificationType is null)
-        {
-            throw new ArgumentNullException(nameof(notificationType));
-        }
+        ArgumentNullException.ThrowIfNull(notificationType);
 
         // Use a switch or mapping based on notificationType to resolve the correct set of rules.
         return notificationType switch
@@ -41,6 +38,8 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         //OrphanCheckCodeDecisionRule
         var rules = new List<IDecisionRule>
         {
+            AddRule<CommodityWeightOrQuantityValidationRule>(),
+            AddRule<CommodityCodeValidationRule>(),
             AddRule<OrphanCheckCodeDecisionRule>(),
             AddRule<UnlinkedNotificationDecisionRule>(),
             AddRule<WrongChedTypeDecisionRule>(),
@@ -49,8 +48,6 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<AmendDecisionRule>(),
             AddRule<InspectionRequiredDecisionRule>(),
             AddRule<CvedaDecisionRule>(),
-            AddRule<CommodityCodeValidationRule>(),
-            AddRule<CommodityWeightOrQuantityValidationRule>(),
         };
 
         return new DecisionRulesEngine(rules, serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>());
@@ -60,6 +57,8 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
     {
         var rules = new List<IDecisionRule>
         {
+            AddRule<CommodityWeightOrQuantityValidationRule>(),
+            AddRule<CommodityCodeValidationRule>(),
             AddRule<OrphanCheckCodeDecisionRule>(),
             AddRule<UnlinkedNotificationDecisionRule>(),
             AddRule<WrongChedTypeDecisionRule>(),
@@ -69,8 +68,6 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<InspectionRequiredDecisionRule>(),
             AddRule<CvedpIuuCheckRule>(),
             AddRule<CvedpDecisionRule>(),
-            AddRule<CommodityCodeValidationRule>(),
-            AddRule<CommodityWeightOrQuantityValidationRule>(),
         };
 
         return new DecisionRulesEngine(rules, serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>());
@@ -80,14 +77,14 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
     {
         var rules = new List<IDecisionRule>
         {
+            AddRule<CommodityWeightOrQuantityValidationRule>(),
+            AddRule<CommodityCodeValidationRule>(),
             AddRule<OrphanCheckCodeDecisionRule>(),
             AddRule<UnlinkedNotificationDecisionRule>(),
             AddRule<WrongChedTypeDecisionRule>(),
             AddRule<TerminalStatusDecisionRule>(),
             AddRule<MissingPartTwoDecisionRule>(),
             AddRule<ChedppDecisionRule>(),
-            AddRule<CommodityCodeValidationRule>(),
-            AddRule<CommodityWeightOrQuantityValidationRule>(),
         };
 
         return new DecisionRulesEngine(rules, serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>());
@@ -97,6 +94,8 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
     {
         var rules = new List<IDecisionRule>
         {
+            AddRule<CommodityWeightOrQuantityValidationRule>(),
+            AddRule<CommodityCodeValidationRule>(),
             AddRule<OrphanCheckCodeDecisionRule>(),
             AddRule<UnlinkedNotificationDecisionRule>(),
             AddRule<WrongChedTypeDecisionRule>(),
@@ -105,8 +104,8 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<AmendDecisionRule>(),
             AddRule<InspectionRequiredDecisionRule>(),
             AddRule<CedDecisionRule>(),
-            AddRule<CommodityCodeValidationRule>(),
             AddRule<CommodityWeightOrQuantityValidationRule>(),
+            AddRule<CommodityCodeValidationRule>(),
         };
 
         return new DecisionRulesEngine(rules, serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>());

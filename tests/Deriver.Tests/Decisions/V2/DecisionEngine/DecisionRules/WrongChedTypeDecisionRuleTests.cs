@@ -20,7 +20,7 @@ public class WrongChedTypeDecisionRuleTests
     // Initialize the rule and mock objects
 
     [Fact]
-    public void Execute_WhenImportNotificationTypeIsDifferentFromCheckCode_ReturnsWrongChedTypeDecisionResolutionResult()
+    public void Execute_WhenImportNotificationTypeIsDifferentFromCheckCode_ReturnsWrongChedTypeDecisionEngineResult()
     {
         // Arrange
         var notification = DecisionImportPreNotificationBuilder
@@ -45,7 +45,7 @@ public class WrongChedTypeDecisionRuleTests
         var result = _rule.Execute(c, _mockNext);
 
         // Assert using FluentAssertions
-        result.Should().Be(DecisionResolutionResult.WrongChedType);
+        result.Should().Be(DecisionEngineResult.WrongChedType);
 
         // Verify the next delegate was NOT called
         _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionResolutionContext>());
@@ -73,7 +73,7 @@ public class WrongChedTypeDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = new DecisionResolutionResult(DecisionCode.C02, DecisionInternalFurtherDetail.E84);
+        var expectedResult = new DecisionEngineResult(DecisionCode.C02, DecisionInternalFurtherDetail.E84);
         _mockNext.Invoke(Arg.Any<DecisionResolutionContext>()).Returns(expectedResult);
 
         // Act

@@ -2,11 +2,11 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine.
 
 public sealed class WrongChedTypeDecisionRule : IDecisionRule
 {
-    public DecisionResolutionResult Execute(DecisionResolutionContext context, DecisionRuleDelegate next)
+    public DecisionEngineResult Execute(DecisionResolutionContext context, DecisionRuleDelegate next)
     {
         if (context.Notification.ImportNotificationType != context.CheckCode.GetImportNotificationType())
         {
-            return DecisionResolutionResult.WrongChedType;
+            return DecisionEngineResult.WrongChedType;
         }
 
         return next(context);

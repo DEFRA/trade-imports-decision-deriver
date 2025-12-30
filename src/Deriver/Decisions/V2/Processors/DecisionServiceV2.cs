@@ -43,7 +43,7 @@ public class DecisionServiceV2(IClearanceDecisionBuilder clearanceDecisionBuilde
         Commodity commodity
     )
     {
-        var checks = commodity.Checks;
+        var checks = commodity.Checks?.DistinctBy(x => x.CheckCode).ToArray();
         if (checks == null || checks.Length == 0)
         {
             return Array.Empty<CheckDecisionResult>();

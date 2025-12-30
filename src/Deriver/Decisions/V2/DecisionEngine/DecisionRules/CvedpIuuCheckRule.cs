@@ -2,7 +2,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine.
 
 public sealed class CvedpIuuCheckRule : IDecisionRule
 {
-    public DecisionResolutionResult Execute(DecisionResolutionContext context, DecisionRuleDelegate next)
+    public DecisionEngineResult Execute(DecisionResolutionContext context, DecisionRuleDelegate next)
     {
         if (!context.CheckCode.IsIuu())
         {
@@ -14,12 +14,12 @@ public sealed class CvedpIuuCheckRule : IDecisionRule
         {
             true => notification.IuuOption switch
             {
-                ControlAuthorityIuuOption.IUUOK => new DecisionResolutionResult(DecisionCode.C07),
-                ControlAuthorityIuuOption.IUUNotCompliant => new DecisionResolutionResult(DecisionCode.X00),
-                ControlAuthorityIuuOption.IUUNA => new DecisionResolutionResult(DecisionCode.C08),
-                _ => new DecisionResolutionResult(DecisionCode.H02, DecisionInternalFurtherDetail.E93),
+                ControlAuthorityIuuOption.IUUOK => new DecisionEngineResult(DecisionCode.C07),
+                ControlAuthorityIuuOption.IUUNotCompliant => new DecisionEngineResult(DecisionCode.X00),
+                ControlAuthorityIuuOption.IUUNA => new DecisionEngineResult(DecisionCode.C08),
+                _ => new DecisionEngineResult(DecisionCode.H02, DecisionInternalFurtherDetail.E93),
             },
-            false => new DecisionResolutionResult(DecisionCode.H02, DecisionInternalFurtherDetail.E94),
+            false => new DecisionEngineResult(DecisionCode.H02, DecisionInternalFurtherDetail.E94),
         };
     }
 }

@@ -68,7 +68,7 @@ public class ClearanceRequestConsumer(
             .ToList();
 
         var (v1Result, v1Elapsed) = await TimingExtensions.TimeAsync(() =>
-            RunV1(message, cancellationToken, preNotifications, clearanceRequest)
+            RunV1(message, preNotifications, clearanceRequest, cancellationToken)
         );
 
         var (v2Result, v2Elapsed) = TimingExtensions.Time(() => RunV2(message, preNotifications, clearanceRequest));
@@ -77,9 +77,9 @@ public class ClearanceRequestConsumer(
 
         if (!v1Result.ClearanceDecision.IsSameAs(v2Result))
         {
-            logger.LogInformation(
-                "V1 {V1} - V2 {V2}",
-                JsonSerializer.Serialize(v1Result),
+            logger.LogWarning(
+                "DecionResults are different: V1 {V1} - V2 {V2}",
+                JsonSerializer.Serialize(v1Result.ClearanceDecision),
                 JsonSerializer.Serialize(v2Result)
             );
         }
@@ -128,14 +128,14 @@ public class ClearanceRequestConsumer(
                 ]
             )
         );
-        return newResults.FirstOrDefault().Decision;
+        return newResults[0].Decision;
     }
 
     private async Task<(ClearanceDecision? ClearanceDecision, bool ShouldPersist)> RunV1(
         ResourceEvent<CustomsDeclarationEvent> message,
-        CancellationToken cancellationToken,
         List<ImportPreNotification> preNotifications,
-        CustomsDeclarationResponse? clearanceRequest
+        CustomsDeclarationResponse? clearanceRequest,
+        CancellationToken cancellationToken
     )
     {
         var decisionContext = new DecisionContext(

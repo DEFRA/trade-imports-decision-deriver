@@ -2,7 +2,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine.
 
 public sealed class AmendDecisionRule : IDecisionRule
 {
-    public DecisionResolutionResult Execute(DecisionResolutionContext context, DecisionRuleDelegate next)
+    public DecisionEngineResult Execute(DecisionResolutionContext context, DecisionRuleDelegate next)
     {
         var notification = context.Notification;
 
@@ -13,12 +13,12 @@ public sealed class AmendDecisionRule : IDecisionRule
 
         if (notification.InspectionRequired is InspectionRequired.NotRequired or InspectionRequired.Inconclusive)
         {
-            return new DecisionResolutionResult(DecisionCode.H01, DecisionInternalFurtherDetail.E80);
+            return new DecisionEngineResult(DecisionCode.H01, DecisionInternalFurtherDetail.E80);
         }
 
         return IsInspectionRequired(notification)
-            ? new DecisionResolutionResult(DecisionCode.H02, DecisionInternalFurtherDetail.E80)
-            : new DecisionResolutionResult(DecisionCode.H01, DecisionInternalFurtherDetail.E99);
+            ? new DecisionEngineResult(DecisionCode.H02, DecisionInternalFurtherDetail.E80)
+            : new DecisionEngineResult(DecisionCode.H01, DecisionInternalFurtherDetail.E99);
     }
 
     private static bool IsInspectionRequired(DecisionImportPreNotification notification)

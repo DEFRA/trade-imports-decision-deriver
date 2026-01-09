@@ -64,7 +64,7 @@ public class ImportPreNotificationConsumer(
             if (!v1Result.Decision.IsSameAs(v2Result.Decision))
             {
                 logger.LogWarning(
-                    "ImportPreNotificationConsumer DecisonResults are different: MRN {Mrn} - V1 {V1} - V2 {V2}",
+                    "ImportPreNotificationConsumer DecisionResults are different: MRN {Mrn} - V1 {V1} - V2 {V2}",
                     v1Result.Mrn,
                     JsonSerializer.Serialize(v1Result),
                     JsonSerializer.Serialize(v2Result)

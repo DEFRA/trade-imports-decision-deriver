@@ -30,10 +30,10 @@
     <PackageReference Include="SlimMessageBus.Host.AmazonSQS" Version="3.3.6" />
     <PackageReference Include="SlimMessageBus.Host.Serialization.SystemTextJson" Version="3.3.6" />
     <PackageReference Include="Amazon.CloudWatch.EMF" Version="2.2.0" />
-    <PackageReference Include="AWSSDK.Core" Version="4.0.3.6" />
-    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.17" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="4.0.2.10" />
-    <PackageReference Include="AWSSDK.SQS" Version="4.0.2.8" />
+    <PackageReference Include="AWSSDK.Core" Version="4.0.3.8" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.19" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="4.0.2.13" />
+    <PackageReference Include="AWSSDK.SQS" Version="4.0.2.11" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Properties\.env.local">

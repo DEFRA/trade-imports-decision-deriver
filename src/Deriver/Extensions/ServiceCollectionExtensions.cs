@@ -144,8 +144,6 @@ public static class ServiceCollectionExtensions
                     );
                 });
 
-                mbb.Produce<ResourceEvent<CustomsDeclarationEvent>>(x => x.ToTopic().DefaultTopic("topic name"));
-
                 mbb.AutoStartConsumersEnabled(autoStartConsumers)
                     .Consume<string>(x =>
                         x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(consumersPerHost)

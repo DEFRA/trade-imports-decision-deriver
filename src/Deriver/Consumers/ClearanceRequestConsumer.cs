@@ -78,7 +78,7 @@ public class ClearanceRequestConsumer(
         if (!v1Result.ClearanceDecision.IsSameAs(v2Result))
         {
             logger.LogWarning(
-                "DecionResults are different: V1 {V1} - V2 {V2}",
+                "ClearanceRequestConsumer DecisonResults are different: V1 {V1} - V2 {V2}",
                 JsonSerializer.Serialize(v1Result.ClearanceDecision),
                 JsonSerializer.Serialize(v2Result)
             );

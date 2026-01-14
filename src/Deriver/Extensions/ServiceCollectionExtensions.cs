@@ -89,7 +89,7 @@ public static class ServiceCollectionExtensions
         // Order of interceptors is important here
         services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(TraceContextInterceptor<>));
         services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(LoggingInterceptor<>));
-        services.AddConsumerMetrics();
+        services.AddConsumerMetrics(MetricNames.MeterName);
 
         services.AddOptions<AwsSqsOptions>().Bind(configuration).ValidateDataAnnotations();
 

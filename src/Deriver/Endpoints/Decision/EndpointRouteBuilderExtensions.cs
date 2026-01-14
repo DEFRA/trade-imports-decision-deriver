@@ -113,11 +113,6 @@ public static class EndpointRouteBuilderExtensions
             .ImportPreNotifications.Select(x => x.ImportPreNotification)
             .ToList();
 
-        ////var decisionContext = new DecisionContext(
-        ////    preNotifications.Select(x => x.ToDecisionImportPreNotification()).ToList(),
-        ////    [new ClearanceRequestWrapper(mrn, clearanceRequest!.ClearanceRequest!)]
-        ////);
-
         var decisionContext = new DecisionContext(
             preNotifications.Select(x => x.ToDecisionImportPreNotification()).ToList(),
             [
@@ -125,8 +120,8 @@ public static class EndpointRouteBuilderExtensions
                     mrn,
                     new CustomsDeclaration()
                     {
-                        ClearanceDecision = clearanceRequest?.ClearanceDecision,
-                        ClearanceRequest = clearanceRequest?.ClearanceRequest,
+                        ClearanceDecision = clearanceRequest.ClearanceDecision,
+                        ClearanceRequest = clearanceRequest.ClearanceRequest,
                     }
                 ),
             ]
@@ -141,10 +136,10 @@ public static class EndpointRouteBuilderExtensions
 
         var customsDeclaration = new CustomsDeclaration
         {
-            ClearanceDecision = clearanceRequest?.ClearanceDecision,
-            Finalisation = clearanceRequest?.Finalisation,
-            ClearanceRequest = clearanceRequest?.ClearanceRequest,
-            ExternalErrors = clearanceRequest?.ExternalErrors,
+            ClearanceDecision = clearanceRequest.ClearanceDecision,
+            Finalisation = clearanceRequest.Finalisation,
+            ClearanceRequest = clearanceRequest.ClearanceRequest,
+            ExternalErrors = clearanceRequest.ExternalErrors,
         };
 
         var isDifferent = !decisionResult.Decision.IsSameAs(customsDeclaration.ClearanceDecision);

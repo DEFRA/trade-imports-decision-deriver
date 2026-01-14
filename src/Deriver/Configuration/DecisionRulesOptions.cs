@@ -1,11 +1,15 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 
+[ExcludeFromCodeCoverage]
 public sealed class DecisionRulesOptions
 {
     // Map of CHED type (e.g. "CHEDA", "CHEDP", ...) -> rules config for that CHED
     public Dictionary<string, DecisionRulesPerChedOptions> Cheds { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 }
 
+[ExcludeFromCodeCoverage]
 public sealed class DecisionRulesPerChedOptions
 {
     // Class names of rules to disable for this CHED (e.g. "CommodityCodeValidationRule")

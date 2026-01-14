@@ -154,7 +154,7 @@ public static class EndpointRouteBuilderExtensions
             await apiClient.PutCustomsDeclaration(
                 decisionResult.Mrn,
                 customsDeclaration,
-                clearanceRequest?.ETag,
+                clearanceRequest.ETag,
                 cancellationToken
             );
         }

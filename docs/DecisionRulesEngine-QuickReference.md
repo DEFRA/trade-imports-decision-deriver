@@ -224,7 +224,7 @@ private static DecisionRulesEngine CreateEngineForMyNewChed()
 ```
 
 ### Step 3: Update Factory Switch
-```csharp
+```csharp   
 public DecisionRulesEngine Get(string? notificationType)
 {
     return notificationType switch
@@ -236,6 +236,70 @@ public DecisionRulesEngine Get(string? notificationType)
         ImportNotificationType.MyNewChed => CreateEngineForMyNewChed(),
         _ => throw new ArgumentOutOfRangeException(...)
     };
+}
+```
+
+## Decision Rules Options
+
+You can configure decision rules options in `appsettings.json` or similar configuration files. The options include:
+
+- **Enabled**: A boolean to globally enable or disable the decision rules processing.
+- **RuleSpecificOptions**: A section to specify options for individual rules, like timeouts or thresholds.
+
+### Example Configuration
+```json
+{
+  "DecisionRulesOptions": {
+    "Enabled": true,
+    "RuleSpecificOptions": {
+      "AmendDecisionRule": {
+        "Enabled": false
+      },
+      "InspectionRequiredDecisionRule": {
+        "TimeoutSeconds": 10
+      }
+    }
+  }
+}
+```
+
+### Accessing Options in Code
+```csharp
+public class SomeService
+{
+    private readonly DecisionRulesOptions _options;
+
+    public SomeService(IOptions<DecisionRulesOptions> options)
+    {
+        _options = options.Value;
+    }
+
+    public void SomeMethod()
+    {
+        if (_options.Enabled)
+        {
+            // Execute decision rules logic
+        }
+    }
+}
+```
+
+## Disabling Rules via Configuration (DecisionRulesOptions)
+
+You can disable individual decision rules per CHED type from configuration using the `DecisionRulesOptions` settings. Rules are matched by their class name (for example `CommodityCodeValidationRule`) in a case-insensitive way. The engine reads the configured disabled list for the CHED being processed and skips (and logs) any matching rules while building the pipeline — the skip happens centrally in the engine so rule classes do not need to change.
+
+Schema (POCO)
+```csharp
+public class DecisionRulesOptions
+{
+    public bool Enabled { get; set; } = true;
+    public Dictionary<string, RuleOption> RuleSpecificOptions { get; set; } = new();
+
+    public class RuleOption
+    {
+        public bool Enabled { get; set; } = true;
+        public int TimeoutSeconds { get; set; } = 30;
+    }
 }
 ```
 
@@ -347,4 +411,3 @@ dotnet build --no-incremental
 ### Run Specific Test
 ```bash
 dotnet test --filter "FullyQualifiedName~RuleName"
-```

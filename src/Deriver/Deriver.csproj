@@ -15,9 +15,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Defra.TradeImports.EmfExporter" Version="0.1.0-pr-1.12" />
-    <PackageReference Include="Defra.TradeImports.SMB.Metrics" Version="0.1.0-pr-1.12" />
-    <PackageReference Include="Defra.TradeImports.SMB.SQSSNS" Version="0.1.0-pr-1.12" />
+    <PackageReference Include="Defra.TradeImports.EmfExporter" Version="0.1.0-pr-1.13" />
+    <PackageReference Include="Defra.TradeImports.SMB.Metrics" Version="0.1.0-pr-1.13" />
+    <PackageReference Include="Defra.TradeImports.SMB.SQSSNS" Version="0.1.0-pr-1.13" />
     <PackageReference Include="Defra.TradeImportsDataApi.Api.Client" Version="0.38.0" />
     <PackageReference Include="Elastic.CommonSchema.Serilog" Version="9.0.0" />
     <PackageReference Include="Elastic.Serilog.Enrichers.Web" Version="9.0.0" />

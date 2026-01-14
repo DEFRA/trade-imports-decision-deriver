@@ -1,7 +1,7 @@
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Defra.TradeImportsDecisionDeriver.TestFixtures;
 
@@ -23,6 +23,8 @@ public class TestDecisionRulesEngineFactory : IDecisionRulesEngineFactory
         .AddSingleton<CommodityCodeValidationRule>()
         .AddSingleton<CommodityWeightOrQuantityValidationRule>()
         .AddSingleton<UnknownCheckCodeDecisionRule>()
+        .AddOptions()
+        .Configure<DecisionRulesOptions>(_ => { })
         .AddLogging()
         .BuildServiceProvider();
 

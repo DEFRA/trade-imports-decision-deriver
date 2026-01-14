@@ -1,5 +1,8 @@
 using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
+using Microsoft.Extensions.Options;
+using System.Collections.Concurrent;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 
@@ -10,27 +13,35 @@ public interface IDecisionRulesEngineFactory
 
 public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider) : IDecisionRulesEngineFactory
 {
-    // Inject a dictionary of rules for each notification type, using DI
+    private readonly ConcurrentDictionary<string, DecisionRulesEngine> _cache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly IOptionsMonitor<DecisionRulesOptions> _options = serviceProvider.GetRequiredService<IOptionsMonitor<DecisionRulesOptions>>();
+    private readonly ILogger<DecisionRulesEngine> _logger = serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>();
 
     public DecisionRulesEngine Get(string? notificationType)
     {
+        
+        var key = notificationType ?? "Unknown";
+
         // Use a switch or mapping based on notificationType to resolve the correct set of rules.
-        return notificationType switch
+        return _cache.GetOrAdd(key, k =>
         {
-            ImportNotificationType.Cveda => CreateEngineForCveda(),
-            ImportNotificationType.Cvedp => CreateEngineForCvedp(),
-            ImportNotificationType.Chedpp => CreateEngineForChedpp(),
-            ImportNotificationType.Ced => CreateEngineForCed(),
-            _ => new DecisionRulesEngine(
-                [AddRule<UnknownCheckCodeDecisionRule>()],
-                serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>()
-            ),
-        };
+            return k switch
+            {
+                ImportNotificationType.Cveda => CreateEngineForCveda(k),
+                ImportNotificationType.Cvedp => CreateEngineForCvedp(k),
+                ImportNotificationType.Chedpp => CreateEngineForChedpp(k),
+                ImportNotificationType.Ced => CreateEngineForCed(k),
+                _ => new DecisionRulesEngine(
+                    "Unknown",
+                    new List<IDecisionRule> { AddRule<UnknownCheckCodeDecisionRule>() },
+                    _logger,
+                    _options
+                ),
+            };
+        });
     }
 
-    // Each method uses DI to resolve the dependencies (IDecisionRule) required for the rules engine
-
-    private DecisionRulesEngine CreateEngineForCveda()
+    private DecisionRulesEngine CreateEngineForCveda(string chedType)
     {
         //OrphanCheckCodeDecisionRule
         var rules = new List<IDecisionRule>
@@ -47,10 +58,10 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<CvedaDecisionRule>(),
         };
 
-        return new DecisionRulesEngine(rules, serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>());
+        return new DecisionRulesEngine(chedType, rules, serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(), _options);
     }
 
-    private DecisionRulesEngine CreateEngineForCvedp()
+    private DecisionRulesEngine CreateEngineForCvedp(string chedType)
     {
         var rules = new List<IDecisionRule>
         {
@@ -67,10 +78,10 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<CvedpDecisionRule>(),
         };
 
-        return new DecisionRulesEngine(rules, serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>());
+        return new DecisionRulesEngine(chedType, rules, serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(), _options);
     }
 
-    private DecisionRulesEngine CreateEngineForChedpp()
+    private DecisionRulesEngine CreateEngineForChedpp(string chedType)
     {
         var rules = new List<IDecisionRule>
         {
@@ -84,10 +95,10 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<ChedppDecisionRule>(),
         };
 
-        return new DecisionRulesEngine(rules, serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>());
+        return new DecisionRulesEngine(chedType, rules, serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(), _options);
     }
 
-    private DecisionRulesEngine CreateEngineForCed()
+    private DecisionRulesEngine CreateEngineForCed(string chedType)
     {
         var rules = new List<IDecisionRule>
         {
@@ -103,7 +114,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<CedDecisionRule>(),
         };
 
-        return new DecisionRulesEngine(rules, serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>());
+        return new DecisionRulesEngine(chedType, rules, serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(), _options);
     }
 
     private T AddRule<T>()

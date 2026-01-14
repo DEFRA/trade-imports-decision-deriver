@@ -1,4 +1,3 @@
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;

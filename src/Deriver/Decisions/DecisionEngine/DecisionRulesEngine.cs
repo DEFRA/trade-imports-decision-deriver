@@ -3,9 +3,18 @@ using Microsoft.Extensions.Options;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 
-public sealed class DecisionRulesEngine(string chedType, IReadOnlyList<IDecisionRule> rules, ILogger<DecisionRulesEngine> logger, IOptionsMonitor<DecisionRulesOptions> _options)
+public sealed class DecisionRulesEngine(
+    string chedType,
+    IReadOnlyList<IDecisionRule> rules,
+    ILogger<DecisionRulesEngine> logger,
+    IOptionsMonitor<DecisionRulesOptions> _options
+)
 {
-    private readonly DecisionRuleDelegate _pipeline = BuildRules(rules, GetDisabledRulesForChed(chedType, _options.CurrentValue));
+    private readonly DecisionRuleDelegate _pipeline = BuildRules(
+        rules,
+        GetDisabledRulesForChed(chedType, _options.CurrentValue)
+    );
+
     public DecisionEngineResult Run(DecisionEngineContext context)
     {
         context.Logger = logger;
@@ -26,7 +35,10 @@ public sealed class DecisionRulesEngine(string chedType, IReadOnlyList<IDecision
             {
                 pipeline = context =>
                 {
-                    context.Logger?.LogInformation("Decision rule {Rule} is disabled by configuration for CHED and was skipped.", ruleName);
+                    context.Logger?.LogInformation(
+                        "Decision rule {Rule} is disabled by configuration for CHED and was skipped.",
+                        ruleName
+                    );
                     return next(context);
                 };
             }
@@ -43,7 +55,10 @@ public sealed class DecisionRulesEngine(string chedType, IReadOnlyList<IDecision
     {
         if (options?.Cheds != null && options.Cheds.TryGetValue(chedType ?? string.Empty, out var perChed))
         {
-            return new HashSet<string>(perChed?.DisabledRules ?? Array.Empty<string>(), StringComparer.OrdinalIgnoreCase);
+            return new HashSet<string>(
+                perChed?.DisabledRules ?? Array.Empty<string>(),
+                StringComparer.OrdinalIgnoreCase
+            );
         }
 
         return new HashSet<string>(StringComparer.OrdinalIgnoreCase);

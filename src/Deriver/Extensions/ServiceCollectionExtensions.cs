@@ -1,5 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
+using Amazon;
 using Amazon.SQS;
+using Defra.TradeImports.SMB.Metrics;
+using Defra.TradeImports.SMB.SQSSNS;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
@@ -86,8 +89,7 @@ public static class ServiceCollectionExtensions
         // Order of interceptors is important here
         services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(TraceContextInterceptor<>));
         services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(LoggingInterceptor<>));
-        services.AddSingleton<ConsumerMetrics>();
-        services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(MetricsInterceptor<>));
+        services.AddConsumerMetrics();
 
         services.AddOptions<AwsSqsOptions>().Bind(configuration).ValidateDataAnnotations();
 
@@ -108,11 +110,8 @@ public static class ServiceCollectionExtensions
                 mbb.AddServicesFromAssemblyContaining<ConsumerMediator>();
                 mbb.WithProviderAmazonSQS(cfg =>
                 {
+                    cfg.UseLocalOrAmbientCredentials(configuration);
                     cfg.TopologyProvisioning.Enabled = false;
-                    cfg.SqsClientProviderFactory = _ => new CdpCredentialsSqsClientProvider(
-                        cfg.SqsClientConfig,
-                        configuration
-                    );
                 });
 
                 mbb.AutoStartConsumersEnabled(autoStartConsumers)

@@ -22,6 +22,7 @@ public class TestDecisionRulesEngineFactory : IDecisionRulesEngineFactory
         .AddSingleton<CedDecisionRule>()
         .AddSingleton<CommodityCodeValidationRule>()
         .AddSingleton<CommodityWeightOrQuantityValidationRule>()
+        .AddSingleton<UnknownCheckCodeDecisionRule>()
         .AddLogging()
         .BuildServiceProvider();
 

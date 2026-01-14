@@ -1,18 +1,10 @@
-using System.Linq;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
-using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
-using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
-using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
 using Xunit.Abstractions;
 using ClearanceDecisionBuilder = Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.ClearanceDecisionBuilder;
 
@@ -20,177 +12,97 @@ using ClearanceDecisionBuilder = Defra.TradeImportsDecisionDeriver.Deriver.Decis
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions;
 
-public class DecisionServiceTests
+public class DecisionServiceTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper output;
-
-    public DecisionServiceTests(ITestOutputHelper output)
-    {
-        this.output = output;
-    }
-
-    [Theory]
-    [InlineData(ImportNotificationType.Cveda, DecisionCode.C06, "H221")]
-    public async Task When_processing_decisions_for_ched_type_notifications_not_requiring_iuu_check_Then_should_use_matching_ched_decision_finder_only(
-        string targetImportNotificationType,
-        DecisionCode expectedDecisionCode,
-        params string[] checkCode
-    )
-    {
-        var matchingResult = new MatchingResult();
-        matchingResult.AddMatch("notification-1", "clearancerequest-1", 1, "document-ref-1", "doc-code-1");
-
-        var matchingService = Substitute.For<IMatchingService>();
-        matchingService
-            .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult(matchingResult));
-
-        var decisionContext = CreateDecisionContext(targetImportNotificationType, checkCode, iuuCheckRequired: false);
-        var chedAFinder = Substitute.For<IDecisionFinder>();
-        chedAFinder
-            .CanFindDecision(decisionContext.Notifications[0], Arg.Any<CheckCode>(), Arg.Any<string>())
-            .Returns(true);
-        chedAFinder
-            .FindDecision(decisionContext.Notifications[0], Arg.Any<Commodity>(), Arg.Any<CheckCode>())
-            .Returns(new DecisionFinderResult(expectedDecisionCode, new CheckCode { Value = checkCode[0] }));
-
-        var sut = new DecisionService(
-            NullLogger<DecisionService>.Instance,
-            matchingService,
-            [
-                chedAFinder,
-                new CommodityWeightOrQuantityDecisionFinder(
-                    new CommodityCodeDecisionFinder(
-                        new ChedADecisionFinder(),
-                        NullLogger<CommodityCodeDecisionFinder>.Instance
-                    ),
-                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
-                ),
-                new CommodityWeightOrQuantityDecisionFinder(
-                    new CommodityCodeDecisionFinder(
-                        new ChedDDecisionFinder(),
-                        NullLogger<CommodityCodeDecisionFinder>.Instance
-                    ),
-                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
-                ),
-                new CommodityWeightOrQuantityDecisionFinder(
-                    new CommodityCodeDecisionFinder(
-                        new ChedPDecisionFinder(),
-                        NullLogger<CommodityCodeDecisionFinder>.Instance
-                    ),
-                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
-                ),
-                new CommodityWeightOrQuantityDecisionFinder(
-                    new CommodityCodeDecisionFinder(
-                        new ChedPPDecisionFinder(),
-                        NullLogger<CommodityCodeDecisionFinder>.Instance
-                    ),
-                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
-                ),
-                new CommodityWeightOrQuantityDecisionFinder(
-                    new CommodityCodeDecisionFinder(
-                        new IuuDecisionFinder(),
-                        NullLogger<CommodityCodeDecisionFinder>.Instance
-                    ),
-                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
-                ),
-            ]
-        );
-
-        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
-
-        decisionResult.Decisions.Should().HaveCount(1);
-        decisionResult.Decisions[0].DecisionCode.Should().Be(expectedDecisionCode);
-    }
-
     [Fact]
-    public async Task When_processing_clearance_request_with_null_documents_then_no_match_should_be_generated()
+    public void When_processing_clearance_request_with_null_documents_then_no_match_should_be_generated()
     {
-        var matchingResult = new MatchingResult();
-
-        var matchingService = Substitute.For<IMatchingService>();
-        matchingService
-            .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult(matchingResult));
-
-        var decisionContext = new DecisionContext(
+        var decisionContext = new DecisionContextV2(
             [],
             [
-                new ClearanceRequestWrapper(
+                new CustomsDeclarationWrapper(
                     "clearancerequest-1",
-                    new ClearanceRequest
+                    new CustomsDeclaration()
                     {
-                        Commodities =
-                        [
-                            new Commodity
-                            {
-                                ItemNumber = 1,
-                                Documents = null,
-                                Checks = [new CommodityCheck { CheckCode = "H221" }],
-                            },
-                        ],
+                        ClearanceRequest = new ClearanceRequest
+                        {
+                            Commodities =
+                            [
+                                new Commodity
+                                {
+                                    ItemNumber = 1,
+                                    Documents = null,
+                                    Checks = [new CommodityCheck { CheckCode = "H221" }],
+                                },
+                            ],
+                        },
                     }
                 ),
             ]
         );
 
-        var decisionResult = await RunBothVersions(decisionContext);
+        var decisionServiceV2 = new DecisionServiceV2(
+            new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
+            new CheckProcessor(new TestDecisionRulesEngineFactory())
+        );
 
-        decisionResult.Decisions.Should().HaveCount(1);
-        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
-        decisionResult.Decisions[0].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E83);
-        decisionResult.Decisions[0].CheckCode.Should().Be("H221");
+        // Act
+        var decisionResult = decisionServiceV2.Process(decisionContext);
+
+        decisionResult.Should().HaveCount(1);
+        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(DecisionCode.X00.ToString());
+        decisionResult[0]
+            .Decision.Results?[0].InternalDecisionCode.Should()
+            .Be(DecisionInternalFurtherDetail.E83.ToString());
+        decisionResult[0].Decision.Results?[0].CheckCode.Should().Be("H221");
     }
 
     [Fact]
-    public async Task When_processing_clearance_request_with_empty_documents_then_no_match_should_be_generated()
+    public void When_processing_clearance_request_with_empty_documents_then_no_match_should_be_generated()
     {
-        var matchingResult = new MatchingResult();
-
-        var matchingService = Substitute.For<IMatchingService>();
-        matchingService
-            .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult(matchingResult));
-
-        var decisionContext = new DecisionContext(
+        var decisionContext = new DecisionContextV2(
             [],
             [
-                new ClearanceRequestWrapper(
+                new CustomsDeclarationWrapper(
                     "clearancerequest-1",
-                    new ClearanceRequest
+                    new CustomsDeclaration()
                     {
-                        Commodities =
-                        [
-                            new Commodity
-                            {
-                                ItemNumber = 1,
-                                Documents = [],
-                                Checks = [new CommodityCheck { CheckCode = "H221" }],
-                            },
-                        ],
+                        ClearanceRequest = new ClearanceRequest
+                        {
+                            Commodities =
+                            [
+                                new Commodity
+                                {
+                                    ItemNumber = 1,
+                                    Documents = [],
+                                    Checks = [new CommodityCheck { CheckCode = "H221" }],
+                                },
+                            ],
+                        },
                     }
                 ),
             ]
         );
 
-        var decisionResult = await RunBothVersions(decisionContext);
+        var decisionServiceV2 = new DecisionServiceV2(
+            new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
+            new CheckProcessor(new TestDecisionRulesEngineFactory())
+        );
 
-        decisionResult.Decisions.Should().HaveCount(1);
-        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
-        decisionResult.Decisions[0].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E83);
+        // Act
+        var decisionResult = decisionServiceV2.Process(decisionContext);
+
+        decisionResult.Should().HaveCount(1);
+        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(DecisionCode.X00.ToString());
+        decisionResult[0]
+            .Decision.Results?[0].InternalDecisionCode.Should()
+            .Be(DecisionInternalFurtherDetail.E83.ToString());
     }
 
     [Fact]
-    public async Task When_processing_chedpp_with_phsi_and_missing_hmi()
+    public void When_processing_chedpp_with_phsi_and_missing_hmi()
     {
-        var matchingResult = new MatchingResult();
-
-        var matchingService = Substitute.For<IMatchingService>();
-        matchingService
-            .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult(matchingResult));
-
-        var decisionContext = new DecisionContext(
+        var decisionContext = new DecisionContextV2(
             [
                 new DecisionImportPreNotification()
                 {
@@ -218,53 +130,62 @@ public class DecisionServiceTests
                 },
             ],
             [
-                new ClearanceRequestWrapper(
+                new CustomsDeclarationWrapper(
                     "25GB7FOTHLNCYKEAR2",
-                    new ClearanceRequest
+                    new CustomsDeclaration()
                     {
-                        Commodities =
-                        [
-                            new Commodity
-                            {
-                                ItemNumber = 1,
-                                Documents =
-                                [
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "N002",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.6248785"),
-                                        DocumentStatus = "AE",
-                                        DocumentControl = "P",
-                                    },
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "N851",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.6248785"),
-                                        DocumentStatus = "AE",
-                                        DocumentControl = "P",
-                                    },
-                                ],
-                                Checks =
-                                [
-                                    new CommodityCheck { CheckCode = "H218", DepartmentCode = "HMI" },
-                                    new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" },
-                                ],
-                            },
-                        ],
+                        ClearanceRequest = new ClearanceRequest
+                        {
+                            Commodities =
+                            [
+                                new Commodity
+                                {
+                                    ItemNumber = 1,
+                                    Documents =
+                                    [
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "N002",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.6248785"),
+                                            DocumentStatus = "AE",
+                                            DocumentControl = "P",
+                                        },
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "N851",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.6248785"),
+                                            DocumentStatus = "AE",
+                                            DocumentControl = "P",
+                                        },
+                                    ],
+                                    Checks =
+                                    [
+                                        new CommodityCheck { CheckCode = "H218", DepartmentCode = "HMI" },
+                                        new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" },
+                                    ],
+                                },
+                            ],
+                        },
                     }
                 ),
             ]
         );
 
-        var decisionResult = await RunBothVersions(decisionContext);
+        var decisionServiceV2 = new DecisionServiceV2(
+            new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
+            new CheckProcessor(new TestDecisionRulesEngineFactory())
+        );
 
-        decisionResult.Decisions.Max(x => x.DecisionCode).Should().Be(DecisionCode.H01);
+        // Act
+        var decisionResult = decisionServiceV2.Process(decisionContext);
+
+        decisionResult[0].Decision.Results!.Max(x => x.DecisionCode).Should().Be(DecisionCode.H01.ToString());
     }
 
     [Fact]
-    public async Task When_processing_chedpp_phsi_with_both_validated_and_rejected_documents()
+    public void When_processing_chedpp_phsi_with_both_validated_and_rejected_documents()
     {
-        var decisionContext = new DecisionContext(
+        var decisionContext = new DecisionContextV2(
             [
                 new DecisionImportPreNotification()
                 {
@@ -315,138 +236,78 @@ public class DecisionServiceTests
                 },
             ],
             [
-                new ClearanceRequestWrapper(
+                new CustomsDeclarationWrapper(
                     "25GB99999999999021",
-                    new ClearanceRequest
+                    new CustomsDeclaration()
                     {
-                        Commodities =
-                        [
-                            new Commodity
-                            {
-                                ItemNumber = 1,
-                                Documents =
-                                [
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "N851",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009R"),
-                                        DocumentStatus = "JE",
-                                        DocumentControl = "P",
-                                    },
-                                ],
-                                Checks = [new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" }],
-                            },
-                            new Commodity
-                            {
-                                ItemNumber = 2,
-                                Documents =
-                                [
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "N851",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009V"),
-                                        DocumentStatus = "JE",
-                                        DocumentControl = "P",
-                                    },
-                                ],
-                                Checks = [new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" }],
-                            },
-                            new Commodity
-                            {
-                                ItemNumber = 3,
-                                Documents =
-                                [
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "N851",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009V"),
-                                        DocumentStatus = "JE",
-                                        DocumentControl = "P",
-                                    },
-                                ],
-                                Checks = [new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" }],
-                            },
-                        ],
+                        ClearanceRequest = new ClearanceRequest
+                        {
+                            Commodities =
+                            [
+                                new Commodity
+                                {
+                                    ItemNumber = 1,
+                                    Documents =
+                                    [
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "N851",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.9200009R"),
+                                            DocumentStatus = "JE",
+                                            DocumentControl = "P",
+                                        },
+                                    ],
+                                    Checks = [new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" }],
+                                },
+                                new Commodity
+                                {
+                                    ItemNumber = 2,
+                                    Documents =
+                                    [
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "N851",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.9200009V"),
+                                            DocumentStatus = "JE",
+                                            DocumentControl = "P",
+                                        },
+                                    ],
+                                    Checks = [new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" }],
+                                },
+                                new Commodity
+                                {
+                                    ItemNumber = 3,
+                                    Documents =
+                                    [
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "N851",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.9200009V"),
+                                            DocumentStatus = "JE",
+                                            DocumentControl = "P",
+                                        },
+                                    ],
+                                    Checks = [new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" }],
+                                },
+                            ],
+                        },
                     }
                 ),
             ]
         );
 
-        var decisionResult = await RunBothVersions(decisionContext);
-
-        decisionResult.Decisions.Count.Should().Be(3);
-        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.N01);
-        decisionResult.Decisions[1].DecisionCode.Should().Be(DecisionCode.C03);
-        decisionResult.Decisions[2].DecisionCode.Should().Be(DecisionCode.C03);
-    }
-
-    [Fact]
-    public async Task When_no_finders_are_found()
-    {
-        var matchingResult = new MatchingResult();
-
-        var matchingService = Substitute.For<IMatchingService>();
-        matchingService
-            .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult(matchingResult));
-
-        var decisionContext = new DecisionContext(
-            [
-                new DecisionImportPreNotification()
-                {
-                    Id = "CHEDPP.GB.2025.6248785",
-                    Status = ImportNotificationStatus.Validated,
-                    ImportNotificationType = ImportNotificationType.Cveda,
-                    UpdatedSource = DateTime.UtcNow,
-                    ConsignmentDecision = null,
-                    NotAcceptableAction = null,
-                    IuuCheckRequired = true,
-                    IuuOption = null,
-                    NotAcceptableReasons = null,
-                    InspectionRequired = "Required",
-                    Commodities =
-                    [
-                        new DecisionCommodityComplement() { HmiDecision = "NOTREQUIRED", PhsiDecision = "REQUIRED" },
-                    ],
-                    CommodityChecks =
-                    [
-                        new DecisionCommodityCheck.Check() { Type = "PHSI_DOCUMENT", Status = "Compliant" },
-                        new DecisionCommodityCheck.Check() { Type = "PHSI_IDENTITY", Status = "Auto cleared" },
-                        new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "Auto cleared" },
-                    ],
-                },
-            ],
-            [
-                new ClearanceRequestWrapper(
-                    "25GB7FOTHLNCYKEAR2",
-                    new ClearanceRequest
-                    {
-                        Commodities =
-                        [
-                            new Commodity
-                            {
-                                ItemNumber = 1,
-                                Documents =
-                                [
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "N002",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.6248785"),
-                                        DocumentStatus = "AE",
-                                        DocumentControl = "P",
-                                    },
-                                ],
-                                Checks = [new CommodityCheck { CheckCode = "H218", DepartmentCode = "HMI" }],
-                            },
-                        ],
-                    }
-                ),
-            ]
+        var decisionServiceV2 = new DecisionServiceV2(
+            new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
+            new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
 
-        var decisionResult = await RunBothVersions(decisionContext);
+        // Act
+        var decisionResult = decisionServiceV2.Process(decisionContext);
 
-        decisionResult.Decisions.Max(x => x.DecisionCode).Should().Be(DecisionCode.X00);
+        decisionResult[0].Decision.Results?.Length.Should().Be(3);
+        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(DecisionCode.N01.ToString());
+        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(DecisionCode.C03.ToString());
+        decisionResult[0].Decision.Results?[2].DecisionCode.Should().Be(DecisionCode.C03.ToString());
     }
 
     [Theory]
@@ -531,7 +392,7 @@ public class DecisionServiceTests
     [InlineData("hmi", "Missing", "Missing", "Missing", "Hold", DecisionCode.H01)]
     [InlineData("hmi", "Missing", "Missing", "Missing", "To be inspected", DecisionCode.H02)]
     [InlineData("hmi", "Missing", "Missing", "Missing", "Not inspected", DecisionCode.C02)]
-    public async Task When_processing_chedpp_scenarios_Then_should_return_expected_decisions(
+    public void When_processing_chedpp_scenarios_Then_should_return_expected_decisions(
         string scenario,
         string phsiDocumentStatus,
         string phsiIdentityStatus,
@@ -542,27 +403,8 @@ public class DecisionServiceTests
     )
     {
         // Arrange
-        var matchingResult = new MatchingResult();
-        if (scenario == "both")
-        {
-            matchingResult.AddMatch("CHEDPP.GB.2025.1234567", "25GB12345678901234", 1, "GBCHD2025.1234567", "N002");
-            matchingResult.AddMatch("CHEDPP.GB.2025.1234567", "25GB12345678901234", 1, "GBCHD2025.1234567", "N851");
-        }
-        else if (scenario == "phsi")
-        {
-            matchingResult.AddMatch("CHEDPP.GB.2025.1234567", "25GB12345678901234", 1, "GBCHD2025.1234567", "N851");
-        }
-        else if (scenario == "hmi")
-        {
-            matchingResult.AddMatch("CHEDPP.GB.2025.1234567", "25GB12345678901234", 1, "GBCHD2025.1234567", "N002");
-        }
 
-        var matchingService = Substitute.For<IMatchingService>();
-        matchingService
-            .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult(matchingResult));
-
-        var decisionContext = CreateChedppDecisionContext(
+        var decisionContext = CreateChedppDecisionContextV2(
             scenario,
             phsiDocumentStatus,
             phsiIdentityStatus,
@@ -570,11 +412,16 @@ public class DecisionServiceTests
             hmiStatus
         );
 
+        var decisionServiceV2 = new DecisionServiceV2(
+            new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
+            new CheckProcessor(new TestDecisionRulesEngineFactory())
+        );
+
         // Act
-        var decisionResult = await RunBothVersions(decisionContext);
+        var decisionResult = decisionServiceV2.Process(decisionContext);
 
         // Assert
-        decisionResult.Decisions.Should().NotBeEmpty();
+        decisionResult.Should().NotBeEmpty();
 
         // Log  the scenario being tested for debugging
         output.WriteLine(
@@ -584,38 +431,38 @@ public class DecisionServiceTests
         // For scenarios with both PHSI and HMI checks, we need to verify the correct decision for each
         if (scenario == "both")
         {
-            var phsiDecision = decisionResult.Decisions.FirstOrDefault(d => d.CheckCode == "H219");
-            var hmiDecision = decisionResult.Decisions.FirstOrDefault(d => d.CheckCode == "H218");
+            var phsiDecision = decisionResult[0].Decision.Results!.FirstOrDefault(d => d.CheckCode == "H219");
+            var hmiDecision = decisionResult[0].Decision.Results!.FirstOrDefault(d => d.CheckCode == "H218");
 
             if (phsiDecision != null)
             {
-                phsiDecision.DecisionCode.Should().Be(expectedPhsiDecisionCode);
+                phsiDecision.DecisionCode.Should().Be(expectedPhsiDecisionCode.ToString());
             }
 
             if (hmiDecision != null && expectedHmiDecisionCode.HasValue)
             {
-                hmiDecision.DecisionCode.Should().Be(expectedHmiDecisionCode.Value);
+                hmiDecision.DecisionCode.Should().Be(expectedHmiDecisionCode.Value.ToString());
             }
         }
         else if (scenario == "phsi")
         {
-            var phsiDecision = decisionResult.Decisions.FirstOrDefault(d => d.CheckCode == "H219");
+            var phsiDecision = decisionResult[0].Decision.Results!.FirstOrDefault(d => d.CheckCode == "H219");
             phsiDecision.Should().NotBeNull();
-            phsiDecision!.DecisionCode.Should().Be(expectedPhsiDecisionCode);
+            phsiDecision!.DecisionCode.Should().Be(expectedPhsiDecisionCode.ToString());
         }
         else if (scenario == "hmi")
         {
-            var hmiDecision = decisionResult.Decisions.FirstOrDefault(d => d.CheckCode == "H218");
+            var hmiDecision = decisionResult[0].Decision.Results!.FirstOrDefault(d => d.CheckCode == "H218");
             hmiDecision.Should().NotBeNull();
-            hmiDecision!.DecisionCode.Should().Be(expectedPhsiDecisionCode);
+            hmiDecision!.DecisionCode.Should().Be(expectedPhsiDecisionCode.ToString());
         }
     }
 
     [Fact]
-    public async Task When_processing_chedpp_with_both_phsi_and_hmi_Then_should_return_expected_decisions()
+    public void When_processing_chedpp_with_both_phsi_and_hmi_Then_should_return_expected_decisions()
     {
         // Arrange
-        var decisionContext = new DecisionContext(
+        var decisionContext = new DecisionContextV2(
             [
                 new DecisionImportPreNotification()
                 {
@@ -638,282 +485,45 @@ public class DecisionServiceTests
                 },
             ],
             [
-                new ClearanceRequestWrapper(
+                new CustomsDeclarationWrapper(
                     "25GB99999999999021",
-                    new ClearanceRequest
+                    new CustomsDeclaration()
                     {
-                        Commodities =
-                        [
-                            new Commodity
-                            {
-                                ItemNumber = 1,
-                                Documents =
-                                [
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "N851",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
-                                        DocumentStatus = "JE",
-                                        DocumentControl = "P",
-                                    },
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "N002",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
-                                        DocumentStatus = "JE",
-                                        DocumentControl = "P",
-                                    },
-                                ],
-                                Checks =
-                                [
-                                    new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" },
-                                    new CommodityCheck { CheckCode = "H218", DepartmentCode = "HMI" },
-                                ],
-                            },
-                        ],
+                        ClearanceRequest = new ClearanceRequest
+                        {
+                            Commodities =
+                            [
+                                new Commodity
+                                {
+                                    ItemNumber = 1,
+                                    Documents =
+                                    [
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "N851",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
+                                            DocumentStatus = "JE",
+                                            DocumentControl = "P",
+                                        },
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "N002",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
+                                            DocumentStatus = "JE",
+                                            DocumentControl = "P",
+                                        },
+                                    ],
+                                    Checks =
+                                    [
+                                        new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" },
+                                        new CommodityCheck { CheckCode = "H218", DepartmentCode = "HMI" },
+                                    ],
+                                },
+                            ],
+                        },
                     }
                 ),
             ]
-        );
-
-        // Act
-        var decisionResult = await RunBothVersions(decisionContext);
-
-        // Assert
-
-        decisionResult.Should().NotBeNull();
-        decisionResult.Decisions.Count.Should().Be(2);
-        decisionResult.Decisions[0].CheckCode.Should().Be("H219");
-        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.C03);
-        decisionResult.Decisions[0].DocumentCode.Should().Be("N851");
-
-        decisionResult.Decisions[1].CheckCode.Should().Be("H218");
-        decisionResult.Decisions[1].DecisionCode.Should().Be(DecisionCode.H01);
-        decisionResult.Decisions[1].DocumentCode.Should().Be("N002");
-    }
-
-    [Fact]
-    public async Task When_processing_chedpp_with_both_phsi_and_hmi_with_H220_Then_should_return_expected_decisions()
-    {
-        // Arrange
-        var decisionContext = new DecisionContext(
-            [
-                new DecisionImportPreNotification()
-                {
-                    Id = "CHEDPP.GB.2025.9200009",
-                    Status = ImportNotificationStatus.Validated,
-                    ImportNotificationType = ImportNotificationType.Chedpp,
-                    UpdatedSource = DateTime.UtcNow,
-                    ConsignmentDecision = null,
-                    NotAcceptableAction = null,
-                    IuuCheckRequired = null,
-                    IuuOption = null,
-                    NotAcceptableReasons = null,
-                    CommodityChecks =
-                    [
-                        new DecisionCommodityCheck.Check() { Type = "PHSI_DOCUMENT", Status = "To do" },
-                        new DecisionCommodityCheck.Check() { Type = "PHSI_IDENTITY", Status = "To do" },
-                        new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "To do" },
-                        new DecisionCommodityCheck.Check() { Type = "HMI", Status = "Auto cleared" },
-                    ],
-                    HasPartTwo = true,
-                },
-            ],
-            [
-                new ClearanceRequestWrapper(
-                    "25GB99999999999021",
-                    new ClearanceRequest
-                    {
-                        Commodities =
-                        [
-                            new Commodity
-                            {
-                                ItemNumber = 1,
-                                Documents =
-                                [
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "N851",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
-                                        DocumentStatus = "JE",
-                                        DocumentControl = "P",
-                                    },
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "N002",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
-                                        DocumentStatus = "JE",
-                                        DocumentControl = "P",
-                                    },
-                                ],
-                                Checks =
-                                [
-                                    new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" },
-                                    new CommodityCheck { CheckCode = "H220", DepartmentCode = "HMI" },
-                                ],
-                            },
-                        ],
-                    }
-                ),
-            ]
-        );
-
-        // Act
-        var decisionResult = await RunBothVersions(decisionContext);
-
-        // Assert
-
-        decisionResult.Should().NotBeNull();
-        decisionResult.Decisions.Count.Should().Be(2);
-        decisionResult.Decisions[0].CheckCode.Should().Be("H219");
-        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.H01);
-        decisionResult.Decisions[0].DocumentCode.Should().Be("N851");
-
-        decisionResult.Decisions[1].CheckCode.Should().Be("H220");
-        decisionResult.Decisions[1].DecisionCode.Should().Be(DecisionCode.C03);
-        decisionResult.Decisions[1].DocumentCode.Should().Be("N002");
-    }
-
-    [Fact]
-    public async Task When_processing_chedpp_with_phsi_and_all_three_document_codes_Then_should_return_expected_decisions()
-    {
-        // Arrange
-        var decisionContext = new DecisionContext(
-            [
-                new DecisionImportPreNotification()
-                {
-                    Id = "CHEDPP.GB.2025.9200009",
-                    Status = ImportNotificationStatus.Validated,
-                    ImportNotificationType = ImportNotificationType.Chedpp,
-                    UpdatedSource = DateTime.UtcNow,
-                    ConsignmentDecision = null,
-                    NotAcceptableAction = null,
-                    IuuCheckRequired = null,
-                    IuuOption = null,
-                    NotAcceptableReasons = null,
-                    CommodityChecks =
-                    [
-                        new DecisionCommodityCheck.Check() { Type = "PHSI_DOCUMENT", Status = "To do" },
-                        new DecisionCommodityCheck.Check() { Type = "PHSI_IDENTITY", Status = "To do" },
-                        new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "To do" },
-                        new DecisionCommodityCheck.Check() { Type = "HMI", Status = "Auto cleared" },
-                    ],
-                    HasPartTwo = true,
-                },
-            ],
-            [
-                new ClearanceRequestWrapper(
-                    "25GB99999999999021",
-                    new ClearanceRequest
-                    {
-                        Commodities =
-                        [
-                            new Commodity
-                            {
-                                ItemNumber = 1,
-                                Documents =
-                                [
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "N851",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
-                                        DocumentStatus = "JE",
-                                        DocumentControl = "P",
-                                    },
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "C085",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
-                                        DocumentStatus = "JE",
-                                        DocumentControl = "P",
-                                    },
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "9115",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
-                                        DocumentStatus = "JE",
-                                        DocumentControl = "P",
-                                    },
-                                ],
-                                Checks = [new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" }],
-                            },
-                        ],
-                    }
-                ),
-            ]
-        );
-
-        // Act
-        var decisionResult = await RunBothVersions(decisionContext);
-
-        // Assert
-        decisionResult.Should().NotBeNull();
-        decisionResult.Decisions.Count.Should().Be(3);
-        decisionResult.Decisions[0].CheckCode.Should().Be("H219");
-        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.H01);
-        decisionResult.Decisions[0].DocumentCode.Should().Be("N851");
-
-        decisionResult.Decisions[1].CheckCode.Should().Be("H219");
-        decisionResult.Decisions[1].DecisionCode.Should().Be(DecisionCode.H01);
-        decisionResult.Decisions[1].DocumentCode.Should().Be("C085");
-
-        decisionResult.Decisions[2].CheckCode.Should().Be("H219");
-        decisionResult.Decisions[2].DecisionCode.Should().Be(DecisionCode.H01);
-        decisionResult.Decisions[2].DocumentCode.Should().Be("9115");
-    }
-
-    private async Task<DecisionResult> RunBothVersions(DecisionContext decisionContext)
-    {
-        var sut = new DecisionService(
-            NullLogger<DecisionService>.Instance,
-            new MatchingService(),
-            [
-                new CommodityWeightOrQuantityDecisionFinder(
-                    new CommodityCodeDecisionFinder(
-                        new ChedADecisionFinder(),
-                        NullLogger<CommodityCodeDecisionFinder>.Instance
-                    ),
-                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
-                ),
-                new CommodityWeightOrQuantityDecisionFinder(
-                    new CommodityCodeDecisionFinder(
-                        new ChedDDecisionFinder(),
-                        NullLogger<CommodityCodeDecisionFinder>.Instance
-                    ),
-                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
-                ),
-                new CommodityWeightOrQuantityDecisionFinder(
-                    new CommodityCodeDecisionFinder(
-                        new ChedPDecisionFinder(),
-                        NullLogger<CommodityCodeDecisionFinder>.Instance
-                    ),
-                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
-                ),
-                new CommodityWeightOrQuantityDecisionFinder(
-                    new CommodityCodeDecisionFinder(
-                        new ChedPPDecisionFinder(),
-                        NullLogger<CommodityCodeDecisionFinder>.Instance
-                    ),
-                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
-                ),
-                new CommodityWeightOrQuantityDecisionFinder(
-                    new CommodityCodeDecisionFinder(
-                        new IuuDecisionFinder(),
-                        NullLogger<CommodityCodeDecisionFinder>.Instance
-                    ),
-                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
-                ),
-            ]
-        );
-
-        var (decisionResult, v1Elapsed) = await TimingExtensions.TimeAsync(() =>
-            sut.Process(decisionContext, CancellationToken.None)
-        );
-
-        var v1Decision = decisionResult.BuildClearanceDecision(
-            decisionContext.ClearanceRequests[0].MovementReferenceNumber,
-            new CustomsDeclaration() { ClearanceRequest = decisionContext.ClearanceRequests[0].ClearanceRequest },
-            new TestCorrelationIdGenerator("TEST")
         );
 
         var decisionServiceV2 = new DecisionServiceV2(
@@ -921,39 +531,213 @@ public class DecisionServiceTests
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
 
-        var (newDecisionResult, v2Elapsed) = TimingExtensions.Time(() =>
-            decisionServiceV2
-                .Process(
-                    new DecisionContextV2(
-                        decisionContext.Notifications,
-                        [
-                            new CustomsDeclarationWrapper(
-                                decisionContext.ClearanceRequests[0].MovementReferenceNumber,
-                                new CustomsDeclaration()
-                                {
-                                    ClearanceRequest = decisionContext.ClearanceRequests[0].ClearanceRequest,
-                                }
-                            ),
-                        ]
-                    )
-                )
-                .ToList()
-        );
+        // Act
+        var decisionResult = decisionServiceV2.Process(decisionContext);
 
-        v1Decision.IsSameAs(newDecisionResult[0].Decision).Should().BeTrue();
+        // Assert
 
-        var percentIncrease = (v1Elapsed - v2Elapsed).TotalMilliseconds / v1Elapsed.TotalMilliseconds * 100;
-        output.WriteLine($"V1 {v1Elapsed}");
-        output.WriteLine($"V2 {v2Elapsed}");
-        output.WriteLine($"V2 {percentIncrease}% quicker");
-        return decisionResult;
+        decisionResult.Should().NotBeNull();
+        decisionResult[0].Decision.Results?.Length.Should().Be(2);
+        decisionResult[0].Decision.Results?[0].CheckCode.Should().Be("H219");
+        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(DecisionCode.C03.ToString());
+        decisionResult[0].Decision.Results?[0].DocumentCode.Should().Be("N851");
+
+        decisionResult[0].Decision.Results?[1].CheckCode.Should().Be("H218");
+        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(DecisionCode.H01.ToString());
+        decisionResult[0].Decision.Results?[1].DocumentCode.Should().Be("N002");
     }
 
     [Fact]
-    public async Task When_processing_chedp_but_with_ced_notification_Then_should_return_expected_decisions()
+    public void When_processing_chedpp_with_both_phsi_and_hmi_with_H220_Then_should_return_expected_decisions()
     {
         // Arrange
-        var decisionContext = new DecisionContext(
+        var decisionContext = new DecisionContextV2(
+            [
+                new DecisionImportPreNotification()
+                {
+                    Id = "CHEDPP.GB.2025.9200009",
+                    Status = ImportNotificationStatus.Validated,
+                    ImportNotificationType = ImportNotificationType.Chedpp,
+                    UpdatedSource = DateTime.UtcNow,
+                    ConsignmentDecision = null,
+                    NotAcceptableAction = null,
+                    IuuCheckRequired = null,
+                    IuuOption = null,
+                    NotAcceptableReasons = null,
+                    CommodityChecks =
+                    [
+                        new DecisionCommodityCheck.Check() { Type = "PHSI_DOCUMENT", Status = "To do" },
+                        new DecisionCommodityCheck.Check() { Type = "PHSI_IDENTITY", Status = "To do" },
+                        new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "To do" },
+                        new DecisionCommodityCheck.Check() { Type = "HMI", Status = "Auto cleared" },
+                    ],
+                    HasPartTwo = true,
+                },
+            ],
+            [
+                new CustomsDeclarationWrapper(
+                    "25GB99999999999021",
+                    new CustomsDeclaration()
+                    {
+                        ClearanceRequest = new ClearanceRequest
+                        {
+                            Commodities =
+                            [
+                                new Commodity
+                                {
+                                    ItemNumber = 1,
+                                    Documents =
+                                    [
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "N851",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
+                                            DocumentStatus = "JE",
+                                            DocumentControl = "P",
+                                        },
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "N002",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
+                                            DocumentStatus = "JE",
+                                            DocumentControl = "P",
+                                        },
+                                    ],
+                                    Checks =
+                                    [
+                                        new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" },
+                                        new CommodityCheck { CheckCode = "H220", DepartmentCode = "HMI" },
+                                    ],
+                                },
+                            ],
+                        },
+                    }
+                ),
+            ]
+        );
+
+        var decisionServiceV2 = new DecisionServiceV2(
+            new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
+            new CheckProcessor(new TestDecisionRulesEngineFactory())
+        );
+
+        // Act
+        var decisionResult = decisionServiceV2.Process(decisionContext);
+
+        // Assert
+
+        decisionResult.Should().NotBeNull();
+        decisionResult[0].Decision.Results?.Length.Should().Be(2);
+        decisionResult[0].Decision.Results?[0].CheckCode.Should().Be("H219");
+        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(DecisionCode.H01.ToString());
+        decisionResult[0].Decision.Results?[0].DocumentCode.Should().Be("N851");
+
+        decisionResult[0].Decision.Results?[1].CheckCode.Should().Be("H220");
+        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(DecisionCode.C03.ToString());
+        decisionResult[0].Decision.Results?[1].DocumentCode.Should().Be("N002");
+    }
+
+    [Fact]
+    public void When_processing_chedpp_with_phsi_and_all_three_document_codes_Then_should_return_expected_decisions()
+    {
+        // Arrange
+        var decisionContext = new DecisionContextV2(
+            [
+                new DecisionImportPreNotification()
+                {
+                    Id = "CHEDPP.GB.2025.9200009",
+                    Status = ImportNotificationStatus.Validated,
+                    ImportNotificationType = ImportNotificationType.Chedpp,
+                    UpdatedSource = DateTime.UtcNow,
+                    ConsignmentDecision = null,
+                    NotAcceptableAction = null,
+                    IuuCheckRequired = null,
+                    IuuOption = null,
+                    NotAcceptableReasons = null,
+                    CommodityChecks =
+                    [
+                        new DecisionCommodityCheck.Check() { Type = "PHSI_DOCUMENT", Status = "To do" },
+                        new DecisionCommodityCheck.Check() { Type = "PHSI_IDENTITY", Status = "To do" },
+                        new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "To do" },
+                        new DecisionCommodityCheck.Check() { Type = "HMI", Status = "Auto cleared" },
+                    ],
+                    HasPartTwo = true,
+                },
+            ],
+            [
+                new CustomsDeclarationWrapper(
+                    "25GB99999999999021",
+                    new CustomsDeclaration()
+                    {
+                        ClearanceRequest = new ClearanceRequest
+                        {
+                            Commodities =
+                            [
+                                new Commodity
+                                {
+                                    ItemNumber = 1,
+                                    Documents =
+                                    [
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "N851",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
+                                            DocumentStatus = "JE",
+                                            DocumentControl = "P",
+                                        },
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "C085",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
+                                            DocumentStatus = "JE",
+                                            DocumentControl = "P",
+                                        },
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "9115",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
+                                            DocumentStatus = "JE",
+                                            DocumentControl = "P",
+                                        },
+                                    ],
+                                    Checks = [new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" }],
+                                },
+                            ],
+                        },
+                    }
+                ),
+            ]
+        );
+
+        var decisionServiceV2 = new DecisionServiceV2(
+            new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
+            new CheckProcessor(new TestDecisionRulesEngineFactory())
+        );
+
+        // Act
+        var decisionResult = decisionServiceV2.Process(decisionContext);
+
+        // Assert
+        decisionResult.Should().NotBeNull();
+        decisionResult[0].Decision.Results?.Length.Should().Be(3);
+        decisionResult[0].Decision.Results?[0].CheckCode.Should().Be("H219");
+        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(nameof(DecisionCode.H01));
+        decisionResult[0].Decision.Results?[0].DocumentCode.Should().Be("N851");
+
+        decisionResult[0].Decision.Results?[1].CheckCode.Should().Be("H219");
+        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(nameof(DecisionCode.H01));
+        decisionResult[0].Decision.Results?[1].DocumentCode.Should().Be("C085");
+
+        decisionResult[0].Decision.Results?[2].CheckCode.Should().Be("H219");
+        decisionResult[0].Decision.Results?[2].DecisionCode.Should().Be(nameof(DecisionCode.H01));
+        decisionResult[0].Decision.Results?[2].DocumentCode.Should().Be("9115");
+    }
+
+    [Fact]
+    public void When_processing_chedp_but_with_ced_notification_Then_should_return_expected_decisions()
+    {
+        // Arrange
+        var decisionContext = new DecisionContextV2(
             [
                 new DecisionImportPreNotification()
                 {
@@ -987,142 +771,73 @@ public class DecisionServiceTests
                 },
             ],
             [
-                new ClearanceRequestWrapper(
+                new CustomsDeclarationWrapper(
                     "25GB99999999999021",
-                    new ClearanceRequest
+                    new CustomsDeclaration()
                     {
-                        Commodities =
-                        [
-                            new Commodity
-                            {
-                                ItemNumber = 1,
-                                TaricCommodityCode = "0207119000",
-                                NetMass = 56,
-                                Documents =
-                                [
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "N853",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
-                                        DocumentStatus = "JE",
-                                        DocumentControl = "P",
-                                    },
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "C678",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
-                                        DocumentStatus = "JE",
-                                        DocumentControl = "P",
-                                    },
-                                ],
-                                Checks =
-                                [
-                                    new CommodityCheck { CheckCode = "H222", DepartmentCode = "PHSI" },
-                                    new CommodityCheck { CheckCode = "H223", DepartmentCode = "PHSI" },
-                                ],
-                            },
-                        ],
+                        ClearanceRequest = new ClearanceRequest
+                        {
+                            Commodities =
+                            [
+                                new Commodity
+                                {
+                                    ItemNumber = 1,
+                                    TaricCommodityCode = "0207119000",
+                                    NetMass = 56,
+                                    Documents =
+                                    [
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "N853",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
+                                            DocumentStatus = "JE",
+                                            DocumentControl = "P",
+                                        },
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "C678",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.9200009"),
+                                            DocumentStatus = "JE",
+                                            DocumentControl = "P",
+                                        },
+                                    ],
+                                    Checks =
+                                    [
+                                        new CommodityCheck { CheckCode = "H222", DepartmentCode = "PHSI" },
+                                        new CommodityCheck { CheckCode = "H223", DepartmentCode = "PHSI" },
+                                    ],
+                                },
+                            ],
+                        },
                     }
                 ),
             ]
         );
 
-        var sut = new DecisionService(
-            NullLogger<DecisionService>.Instance,
-            new MatchingService(),
-            [
-                new CommodityWeightOrQuantityDecisionFinder(
-                    new CommodityCodeDecisionFinder(
-                        new ChedADecisionFinder(),
-                        NullLogger<CommodityCodeDecisionFinder>.Instance
-                    ),
-                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
-                ),
-                new CommodityWeightOrQuantityDecisionFinder(
-                    new CommodityCodeDecisionFinder(
-                        new ChedDDecisionFinder(),
-                        NullLogger<CommodityCodeDecisionFinder>.Instance
-                    ),
-                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
-                ),
-                new CommodityWeightOrQuantityDecisionFinder(
-                    new CommodityCodeDecisionFinder(
-                        new ChedPDecisionFinder(),
-                        NullLogger<CommodityCodeDecisionFinder>.Instance
-                    ),
-                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
-                ),
-                new CommodityWeightOrQuantityDecisionFinder(
-                    new CommodityCodeDecisionFinder(
-                        new ChedPPDecisionFinder(),
-                        NullLogger<CommodityCodeDecisionFinder>.Instance
-                    ),
-                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
-                ),
-                new CommodityWeightOrQuantityDecisionFinder(
-                    new CommodityCodeDecisionFinder(
-                        new IuuDecisionFinder(),
-                        NullLogger<CommodityCodeDecisionFinder>.Instance
-                    ),
-                    NullLogger<CommodityWeightOrQuantityDecisionFinder>.Instance
-                ),
-            ]
+        var sut = new DecisionServiceV2(
+            new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
+            new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
 
         // Act
-        var decisionResult = await sut.Process(decisionContext, CancellationToken.None);
+        var decisionResult = sut.Process(decisionContext);
 
         // Assert
         decisionResult.Should().NotBeNull();
-        decisionResult.Decisions.Count.Should().Be(2);
-        decisionResult.Decisions[0].CheckCode.Should().Be("H222");
-        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.C03);
-        decisionResult.Decisions[0].DocumentCode.Should().Be("N853");
+        decisionResult[0].Decision.Results?.Length.Should().Be(2);
+        decisionResult[0].Decision.Results?[0].CheckCode.Should().Be("H222");
+        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(DecisionCode.C03.ToString());
+        decisionResult[0].Decision.Results?[0].DocumentCode.Should().Be("N853");
 
-        decisionResult.Decisions[1].CheckCode.Should().Be("H223");
-        decisionResult.Decisions[1].DecisionCode.Should().Be(DecisionCode.X00);
-        decisionResult.Decisions[1].DocumentCode.Should().Be("C678");
-        decisionResult.Decisions[1].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E84);
+        decisionResult[0].Decision.Results?[1].CheckCode.Should().Be("H223");
+        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(DecisionCode.X00.ToString());
+        decisionResult[0].Decision.Results?[1].DocumentCode.Should().Be("C678");
+        decisionResult[0]
+            .Decision.Results?[1].InternalDecisionCode.Should()
+            .Be(DecisionInternalFurtherDetail.E84.ToString());
     }
 
-    private static DecisionContext CreateDecisionContext(
-        string? importNotificationType,
-        string[]? checkCodes,
-        bool? iuuCheckRequired
-    )
-    {
-        return new DecisionContext(
-            [
-                new DecisionImportPreNotification
-                {
-                    Id = "notification-1",
-                    ImportNotificationType = importNotificationType,
-                    IuuCheckRequired = iuuCheckRequired,
-                },
-            ],
-            [
-                new ClearanceRequestWrapper(
-                    "clearancerequest-1",
-                    new ClearanceRequest
-                    {
-                        Commodities =
-                        [
-                            new Commodity
-                            {
-                                ItemNumber = 1,
-                                Documents = [new ImportDocument { DocumentCode = "9115" }],
-                                Checks = checkCodes
-                                    ?.Select(checkCode => new CommodityCheck { CheckCode = checkCode })
-                                    .ToArray(),
-                            },
-                        ],
-                    }
-                ),
-            ]
-        );
-    }
-
-    private static DecisionContext CreateChedppDecisionContext(
+    private static DecisionContextV2 CreateChedppDecisionContextV2(
         string scenario,
         string phsiDocumentStatus,
         string phsiIdentityStatus,
@@ -1170,7 +885,7 @@ public class DecisionServiceTests
             clearanceRequestChecks.Add(new CommodityCheck { CheckCode = "H218", DepartmentCode = "HMI" });
         }
 
-        return new DecisionContext(
+        return new DecisionContextV2(
             [
                 new DecisionImportPreNotification()
                 {
@@ -1197,35 +912,38 @@ public class DecisionServiceTests
                 },
             ],
             [
-                new ClearanceRequestWrapper(
+                new CustomsDeclarationWrapper(
                     "25GB12345678901234",
-                    new ClearanceRequest
+                    new CustomsDeclaration()
                     {
-                        Commodities =
-                        [
-                            new Commodity
-                            {
-                                ItemNumber = 1,
-                                Documents =
-                                [
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "N002",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.1234567"),
-                                        DocumentStatus = "AE",
-                                        DocumentControl = "P",
-                                    },
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "N851",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.1234567"),
-                                        DocumentStatus = "AE",
-                                        DocumentControl = "P",
-                                    },
-                                ],
-                                Checks = clearanceRequestChecks.ToArray(),
-                            },
-                        ],
+                        ClearanceRequest = new ClearanceRequest
+                        {
+                            Commodities =
+                            [
+                                new Commodity
+                                {
+                                    ItemNumber = 1,
+                                    Documents =
+                                    [
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "N002",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.1234567"),
+                                            DocumentStatus = "AE",
+                                            DocumentControl = "P",
+                                        },
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "N851",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.1234567"),
+                                            DocumentStatus = "AE",
+                                            DocumentControl = "P",
+                                        },
+                                    ],
+                                    Checks = clearanceRequestChecks.ToArray(),
+                                },
+                            ],
+                        },
                     }
                 ),
             ]

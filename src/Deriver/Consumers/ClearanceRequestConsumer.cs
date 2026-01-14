@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
@@ -9,16 +8,13 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
-using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using SlimMessageBus;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 
 public class ClearanceRequestConsumer(
     ILogger<ClearanceRequestConsumer> logger,
-    IDecisionService decisionService,
     ITradeImportsDataApiClient apiClient,
-    ICorrelationIdGenerator correlationIdGenerator,
     IDecisionServiceV2 decisionServiceV2
 ) : IConsumer<ResourceEvent<CustomsDeclarationEvent>>, IConsumerWithContext
 {
@@ -67,28 +63,13 @@ public class ClearanceRequestConsumer(
             .ImportPreNotifications.Select(x => x.ImportPreNotification)
             .ToList();
 
-        var (v1Result, v1Elapsed) = await TimingExtensions.TimeAsync(() =>
-            RunV1(message, preNotifications, clearanceRequest, cancellationToken)
-        );
+        var v2Result = RunDecisionService(message, preNotifications, clearanceRequest);
 
-        var (v2Result, v2Elapsed) = TimingExtensions.Time(() => RunV2(message, preNotifications, clearanceRequest));
-
-        logger.LogInformation("V1 Took {V1Elapsed} - V2 took {V2Elapsed}", v1Elapsed, v2Elapsed);
-
-        if (!v1Result.ClearanceDecision.IsSameAs(v2Result))
-        {
-            logger.LogWarning(
-                "ClearanceRequestConsumer DecisionResults are different: V1 {V1} - V2 {V2}",
-                JsonSerializer.Serialize(v1Result.ClearanceDecision),
-                JsonSerializer.Serialize(v2Result)
-            );
-        }
-
-        if (v1Result.ShouldPersist)
+        if (clearanceRequest == null || !clearanceRequest.ClearanceDecision.IsSameAs(v2Result))
         {
             var customsDeclaration = new CustomsDeclaration
             {
-                ClearanceDecision = v1Result.ClearanceDecision,
+                ClearanceDecision = v2Result,
                 Finalisation = clearanceRequest?.Finalisation,
                 ClearanceRequest = clearanceRequest?.ClearanceRequest,
                 ExternalErrors = clearanceRequest?.ExternalErrors,
@@ -107,76 +88,28 @@ public class ClearanceRequestConsumer(
         }
     }
 
-    private ClearanceDecision? RunV2(
+    private ClearanceDecision? RunDecisionService(
         ResourceEvent<CustomsDeclarationEvent> message,
         List<ImportPreNotification> preNotifications,
         CustomsDeclarationResponse? clearanceRequest
     )
     {
-        var newResults = decisionServiceV2.Process(
-            new DecisionContextV2(
-                preNotifications.Select(x => x.ToDecisionImportPreNotification()).ToList(),
-                [
-                    new CustomsDeclarationWrapper(
-                        message.ResourceId,
-                        new CustomsDeclaration()
-                        {
-                            ClearanceDecision = clearanceRequest?.ClearanceDecision,
-                            ClearanceRequest = clearanceRequest?.ClearanceRequest,
-                        }
-                    ),
-                ]
-            )
-        );
+        var decisionImportPreNotifications = preNotifications.Select(x => x.ToDecisionImportPreNotification()).ToList();
+        CustomsDeclarationWrapper[] cds =
+        [
+            new CustomsDeclarationWrapper(
+                message.ResourceId,
+                new CustomsDeclaration()
+                {
+                    ClearanceDecision = clearanceRequest?.ClearanceDecision,
+                    ClearanceRequest = clearanceRequest?.ClearanceRequest,
+                }
+            ),
+        ];
+        var context = new DecisionContextV2(decisionImportPreNotifications, cds.ToList());
+
+        var newResults = decisionServiceV2.Process(context);
         return newResults[0].Decision;
-    }
-
-    private async Task<(ClearanceDecision? ClearanceDecision, bool ShouldPersist)> RunV1(
-        ResourceEvent<CustomsDeclarationEvent> message,
-        List<ImportPreNotification> preNotifications,
-        CustomsDeclarationResponse? clearanceRequest,
-        CancellationToken cancellationToken
-    )
-    {
-        var decisionContext = new DecisionContext(
-            preNotifications.Select(x => x.ToDecisionImportPreNotification()).ToList(),
-            [new ClearanceRequestWrapper(message.ResourceId, clearanceRequest!.ClearanceRequest!)]
-        );
-        var decisionResult = await decisionService.Process(decisionContext, cancellationToken);
-
-        if (!decisionResult.Decisions.Any())
-        {
-            logger.LogInformation("No decision derived");
-
-            return (null, false);
-        }
-
-        logger.LogInformation("Decision derived");
-
-        return BuildDecision(clearanceRequest, decisionResult);
-    }
-
-    private (ClearanceDecision ClearanceDecision, bool ShouldPersist) BuildDecision(
-        CustomsDeclarationResponse existingCustomsDeclaration,
-        DecisionResult decisionResult
-    )
-    {
-        var customsDeclaration = new CustomsDeclaration
-        {
-            ClearanceDecision = existingCustomsDeclaration.ClearanceDecision,
-            Finalisation = existingCustomsDeclaration.Finalisation,
-            ClearanceRequest = existingCustomsDeclaration.ClearanceRequest,
-            ExternalErrors = existingCustomsDeclaration.ExternalErrors,
-        };
-
-        var newDecision = decisionResult.BuildClearanceDecision(
-            existingCustomsDeclaration.MovementReferenceNumber,
-            customsDeclaration,
-            correlationIdGenerator
-        );
-
-        var shouldPersist = !newDecision.IsSameAs(existingCustomsDeclaration.ClearanceDecision);
-        return (newDecision, shouldPersist);
     }
 
     public IConsumerContext Context { get; set; } = null!;

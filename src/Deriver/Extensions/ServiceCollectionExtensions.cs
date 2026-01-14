@@ -1,33 +1,26 @@
 using System.Diagnostics.CodeAnalysis;
-using Amazon.SimpleNotificationService;
 using Amazon.SQS;
 using Defra.TradeImportsDataApi.Api.Client;
-using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine.DecisionRules;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
-using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
 using Defra.TradeImportsDecisionDeriver.Deriver.Serializers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Services.Admin;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
-using Elastic.CommonSchema;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Options;
 using Polly;
-using Scrutor;
 using SlimMessageBus.Host;
 using SlimMessageBus.Host.AmazonSQS;
 using SlimMessageBus.Host.Interceptor;
 using SlimMessageBus.Host.Serialization;
-using ClearanceDecisionBuilder = Defra.TradeImportsDecisionDeriver.Deriver.Decisions.ClearanceDecisionBuilder;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
@@ -68,24 +61,6 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddConsumers(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<IDecisionService, DecisionService>();
-        services.AddScoped<IMatchingService, MatchingService>();
-
-        services.AddScoped<IDecisionFinder, ChedADecisionFinder>();
-        services.AddScoped<IDecisionFinder, ChedDDecisionFinder>();
-        services.AddScoped<IDecisionFinder, ChedPDecisionFinder>();
-        services.AddScoped<IDecisionFinder, ChedPPDecisionFinder>();
-        services.AddScoped<IDecisionFinder, IuuDecisionFinder>();
-
-        services.Decorate<IDecisionFinder, CommodityCodeDecisionFinder>();
-        services.Decorate<IDecisionFinder>(
-            (inner, provider) =>
-                new CommodityWeightOrQuantityDecisionFinder(
-                    inner,
-                    provider.GetRequiredService<ILogger<CommodityWeightOrQuantityDecisionFinder>>()
-                )
-        );
-
         //V2 of Decision Making
         services.AddSingleton<ICorrelationIdGenerator, CorrelationIdGenerator>();
         services.AddSingleton<IDecisionServiceV2, DecisionServiceV2>();

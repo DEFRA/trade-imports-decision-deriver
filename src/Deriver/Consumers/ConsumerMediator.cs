@@ -12,9 +12,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 
 public class ConsumerMediator(
     ILoggerFactory loggerFactory,
-    IDecisionService decisionService,
     ITradeImportsDataApiClient apiClient,
-    ICorrelationIdGenerator correlationIdGenerator,
     IDecisionServiceV2 decisionServiceV2
 ) : IConsumer<string>, IConsumerWithContext
 {
@@ -43,9 +41,7 @@ public class ConsumerMediator(
     {
         var consumer = new ImportPreNotificationConsumer(
             loggerFactory.CreateLogger<ImportPreNotificationConsumer>(),
-            decisionService,
             apiClient,
-            correlationIdGenerator,
             decisionServiceV2
         )
         {
@@ -64,9 +60,7 @@ public class ConsumerMediator(
     {
         var consumer = new ClearanceRequestConsumer(
             loggerFactory.CreateLogger<ClearanceRequestConsumer>(),
-            decisionService,
             apiClient,
-            correlationIdGenerator,
             decisionServiceV2
         )
         {

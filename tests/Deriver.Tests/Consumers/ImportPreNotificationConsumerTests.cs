@@ -1,15 +1,13 @@
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using SlimMessageBus.Host;
-using ClearanceDecisionBuilder = Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.ClearanceDecisionBuilder;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Consumers;
 
@@ -20,12 +18,9 @@ public class ImportPreNotificationConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = Substitute.For<IDecisionService>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
-            decisionService,
             apiClient,
-            new TestCorrelationIdGenerator("CorrelationId"),
             new DecisionServiceV2(
                 new Deriver.Decisions.V2.ClearanceDecisionBuilder(new CorrelationIdGenerator()),
                 new CheckProcessor(new TestDecisionRulesEngineFactory())
@@ -40,10 +35,6 @@ public class ImportPreNotificationConsumerTests
             .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
             .Returns(new CustomsDeclarationsResponse([]));
 
-        var decisionResult = new DecisionResult();
-        decisionResult.AddDecision("mrn", 1, "docref", "docCode", "checkCode", DecisionCode.C03);
-        decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
-
         // ACT
         await consumer.OnHandle(createdEvent, CancellationToken.None);
 
@@ -56,13 +47,10 @@ public class ImportPreNotificationConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = Substitute.For<IDecisionService>();
         var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
-            decisionService,
             apiClient,
-            new TestCorrelationIdGenerator("CorrelationId"),
             decisionServicev2
         );
 
@@ -86,9 +74,9 @@ public class ImportPreNotificationConsumerTests
                 ])
             );
 
-        var decisionResult = new DecisionResult();
-        decisionResult.AddDecision("mrn123", 1, "docref", "docCode", "checkCode", DecisionCode.C03);
-        decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
+        decisionServicev2
+            .Process(Arg.Any<DecisionContextV2>())
+            .Returns([new ValueTuple<string, ClearanceDecision>("mrn", customsDeclaration.ClearanceDecision!)]);
 
         // ACT
         await consumer.OnHandle(createdEvent, CancellationToken.None);
@@ -102,13 +90,10 @@ public class ImportPreNotificationConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = Substitute.For<IDecisionService>();
         var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
-            decisionService,
             apiClient,
-            new TestCorrelationIdGenerator("CorrelationId"),
             decisionServicev2
         );
 
@@ -132,9 +117,9 @@ public class ImportPreNotificationConsumerTests
                 ])
             );
 
-        var decisionResult = new DecisionResult();
-        decisionResult.AddDecision("mrn123", 1, "docref", "docCode", "checkCode", DecisionCode.C03);
-        decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
+        decisionServicev2
+            .Process(Arg.Any<DecisionContextV2>())
+            .Returns([new ValueTuple<string, ClearanceDecision>("mrn", customsDeclaration.ClearanceDecision!)]);
 
         // ACT
         await consumer.OnHandle(createdEvent, CancellationToken.None);
@@ -148,13 +133,10 @@ public class ImportPreNotificationConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = Substitute.For<IDecisionService>();
         var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
-            decisionService,
             apiClient,
-            new TestCorrelationIdGenerator("CorrelationId"),
             decisionServicev2
         );
 
@@ -215,27 +197,6 @@ public class ImportPreNotificationConsumerTests
 
         customsDeclaration.ClearanceDecision.Results = results.ToArray();
 
-        var decisionResult = new DecisionResult();
-        for (var i = 0; i < (customsDeclaration.ClearanceRequest?.Commodities!).Length; i++)
-        {
-            var commodity = (customsDeclaration.ClearanceRequest?.Commodities!)[i];
-            commodity.ItemNumber = i + 1;
-            commodity.Checks = commodity.Checks!.Take(1).ToArray();
-            commodity.Checks[0].CheckCode = "9115";
-            foreach (var document in commodity.Documents!)
-            {
-                document.DocumentCode = "9115";
-                decisionResult.AddDecision(
-                    customsDeclaration.MovementReferenceNumber,
-                    commodity.ItemNumber!.Value!,
-                    document.DocumentReference!.Value,
-                    document.DocumentCode,
-                    commodity.Checks[0].CheckCode,
-                    DecisionCode.C03
-                );
-            }
-        }
-
         customsDeclaration = customsDeclaration with { Finalisation = null };
 
         apiClient
@@ -254,7 +215,14 @@ public class ImportPreNotificationConsumerTests
                 ])
             );
 
-        decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
+        decisionServicev2
+            .Process(Arg.Any<DecisionContextV2>())
+            .Returns([
+                new ValueTuple<string, ClearanceDecision>(
+                    customsDeclaration.MovementReferenceNumber,
+                    customsDeclaration.ClearanceDecision!
+                ),
+            ]);
 
         // ACT
         await consumer.OnHandle(createdEvent, CancellationToken.None);
@@ -268,13 +236,10 @@ public class ImportPreNotificationConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = Substitute.For<IDecisionService>();
         var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
-            decisionService,
             apiClient,
-            new TestCorrelationIdGenerator("CorrelationId"),
             decisionServicev2
         );
 

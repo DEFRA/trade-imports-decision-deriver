@@ -14,8 +14,6 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
 
     public DecisionRulesEngine Get(string? notificationType)
     {
-        ArgumentNullException.ThrowIfNull(notificationType);
-
         // Use a switch or mapping based on notificationType to resolve the correct set of rules.
         return notificationType switch
         {
@@ -23,10 +21,9 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             ImportNotificationType.Cvedp => CreateEngineForCvedp(),
             ImportNotificationType.Chedpp => CreateEngineForChedpp(),
             ImportNotificationType.Ced => CreateEngineForCed(),
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(notificationType),
-                notificationType,
-                "Unknown import notification type."
+            _ => new DecisionRulesEngine(
+                [AddRule<UnknownCheckCodeDecisionRule>()],
+                serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>()
             ),
         };
     }
@@ -104,8 +101,6 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<AmendDecisionRule>(),
             AddRule<InspectionRequiredDecisionRule>(),
             AddRule<CedDecisionRule>(),
-            AddRule<CommodityWeightOrQuantityValidationRule>(),
-            AddRule<CommodityCodeValidationRule>(),
         };
 
         return new DecisionRulesEngine(rules, serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>());

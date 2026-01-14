@@ -3,6 +3,8 @@ using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Authentication;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Microsoft.AspNetCore.Mvc;
@@ -46,7 +48,7 @@ public static class EndpointRouteBuilderExtensions
     [HttpGet]
     private static Task<IResult> Get(
         [FromRoute] string mrn,
-        [FromServices] IDecisionService decisionService,
+        [FromServices] IDecisionServiceV2 decisionService,
         [FromServices] ITradeImportsDataApiClient apiClient,
         [FromServices] ICorrelationIdGenerator correlationIdGenerator,
         CancellationToken cancellationToken
@@ -73,7 +75,7 @@ public static class EndpointRouteBuilderExtensions
     private static Task<IResult> Post(
         [FromRoute] string mrn,
         [FromBody] DecisionRequest request,
-        [FromServices] IDecisionService decisionService,
+        [FromServices] IDecisionServiceV2 decisionService,
         [FromServices] ITradeImportsDataApiClient apiClient,
         [FromServices] ICorrelationIdGenerator correlationIdGenerator,
         CancellationToken cancellationToken
@@ -92,7 +94,7 @@ public static class EndpointRouteBuilderExtensions
     [HttpPost]
     private static async Task<IResult> ProcessMrn(
         string mrn,
-        IDecisionService decisionService,
+        IDecisionServiceV2 decisionService,
         ITradeImportsDataApiClient apiClient,
         ICorrelationIdGenerator correlationIdGenerator,
         PersistOption persist,
@@ -112,44 +114,53 @@ public static class EndpointRouteBuilderExtensions
             .ImportPreNotifications.Select(x => x.ImportPreNotification)
             .ToList();
 
-        var decisionContext = new DecisionContext(
-            preNotifications.Select(x => x.ToDecisionImportPreNotification()).ToList(),
-            [new ClearanceRequestWrapper(mrn, clearanceRequest!.ClearanceRequest!)]
-        );
-        var decisionResult = await decisionService.Process(decisionContext, cancellationToken);
+        ////var decisionContext = new DecisionContext(
+        ////    preNotifications.Select(x => x.ToDecisionImportPreNotification()).ToList(),
+        ////    [new ClearanceRequestWrapper(mrn, clearanceRequest!.ClearanceRequest!)]
+        ////);
 
-        if (!decisionResult.Decisions.Any())
+        var decisionContext = new DecisionContextV2(
+            preNotifications.Select(x => x.ToDecisionImportPreNotification()).ToList(),
+            [
+                new CustomsDeclarationWrapper(
+                    mrn,
+                    new CustomsDeclaration()
+                    {
+                        ClearanceDecision = clearanceRequest?.ClearanceDecision,
+                        ClearanceRequest = clearanceRequest?.ClearanceRequest,
+                    }
+                ),
+            ]
+        );
+
+        var decisionResult = decisionService.Process(decisionContext).FirstOrDefault();
+
+        if (string.IsNullOrEmpty(decisionResult.Mrn))
         {
             return Results.NoContent();
         }
 
         var customsDeclaration = new CustomsDeclaration
         {
-            ClearanceDecision = clearanceRequest.ClearanceDecision,
-            Finalisation = clearanceRequest.Finalisation,
-            ClearanceRequest = clearanceRequest.ClearanceRequest,
-            ExternalErrors = clearanceRequest.ExternalErrors,
+            ClearanceDecision = clearanceRequest?.ClearanceDecision,
+            Finalisation = clearanceRequest?.Finalisation,
+            ClearanceRequest = clearanceRequest?.ClearanceRequest,
+            ExternalErrors = clearanceRequest?.ExternalErrors,
         };
 
-        var newDecision = decisionResult.BuildClearanceDecision(
-            clearanceRequest.MovementReferenceNumber,
-            customsDeclaration,
-            correlationIdGenerator
-        );
+        var isDifferent = !decisionResult.Decision.IsSameAs(customsDeclaration.ClearanceDecision);
 
-        var isDifferent = !newDecision.IsSameAs(customsDeclaration.ClearanceDecision);
+        customsDeclaration.ClearanceDecision = decisionResult.Decision;
 
-        customsDeclaration.ClearanceDecision = newDecision;
-
-        bool shouldPersist =
+        var shouldPersist =
             persist == PersistOption.AlwaysPersist || (persist == PersistOption.PersistIfSame && !isDifferent);
 
         if (shouldPersist)
         {
             await apiClient.PutCustomsDeclaration(
-                clearanceRequest.MovementReferenceNumber,
+                decisionResult.Mrn,
                 customsDeclaration,
-                clearanceRequest.ETag,
+                clearanceRequest?.ETag,
                 cancellationToken
             );
         }

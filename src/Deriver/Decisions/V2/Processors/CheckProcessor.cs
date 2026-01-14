@@ -54,11 +54,39 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                 documentIdentifier!
             );
 
-            foreach (var notification in notifications)
+            if (notifications.Any())
+            {
+                foreach (var notification in notifications)
+                {
+                    var resolverContext = new DecisionResolutionContext(
+                        context,
+                        notification,
+                        clearanceRequest,
+                        commodity,
+                        checkCode,
+                        document
+                    );
+
+                    var result = decisionEngine.Run(resolverContext);
+                    output.Add(
+                        new CheckDecisionResult(
+                            notification,
+                            clearanceRequest.MovementReferenceNumber,
+                            commodity.ItemNumber!.Value,
+                            document.DocumentReference?.Value,
+                            documentCode,
+                            checkCodeValue,
+                            result.Code,
+                            result.FurtherDetail
+                        )
+                    );
+                }
+            }
+            else
             {
                 var resolverContext = new DecisionResolutionContext(
                     context,
-                    notification,
+                    null!,
                     clearanceRequest,
                     commodity,
                     checkCode,
@@ -68,7 +96,7 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                 var result = decisionEngine.Run(resolverContext);
                 output.Add(
                     new CheckDecisionResult(
-                        notification,
+                        null,
                         clearanceRequest.MovementReferenceNumber,
                         commodity.ItemNumber!.Value,
                         document.DocumentReference?.Value,
@@ -107,7 +135,7 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
             );
         }
 
-        return output;
+        return output.Distinct().ToList();
     }
 
     private static IEnumerable<DecisionImportPreNotification> FindDecisionImportPreNotification(

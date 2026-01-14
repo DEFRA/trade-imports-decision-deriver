@@ -1,9 +1,9 @@
 using System.Text.Json;
 using Defra.TradeImportsDataApi.Api.Client;
+using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
@@ -11,7 +11,6 @@ using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using SlimMessageBus.Host;
-using ClearanceDecisionBuilder = Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.ClearanceDecisionBuilder;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Consumers;
 
@@ -22,12 +21,9 @@ public class MediatorConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = Substitute.For<IDecisionService>();
         var consumer = new ConsumerMediator(
             NullLoggerFactory.Instance,
-            decisionService,
             apiClient,
-            new TestCorrelationIdGenerator("CorrelationId"),
             new DecisionServiceV2(
                 new Deriver.Decisions.V2.ClearanceDecisionBuilder(new CorrelationIdGenerator()),
                 new CheckProcessor(new TestDecisionRulesEngineFactory())
@@ -55,15 +51,8 @@ public class MediatorConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = Substitute.For<IDecisionService>();
         var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
-        var consumer = new ConsumerMediator(
-            NullLoggerFactory.Instance,
-            decisionService,
-            apiClient,
-            new TestCorrelationIdGenerator("CorrelationId"),
-            decisionServicev2
-        )
+        var consumer = new ConsumerMediator(NullLoggerFactory.Instance, apiClient, decisionServicev2)
         {
             Context = new ConsumerContext
             {
@@ -85,10 +74,6 @@ public class MediatorConsumerTests
             .GetImportPreNotificationsByMrn(createdEvent.ResourceId, Arg.Any<CancellationToken>())
             .Returns(new ImportPreNotificationsResponse([]));
 
-        var decisionResult = new DecisionResult();
-        decisionResult.AddDecision("mrn", 1, "docref", "docCode", "checkCode", DecisionCode.C03);
-        decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
-
         // ACT
 
         await consumer.OnHandle(JsonSerializer.Serialize(createdEvent), CancellationToken.None);
@@ -102,15 +87,8 @@ public class MediatorConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionService = Substitute.For<IDecisionService>();
         var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
-        var consumer = new ConsumerMediator(
-            NullLoggerFactory.Instance,
-            decisionService,
-            apiClient,
-            new TestCorrelationIdGenerator("CorrelationId"),
-            decisionServicev2
-        )
+        var consumer = new ConsumerMediator(NullLoggerFactory.Instance, apiClient, decisionServicev2)
         {
             Context = new ConsumerContext
             {
@@ -141,9 +119,9 @@ public class MediatorConsumerTests
                 ])
             );
 
-        var decisionResult = new DecisionResult();
-        decisionResult.AddDecision("mrn", 1, "docref", "docCode", "checkCode", DecisionCode.C03);
-        decisionService.Process(Arg.Any<DecisionContext>(), Arg.Any<CancellationToken>()).Returns(decisionResult);
+        decisionServicev2
+            .Process(Arg.Any<DecisionContextV2>())
+            .Returns([new ValueTuple<string, ClearanceDecision>("mrn", customsDeclaration.ClearanceDecision!)]);
 
         // ACT
         await consumer.OnHandle(JsonSerializer.Serialize(createdEvent), CancellationToken.None);

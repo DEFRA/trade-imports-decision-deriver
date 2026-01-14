@@ -1,11 +1,10 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
-using ClearanceDecisionBuilder = Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.ClearanceDecisionBuilder;
+using ClearanceDecisionBuilder = Defra.TradeImportsDecisionDeriver.Deriver.Decisions.ClearanceDecisionBuilder;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions;
 
@@ -28,14 +27,14 @@ public class NoMatchDecisionsTest
             }
         }
 
-        var sut = new DecisionServiceV2(
+        var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("test")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
 
         // Act
         var decisionResult = sut.Process(
-            new DecisionContextV2(
+            new DecisionContext(
                 new List<DecisionImportPreNotification>(),
                 [new CustomsDeclarationWrapper("123", new CustomsDeclaration() { ClearanceRequest = cr })]
             )
@@ -67,14 +66,14 @@ public class NoMatchDecisionsTest
             }
         }
 
-        var sut = new DecisionServiceV2(
+        var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
 
         // Act
         var decisionResult = sut.Process(
-            new DecisionContextV2(
+            new DecisionContext(
                 new List<DecisionImportPreNotification>(),
                 [new CustomsDeclarationWrapper("123", new CustomsDeclaration() { ClearanceRequest = cr })]
             )
@@ -105,14 +104,14 @@ public class NoMatchDecisionsTest
             }
         }
 
-        var sut = new DecisionServiceV2(
+        var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
 
         // Act
         var decisionResult = sut.Process(
-            new DecisionContextV2(
+            new DecisionContext(
                 new List<DecisionImportPreNotification>(),
                 [new CustomsDeclarationWrapper("123", new CustomsDeclaration() { ClearanceRequest = cr })]
             )
@@ -137,14 +136,14 @@ public class NoMatchDecisionsTest
             commodity.Checks = [];
         }
 
-        var sut = new DecisionServiceV2(
+        var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
 
         // Act
         var decisionResult = sut.Process(
-            new DecisionContextV2(
+            new DecisionContext(
                 new List<DecisionImportPreNotification>(),
                 [new CustomsDeclarationWrapper("123", new CustomsDeclaration() { ClearanceRequest = cr })]
             )
@@ -158,7 +157,7 @@ public class NoMatchDecisionsTest
     [Fact]
     public void When_processing_chedpp_phsi_hmi_with_no_notification()
     {
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             [],
             [
                 new CustomsDeclarationWrapper(
@@ -202,7 +201,7 @@ public class NoMatchDecisionsTest
             ]
         );
 
-        var sut = new DecisionServiceV2(
+        var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
@@ -217,7 +216,7 @@ public class NoMatchDecisionsTest
     [Fact]
     public void When_processing_chedpp_with_new_c085_with_no_notification()
     {
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             [],
             [
                 new CustomsDeclarationWrapper(
@@ -250,7 +249,7 @@ public class NoMatchDecisionsTest
             ]
         );
 
-        var sut = new DecisionServiceV2(
+        var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
@@ -268,7 +267,7 @@ public class NoMatchDecisionsTest
     public void When_processing_chedpp_with_phsi_and_all_three_document_codes_Then_should_return_expected_decisions()
     {
         // Arrange
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             [],
             [
                 new CustomsDeclarationWrapper(
@@ -315,7 +314,7 @@ public class NoMatchDecisionsTest
             ]
         );
 
-        var sut = new DecisionServiceV2(
+        var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
@@ -344,7 +343,7 @@ public class NoMatchDecisionsTest
     public void When_processing_H220_without_H219_Then_should_return_expected_decisions()
     {
         // Arrange
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             [],
             [
                 new CustomsDeclarationWrapper(
@@ -368,7 +367,7 @@ public class NoMatchDecisionsTest
             ]
         );
 
-        var sut = new DecisionServiceV2(
+        var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
@@ -394,7 +393,7 @@ public class NoMatchDecisionsTest
     public void When_processing_H220_with_H219_Then_should_return_expected_decisions()
     {
         // Arrange
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             [],
             [
                 new CustomsDeclarationWrapper(
@@ -422,7 +421,7 @@ public class NoMatchDecisionsTest
             ]
         );
 
-        var sut = new DecisionServiceV2(
+        var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
@@ -448,7 +447,7 @@ public class NoMatchDecisionsTest
     public void When_processing_orphan_H221__Then_should_return_expected_decisions()
     {
         // Arrange
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             [],
             [
                 new CustomsDeclarationWrapper(
@@ -472,7 +471,7 @@ public class NoMatchDecisionsTest
             ]
         );
 
-        var sut = new DecisionServiceV2(
+        var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
@@ -498,7 +497,7 @@ public class NoMatchDecisionsTest
     public void When_processing_orphan_check_code_Then_should_return_expected_decisions()
     {
         // Arrange
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             [
                 new DecisionImportPreNotification()
                 {
@@ -557,7 +556,7 @@ public class NoMatchDecisionsTest
             ]
         );
 
-        var sut = new DecisionServiceV2(
+        var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
@@ -590,7 +589,7 @@ public class NoMatchDecisionsTest
     public void When_processing_iuu_check_codes_Then_should_return_expected_decisions()
     {
         // Arrange
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             [],
             [
                 new CustomsDeclarationWrapper(
@@ -634,7 +633,7 @@ public class NoMatchDecisionsTest
             ]
         );
 
-        var sut = new DecisionServiceV2(
+        var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );

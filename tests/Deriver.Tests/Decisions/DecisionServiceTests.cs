@@ -1,12 +1,11 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using Xunit.Abstractions;
-using ClearanceDecisionBuilder = Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.ClearanceDecisionBuilder;
+using ClearanceDecisionBuilder = Defra.TradeImportsDecisionDeriver.Deriver.Decisions.ClearanceDecisionBuilder;
 
 // ReSharper disable InconsistentNaming
 
@@ -17,7 +16,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
     [Fact]
     public void When_processing_clearance_request_with_null_documents_then_no_match_should_be_generated()
     {
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             [],
             [
                 new CustomsDeclarationWrapper(
@@ -41,26 +40,26 @@ public class DecisionServiceTests(ITestOutputHelper output)
             ]
         );
 
-        var decisionServiceV2 = new DecisionServiceV2(
+        var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
 
         // Act
-        var decisionResult = decisionServiceV2.Process(decisionContext);
+        var decisionResult = decisionService.Process(decisionContext);
 
         decisionResult.Should().HaveCount(1);
-        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(DecisionCode.X00.ToString());
+        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(nameof(DecisionCode.X00));
         decisionResult[0]
             .Decision.Results?[0].InternalDecisionCode.Should()
-            .Be(DecisionInternalFurtherDetail.E83.ToString());
+            .Be(nameof(DecisionInternalFurtherDetail.E83));
         decisionResult[0].Decision.Results?[0].CheckCode.Should().Be("H221");
     }
 
     [Fact]
     public void When_processing_clearance_request_with_empty_documents_then_no_match_should_be_generated()
     {
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             [],
             [
                 new CustomsDeclarationWrapper(
@@ -84,25 +83,25 @@ public class DecisionServiceTests(ITestOutputHelper output)
             ]
         );
 
-        var decisionServiceV2 = new DecisionServiceV2(
+        var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
 
         // Act
-        var decisionResult = decisionServiceV2.Process(decisionContext);
+        var decisionResult = decisionService.Process(decisionContext);
 
         decisionResult.Should().HaveCount(1);
-        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(DecisionCode.X00.ToString());
+        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(nameof(DecisionCode.X00));
         decisionResult[0]
             .Decision.Results?[0].InternalDecisionCode.Should()
-            .Be(DecisionInternalFurtherDetail.E83.ToString());
+            .Be(nameof(DecisionInternalFurtherDetail.E83));
     }
 
     [Fact]
     public void When_processing_chedpp_with_phsi_and_missing_hmi()
     {
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             [
                 new DecisionImportPreNotification()
                 {
@@ -171,21 +170,21 @@ public class DecisionServiceTests(ITestOutputHelper output)
             ]
         );
 
-        var decisionServiceV2 = new DecisionServiceV2(
+        var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
 
         // Act
-        var decisionResult = decisionServiceV2.Process(decisionContext);
+        var decisionResult = decisionService.Process(decisionContext);
 
-        decisionResult[0].Decision.Results!.Max(x => x.DecisionCode).Should().Be(DecisionCode.H01.ToString());
+        decisionResult[0].Decision.Results!.Max(x => x.DecisionCode).Should().Be(nameof(DecisionCode.H01));
     }
 
     [Fact]
     public void When_processing_chedpp_phsi_with_both_validated_and_rejected_documents()
     {
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             [
                 new DecisionImportPreNotification()
                 {
@@ -296,18 +295,18 @@ public class DecisionServiceTests(ITestOutputHelper output)
             ]
         );
 
-        var decisionServiceV2 = new DecisionServiceV2(
+        var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
 
         // Act
-        var decisionResult = decisionServiceV2.Process(decisionContext);
+        var decisionResult = decisionService.Process(decisionContext);
 
         decisionResult[0].Decision.Results?.Length.Should().Be(3);
-        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(DecisionCode.N01.ToString());
-        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(DecisionCode.C03.ToString());
-        decisionResult[0].Decision.Results?[2].DecisionCode.Should().Be(DecisionCode.C03.ToString());
+        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(nameof(DecisionCode.N01));
+        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(nameof(DecisionCode.C03));
+        decisionResult[0].Decision.Results?[2].DecisionCode.Should().Be(nameof(DecisionCode.C03));
     }
 
     [Theory]
@@ -404,7 +403,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
     {
         // Arrange
 
-        var decisionContext = CreateChedppDecisionContextV2(
+        var decisionContext = CreateChedppDecisionContext(
             scenario,
             phsiDocumentStatus,
             phsiIdentityStatus,
@@ -412,13 +411,13 @@ public class DecisionServiceTests(ITestOutputHelper output)
             hmiStatus
         );
 
-        var decisionServiceV2 = new DecisionServiceV2(
+        var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
 
         // Act
-        var decisionResult = decisionServiceV2.Process(decisionContext);
+        var decisionResult = decisionService.Process(decisionContext);
 
         // Assert
         decisionResult.Should().NotBeEmpty();
@@ -462,7 +461,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
     public void When_processing_chedpp_with_both_phsi_and_hmi_Then_should_return_expected_decisions()
     {
         // Arrange
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             [
                 new DecisionImportPreNotification()
                 {
@@ -526,24 +525,24 @@ public class DecisionServiceTests(ITestOutputHelper output)
             ]
         );
 
-        var decisionServiceV2 = new DecisionServiceV2(
+        var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
 
         // Act
-        var decisionResult = decisionServiceV2.Process(decisionContext);
+        var decisionResult = decisionService.Process(decisionContext);
 
         // Assert
 
         decisionResult.Should().NotBeNull();
         decisionResult[0].Decision.Results?.Length.Should().Be(2);
         decisionResult[0].Decision.Results?[0].CheckCode.Should().Be("H219");
-        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(DecisionCode.C03.ToString());
+        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(nameof(DecisionCode.C03));
         decisionResult[0].Decision.Results?[0].DocumentCode.Should().Be("N851");
 
         decisionResult[0].Decision.Results?[1].CheckCode.Should().Be("H218");
-        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(DecisionCode.H01.ToString());
+        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(nameof(DecisionCode.H01));
         decisionResult[0].Decision.Results?[1].DocumentCode.Should().Be("N002");
     }
 
@@ -551,7 +550,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
     public void When_processing_chedpp_with_both_phsi_and_hmi_with_H220_Then_should_return_expected_decisions()
     {
         // Arrange
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             [
                 new DecisionImportPreNotification()
                 {
@@ -616,24 +615,24 @@ public class DecisionServiceTests(ITestOutputHelper output)
             ]
         );
 
-        var decisionServiceV2 = new DecisionServiceV2(
+        var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
 
         // Act
-        var decisionResult = decisionServiceV2.Process(decisionContext);
+        var decisionResult = decisionService.Process(decisionContext);
 
         // Assert
 
         decisionResult.Should().NotBeNull();
         decisionResult[0].Decision.Results?.Length.Should().Be(2);
         decisionResult[0].Decision.Results?[0].CheckCode.Should().Be("H219");
-        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(DecisionCode.H01.ToString());
+        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(nameof(DecisionCode.H01));
         decisionResult[0].Decision.Results?[0].DocumentCode.Should().Be("N851");
 
         decisionResult[0].Decision.Results?[1].CheckCode.Should().Be("H220");
-        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(DecisionCode.C03.ToString());
+        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(nameof(DecisionCode.C03));
         decisionResult[0].Decision.Results?[1].DocumentCode.Should().Be("N002");
     }
 
@@ -641,7 +640,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
     public void When_processing_chedpp_with_phsi_and_all_three_document_codes_Then_should_return_expected_decisions()
     {
         // Arrange
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             [
                 new DecisionImportPreNotification()
                 {
@@ -709,13 +708,13 @@ public class DecisionServiceTests(ITestOutputHelper output)
             ]
         );
 
-        var decisionServiceV2 = new DecisionServiceV2(
+        var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
 
         // Act
-        var decisionResult = decisionServiceV2.Process(decisionContext);
+        var decisionResult = decisionService.Process(decisionContext);
 
         // Assert
         decisionResult.Should().NotBeNull();
@@ -737,7 +736,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
     public void When_processing_chedp_but_with_ced_notification_Then_should_return_expected_decisions()
     {
         // Arrange
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             [
                 new DecisionImportPreNotification()
                 {
@@ -814,7 +813,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
             ]
         );
 
-        var sut = new DecisionServiceV2(
+        var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
             new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
@@ -826,18 +825,18 @@ public class DecisionServiceTests(ITestOutputHelper output)
         decisionResult.Should().NotBeNull();
         decisionResult[0].Decision.Results?.Length.Should().Be(2);
         decisionResult[0].Decision.Results?[0].CheckCode.Should().Be("H222");
-        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(DecisionCode.C03.ToString());
+        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(nameof(DecisionCode.C03));
         decisionResult[0].Decision.Results?[0].DocumentCode.Should().Be("N853");
 
         decisionResult[0].Decision.Results?[1].CheckCode.Should().Be("H223");
-        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(DecisionCode.X00.ToString());
+        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(nameof(DecisionCode.X00));
         decisionResult[0].Decision.Results?[1].DocumentCode.Should().Be("C678");
         decisionResult[0]
             .Decision.Results?[1].InternalDecisionCode.Should()
-            .Be(DecisionInternalFurtherDetail.E84.ToString());
+            .Be(nameof(DecisionInternalFurtherDetail.E84));
     }
 
-    private static DecisionContextV2 CreateChedppDecisionContextV2(
+    private static DecisionContext CreateChedppDecisionContext(
         string scenario,
         string phsiDocumentStatus,
         string phsiIdentityStatus,
@@ -885,7 +884,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
             clearanceRequestChecks.Add(new CommodityCheck { CheckCode = "H218", DepartmentCode = "HMI" });
         }
 
-        return new DecisionContextV2(
+        return new DecisionContext(
             [
                 new DecisionImportPreNotification()
                 {

@@ -1,8 +1,8 @@
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -19,7 +19,7 @@ public class ClearanceRequestConsumerTests
         var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
         customsDeclaration = customsDeclaration with { Finalisation = null };
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
+        var decisionServicev2 = Substitute.For<IDecisionService>();
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             apiClient,
@@ -37,7 +37,7 @@ public class ClearanceRequestConsumerTests
             .Returns(new ImportPreNotificationsResponse([]));
 
         decisionServicev2
-            .Process(Arg.Any<DecisionContextV2>())
+            .Process(Arg.Any<DecisionContext>())
             .Returns([new ValueTuple<string, ClearanceDecision>("mrn", new ClearanceDecision() { Items = [] })]);
 
         // ACT
@@ -103,7 +103,7 @@ public class ClearanceRequestConsumerTests
         customsDeclaration.ClearanceDecision.Results = results.ToArray();
 
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
+        var decisionServicev2 = Substitute.For<IDecisionService>();
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             apiClient,
@@ -121,7 +121,7 @@ public class ClearanceRequestConsumerTests
             .Returns(new ImportPreNotificationsResponse([]));
 
         decisionServicev2
-            .Process(Arg.Any<DecisionContextV2>())
+            .Process(Arg.Any<DecisionContext>())
             .Returns([new ValueTuple<string, ClearanceDecision>("mrn", customsDeclaration.ClearanceDecision)]);
 
         // ACT
@@ -142,8 +142,8 @@ public class ClearanceRequestConsumerTests
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             apiClient,
-            new DecisionServiceV2(
-                new Deriver.Decisions.V2.ClearanceDecisionBuilder(new CorrelationIdGenerator()),
+            new DecisionService(
+                new ClearanceDecisionBuilder(new CorrelationIdGenerator()),
                 new CheckProcessor(new TestDecisionRulesEngineFactory())
             )
         );
@@ -169,7 +169,7 @@ public class ClearanceRequestConsumerTests
         customsDeclaration.ClearanceRequest!.MessageSentAt = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1));
         customsDeclaration.Finalisation!.MessageSentAt = DateTime.UtcNow;
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
+        var decisionServicev2 = Substitute.For<IDecisionService>();
         var consumer = new ClearanceRequestConsumer(
             NullLogger<ClearanceRequestConsumer>.Instance,
             apiClient,
@@ -187,7 +187,7 @@ public class ClearanceRequestConsumerTests
             .Returns(new ImportPreNotificationsResponse([]));
 
         decisionServicev2
-            .Process(Arg.Any<DecisionContextV2>())
+            .Process(Arg.Any<DecisionContext>())
             .Returns(
                 new List<(string, ClearanceDecision)>()
                 {

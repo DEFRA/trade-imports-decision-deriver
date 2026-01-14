@@ -3,8 +3,7 @@ using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Authentication;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Microsoft.AspNetCore.Mvc;
@@ -48,7 +47,7 @@ public static class EndpointRouteBuilderExtensions
     [HttpGet]
     private static Task<IResult> Get(
         [FromRoute] string mrn,
-        [FromServices] IDecisionServiceV2 decisionService,
+        [FromServices] IDecisionService decisionService,
         [FromServices] ITradeImportsDataApiClient apiClient,
         [FromServices] ICorrelationIdGenerator correlationIdGenerator,
         CancellationToken cancellationToken
@@ -75,7 +74,7 @@ public static class EndpointRouteBuilderExtensions
     private static Task<IResult> Post(
         [FromRoute] string mrn,
         [FromBody] DecisionRequest request,
-        [FromServices] IDecisionServiceV2 decisionService,
+        [FromServices] IDecisionService decisionService,
         [FromServices] ITradeImportsDataApiClient apiClient,
         [FromServices] ICorrelationIdGenerator correlationIdGenerator,
         CancellationToken cancellationToken
@@ -94,7 +93,7 @@ public static class EndpointRouteBuilderExtensions
     [HttpPost]
     private static async Task<IResult> ProcessMrn(
         string mrn,
-        IDecisionServiceV2 decisionService,
+        IDecisionService decisionService,
         ITradeImportsDataApiClient apiClient,
         ICorrelationIdGenerator correlationIdGenerator,
         PersistOption persist,
@@ -119,7 +118,7 @@ public static class EndpointRouteBuilderExtensions
         ////    [new ClearanceRequestWrapper(mrn, clearanceRequest!.ClearanceRequest!)]
         ////);
 
-        var decisionContext = new DecisionContextV2(
+        var decisionContext = new DecisionContext(
             preNotifications.Select(x => x.ToDecisionImportPreNotification()).ToList(),
             [
                 new CustomsDeclarationWrapper(

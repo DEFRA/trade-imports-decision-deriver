@@ -4,8 +4,7 @@ using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using SlimMessageBus;
@@ -15,7 +14,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 public class ClearanceRequestConsumer(
     ILogger<ClearanceRequestConsumer> logger,
     ITradeImportsDataApiClient apiClient,
-    IDecisionServiceV2 decisionServiceV2
+    IDecisionService decisionService
 ) : IConsumer<ResourceEvent<CustomsDeclarationEvent>>, IConsumerWithContext
 {
     public async Task OnHandle(ResourceEvent<CustomsDeclarationEvent> message, CancellationToken cancellationToken)
@@ -106,9 +105,9 @@ public class ClearanceRequestConsumer(
                 }
             ),
         ];
-        var context = new DecisionContextV2(decisionImportPreNotifications, cds.ToList());
+        var context = new DecisionContext(decisionImportPreNotifications, cds.ToList());
 
-        var newResults = decisionServiceV2.Process(context);
+        var newResults = decisionService.Process(context);
         return newResults[0].Decision;
     }
 

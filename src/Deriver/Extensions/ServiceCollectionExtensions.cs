@@ -3,11 +3,10 @@ using Amazon.SQS;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Finders;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine.DecisionRules;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
 using Defra.TradeImportsDecisionDeriver.Deriver.Serializers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Services.Admin;
@@ -61,15 +60,11 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddConsumers(this IServiceCollection services, IConfiguration configuration)
     {
-        //V2 of Decision Making
         services.AddSingleton<ICorrelationIdGenerator, CorrelationIdGenerator>();
-        services.AddSingleton<IDecisionServiceV2, DecisionServiceV2>();
+        services.AddSingleton<IDecisionService, DecisionService>();
         services.AddSingleton<ICheckProcessor, CheckProcessor>();
         services.AddSingleton<IDecisionRulesEngineFactory, DecisionRulesEngineFactory>();
-        services.AddSingleton<
-            IClearanceDecisionBuilder,
-            Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.ClearanceDecisionBuilder
-        >();
+        services.AddSingleton<IClearanceDecisionBuilder, ClearanceDecisionBuilder>();
 
         // Register all IDecisionRule implementations
         services.AddSingleton<OrphanCheckCodeDecisionRule>();
@@ -86,6 +81,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<CedDecisionRule>();
         services.AddSingleton<CommodityCodeValidationRule>();
         services.AddSingleton<CommodityWeightOrQuantityValidationRule>();
+        services.AddSingleton<UnknownCheckCodeDecisionRule>();
 
         // Order of interceptors is important here
         services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(TraceContextInterceptor<>));

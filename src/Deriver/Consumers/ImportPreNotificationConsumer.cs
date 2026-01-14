@@ -1,15 +1,12 @@
-using System.Text.Json;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
-using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using SlimMessageBus;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
@@ -17,7 +14,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 public class ImportPreNotificationConsumer(
     ILogger<ImportPreNotificationConsumer> logger,
     ITradeImportsDataApiClient apiClient,
-    IDecisionServiceV2 decisionServiceV2
+    IDecisionService decisionService
 ) : IConsumer<ResourceEvent<ImportPreNotificationEvent>>, IConsumerWithContext
 {
     public async Task OnHandle(ResourceEvent<ImportPreNotificationEvent> message, CancellationToken cancellationToken)
@@ -43,7 +40,7 @@ public class ImportPreNotificationConsumer(
             message,
             clearanceRequests.Select(x => x.MovementReferenceNumber).Distinct().ToArray()
         );
-        var decisionResults = decisionServiceV2.Process(new DecisionContextV2(notifications, customsDeclarations));
+        var decisionResults = decisionService.Process(new DecisionContext(notifications, customsDeclarations));
 
         foreach (var result in decisionResults)
         {

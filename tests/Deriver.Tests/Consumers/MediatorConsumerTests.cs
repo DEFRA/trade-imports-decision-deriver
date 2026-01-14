@@ -3,8 +3,8 @@ using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
@@ -24,8 +24,8 @@ public class MediatorConsumerTests
         var consumer = new ConsumerMediator(
             NullLoggerFactory.Instance,
             apiClient,
-            new DecisionServiceV2(
-                new Deriver.Decisions.V2.ClearanceDecisionBuilder(new CorrelationIdGenerator()),
+            new DecisionService(
+                new ClearanceDecisionBuilder(new CorrelationIdGenerator()),
                 new CheckProcessor(new TestDecisionRulesEngineFactory())
             )
         )
@@ -51,7 +51,7 @@ public class MediatorConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
+        var decisionServicev2 = Substitute.For<IDecisionService>();
         var consumer = new ConsumerMediator(NullLoggerFactory.Instance, apiClient, decisionServicev2)
         {
             Context = new ConsumerContext
@@ -87,7 +87,7 @@ public class MediatorConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
+        var decisionServicev2 = Substitute.For<IDecisionService>();
         var consumer = new ConsumerMediator(NullLoggerFactory.Instance, apiClient, decisionServicev2)
         {
             Context = new ConsumerContext
@@ -120,7 +120,7 @@ public class MediatorConsumerTests
             );
 
         decisionServicev2
-            .Process(Arg.Any<DecisionContextV2>())
+            .Process(Arg.Any<DecisionContext>())
             .Returns([new ValueTuple<string, ClearanceDecision>("mrn", customsDeclaration.ClearanceDecision!)]);
 
         // ACT

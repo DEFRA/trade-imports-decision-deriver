@@ -1,8 +1,8 @@
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -21,8 +21,8 @@ public class ImportPreNotificationConsumerTests
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             apiClient,
-            new DecisionServiceV2(
-                new Deriver.Decisions.V2.ClearanceDecisionBuilder(new CorrelationIdGenerator()),
+            new DecisionService(
+                new ClearanceDecisionBuilder(new CorrelationIdGenerator()),
                 new CheckProcessor(new TestDecisionRulesEngineFactory())
             )
         )
@@ -47,7 +47,7 @@ public class ImportPreNotificationConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
+        var decisionServicev2 = Substitute.For<IDecisionService>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             apiClient,
@@ -75,7 +75,7 @@ public class ImportPreNotificationConsumerTests
             );
 
         decisionServicev2
-            .Process(Arg.Any<DecisionContextV2>())
+            .Process(Arg.Any<DecisionContext>())
             .Returns([new ValueTuple<string, ClearanceDecision>("mrn", customsDeclaration.ClearanceDecision!)]);
 
         // ACT
@@ -90,7 +90,7 @@ public class ImportPreNotificationConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
+        var decisionServicev2 = Substitute.For<IDecisionService>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             apiClient,
@@ -118,7 +118,7 @@ public class ImportPreNotificationConsumerTests
             );
 
         decisionServicev2
-            .Process(Arg.Any<DecisionContextV2>())
+            .Process(Arg.Any<DecisionContext>())
             .Returns([new ValueTuple<string, ClearanceDecision>("mrn", customsDeclaration.ClearanceDecision!)]);
 
         // ACT
@@ -133,7 +133,7 @@ public class ImportPreNotificationConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
+        var decisionServicev2 = Substitute.For<IDecisionService>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             apiClient,
@@ -216,7 +216,7 @@ public class ImportPreNotificationConsumerTests
             );
 
         decisionServicev2
-            .Process(Arg.Any<DecisionContextV2>())
+            .Process(Arg.Any<DecisionContext>())
             .Returns([
                 new ValueTuple<string, ClearanceDecision>(
                     customsDeclaration.MovementReferenceNumber,
@@ -236,7 +236,7 @@ public class ImportPreNotificationConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionServicev2 = Substitute.For<IDecisionServiceV2>();
+        var decisionServicev2 = Substitute.For<IDecisionService>();
         var consumer = new ImportPreNotificationConsumer(
             NullLogger<ImportPreNotificationConsumer>.Instance,
             apiClient,

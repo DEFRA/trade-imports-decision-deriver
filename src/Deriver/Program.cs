@@ -1,5 +1,5 @@
+using Defra.TradeImports.Api.Auth;
 using Defra.TradeImports.EmfExporter;
-using Defra.TradeImportsDecisionDeriver.Deriver.Authentication;
 using Defra.TradeImportsDecisionDeriver.Deriver.Endpoints.Admin;
 using Defra.TradeImportsDecisionDeriver.Deriver.Endpoints.Decision;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;

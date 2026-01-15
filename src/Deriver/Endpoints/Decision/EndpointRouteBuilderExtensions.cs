@@ -1,6 +1,6 @@
+using Defra.TradeImports.Api.Auth;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
-using Defra.TradeImportsDecisionDeriver.Deriver.Authentication;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;

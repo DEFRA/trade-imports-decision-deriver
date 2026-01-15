@@ -4,6 +4,7 @@ using Amazon.SQS;
 using Defra.TradeImports.SMB.CompressedSerializer;
 using Defra.TradeImports.SMB.Metrics;
 using Defra.TradeImports.SMB.SQSSNS;
+using Defra.TradeImports.SMB.Tracing;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
@@ -87,8 +88,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<UnknownCheckCodeDecisionRule>();
 
         // Order of interceptors is important here
-        services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(TraceContextInterceptor<>));
-        services.AddSingleton(typeof(IConsumerInterceptor<>), typeof(LoggingInterceptor<>));
+        services.AddTraceContextInterceptor();
         services.AddConsumerMetrics(MetricNames.MeterName);
 
         services.AddOptions<AwsSqsOptions>().Bind(configuration).ValidateDataAnnotations();

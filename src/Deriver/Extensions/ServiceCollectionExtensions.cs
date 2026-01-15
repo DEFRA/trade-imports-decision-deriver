@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Amazon;
 using Amazon.SQS;
+using Defra.TradeImports.SMB.CompressedSerializer;
 using Defra.TradeImports.SMB.Metrics;
 using Defra.TradeImports.SMB.SQSSNS;
 using Defra.TradeImportsDataApi.Api.Client;
@@ -11,7 +12,6 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
-using Defra.TradeImportsDecisionDeriver.Deriver.Serializers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Services.Admin;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
@@ -102,19 +102,14 @@ public static class ServiceCollectionExtensions
                 var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");
                 var consumersPerHost = configuration.GetValue<int>("CONSUMERS_PER_HOST");
 
-                mbb.RegisterSerializer<ToStringSerializer>(s =>
-                {
-                    s.TryAddSingleton(_ => new ToStringSerializer());
-                    s.TryAddSingleton<IMessageSerializer<string>>(svp => svp.GetRequiredService<ToStringSerializer>());
-                });
-                mbb.AddServicesFromAssemblyContaining<ConsumerMediator>();
-                mbb.WithProviderAmazonSQS(cfg =>
-                {
-                    cfg.UseLocalOrAmbientCredentials(configuration);
-                    cfg.TopologyProvisioning.Enabled = false;
-                });
-
-                mbb.AutoStartConsumersEnabled(autoStartConsumers)
+                mbb.AddStringSerializer()
+                    .AddServicesFromAssemblyContaining<ConsumerMediator>()
+                    .WithProviderAmazonSQS(cfg =>
+                    {
+                        cfg.UseLocalOrAmbientCredentials(configuration);
+                        cfg.TopologyProvisioning.Enabled = false;
+                    })
+                    .AutoStartConsumersEnabled(autoStartConsumers)
                     .Consume<string>(x =>
                         x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(consumersPerHost)
                     );

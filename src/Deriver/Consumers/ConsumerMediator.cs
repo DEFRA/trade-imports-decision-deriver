@@ -1,3 +1,4 @@
+using Defra.TradeImports.SMB.CompressedSerializer;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;

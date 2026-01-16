@@ -1,4 +1,5 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
@@ -6,13 +7,14 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions.DecisionEngine.DecisionRules;
 
-public class CommodityWeightOrQuantityValidationRuleTests
+public class CommodityQuantityCheckDecisionRuleTests
 {
-    private readonly CommodityWeightOrQuantityValidationRule _rule = new();
+    private readonly CommodityQuantityCheckDecisionRule _rule = new(Options.Create(new DecisionRulesOptions()));
 
     private readonly DecisionRuleDelegate _mockNext = Substitute.For<DecisionRuleDelegate>();
     private readonly ILogger _mockLogger = Substitute.For<ILogger>();

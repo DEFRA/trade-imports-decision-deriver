@@ -2,7 +2,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
-public sealed class CommodityCodeValidationRule : IDecisionRule
+public sealed class CommodityCodeDecisionRule : IDecisionRule
 {
     public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {

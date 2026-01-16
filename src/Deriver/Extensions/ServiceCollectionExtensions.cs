@@ -83,8 +83,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<CvedpDecisionRule>();
         services.AddSingleton<ChedppDecisionRule>();
         services.AddSingleton<CedDecisionRule>();
-        services.AddSingleton<CommodityCodeValidationRule>();
-        services.AddSingleton<CommodityWeightOrQuantityValidationRule>();
+        services.AddSingleton<CommodityCodeDecisionRule>();
+        services.AddSingleton<CommodityQuantityCheckDecisionRule>();
         services.AddSingleton<UnknownCheckCodeDecisionRule>();
 
         // Order of interceptors is important here

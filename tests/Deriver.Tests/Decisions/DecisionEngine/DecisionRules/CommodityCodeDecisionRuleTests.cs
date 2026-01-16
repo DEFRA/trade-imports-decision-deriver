@@ -9,9 +9,9 @@ using NSubstitute;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions.DecisionEngine.DecisionRules;
 
-public class CommodityCodeValidationRuleTests
+public class CommodityCodeDecisionRuleTests
 {
-    private readonly CommodityCodeValidationRule _rule = new();
+    private readonly CommodityCodeDecisionRule _rule = new();
 
     private readonly DecisionRuleDelegate _mockNext = Substitute.For<DecisionRuleDelegate>();
     private readonly ILogger _mockLogger = Substitute.For<ILogger>();

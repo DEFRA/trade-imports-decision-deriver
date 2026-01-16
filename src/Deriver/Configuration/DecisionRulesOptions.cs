@@ -7,6 +7,8 @@ public sealed class DecisionRulesOptions
 {
     // Map of CHED type (e.g. "CHEDA", "CHEDP", ...) -> rules config for that CHED
     public Dictionary<string, DecisionRulesPerChedOptions> Cheds { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    public decimal? QuantityManagementCheckNetMassTolerance { get; set; } = 0.04M;
 }
 
 [ExcludeFromCodeCoverage]

@@ -52,8 +52,8 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         //OrphanCheckCodeDecisionRule
         var rules = new List<IDecisionRule>
         {
-            AddRule<CommodityWeightOrQuantityValidationRule>(),
-            AddRule<CommodityCodeValidationRule>(),
+            AddRule<CommodityQuantityCheckDecisionRule>(),
+            AddRule<CommodityCodeDecisionRule>(),
             AddRule<OrphanCheckCodeDecisionRule>(),
             AddRule<UnlinkedNotificationDecisionRule>(),
             AddRule<WrongChedTypeDecisionRule>(),
@@ -76,8 +76,8 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
     {
         var rules = new List<IDecisionRule>
         {
-            AddRule<CommodityWeightOrQuantityValidationRule>(),
-            AddRule<CommodityCodeValidationRule>(),
+            AddRule<CommodityQuantityCheckDecisionRule>(),
+            AddRule<CommodityCodeDecisionRule>(),
             AddRule<OrphanCheckCodeDecisionRule>(),
             AddRule<UnlinkedNotificationDecisionRule>(),
             AddRule<WrongChedTypeDecisionRule>(),
@@ -101,8 +101,8 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
     {
         var rules = new List<IDecisionRule>
         {
-            AddRule<CommodityWeightOrQuantityValidationRule>(),
-            AddRule<CommodityCodeValidationRule>(),
+            AddRule<CommodityQuantityCheckDecisionRule>(),
+            AddRule<CommodityCodeDecisionRule>(),
             AddRule<OrphanCheckCodeDecisionRule>(),
             AddRule<UnlinkedNotificationDecisionRule>(),
             AddRule<WrongChedTypeDecisionRule>(),
@@ -123,8 +123,8 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
     {
         var rules = new List<IDecisionRule>
         {
-            AddRule<CommodityWeightOrQuantityValidationRule>(),
-            AddRule<CommodityCodeValidationRule>(),
+            AddRule<CommodityQuantityCheckDecisionRule>(),
+            AddRule<CommodityCodeDecisionRule>(),
             AddRule<OrphanCheckCodeDecisionRule>(),
             AddRule<UnlinkedNotificationDecisionRule>(),
             AddRule<WrongChedTypeDecisionRule>(),

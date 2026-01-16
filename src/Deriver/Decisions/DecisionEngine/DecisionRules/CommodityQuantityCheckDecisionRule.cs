@@ -1,10 +1,11 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
-public sealed class CommodityWeightOrQuantityValidationRule : IDecisionRule
+public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOptions> options) : IDecisionRule
 {
     public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
@@ -60,14 +61,15 @@ public sealed class CommodityWeightOrQuantityValidationRule : IDecisionRule
         }
     }
 
-    private static void CompareWeight(
-        Commodity commodity,
-        List<DecisionCommodityComplement> commodities,
-        ILogger logger
-    )
+    private void CompareWeight(Commodity commodity, List<DecisionCommodityComplement> commodities, ILogger logger)
     {
-        var totalWeight = commodities.Sum(x => x.Weight);
-        if (totalWeight > commodity.NetMass)
+        // Sum of nullable decimals returns nullable decimal; coalesce to 0 if null.
+        var totalWeight = commodities.Sum(x => x.Weight) ?? 0m;
+
+        var allowedWeight =
+            commodity.NetMass.GetValueOrDefault() + options.Value.QuantityManagementCheckNetMassTolerance;
+
+        if (totalWeight > allowedWeight)
         {
             logger.LogWarning(
                 "Level 3 would have resulted in an X00 as IPAFFS NetWeight {NetWeight} is greater than allow in ClearanceRequest {CRNetWeight}",
@@ -76,7 +78,7 @@ public sealed class CommodityWeightOrQuantityValidationRule : IDecisionRule
             );
         }
 
-        if (totalWeight < commodity.NetMass)
+        if (totalWeight <= allowedWeight)
         {
             logger.LogInformation(
                 "Level 3 would have succeeded as IPAFFS NetWeight {NetWeight} is less than allow in ClearanceRequest {CRNetWeight}",

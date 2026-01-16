@@ -1,18 +1,27 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
-public static class ClearanceDecisionBuilder
+public interface IClearanceDecisionBuilder
 {
-    public static ClearanceDecision BuildClearanceDecision(
-        this DecisionResult decisionResult,
+    ClearanceDecision BuildClearanceDecision(
         string mrn,
-        CustomsDeclaration customsDeclaration,
-        ICorrelationIdGenerator correlationIdGenerator
+        IEnumerable<CheckDecisionResult> checkDecisionResults,
+        CustomsDeclaration customsDeclaration
+    );
+}
+
+public class ClearanceDecisionBuilder(ICorrelationIdGenerator correlationIdGenerator) : IClearanceDecisionBuilder
+{
+    public ClearanceDecision BuildClearanceDecision(
+        string mrn,
+        IEnumerable<CheckDecisionResult> checkDecisionResults,
+        CustomsDeclaration customsDeclaration
     )
     {
-        var decisions = decisionResult.Decisions.Where(x => x.Mrn == mrn).ToList();
+        var decisions = checkDecisionResults.Where(x => x.Mrn == mrn).ToList();
 
         return new ClearanceDecision
         {
@@ -41,7 +50,7 @@ public static class ClearanceDecisionBuilder
 
     private static IEnumerable<ClearanceDecisionItem> BuildItems(
         ClearanceRequest clearanceRequest,
-        List<DocumentDecisionResult> movementDecisions
+        List<CheckDecisionResult> movementDecisions
     )
     {
         if (clearanceRequest is not null)
@@ -65,7 +74,7 @@ public static class ClearanceDecisionBuilder
     private static IEnumerable<ClearanceDecisionCheck> BuildChecks(
         ClearanceRequest clearanceRequest,
         Commodity item,
-        IGrouping<int, DocumentDecisionResult> itemDecisions
+        IGrouping<int, CheckDecisionResult> itemDecisions
     )
     {
         if (item.Checks == null)
@@ -86,7 +95,7 @@ public static class ClearanceDecisionBuilder
                     CheckCode = checkCode,
                     DecisionCode = maxDecisionResult.DecisionCode.ToString(),
                     DecisionReasons = DecisionReasonBuilder
-                        .Build(clearanceRequest, item, maxDecisionResult!, documentResultsForItem)
+                        .Build(clearanceRequest, item, maxDecisionResult, documentResultsForItem)
                         .ToArray(),
                     DecisionInternalFurtherDetail = maxDecisionResult.InternalDecisionCode.HasValue
                         ? [maxDecisionResult.InternalDecisionCode.Value.ToString()]

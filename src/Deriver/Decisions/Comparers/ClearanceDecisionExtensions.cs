@@ -13,33 +13,43 @@ public static class ClearanceDecisionExtensions
         if (ReferenceEquals(x, y))
             return true;
 
-        if (x is null)
-            return false;
-
-        if (y is null)
-            return false;
-
-        if (x.Results is null && y.Results is null)
-            return true;
-
-        if (x.Results is null && y.Results is not null)
-            return false;
-
-        if (x.Results is not null && y.Results is null)
+        if (x is null || y is null)
             return false;
 
         if (x.ExternalVersionNumber != y.ExternalVersionNumber)
             return false;
 
-        ClearanceDecisionResult[] xResults = x.Results!;
-        ClearanceDecisionResult[] yResults = y.Results!;
+        var xResults = x.Results;
+        var yResults = y.Results;
 
-        return xResults
-            .OrderBy(r => r.DocumentReference)
-            .ThenBy(r => r.DocumentCode)
-            .SequenceEqual(
-                yResults.OrderBy(r => r.DocumentReference).ThenBy(r => r.DocumentCode),
-                ClearanceDecisionResultExistsComparer.Default
-            );
+        if (xResults is null || yResults is null)
+            return xResults is null && yResults is null;
+
+        if (xResults.Length != yResults.Length)
+            return false;
+
+        var comparer = ClearanceDecisionResultExistsComparer.Default;
+
+        // Count occurrences instead of sorting
+        var counts = new Dictionary<ClearanceDecisionResult, int>(comparer);
+
+        foreach (var r in xResults)
+        {
+            counts.TryGetValue(r, out var count);
+            counts[r] = count + 1;
+        }
+
+        foreach (var r in yResults)
+        {
+            if (!counts.TryGetValue(r, out var count))
+                return false;
+
+            if (count == 1)
+                counts.Remove(r);
+            else
+                counts[r] = count - 1;
+        }
+
+        return counts.Count == 0;
     }
 }

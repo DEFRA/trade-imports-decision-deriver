@@ -31,6 +31,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "compose", "compose", "{599D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestFixtures", "tests\TestFixtures\TestFixtures.csproj", "{D25D7ACA-5810-4469-98AC-FFCA4A6E529E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		docs\DecisionRulesEngine-Diagrams.md = docs\DecisionRulesEngine-Diagrams.md
+		docs\DecisionRulesEngine-QuickReference.md = docs\DecisionRulesEngine-QuickReference.md
+		docs\DecisionRulesEngine.md = docs\DecisionRulesEngine.md
+		docs\README.md = docs\README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,5 +76,8 @@ Global
 		{7B45D389-C533-43D5-8E04-ADC17FADC4D4} = {92349C3B-0C37-4727-ADAC-95748294D315}
 		{599D8AE8-B24F-422A-830D-273838E9FEE5} = {DA0DAA7E-84EB-4BD0-B40C-E1243E75400C}
 		{D25D7ACA-5810-4469-98AC-FFCA4A6E529E} = {92349C3B-0C37-4727-ADAC-95748294D315}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A8813714-8BE6-4243-985D-6372A44141E0}
 	EndGlobalSection
 EndGlobal

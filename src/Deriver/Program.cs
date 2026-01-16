@@ -1,4 +1,5 @@
-using Defra.TradeImportsDecisionDeriver.Deriver.Authentication;
+using Defra.TradeImports.Api.Auth;
+using Defra.TradeImports.EmfExporter;
 using Defra.TradeImportsDecisionDeriver.Deriver.Endpoints.Admin;
 using Defra.TradeImportsDecisionDeriver.Deriver.Endpoints.Decision;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
@@ -60,7 +61,7 @@ static WebApplication BuildWebApplication(WebApplicationBuilder builder)
 {
     var app = builder.Build();
 
-    app.UseEmfExporter();
+    app.UseEmfExporter(MetricNames.MeterName);
     app.UseHeaderPropagation();
     app.UseAuthentication();
     app.UseAuthorization();

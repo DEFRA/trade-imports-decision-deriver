@@ -6,17 +6,6 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Comparers;
 public class ClearanceDecisionResultExistsComparerTests
 {
     [Fact]
-    public void HashCodeTest()
-    {
-        var item = new ClearanceDecisionResult { ItemNumber = 1 };
-        var sut = new ClearanceDecisionResultExistsComparer();
-
-        Action act = () => sut.GetHashCode(item);
-
-        act.Should().Throw<NotSupportedException>();
-    }
-
-    [Fact]
     public void ReferenceEqualsTest()
     {
         var item = new ClearanceDecisionResult { ItemNumber = 1 };

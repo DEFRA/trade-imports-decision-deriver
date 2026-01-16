@@ -1,10 +1,9 @@
+using Defra.TradeImports.SMB.CompressedSerializer;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.Events;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.Processors;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils;
-using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 using SlimMessageBus;
 
@@ -12,10 +11,8 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 
 public class ConsumerMediator(
     ILoggerFactory loggerFactory,
-    IDecisionService decisionService,
     ITradeImportsDataApiClient apiClient,
-    ICorrelationIdGenerator correlationIdGenerator,
-    IDecisionServiceV2 decisionServiceV2
+    IDecisionService decisionService
 ) : IConsumer<string>, IConsumerWithContext
 {
     private readonly ILogger<ConsumerMediator> _logger = loggerFactory.CreateLogger<ConsumerMediator>();
@@ -43,10 +40,8 @@ public class ConsumerMediator(
     {
         var consumer = new ImportPreNotificationConsumer(
             loggerFactory.CreateLogger<ImportPreNotificationConsumer>(),
-            decisionService,
             apiClient,
-            correlationIdGenerator,
-            decisionServiceV2
+            decisionService
         )
         {
             Context = Context,
@@ -64,10 +59,8 @@ public class ConsumerMediator(
     {
         var consumer = new ClearanceRequestConsumer(
             loggerFactory.CreateLogger<ClearanceRequestConsumer>(),
-            decisionService,
             apiClient,
-            correlationIdGenerator,
-            decisionServiceV2
+            decisionService
         )
         {
             Context = Context,

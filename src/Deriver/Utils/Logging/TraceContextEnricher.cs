@@ -1,3 +1,4 @@
+using Defra.TradeImports.Tracing;
 using Serilog.Core;
 using Serilog.Events;
 

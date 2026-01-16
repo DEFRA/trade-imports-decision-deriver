@@ -1,7 +1,0 @@
-﻿{
-  DecisionCode: X00,
-  CheckCode: {
-    Value: value
-  },
-  InternalDecisionCode: E72
-}

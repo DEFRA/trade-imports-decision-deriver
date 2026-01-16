@@ -1,8 +1,9 @@
+using Defra.TradeImports.Api.Auth;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
-using Defra.TradeImportsDecisionDeriver.Deriver.Authentication;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Microsoft.AspNetCore.Mvc;
@@ -114,11 +115,21 @@ public static class EndpointRouteBuilderExtensions
 
         var decisionContext = new DecisionContext(
             preNotifications.Select(x => x.ToDecisionImportPreNotification()).ToList(),
-            [new ClearanceRequestWrapper(mrn, clearanceRequest!.ClearanceRequest!)]
+            [
+                new CustomsDeclarationWrapper(
+                    mrn,
+                    new CustomsDeclaration()
+                    {
+                        ClearanceDecision = clearanceRequest.ClearanceDecision,
+                        ClearanceRequest = clearanceRequest.ClearanceRequest,
+                    }
+                ),
+            ]
         );
-        var decisionResult = await decisionService.Process(decisionContext, cancellationToken);
 
-        if (!decisionResult.Decisions.Any())
+        var decisionResult = decisionService.Process(decisionContext).FirstOrDefault();
+
+        if (string.IsNullOrEmpty(decisionResult.Mrn))
         {
             return Results.NoContent();
         }
@@ -131,23 +142,17 @@ public static class EndpointRouteBuilderExtensions
             ExternalErrors = clearanceRequest.ExternalErrors,
         };
 
-        var newDecision = decisionResult.BuildClearanceDecision(
-            clearanceRequest.MovementReferenceNumber,
-            customsDeclaration,
-            correlationIdGenerator
-        );
+        var isDifferent = !decisionResult.Decision.IsSameAs(customsDeclaration.ClearanceDecision);
 
-        var isDifferent = !newDecision.IsSameAs(customsDeclaration.ClearanceDecision);
+        customsDeclaration.ClearanceDecision = decisionResult.Decision;
 
-        customsDeclaration.ClearanceDecision = newDecision;
-
-        bool shouldPersist =
+        var shouldPersist =
             persist == PersistOption.AlwaysPersist || (persist == PersistOption.PersistIfSame && !isDifferent);
 
         if (shouldPersist)
         {
             await apiClient.PutCustomsDeclaration(
-                clearanceRequest.MovementReferenceNumber,
+                decisionResult.Mrn,
                 customsDeclaration,
                 clearanceRequest.ETag,
                 cancellationToken

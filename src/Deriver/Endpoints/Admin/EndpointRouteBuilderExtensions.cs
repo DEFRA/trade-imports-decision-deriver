@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Defra.TradeImportsDecisionDeriver.Deriver.Authentication;
+using Defra.TradeImports.Api.Auth;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Services.Admin;
 using Microsoft.AspNetCore.Mvc;

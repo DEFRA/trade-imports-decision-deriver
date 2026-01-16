@@ -1,6 +1,6 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
-using Defra.TradeImportsDataApi.Domain.Gvms;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
@@ -21,8 +21,8 @@ public static class DecisionReasonBuilder
     public static List<string> Build(
         ClearanceRequest clearanceRequest,
         Commodity item,
-        DocumentDecisionResult maxDecisionResult,
-        DocumentDecisionResult[] documentDecisions
+        CheckDecisionResult maxDecisionResult,
+        CheckDecisionResult[] documentDecisions
     )
     {
         var reasons = new List<string>();
@@ -35,14 +35,13 @@ public static class DecisionReasonBuilder
 
     private static void HandleNoLinkedNotifications(
         Commodity item,
-        DocumentDecisionResult maxDecisionResult,
-        DocumentDecisionResult[] documentDecisions,
+        CheckDecisionResult maxDecisionResult,
+        CheckDecisionResult[] documentDecisions,
         List<string> reasons
     )
     {
         if (
-            item.Documents != null
-            && item.Documents.Any()
+            item.Documents is { Length: > 0 }
             && maxDecisionResult.DecisionCode == DecisionCode.X00
             && maxDecisionResult.CheckCode != "H220"
         )
@@ -55,7 +54,7 @@ public static class DecisionReasonBuilder
             var chedType = MapToChedType(
                 new ImportDocument()
                 {
-                    DocumentReference = new ImportDocumentReference(maxDecisionResult.DocumentReference),
+                    DocumentReference = new ImportDocumentReference(maxDecisionResult.DocumentReference!),
                     DocumentCode = maxDecisionResult.DocumentCode,
                 }
             );
@@ -92,7 +91,7 @@ public static class DecisionReasonBuilder
 
     private static void HandleHmiGmsDecisionReason(
         Commodity item,
-        DocumentDecisionResult maxDecisionResult,
+        CheckDecisionResult maxDecisionResult,
         List<string> reasons
     )
     {

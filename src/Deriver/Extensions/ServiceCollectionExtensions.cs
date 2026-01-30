@@ -1,11 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
-using Amazon;
 using Amazon.SQS;
 using Defra.TradeImports.SMB.CompressedSerializer;
 using Defra.TradeImports.SMB.Metrics;
 using Defra.TradeImports.SMB.SQSSNS;
 using Defra.TradeImports.SMB.Tracing;
 using Defra.TradeImportsDataApi.Api.Client;
+using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
@@ -15,15 +15,11 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
 using Defra.TradeImportsDecisionDeriver.Deriver.Services.Admin;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
-using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Options;
 using Polly;
 using SlimMessageBus.Host;
 using SlimMessageBus.Host.AmazonSQS;
-using SlimMessageBus.Host.Interceptor;
-using SlimMessageBus.Host.Serialization;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
@@ -102,16 +98,19 @@ public static class ServiceCollectionExtensions
                 var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");
                 var consumersPerHost = configuration.GetValue<int>("CONSUMERS_PER_HOST");
 
-                mbb.AddStringSerializer()
-                    .AddServicesFromAssemblyContaining<ConsumerMediator>()
+                mbb.AddCompressedJsonSerializer()
+                    .AddServicesFromAssemblyContaining<ClearanceRequestConsumer>()
                     .WithProviderAmazonSQS(cfg =>
                     {
                         cfg.UseLocalOrAmbientCredentials(configuration);
                         cfg.TopologyProvisioning.Enabled = false;
                     })
                     .AutoStartConsumersEnabled(autoStartConsumers)
-                    .Consume<string>(x =>
-                        x.WithConsumer<ConsumerMediator>().Queue(queueName).Instances(consumersPerHost)
+                    .Consume<ResourceEvent<CustomsDeclarationEvent>>(x =>
+                        x.WithConsumer<ClearanceRequestConsumer>().Queue(queueName).Instances(consumersPerHost)
+                    )
+                    .Consume<ResourceEvent<ImportPreNotificationEvent>>(x =>
+                        x.WithConsumer<ImportPreNotificationConsumer>().Queue(queueName).Instances(consumersPerHost)
                     );
             });
         }

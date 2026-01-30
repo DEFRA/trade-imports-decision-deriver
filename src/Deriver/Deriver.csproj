@@ -17,7 +17,7 @@
   <ItemGroup>
     <PackageReference Include="Defra.TradeImports.Api.Auth" Version="0.1.0" />
     <PackageReference Include="Defra.TradeImports.EmfExporter" Version="0.1.0" />
-    <PackageReference Include="Defra.TradeImports.SMB.CompressedSerializer" Version="0.1.0" />
+    <PackageReference Include="Defra.TradeImports.SMB.CompressedSerializer" Version="0.1.1" />
     <PackageReference Include="Defra.TradeImports.SMB.Metrics" Version="0.1.0" />
     <PackageReference Include="Defra.TradeImports.SMB.SQSSNS" Version="0.1.0" />
     <PackageReference Include="Defra.TradeImports.SMB.Tracing" Version="0.1.0" />

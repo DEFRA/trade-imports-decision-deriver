@@ -55,7 +55,7 @@ public sealed class CommodityWeightOrQuantityValidationRule : IDecisionRule
         {
             logger.LogInformation(
                 "{MRN} - Level 3 would have succeeded as IPAFFS NetQuantity {NetQuantity} is greater than allow in ClearanceRequest {CRNetWeight}",
-                mrn, 
+                mrn,
                 totalQuantity,
                 commodity.NetMass
             );
@@ -74,7 +74,7 @@ public sealed class CommodityWeightOrQuantityValidationRule : IDecisionRule
         {
             logger.LogWarning(
                 "{MRN} - Level 3 would have resulted in an X00 as IPAFFS NetWeight {NetWeight} is less than allow in ClearanceRequest {CRNetWeight}",
-                mrn, 
+                mrn,
                 totalWeight,
                 commodity.NetMass
             );
@@ -84,7 +84,7 @@ public sealed class CommodityWeightOrQuantityValidationRule : IDecisionRule
         {
             logger.LogInformation(
                 "{MRN} - Level 3 would have succeeded as IPAFFS NetWeight {NetWeight} is greather than allow in ClearanceRequest {CRNetWeight}",
-                mrn, 
+                mrn,
                 totalWeight,
                 commodity.NetMass
             );

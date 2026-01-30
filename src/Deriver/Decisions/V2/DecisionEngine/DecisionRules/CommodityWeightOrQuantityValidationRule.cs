@@ -23,36 +23,39 @@ public sealed class CommodityWeightOrQuantityValidationRule : IDecisionRule
 
         if (commodity.NetMass.HasValue)
         {
-            CompareWeight(commodity, commodities, context.Logger);
+            CompareWeight(context.ClearanceRequest.MovementReferenceNumber, commodity, commodities, context.Logger);
         }
         else if (commodity.SupplementaryUnits.HasValue)
         {
-            CompareQuantity(commodity, commodities, context.Logger);
+            CompareQuantity(context.ClearanceRequest.MovementReferenceNumber, commodity, commodities, context.Logger);
         }
 
         return result;
     }
 
     private static void CompareQuantity(
+        string mrn,
         Commodity commodity,
         List<DecisionCommodityComplement> commodities,
         ILogger logger
     )
     {
         var totalQuantity = commodities.Sum(x => x.Quantity);
-        if (totalQuantity > commodity.SupplementaryUnits)
+        if (totalQuantity < commodity.SupplementaryUnits)
         {
             logger.LogWarning(
-                "Level 3 would have resulted in an X00 as IPAFFS NetQuantity {NetQuantity} is greater than allow in ClearanceRequest {CRNetQuantity}",
+                "{MRN} - Level 3 would have resulted in an X00 as IPAFFS NetQuantity {NetQuantity} is less than allow in ClearanceRequest {CRNetQuantity}",
+                mrn,
                 totalQuantity,
                 commodity.NetMass
             );
         }
 
-        if (totalQuantity < commodity.SupplementaryUnits)
+        if (totalQuantity > commodity.SupplementaryUnits)
         {
             logger.LogInformation(
-                "Level 3 would have succeeded as IPAFFS NetQuantity {NetQuantity} is less than allow in ClearanceRequest {CRNetWeight}",
+                "{MRN} - Level 3 would have succeeded as IPAFFS NetQuantity {NetQuantity} is greater than allow in ClearanceRequest {CRNetWeight}",
+                mrn, 
                 totalQuantity,
                 commodity.NetMass
             );
@@ -60,25 +63,28 @@ public sealed class CommodityWeightOrQuantityValidationRule : IDecisionRule
     }
 
     private static void CompareWeight(
+        string mrn,
         Commodity commodity,
         List<DecisionCommodityComplement> commodities,
         ILogger logger
     )
     {
         var totalWeight = commodities.Sum(x => x.Weight);
-        if (totalWeight > commodity.NetMass)
+        if (totalWeight < commodity.NetMass)
         {
             logger.LogWarning(
-                "Level 3 would have resulted in an X00 as IPAFFS NetWeight {NetWeight} is greater than allow in ClearanceRequest {CRNetWeight}",
+                "{MRN} - Level 3 would have resulted in an X00 as IPAFFS NetWeight {NetWeight} is less than allow in ClearanceRequest {CRNetWeight}",
+                mrn, 
                 totalWeight,
                 commodity.NetMass
             );
         }
 
-        if (totalWeight < commodity.NetMass)
+        if (totalWeight > commodity.NetMass)
         {
             logger.LogInformation(
-                "Level 3 would have succeeded as IPAFFS NetWeight {NetWeight} is less than allow in ClearanceRequest {CRNetWeight}",
+                "{MRN} - Level 3 would have succeeded as IPAFFS NetWeight {NetWeight} is greather than allow in ClearanceRequest {CRNetWeight}",
+                mrn, 
                 totalWeight,
                 commodity.NetMass
             );

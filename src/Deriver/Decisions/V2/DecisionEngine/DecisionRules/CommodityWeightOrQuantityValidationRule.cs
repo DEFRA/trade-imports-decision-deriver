@@ -45,7 +45,7 @@ public sealed class CommodityWeightOrQuantityValidationRule : IDecisionRule
             logger.LogWarning(
                 "Level 3 would have resulted in an X00 as IPAFFS NetQuantity {NetQuantity} is greater than allow in ClearanceRequest {CRNetQuantity}",
                 totalQuantity,
-                commodity.NetMass.HasValue
+                commodity.NetMass
             );
         }
 
@@ -54,7 +54,7 @@ public sealed class CommodityWeightOrQuantityValidationRule : IDecisionRule
             logger.LogInformation(
                 "Level 3 would have succeeded as IPAFFS NetQuantity {NetQuantity} is less than allow in ClearanceRequest {CRNetWeight}",
                 totalQuantity,
-                commodity.NetMass.HasValue
+                commodity.NetMass
             );
         }
     }
@@ -71,7 +71,7 @@ public sealed class CommodityWeightOrQuantityValidationRule : IDecisionRule
             logger.LogWarning(
                 "Level 3 would have resulted in an X00 as IPAFFS NetWeight {NetWeight} is greater than allow in ClearanceRequest {CRNetWeight}",
                 totalWeight,
-                commodity.NetMass.HasValue
+                commodity.NetMass
             );
         }
 
@@ -80,7 +80,7 @@ public sealed class CommodityWeightOrQuantityValidationRule : IDecisionRule
             logger.LogInformation(
                 "Level 3 would have succeeded as IPAFFS NetWeight {NetWeight} is less than allow in ClearanceRequest {CRNetWeight}",
                 totalWeight,
-                commodity.NetMass.HasValue
+                commodity.NetMass
             );
         }
     }

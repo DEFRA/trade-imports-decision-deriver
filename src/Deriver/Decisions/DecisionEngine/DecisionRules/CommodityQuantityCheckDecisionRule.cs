@@ -64,7 +64,7 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
         }
     }
 
-    private static void CompareWeight(
+    private void CompareWeight(
         string mrn,
         Commodity commodity,
         List<DecisionCommodityComplement> commodities,

@@ -4,6 +4,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
+using NSubstitute;
 using Xunit.Abstractions;
 using ClearanceDecisionBuilder = Defra.TradeImportsDecisionDeriver.Deriver.Decisions.ClearanceDecisionBuilder;
 
@@ -99,52 +100,55 @@ public class DecisionServiceTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task When_processing_clearance_request_with_invalid_documents_ref_then_no_match_should_be_generated123()
+    public void When_processing_clearance_request_with_invalid_documents_ref_then_no_match_should_be_generated()
     {
-        var matchingResult = new MatchingResult();
-
-        var matchingService = Substitute.For<IMatchingService>();
-        matchingService
-            .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult(matchingResult));
-
         var decisionContext = new DecisionContext(
             [],
             [
-                new ClearanceRequestWrapper(
+                new CustomsDeclarationWrapper(
                     "clearancerequest-1",
-                    new ClearanceRequest
+                    new CustomsDeclaration()
                     {
-                        Commodities =
-                        [
-                            new Commodity
-                            {
-                                ItemNumber = 1,
-                                Documents =
-                                [
-                                    new ImportDocument()
-                                    {
-                                        DocumentReference = new ImportDocumentReference("GBCHD2026.7."),
-                                        DocumentCode = "N853",
-                                    },
-                                ],
-                                Checks = [new CommodityCheck { CheckCode = "H222" }],
-                            },
-                        ],
+                        ClearanceRequest = new ClearanceRequest
+                        {
+                            Commodities =
+                            [
+                                new Commodity
+                                {
+                                    ItemNumber = 1,
+                                    Documents =
+                                    [
+                                        new ImportDocument()
+                                        {
+                                            DocumentReference = new ImportDocumentReference("GBCHD2026.7."),
+                                            DocumentCode = "N853",
+                                        },
+                                    ],
+                                    Checks = [new CommodityCheck { CheckCode = "H222" }],
+                                },
+                            ],
+                        },
                     }
                 ),
             ]
         );
 
-        var decisionResult = await RunBothVersions(decisionContext);
+        var decisionService = new DecisionService(
+            new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
+            new CheckProcessor(new TestDecisionRulesEngineFactory())
+        );
 
-        decisionResult.Decisions.Should().HaveCount(1);
-        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
-        decisionResult.Decisions[0].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E70);
+        var decisionResult = decisionService.Process(decisionContext);
+
+        decisionResult.Should().HaveCount(1);
+        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(nameof(DecisionCode.X00));
+        decisionResult[0]
+            .Decision.Results?[0].InternalDecisionCode.Should()
+            .Be(nameof(DecisionInternalFurtherDetail.E70));
     }
 
     [Fact]
-    public async Task When_processing_chedpp_with_phsi_and_missing_hmi()
+    public void When_processing_chedpp_with_phsi_and_missing_hmi()
     {
         var decisionContext = new DecisionContext(
             [

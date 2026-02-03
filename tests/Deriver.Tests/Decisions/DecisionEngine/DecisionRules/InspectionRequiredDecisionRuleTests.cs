@@ -23,8 +23,8 @@ public class InspectionRequiredDecisionRuleTests
             .WithId("Test")
             .WithStatus(ImportNotificationStatus.Submitted)
             .Build();
-        var c = new DecisionResolutionContext(
-            new DecisionContextV2([notification], []),
+        var c = new DecisionEngineContext(
+            new DecisionContext([notification], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
@@ -39,8 +39,8 @@ public class InspectionRequiredDecisionRuleTests
         var result = _rule.Execute(c, _mockNext);
 
         // Assert
-        result.Should().BeEquivalentTo(_mockNext.Invoke(Arg.Any<DecisionResolutionContext>()));
-        _mockNext.Received(1).Invoke(Arg.Any<DecisionResolutionContext>());
+        result.Should().BeEquivalentTo(_mockNext.Invoke(Arg.Any<DecisionEngineContext>()));
+        _mockNext.Received(1).Invoke(Arg.Any<DecisionEngineContext>());
     }
 
     [Fact]

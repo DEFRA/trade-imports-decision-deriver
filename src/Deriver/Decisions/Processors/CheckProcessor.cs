@@ -53,7 +53,9 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                 documentIdentifier!
             );
 
-            if (notifications.Any())
+            var decisionImportPreNotifications =
+                notifications as DecisionImportPreNotification[] ?? notifications.ToArray();
+            if (!decisionImportPreNotifications.Any())
             {
                 foreach (var notification in notifications)
                 {
@@ -86,6 +88,32 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                 var resolverContext = new DecisionEngineContext(
                     context,
                     null!,
+                    clearanceRequest,
+                    commodity,
+                    checkCode,
+                    document
+                );
+
+                var result = decisionEngine.Run(resolverContext);
+                output.Add(
+                    new CheckDecisionResult(
+                        null,
+                        clearanceRequest.MovementReferenceNumber,
+                        commodity.ItemNumber!.Value,
+                        document.DocumentReference?.Value,
+                        documentCode,
+                        checkCodeValue,
+                        result.Code,
+                        result.FurtherDetail
+                    )
+                );
+            }
+
+            foreach (var notification in decisionImportPreNotifications)
+            {
+                var resolverContext = new DecisionResolutionContext(
+                    context,
+                    notification,
                     clearanceRequest,
                     commodity,
                     checkCode,

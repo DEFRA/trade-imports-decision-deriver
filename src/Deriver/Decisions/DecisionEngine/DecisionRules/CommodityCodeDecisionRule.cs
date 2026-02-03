@@ -23,7 +23,8 @@ public sealed class CommodityCodeDecisionRule : IDecisionRule
         if (commodities.Count == 0)
         {
             context.Logger.LogWarning(
-                "Level 2 would have resulted in an X00 as could not match CommodityCode {CommodityCode} for Item {Item}",
+                "Level 2 would have resulted in an X00 as could not match MRN {Mrn} CommodityCode {CommodityCode} for Item {Item}",
+                context.ClearanceRequest.MovementReferenceNumber,
                 commodity.TaricCommodityCode,
                 commodity.ItemNumber
             );

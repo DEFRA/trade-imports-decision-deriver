@@ -99,7 +99,52 @@ public class DecisionServiceTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public void When_processing_chedpp_with_phsi_and_missing_hmi()
+    public async Task When_processing_clearance_request_with_invalid_documents_ref_then_no_match_should_be_generated123()
+    {
+        var matchingResult = new MatchingResult();
+
+        var matchingService = Substitute.For<IMatchingService>();
+        matchingService
+            .Process(Arg.Any<MatchingContext>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(matchingResult));
+
+        var decisionContext = new DecisionContext(
+            [],
+            [
+                new ClearanceRequestWrapper(
+                    "clearancerequest-1",
+                    new ClearanceRequest
+                    {
+                        Commodities =
+                        [
+                            new Commodity
+                            {
+                                ItemNumber = 1,
+                                Documents =
+                                [
+                                    new ImportDocument()
+                                    {
+                                        DocumentReference = new ImportDocumentReference("GBCHD2026.7."),
+                                        DocumentCode = "N853",
+                                    },
+                                ],
+                                Checks = [new CommodityCheck { CheckCode = "H222" }],
+                            },
+                        ],
+                    }
+                ),
+            ]
+        );
+
+        var decisionResult = await RunBothVersions(decisionContext);
+
+        decisionResult.Decisions.Should().HaveCount(1);
+        decisionResult.Decisions[0].DecisionCode.Should().Be(DecisionCode.X00);
+        decisionResult.Decisions[0].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E70);
+    }
+
+    [Fact]
+    public async Task When_processing_chedpp_with_phsi_and_missing_hmi()
     {
         var decisionContext = new DecisionContext(
             [

@@ -85,7 +85,8 @@ public class CommodityCodeDecisionRuleTests
         returnResult.Should().Be(result);
         _mockNext.Received(1).Invoke(Arg.Any<DecisionEngineContext>());
         var msg = GetFormattedMessageFromLoggerCall(_mockLogger);
-        msg.Should().Contain("Level 2 would have resulted in an X00 as could not match CommodityCode 12345 for Item 1");
+        msg.Should()
+            .Contain("Level 2 would have resulted in an X00 as could not match MRN mrn CommodityCode 12345 for Item 1");
     }
 
     [Fact]

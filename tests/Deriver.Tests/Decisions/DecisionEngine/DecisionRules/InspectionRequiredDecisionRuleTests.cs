@@ -14,7 +14,34 @@ public class InspectionRequiredDecisionRuleTests
     private readonly InspectionRequiredDecisionRule _rule = new();
     private readonly DecisionRuleDelegate _mockNext = Substitute.For<DecisionRuleDelegate>();
 
-    // Initialize the rule and mock objects
+    [Fact]
+    public void Execute_WhenCheckCodeIsIUU_CallsNextDelegate()
+    {
+        // Arrange
+        var notification = DecisionImportPreNotificationBuilder
+            .Create()
+            .WithId("Test")
+            .WithStatus(ImportNotificationStatus.Submitted)
+            .Build();
+        var c = new DecisionResolutionContext(
+            new DecisionContextV2([notification], []),
+            notification,
+            new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
+            new Commodity(),
+            new CheckCode() { Value = "H224" },
+            new ImportDocument()
+        )
+        {
+            Logger = NullLogger.Instance,
+        };
+
+        // Act
+        var result = _rule.Execute(c, _mockNext);
+
+        // Assert
+        result.Should().BeEquivalentTo(_mockNext.Invoke(Arg.Any<DecisionResolutionContext>()));
+        _mockNext.Received(1).Invoke(Arg.Any<DecisionResolutionContext>());
+    }
 
     [Fact]
     public void Execute_WhenStatusIsNotSubmittedInProgressOrAmend_CallsNextDelegate()

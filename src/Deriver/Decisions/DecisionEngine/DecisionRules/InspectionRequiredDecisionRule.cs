@@ -6,6 +6,11 @@ public sealed class InspectionRequiredDecisionRule : IDecisionRule
 {
     public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
+        if (context.CheckCode.IsIuu())
+        {
+            return next(context);
+        }
+
         var notification = context.Notification;
 
         if (notification.Status is not (ImportNotificationStatus.Submitted or ImportNotificationStatus.InProgress))

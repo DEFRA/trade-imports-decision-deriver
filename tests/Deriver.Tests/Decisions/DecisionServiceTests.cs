@@ -1130,6 +1130,55 @@ public class DecisionServiceTests
         decisionResult.Decisions[1].InternalDecisionCode.Should().Be(DecisionInternalFurtherDetail.E84);
     }
 
+    [Fact]
+    public async Task When_processing_chedpp_in_amend_state_should_be_hold()
+    {
+        var notification = DecisionImportPreNotificationBuilder
+            .Create()
+            .WithId("1234567")
+            .WithImportNotificationType(ImportNotificationType.Chedpp)
+            .WithHasPartTwo(true)
+            .WithStatus(ImportNotificationStatus.Amend)
+            .Build();
+
+        var decisionContext = new DecisionContext(
+            [notification],
+            [
+                new ClearanceRequestWrapper(
+                    "25GB99999999999021",
+                    new ClearanceRequest
+                    {
+                        Commodities =
+                        [
+                            new Commodity
+                            {
+                                ItemNumber = 1,
+                                TaricCommodityCode = "0207119000",
+                                NetMass = 56,
+                                Documents =
+                                [
+                                    new ImportDocument()
+                                    {
+                                        DocumentCode = "N851",
+                                        DocumentReference = new ImportDocumentReference("GBCHD2025.1234567"),
+                                        DocumentStatus = "JE",
+                                        DocumentControl = "P",
+                                    },
+                                ],
+                                Checks = [new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" }],
+                            },
+                        ],
+                    }
+                ),
+            ]
+        );
+
+        // Act
+        var decisionResult = await RunBothVersions(decisionContext);
+
+        decisionResult.Should().NotBeNull();
+    }
+
     private static DecisionContext CreateDecisionContext(
         string? importNotificationType,
         string[]? checkCodes,

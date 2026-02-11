@@ -44,8 +44,8 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<UnlinkedNotificationDecisionRule>(),
             AddRule<WrongChedTypeDecisionRule>(),
             AddRule<TerminalStatusDecisionRule>(),
-            AddRule<MissingPartTwoDecisionRule>(),
             AddRule<AmendDecisionRule>(),
+            AddRule<MissingPartTwoDecisionRule>(),
             AddRule<InspectionRequiredDecisionRule>(),
             AddRule<CvedaDecisionRule>(),
         };
@@ -63,8 +63,8 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<UnlinkedNotificationDecisionRule>(),
             AddRule<WrongChedTypeDecisionRule>(),
             AddRule<TerminalStatusDecisionRule>(),
-            AddRule<MissingPartTwoDecisionRule>(),
             AddRule<AmendDecisionRule>(),
+            AddRule<MissingPartTwoDecisionRule>(),
             AddRule<InspectionRequiredDecisionRule>(),
             AddRule<CvedpIuuCheckRule>(),
             AddRule<CvedpDecisionRule>(),
@@ -83,6 +83,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<UnlinkedNotificationDecisionRule>(),
             AddRule<WrongChedTypeDecisionRule>(),
             AddRule<TerminalStatusDecisionRule>(),
+            AddRule<AmendDecisionRule>(),
             AddRule<MissingPartTwoDecisionRule>(),
             AddRule<ChedppDecisionRule>(),
         };

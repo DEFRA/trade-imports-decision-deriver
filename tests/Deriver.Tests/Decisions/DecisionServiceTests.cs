@@ -886,7 +886,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task When_processing_chedpp_in_amend_state_should_be_hold()
+    public void When_processing_chedpp_in_amend_state_should_be_hold()
     {
         var notification = DecisionImportPreNotificationBuilder
             .Create()
@@ -898,76 +898,47 @@ public class DecisionServiceTests(ITestOutputHelper output)
         var decisionContext = new DecisionContext(
             [notification],
             [
-                new ClearanceRequestWrapper(
+                new CustomsDeclarationWrapper(
                     "25GB99999999999021",
-                    new ClearanceRequest
+                    new CustomsDeclaration()
                     {
-                        Commodities =
-                        [
-                            new Commodity
-                            {
-                                ItemNumber = 1,
-                                TaricCommodityCode = "0207119000",
-                                NetMass = 56,
-                                Documents =
-                                [
-                                    new ImportDocument()
-                                    {
-                                        DocumentCode = "N851",
-                                        DocumentReference = new ImportDocumentReference("GBCHD2025.1234567"),
-                                        DocumentStatus = "JE",
-                                        DocumentControl = "P",
-                                    },
-                                ],
-                                Checks = [new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" }],
-                            },
-                        ],
+                        ClearanceRequest = new ClearanceRequest
+                        {
+                            Commodities =
+                            [
+                                new Commodity
+                                {
+                                    ItemNumber = 1,
+                                    TaricCommodityCode = "0207119000",
+                                    NetMass = 56,
+                                    Documents =
+                                    [
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "N851",
+                                            DocumentReference = new ImportDocumentReference("GBCHD2025.1234567"),
+                                            DocumentStatus = "JE",
+                                            DocumentControl = "P",
+                                        },
+                                    ],
+                                    Checks = [new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" }],
+                                },
+                            ],
+                        },
                     }
                 ),
             ]
+        );
+
+        var decisionService = new DecisionService(
+            new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
+            new CheckProcessor(new TestDecisionRulesEngineFactory())
         );
 
         // Act
-        var decisionResult = await RunBothVersions(decisionContext);
+        var decisionResult = decisionService.Process(decisionContext);
 
         decisionResult.Should().NotBeNull();
-    }
-
-    private static DecisionContext CreateDecisionContext(
-        string? importNotificationType,
-        string[]? checkCodes,
-        bool? iuuCheckRequired
-    )
-    {
-        return new DecisionContext(
-            [
-                new DecisionImportPreNotification
-                {
-                    Id = "notification-1",
-                    ImportNotificationType = importNotificationType,
-                    IuuCheckRequired = iuuCheckRequired,
-                },
-            ],
-            [
-                new ClearanceRequestWrapper(
-                    "clearancerequest-1",
-                    new ClearanceRequest
-                    {
-                        Commodities =
-                        [
-                            new Commodity
-                            {
-                                ItemNumber = 1,
-                                Documents = [new ImportDocument { DocumentCode = "9115" }],
-                                Checks = checkCodes
-                                    ?.Select(checkCode => new CommodityCheck { CheckCode = checkCode })
-                                    .ToArray(),
-                            },
-                        ],
-                    }
-                ),
-            ]
-        );
     }
 
     private static DecisionContext CreateChedppDecisionContext(

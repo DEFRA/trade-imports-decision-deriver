@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
@@ -35,6 +36,7 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
         return result;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void CompareQuantity(
         string mrn,
         Commodity commodity,
@@ -64,6 +66,7 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void CompareWeight(
         string mrn,
         Commodity commodity,

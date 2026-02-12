@@ -1,4 +1,4 @@
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
+using System.Runtime.CompilerServices;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
@@ -20,17 +20,18 @@ public sealed class InspectionRequiredDecisionRule : IDecisionRule
 
         if (notification.InspectionRequired is InspectionRequired.NotRequired or InspectionRequired.Inconclusive)
         {
-            return new DecisionEngineResult(DecisionCode.H01);
+            return DecisionEngineResult.H01;
         }
 
         if (IsInspectionRequired(notification))
         {
-            return new DecisionEngineResult(DecisionCode.H02);
+            return DecisionEngineResult.H02;
         }
 
         return next(context);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool IsInspectionRequired(DecisionImportPreNotification notification)
     {
         return notification.InspectionRequired == InspectionRequired.Required

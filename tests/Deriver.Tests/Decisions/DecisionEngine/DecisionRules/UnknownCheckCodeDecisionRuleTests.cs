@@ -32,7 +32,7 @@ public class UnknownCheckCodeDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expected = new DecisionEngineResult(DecisionCode.X00, DecisionInternalFurtherDetail.E88);
+        var expected = DecisionEngineResult.Create(DecisionCode.X00, DecisionInternalFurtherDetail.E88);
 
         // Act
         var result = _rule.Execute(context, _mockNext);
@@ -60,13 +60,15 @@ public class UnknownCheckCodeDecisionRuleTests
         };
 
         // Make the next delegate return a different result to prove it is not used
-        _mockNext.Invoke(Arg.Any<DecisionEngineContext>()).Returns(new DecisionEngineResult(DecisionCode.C02));
+        _mockNext.Invoke(Arg.Any<DecisionEngineContext>()).Returns(DecisionEngineResult.Create(DecisionCode.C02));
 
         // Act
         var result = _rule.Execute(context, _mockNext);
 
         // Assert result is the rule's own value and next was not invoked
-        result.Should().BeEquivalentTo(new DecisionEngineResult(DecisionCode.X00, DecisionInternalFurtherDetail.E88));
+        result
+            .Should()
+            .BeEquivalentTo(DecisionEngineResult.Create(DecisionCode.X00, DecisionInternalFurtherDetail.E88));
         _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionEngineContext>());
     }
 }

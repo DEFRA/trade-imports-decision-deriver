@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
@@ -43,15 +44,11 @@ public class DecisionImportPreNotification
     [JsonPropertyName("hasPartTwo")]
     public bool HasPartTwo { get; set; }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool HasAcceptableConsignmentDecision()
     {
         return ConsignmentDecision is not null
             && ConsignmentDecision
                 != Defra.TradeImportsDecisionDeriver.Deriver.Decisions.ConsignmentDecision.NonAcceptable;
-    }
-
-    public string GetVersion()
-    {
-        return $"{Id}_{Status}_{UpdatedSource:o}";
     }
 }

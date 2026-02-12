@@ -1,4 +1,4 @@
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
+using System.Runtime.CompilerServices;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
@@ -8,35 +8,32 @@ public sealed class ChedppDecisionRule : IDecisionRule
     {
         return context.Notification.Status switch
         {
-            ImportNotificationStatus.Submitted or ImportNotificationStatus.InProgress => new DecisionEngineResult(
-                DecisionCode.H02
-            ),
+            ImportNotificationStatus.Submitted or ImportNotificationStatus.InProgress => DecisionEngineResult.H02,
             ImportNotificationStatus.Validated or ImportNotificationStatus.Rejected => context.CheckCode.Value switch
             {
                 "H218" or "H220" => ProcessHmi(context.Notification),
                 "H219" => ProcessPhsi(context.Notification),
-                _ => new DecisionEngineResult(DecisionCode.X00, DecisionInternalFurtherDetail.E99),
+                _ => DecisionEngineResult.X00E99,
             },
-            ImportNotificationStatus.PartiallyRejected => new DecisionEngineResult(
-                DecisionCode.H01,
-                DecisionInternalFurtherDetail.E74
-            ),
-            _ => new DecisionEngineResult(DecisionCode.X00, DecisionInternalFurtherDetail.E99),
+            ImportNotificationStatus.PartiallyRejected => DecisionEngineResult.H01E74,
+            _ => DecisionEngineResult.X00E99,
         };
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static DecisionEngineResult ProcessHmi(DecisionImportPreNotification notification)
     {
         var hmiCheck = notification.CommodityChecks.FirstOrDefault(x => x.Type == "HMI");
 
         if (hmiCheck is null)
         {
-            return new DecisionEngineResult(DecisionCode.H01, DecisionInternalFurtherDetail.E86);
+            return DecisionEngineResult.H01E86;
         }
 
         return GetDecisionFromStatus(hmiCheck.Status);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static DecisionEngineResult ProcessPhsi(DecisionImportPreNotification notification)
     {
         var documentCheck = notification.CommodityChecks.FirstOrDefault(x => x.Type == "PHSI_DOCUMENT");
@@ -45,7 +42,7 @@ public sealed class ChedppDecisionRule : IDecisionRule
 
         if (documentCheck is null || physicalCheck is null || identifyCheck is null)
         {
-            return new DecisionEngineResult(DecisionCode.H01, DecisionInternalFurtherDetail.E85);
+            return DecisionEngineResult.H01E85;
         }
 
         var decisions = new List<DecisionEngineResult>
@@ -58,16 +55,17 @@ public sealed class ChedppDecisionRule : IDecisionRule
         return decisions.OrderByDescending(x => x.Code).First();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static DecisionEngineResult GetDecisionFromStatus(string status)
     {
         return status switch
         {
-            "To do" or "Hold" => new DecisionEngineResult(DecisionCode.H01),
-            "To be inspected" => new DecisionEngineResult(DecisionCode.H02),
-            "Compliant" or "Auto cleared" => new DecisionEngineResult(DecisionCode.C03),
-            "Non compliant" => new DecisionEngineResult(DecisionCode.N01),
-            "Not inspected" => new DecisionEngineResult(DecisionCode.C02),
-            _ => new DecisionEngineResult(DecisionCode.X00, DecisionInternalFurtherDetail.E99),
+            "To do" or "Hold" => DecisionEngineResult.H01,
+            "To be inspected" => DecisionEngineResult.H02,
+            "Compliant" or "Auto cleared" => DecisionEngineResult.C03,
+            "Non compliant" => DecisionEngineResult.N01,
+            "Not inspected" => DecisionEngineResult.C02,
+            _ => DecisionEngineResult.X00E99,
         };
     }
 }

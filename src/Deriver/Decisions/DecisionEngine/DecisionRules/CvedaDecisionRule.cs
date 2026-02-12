@@ -1,5 +1,3 @@
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
-
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
 public sealed class CvedaDecisionRule : IDecisionRule
@@ -13,11 +11,11 @@ public sealed class CvedaDecisionRule : IDecisionRule
             return notification.ConsignmentDecision switch
             {
                 ConsignmentDecision.AcceptableForTranshipment or ConsignmentDecision.AcceptableForTransit =>
-                    new DecisionEngineResult(DecisionCode.E03),
-                ConsignmentDecision.AcceptableForInternalMarket => new DecisionEngineResult(DecisionCode.C03),
-                ConsignmentDecision.AcceptableForTemporaryImport => new DecisionEngineResult(DecisionCode.C05),
-                ConsignmentDecision.HorseReEntry => new DecisionEngineResult(DecisionCode.C06),
-                _ => new DecisionEngineResult(DecisionCode.X00, DecisionInternalFurtherDetail.E96),
+                    DecisionEngineResult.E03,
+                ConsignmentDecision.AcceptableForInternalMarket => DecisionEngineResult.C03,
+                ConsignmentDecision.AcceptableForTemporaryImport => DecisionEngineResult.C05,
+                ConsignmentDecision.HorseReEntry => DecisionEngineResult.C06,
+                _ => DecisionEngineResult.X00E96,
             };
         }
 
@@ -26,15 +24,15 @@ public sealed class CvedaDecisionRule : IDecisionRule
             return notification.NotAcceptableAction switch
             {
                 DecisionNotAcceptableAction.Euthanasia or DecisionNotAcceptableAction.Slaughter =>
-                    new DecisionEngineResult(DecisionCode.N02),
-                DecisionNotAcceptableAction.Reexport => new DecisionEngineResult(DecisionCode.N04),
-                _ => new DecisionEngineResult(DecisionCode.X00, DecisionInternalFurtherDetail.E97),
+                    DecisionEngineResult.N02,
+                DecisionNotAcceptableAction.Reexport => DecisionEngineResult.N04,
+                _ => DecisionEngineResult.X00E97,
             };
         }
 
         if (notification.NotAcceptableReasons?.Length > 0)
         {
-            return new DecisionEngineResult(DecisionCode.N04);
+            return DecisionEngineResult.N04;
         }
 
         return next(context);

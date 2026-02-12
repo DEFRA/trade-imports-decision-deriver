@@ -67,8 +67,8 @@ public class CvedpIuuCheckRuleTests
         };
 
         var expectedResult = expectedDetail.HasValue
-            ? new DecisionEngineResult(expectedCode, expectedDetail.Value)
-            : new DecisionEngineResult(expectedCode);
+            ? DecisionEngineResult.Create(expectedCode, expectedDetail.Value)
+            : DecisionEngineResult.Create(expectedCode);
 
         var result = _rule.Execute(c, _mockNext);
 
@@ -97,7 +97,7 @@ public class CvedpIuuCheckRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = new DecisionEngineResult(DecisionCode.H02, DecisionInternalFurtherDetail.E94);
+        var expectedResult = DecisionEngineResult.Create(DecisionCode.H02, DecisionInternalFurtherDetail.E94);
 
         var result = _rule.Execute(c, _mockNext);
 

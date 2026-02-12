@@ -23,7 +23,7 @@ public sealed class DecisionRulesEngine(
 
     private static DecisionRuleDelegate BuildRules(IReadOnlyList<IDecisionRule> rules, HashSet<string> disabledRules)
     {
-        DecisionRuleDelegate pipeline = _ => DecisionEngineResult.UnknownDecision;
+        DecisionRuleDelegate pipeline = _ => DecisionEngineResult.X00E99;
 
         for (var i = rules.Count - 1; i >= 0; i--)
         {

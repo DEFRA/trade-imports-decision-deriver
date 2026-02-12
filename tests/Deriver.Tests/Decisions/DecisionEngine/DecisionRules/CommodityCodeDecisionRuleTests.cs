@@ -40,7 +40,7 @@ public class CommodityCodeDecisionRuleTests
             Logger = _mockLogger,
         };
 
-        var result = new DecisionEngineResult(DecisionCode.N01);
+        var result = DecisionEngineResult.Create(DecisionCode.N01);
         _mockNext.Invoke(Arg.Any<DecisionEngineContext>()).Returns(result);
 
         // Act
@@ -75,7 +75,7 @@ public class CommodityCodeDecisionRuleTests
         };
 
         // Simulate that the next result is a "Release" or "Hold"
-        var result = new DecisionEngineResult(DecisionCode.C02); // or DecisionCode.Hold
+        var result = DecisionEngineResult.Create(DecisionCode.C02); // or DecisionCode.Hold
         _mockNext.Invoke(Arg.Any<DecisionEngineContext>()).Returns(result);
 
         // Act
@@ -112,7 +112,7 @@ public class CommodityCodeDecisionRuleTests
         };
 
         // Simulate that the next result is a "Release" or "Hold"
-        var result = new DecisionEngineResult(DecisionCode.C02); // or DecisionCode.Hold
+        var result = DecisionEngineResult.Create(DecisionCode.C02); // or DecisionCode.Hold
         _mockNext.Invoke(Arg.Any<DecisionEngineContext>()).Returns(result);
 
         // Act

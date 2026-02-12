@@ -48,8 +48,8 @@ public class CvedpDecisionRuleTests
         };
 
         var expectedResult = expectedDetail.HasValue
-            ? new DecisionEngineResult(expectedCode, expectedDetail.Value)
-            : new DecisionEngineResult(expectedCode);
+            ? DecisionEngineResult.Create(expectedCode, expectedDetail.Value)
+            : DecisionEngineResult.Create(expectedCode);
 
         // Act
         var result = _rule.Execute(c, _mockNext);
@@ -85,7 +85,7 @@ public class CvedpDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = new DecisionEngineResult(expectedCode);
+        var expectedResult = DecisionEngineResult.Create(expectedCode);
 
         // Act
         var result = _rule.Execute(c, _mockNext);
@@ -117,7 +117,7 @@ public class CvedpDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = new DecisionEngineResult(DecisionCode.N04);
+        var expectedResult = DecisionEngineResult.Create(DecisionCode.N04);
 
         var result = _rule.Execute(c, _mockNext);
 

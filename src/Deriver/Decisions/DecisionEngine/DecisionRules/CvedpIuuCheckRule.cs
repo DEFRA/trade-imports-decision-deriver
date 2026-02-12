@@ -1,5 +1,3 @@
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
-
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
 public sealed class CvedpIuuCheckRule : IDecisionRule
@@ -16,12 +14,12 @@ public sealed class CvedpIuuCheckRule : IDecisionRule
         {
             true => notification.IuuOption switch
             {
-                ControlAuthorityIuuOption.IUUOK => new DecisionEngineResult(DecisionCode.C07),
-                ControlAuthorityIuuOption.IUUNotCompliant => new DecisionEngineResult(DecisionCode.X00),
-                ControlAuthorityIuuOption.IUUNA => new DecisionEngineResult(DecisionCode.C08),
-                _ => new DecisionEngineResult(DecisionCode.H02, DecisionInternalFurtherDetail.E93),
+                ControlAuthorityIuuOption.IUUOK => DecisionEngineResult.C07,
+                ControlAuthorityIuuOption.IUUNotCompliant => DecisionEngineResult.X00,
+                ControlAuthorityIuuOption.IUUNA => DecisionEngineResult.C08,
+                _ => DecisionEngineResult.H02E93,
             },
-            false => new DecisionEngineResult(DecisionCode.H02, DecisionInternalFurtherDetail.E94),
+            false => DecisionEngineResult.H02E94,
         };
     }
 }

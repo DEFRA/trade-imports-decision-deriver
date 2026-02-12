@@ -46,8 +46,8 @@ public class CedDecisionRuleTests
         };
 
         var expectedResult = expectedDetail.HasValue
-            ? new DecisionEngineResult(expectedCode, expectedDetail.Value)
-            : new DecisionEngineResult(expectedCode);
+            ? DecisionEngineResult.Create(expectedCode, expectedDetail.Value)
+            : DecisionEngineResult.Create(expectedCode);
 
         // Act
         var result = _rule.Execute(context, _mockNext);
@@ -93,8 +93,8 @@ public class CedDecisionRuleTests
         };
 
         var expectedResult = expectedDetail.HasValue
-            ? new DecisionEngineResult(expectedCode, expectedDetail.Value)
-            : new DecisionEngineResult(expectedCode);
+            ? DecisionEngineResult.Create(expectedCode, expectedDetail.Value)
+            : DecisionEngineResult.Create(expectedCode);
 
         // Act
         var result = _rule.Execute(context, _mockNext);
@@ -121,7 +121,7 @@ public class CedDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = new DecisionEngineResult(DecisionCode.X00, DecisionInternalFurtherDetail.E99);
+        var expectedResult = DecisionEngineResult.Create(DecisionCode.X00, DecisionInternalFurtherDetail.E99);
 
         // Act
         var result = _rule.Execute(c, _mockNext);

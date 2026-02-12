@@ -42,8 +42,8 @@ public class ChedppDecisionRuleTests
         };
 
         var expectedResult = expectedDetail.HasValue
-            ? new DecisionEngineResult(expectedCode, expectedDetail.Value)
-            : new DecisionEngineResult(expectedCode);
+            ? DecisionEngineResult.Create(expectedCode, expectedDetail.Value)
+            : DecisionEngineResult.Create(expectedCode);
 
         // Act
         var result = _rule.Execute(c, _mockNext);
@@ -90,8 +90,8 @@ public class ChedppDecisionRuleTests
         };
 
         var expectedResult = expectedDetail.HasValue
-            ? new DecisionEngineResult(expectedCode, expectedDetail.Value)
-            : new DecisionEngineResult(expectedCode);
+            ? DecisionEngineResult.Create(expectedCode, expectedDetail.Value)
+            : DecisionEngineResult.Create(expectedCode);
 
         // Act
         var result = _rule.Execute(c, _mockNext);
@@ -135,7 +135,7 @@ public class ChedppDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = new DecisionEngineResult(expectedCode);
+        var expectedResult = DecisionEngineResult.Create(expectedCode);
 
         // Act
         var result = _rule.Execute(c, _mockNext);
@@ -167,7 +167,7 @@ public class ChedppDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = new DecisionEngineResult(DecisionCode.H01, DecisionInternalFurtherDetail.E86);
+        var expectedResult = DecisionEngineResult.Create(DecisionCode.H01, DecisionInternalFurtherDetail.E86);
 
         var result = _rule.Execute(c, _mockNext);
 
@@ -196,7 +196,7 @@ public class ChedppDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = new DecisionEngineResult(DecisionCode.H01, DecisionInternalFurtherDetail.E85);
+        var expectedResult = DecisionEngineResult.Create(DecisionCode.H01, DecisionInternalFurtherDetail.E85);
 
         var result = _rule.Execute(c, _mockNext);
 

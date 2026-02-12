@@ -1,5 +1,3 @@
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
-
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
 public sealed class CedDecisionRule : IDecisionRule
@@ -13,8 +11,8 @@ public sealed class CedDecisionRule : IDecisionRule
             return notification.ConsignmentDecision switch
             {
                 ConsignmentDecision.AcceptableForInternalMarket or ConsignmentDecision.AcceptableForNonInternalMarket =>
-                    new DecisionEngineResult(DecisionCode.C03),
-                _ => new DecisionEngineResult(DecisionCode.X00, DecisionInternalFurtherDetail.E96),
+                    DecisionEngineResult.C03,
+                _ => DecisionEngineResult.X00E96,
             };
         }
 
@@ -22,19 +20,19 @@ public sealed class CedDecisionRule : IDecisionRule
         {
             return notification.NotAcceptableAction switch
             {
-                DecisionNotAcceptableAction.Destruction => new DecisionEngineResult(DecisionCode.N02),
-                DecisionNotAcceptableAction.Redispatching => new DecisionEngineResult(DecisionCode.N04),
-                DecisionNotAcceptableAction.Transformation => new DecisionEngineResult(DecisionCode.N03),
-                DecisionNotAcceptableAction.Other => new DecisionEngineResult(DecisionCode.N07),
-                _ => new DecisionEngineResult(DecisionCode.X00, DecisionInternalFurtherDetail.E97),
+                DecisionNotAcceptableAction.Destruction => DecisionEngineResult.N02,
+                DecisionNotAcceptableAction.Redispatching => DecisionEngineResult.N04,
+                DecisionNotAcceptableAction.Transformation => DecisionEngineResult.N03,
+                DecisionNotAcceptableAction.Other => DecisionEngineResult.N07,
+                _ => DecisionEngineResult.X00E97,
             };
         }
 
         if (notification.NotAcceptableReasons?.Length > 0)
         {
-            return new DecisionEngineResult(DecisionCode.N04);
+            return DecisionEngineResult.N04;
         }
 
-        return new DecisionEngineResult(DecisionCode.X00, DecisionInternalFurtherDetail.E99);
+        return DecisionEngineResult.X00E99;
     }
 }

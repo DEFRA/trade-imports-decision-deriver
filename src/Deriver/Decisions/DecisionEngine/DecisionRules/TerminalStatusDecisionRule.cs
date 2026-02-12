@@ -1,5 +1,3 @@
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
-
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
 public sealed class TerminalStatusDecisionRule : IDecisionRule
@@ -8,27 +6,13 @@ public sealed class TerminalStatusDecisionRule : IDecisionRule
     {
         var notification = context.Notification;
 
-        var result = notification.Status switch
+        return notification.Status switch
         {
-            ImportNotificationStatus.Cancelled => new DecisionEngineResult(
-                DecisionCode.X00,
-                DecisionInternalFurtherDetail.E71
-            ),
-            ImportNotificationStatus.Replaced => new DecisionEngineResult(
-                DecisionCode.X00,
-                DecisionInternalFurtherDetail.E72
-            ),
-            ImportNotificationStatus.Deleted => new DecisionEngineResult(
-                DecisionCode.X00,
-                DecisionInternalFurtherDetail.E73
-            ),
-            ImportNotificationStatus.SplitConsignment => new DecisionEngineResult(
-                DecisionCode.X00,
-                DecisionInternalFurtherDetail.E75
-            ),
-            _ => null,
+            ImportNotificationStatus.Cancelled => DecisionEngineResult.X00E71,
+            ImportNotificationStatus.Replaced => DecisionEngineResult.X00E72,
+            ImportNotificationStatus.Deleted => DecisionEngineResult.X00E73,
+            ImportNotificationStatus.SplitConsignment => DecisionEngineResult.X00E75,
+            _ => next(context),
         };
-
-        return result ?? next(context);
     }
 }

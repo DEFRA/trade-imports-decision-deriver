@@ -1,5 +1,4 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
@@ -19,6 +18,6 @@ public sealed class OrphanCheckCodeDecisionRule : IDecisionRule
 
             internalFurtherDetail = hasH219 ? DecisionInternalFurtherDetail.E82 : DecisionInternalFurtherDetail.E87;
         }
-        return new DecisionEngineResult(DecisionCode.X00, internalFurtherDetail);
+        return DecisionEngineResult.Create(DecisionCode.X00, internalFurtherDetail);
     }
 }

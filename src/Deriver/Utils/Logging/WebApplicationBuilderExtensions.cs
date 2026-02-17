@@ -1,10 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Defra.TradeImports.Tracing;
-using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Elastic.Serilog.Enrichers.Web;
-using Microsoft.AspNetCore.HeaderPropagation;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
 

@@ -36,7 +36,7 @@ public readonly record struct DecisionEngineResult
     public static DecisionEngineResult H01E99 => new(DecisionCode.H01, DecisionInternalFurtherDetail.E99);
 
     public static DecisionEngineResult X00 => new(DecisionCode.X00);
-
+    public static DecisionEngineResult X00E20 => new(DecisionCode.X00, DecisionInternalFurtherDetail.E20);
     public static DecisionEngineResult X00E99 => new(DecisionCode.X00, DecisionInternalFurtherDetail.E99);
 
     public static DecisionEngineResult X00E97 => new(DecisionCode.X00, DecisionInternalFurtherDetail.E97);

@@ -20,6 +20,8 @@ public sealed class CommodityCodeDecisionRule : IDecisionRule
             )
             .ToList();
 
+        context.Level2Succeeded = commodities.Count > 0;
+
         if (commodities.Count == 0)
         {
             context.Logger.LogWarning(

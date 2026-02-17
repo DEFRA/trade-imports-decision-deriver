@@ -12,7 +12,7 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
     {
         var result = next(context);
 
-        if (!result.Code.IsReleaseOrHold())
+        if (!result.Code.IsReleaseOrHold() || !context.Level2Succeeded == false)
         {
             return result;
         }

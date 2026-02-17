@@ -13,4 +13,6 @@ public sealed record DecisionEngineContext(
 )
 {
     public ILogger Logger { get; set; } = null!;
+
+    public bool? Level2Succeeded { get; set; }
 }

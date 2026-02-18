@@ -171,7 +171,7 @@ public class AmendDecisionRuleTests
     }
 
     [Fact]
-    public void Execute_WhenInspectionRequiredIsOther_ReturnsH01AndE99()
+    public void Execute_WhenInspectionRequiredIsOther_ReturnsH01AndE88()
     {
         // Arrange
         var notification = DecisionImportPreNotificationBuilder
@@ -197,7 +197,7 @@ public class AmendDecisionRuleTests
 
         // Assert
         result.Code.Should().Be(DecisionCode.H01);
-        result.FurtherDetail.Should().Be(DecisionInternalFurtherDetail.E99);
+        result.FurtherDetail.Should().Be(DecisionInternalFurtherDetail.E88);
         _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionEngineContext>()); // Ensure the next delegate was NOT called
     }
 }

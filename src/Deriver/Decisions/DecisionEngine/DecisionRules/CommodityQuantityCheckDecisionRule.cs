@@ -44,15 +44,24 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
         ILogger logger
     )
     {
-        var ipaffsCount = commodities.Sum(x => x.Quantity);
-        if (commodity.SupplementaryUnits > ipaffsCount)
+        var totalQuantity = commodities.Sum(x => x.Quantity);
+        if (totalQuantity < commodity.SupplementaryUnits)
         {
             logger.LogWarning(
-                "{MRN} - Level 3 would have resulted in a No Match as Item {ItemNumber} on Clearance Request has a quantity of {CRNetQuantity}, but associated item(s) on IPAFFS have a quanitity of {NetQuantity}",
+                "{MRN} - Level 3 would have resulted in an X00 as IPAFFS NetQuantity {NetQuantity} is less than allow in ClearanceRequest {CRNetQuantity}",
                 mrn,
-                commodity.ItemNumber,
-                commodity.SupplementaryUnits,
-                ipaffsCount
+                totalQuantity,
+                commodity.NetMass
+            );
+        }
+
+        if (totalQuantity > commodity.SupplementaryUnits)
+        {
+            logger.LogInformation(
+                "{MRN} - Level 3 would have succeeded as IPAFFS NetQuantity {NetQuantity} is greater than allow in ClearanceRequest {CRNetWeight}",
+                mrn,
+                totalQuantity,
+                commodity.NetMass
             );
         }
     }
@@ -66,18 +75,28 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
     )
     {
         // Sum of nullable decimals returns nullable decimal; coalesce to 0 if null.
-        var ipaffsWeight = commodities.Sum(x => x.Weight) ?? 0m;
+        var totalWeight = commodities.Sum(x => x.Weight) ?? 0m;
 
-        var crWeight = commodity.NetMass.GetValueOrDefault() + options.Value.QuantityManagementCheckNetMassTolerance;
+        var allowedWeight =
+            commodity.NetMass.GetValueOrDefault() + options.Value.QuantityManagementCheckNetMassTolerance;
 
-        if (crWeight > ipaffsWeight)
+        if (totalWeight > allowedWeight)
         {
             logger.LogWarning(
-                "{MRN} - Level 3 would have resulted in a No Match as Item {ItemNumber} on Clearance Request has a weight of {CRNetWeight}, but associated item(s) on IPAFFS have a weight of {NetWeight}",
+                "{MRN} - Level 3 would have resulted in an X00 as IPAFFS NetWeight {NetWeight} is less than allow in ClearanceRequest {CRNetWeight}",
                 mrn,
-                commodity.ItemNumber,
-                crWeight,
-                ipaffsWeight
+                totalWeight,
+                commodity.NetMass
+            );
+        }
+
+        if (totalWeight <= allowedWeight)
+        {
+            logger.LogInformation(
+                "{MRN} - Level 3 would have succeeded as IPAFFS NetWeight {NetWeight} is greather than allow in ClearanceRequest {CRNetWeight}",
+                mrn,
+                totalWeight,
+                commodity.NetMass
             );
         }
     }

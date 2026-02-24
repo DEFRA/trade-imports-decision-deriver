@@ -11,10 +11,7 @@ public class ClearanceDecisionResultExistsComparer : IEqualityComparer<Clearance
         if (ReferenceEquals(x, y))
             return true;
 
-        if (x is null)
-            return false;
-
-        if (y is null)
+        if (x is null || y is null)
             return false;
 
         return x.ItemNumber == y.ItemNumber
@@ -28,6 +25,16 @@ public class ClearanceDecisionResultExistsComparer : IEqualityComparer<Clearance
 
     public int GetHashCode(ClearanceDecisionResult obj)
     {
-        throw new NotSupportedException();
+        ArgumentNullException.ThrowIfNull(obj);
+
+        return HashCode.Combine(
+            obj.ItemNumber,
+            obj.ImportPreNotification,
+            obj.DocumentReference,
+            obj.CheckCode,
+            obj.DecisionCode,
+            obj.DecisionReason,
+            obj.InternalDecisionCode
+        );
     }
 }

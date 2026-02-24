@@ -1,5 +1,5 @@
 using System.Net.Http.Headers;
-using Defra.TradeImportsDecisionDeriver.Deriver.Authentication;
+using Defra.TradeImports.Api.Auth;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

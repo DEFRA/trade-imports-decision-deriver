@@ -1,7 +1,7 @@
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.V2.DecisionEngine.DecisionRules;
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Defra.TradeImportsDecisionDeriver.TestFixtures;
 
@@ -20,8 +20,11 @@ public class TestDecisionRulesEngineFactory : IDecisionRulesEngineFactory
         .AddSingleton<CvedpDecisionRule>()
         .AddSingleton<ChedppDecisionRule>()
         .AddSingleton<CedDecisionRule>()
-        .AddSingleton<CommodityCodeValidationRule>()
-        .AddSingleton<CommodityWeightOrQuantityValidationRule>()
+        .AddSingleton<CommodityCodeDecisionRule>()
+        .AddSingleton<CommodityQuantityCheckDecisionRule>()
+        .AddSingleton<UnknownCheckCodeDecisionRule>()
+        .AddOptions()
+        .Configure<DecisionRulesOptions>(_ => { })
         .AddLogging()
         .BuildServiceProvider();
 

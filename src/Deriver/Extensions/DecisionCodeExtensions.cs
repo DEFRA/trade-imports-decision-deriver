@@ -1,9 +1,11 @@
+using System.Runtime.CompilerServices;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
 public static class DecisionCodeExtensions
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsReleaseOrHold(this DecisionCode decisionCode)
     {
         return decisionCode switch

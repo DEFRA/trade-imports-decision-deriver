@@ -1,9 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
-using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
+using Defra.TradeImports.Tracing;
 using Elastic.Serilog.Enrichers.Web;
-using Microsoft.AspNetCore.HeaderPropagation;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
 
@@ -15,25 +12,7 @@ public static class WebApplicationBuilderExtensions
     public static void ConfigureLoggingAndTracing(this WebApplicationBuilder builder, bool integrationTest = false)
     {
         builder.Services.AddHttpContextAccessor();
-        builder.Services.TryAddSingleton<ITraceContextAccessor, TraceContextAccessor>();
-        builder
-            .Services.AddOptions<TraceHeader>()
-            .Bind(builder.Configuration)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        // Replaces use of AddHeaderPropagation so we can configure outside startup
-        // and use the TraceHeader options configured above that will have been validated
-        builder.Services.AddSingleton<IConfigureOptions<HeaderPropagationOptions>>(sp =>
-        {
-            var traceHeader = sp.GetRequiredService<IOptions<TraceHeader>>().Value;
-            return new ConfigureOptions<HeaderPropagationOptions>(options =>
-            {
-                if (!string.IsNullOrWhiteSpace(traceHeader.Name))
-                    options.Headers.Add(traceHeader.Name);
-            });
-        });
-        builder.Services.TryAddSingleton<HeaderPropagationValues>();
+        builder.Services.AddTraceContextAccessor(builder.Configuration);
 
         if (!integrationTest)
         {

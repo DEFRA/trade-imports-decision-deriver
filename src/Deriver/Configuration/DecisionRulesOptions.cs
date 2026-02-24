@@ -5,6 +5,8 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 [ExcludeFromCodeCoverage]
 public sealed class DecisionRulesOptions
 {
+    public const string SectionName = "DecisionRules";
+
     // Map of CHED type (e.g. "CHEDA", "CHEDP", ...) -> rules config for that CHED
     public Dictionary<string, DecisionRulesPerChedOptions> Cheds { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 

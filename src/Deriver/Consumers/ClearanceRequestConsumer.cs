@@ -62,13 +62,13 @@ public class ClearanceRequestConsumer(
             .ImportPreNotifications.Select(x => x.ImportPreNotification)
             .ToList();
 
-        var v2Result = RunDecisionService(message, preNotifications, clearanceRequest);
+        var result = RunDecisionService(message, preNotifications, clearanceRequest);
 
-        if (clearanceRequest == null || !clearanceRequest.ClearanceDecision.IsSameAs(v2Result))
+        if (clearanceRequest == null || !clearanceRequest.ClearanceDecision.IsSameAs(result))
         {
             var customsDeclaration = new CustomsDeclaration
             {
-                ClearanceDecision = v2Result,
+                ClearanceDecision = result,
                 Finalisation = clearanceRequest?.Finalisation,
                 ClearanceRequest = clearanceRequest?.ClearanceRequest,
                 ExternalErrors = clearanceRequest?.ExternalErrors,

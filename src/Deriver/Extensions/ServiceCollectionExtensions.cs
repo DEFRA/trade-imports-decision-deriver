@@ -123,6 +123,10 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration
     )
     {
+        services
+            .AddOptions<DecisionRulesOptions>()
+            .BindConfiguration(DecisionRulesOptions.SectionName)
+            .ValidateDataAnnotations();
         services.AddOptions<DataApiOptions>().BindConfiguration(DataApiOptions.SectionName).ValidateDataAnnotations();
         services.AddSingleton<ISqsDeadLetterService, SqsDeadLetterService>();
         services.AddAWSService<IAmazonSQS>();

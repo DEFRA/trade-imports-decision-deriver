@@ -18,7 +18,7 @@ public sealed class AmendDecisionRule : IDecisionRule
             return DecisionEngineResult.H01E80;
         }
 
-        return IsInspectionRequired(notification) ? DecisionEngineResult.H02E80 : DecisionEngineResult.H01E99;
+        return IsInspectionRequired(notification) ? DecisionEngineResult.H02E80 : DecisionEngineResult.H01E88;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

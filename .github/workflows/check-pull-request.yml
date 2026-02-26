@@ -23,7 +23,7 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: |
-            9.0
+            10.0
       - name: Update NuGet.config
         run: |
           dotnet nuget remove source defra
@@ -41,7 +41,7 @@ jobs:
         run: |
           docker compose logs
       - name: Check Dockerfile Builds
-        uses: docker/build-push-action@601a80b39c9405e50806ae38af30926f9d957c47
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
         with:
           context: .
           file: ./Dockerfile

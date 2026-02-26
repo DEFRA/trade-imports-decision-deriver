@@ -25,6 +25,7 @@ public enum DecisionCode
 
 public enum DecisionInternalFurtherDetail
 {
+    E20, // Level 2
     E70, // No Match
     E71, // Cancelled
     E72, // Replaced

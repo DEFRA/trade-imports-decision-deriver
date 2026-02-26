@@ -83,7 +83,7 @@ public class CommodityQuantityCheckDecisionRuleTests
         // Assert
         _mockLogger.ReceivedCalls().Count().Should().BeGreaterThanOrEqualTo(1);
         var msg = GetFormattedMessageFromLoggerCall(_mockLogger, 0);
-        msg.Should().Contain("IPAFFS have a weight of");
+        msg.Should().Contain("IPAFFS NetWeight");
     }
 
     [Fact]
@@ -122,7 +122,7 @@ public class CommodityQuantityCheckDecisionRuleTests
         // Assert
         _mockLogger.ReceivedCalls().Count().Should().BeGreaterThanOrEqualTo(1);
         var msg = GetFormattedMessageFromLoggerCall(_mockLogger, 0);
-        msg.Should().Contain("IPAFFS have a weight of");
+        msg.Should().Contain("IPAFFS NetWeight");
     }
 
     [Fact]
@@ -161,7 +161,7 @@ public class CommodityQuantityCheckDecisionRuleTests
         // Assert
         _mockLogger.ReceivedCalls().Count().Should().BeGreaterThanOrEqualTo(1);
         var msg = GetFormattedMessageFromLoggerCall(_mockLogger, 0);
-        msg.Should().Contain("IPAFFS have a quanitity of");
+        msg.Should().Contain("IPAFFS NetQuantity");
     }
 
     [Fact]
@@ -202,7 +202,7 @@ public class CommodityQuantityCheckDecisionRuleTests
         // Assert
         _mockLogger.ReceivedCalls().Count().Should().BeGreaterThanOrEqualTo(1);
         var msg = GetFormattedMessageFromLoggerCall(_mockLogger, 0);
-        msg.Should().Contain("IPAFFS have a quanitity of");
+        msg.Should().Contain("IPAFFS NetQuantity");
     }
 
     [Fact]

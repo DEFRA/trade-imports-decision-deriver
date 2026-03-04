@@ -4,6 +4,7 @@ using Defra.TradeImports.SMB.CompressedSerializer;
 using Defra.TradeImports.SMB.Metrics;
 using Defra.TradeImports.SMB.SQSSNS;
 using Defra.TradeImports.SMB.Tracing;
+using Defra.TradeImports.SQS.Endpoints;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
@@ -13,7 +14,6 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
-using Defra.TradeImportsDecisionDeriver.Deriver.Services.Admin;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Options;
@@ -128,7 +128,7 @@ public static class ServiceCollectionExtensions
             .BindConfiguration(DecisionRulesOptions.SectionName)
             .ValidateDataAnnotations();
         services.AddOptions<DataApiOptions>().BindConfiguration(DataApiOptions.SectionName).ValidateDataAnnotations();
-        services.AddSingleton<ISqsDeadLetterService, SqsDeadLetterService>();
+        services.AddDeadLetterQueueManagementServices();
         services.AddAWSService<IAmazonSQS>();
         return services;
     }

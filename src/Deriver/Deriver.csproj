@@ -21,7 +21,7 @@
     <PackageReference Include="Defra.TradeImports.SMB.Metrics" Version="0.1.0" />
     <PackageReference Include="Defra.TradeImports.SMB.SQSSNS" Version="0.1.0" />
     <PackageReference Include="Defra.TradeImports.SMB.Tracing" Version="0.1.0" />
-    <PackageReference Include="Defra.TradeImports.SQS.Endpoints" Version="0.1.0" />
+    <PackageReference Include="Defra.TradeImports.SQS.Endpoints" Version="0.1.2" />
     <PackageReference Include="Defra.TradeImportsDataApi.Api.Client" Version="0.38.0" />
     <PackageReference Include="Elastic.CommonSchema.Serilog" Version="9.0.0" />
     <PackageReference Include="Elastic.Serilog.Enrichers.Web" Version="9.0.0" />

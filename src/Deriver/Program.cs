@@ -73,7 +73,8 @@ static WebApplication BuildWebApplication(WebApplicationBuilder builder)
     app.MapDeadLetterQueueEndpoints(
         awsSqsOptions.Value.ResourceEventsQueueName,
         awsSqsOptions.Value.ResourceEventsDeadLetterQueueName,
-        policyName: PolicyNames.Execute
+        policyName: PolicyNames.Execute,
+        tags: "Admin"
     );
     app.UseStatusCodePages();
     app.UseExceptionHandler(

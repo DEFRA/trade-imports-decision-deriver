@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -18,7 +18,7 @@
     <PackageReference Include="Defra.TradeImports.Api.Auth" Version="0.2.0" />
     <PackageReference Include="Defra.TradeImports.EmfExporter" Version="0.2.0" />
     <PackageReference Include="Defra.TradeImports.SMB.CompressedSerializer" Version="0.2.0" />
-    <PackageReference Include="Defra.TradeImports.SMB.Metrics" Version="0.2.0" />
+    <PackageReference Include="Defra.TradeImports.SMB.Metrics" Version="0.2.1" />
     <PackageReference Include="Defra.TradeImports.SMB.SQSSNS" Version="0.2.0" />
     <PackageReference Include="Defra.TradeImports.SMB.Tracing" Version="0.2.0" />
     <PackageReference Include="Defra.TradeImportsDataApi.Api.Client" Version="0.38.0" />

@@ -12,6 +12,7 @@ public sealed class TerminalStatusDecisionRule : IDecisionRule
             ImportNotificationStatus.Replaced => DecisionEngineResult.X00E72,
             ImportNotificationStatus.Deleted => DecisionEngineResult.X00E73,
             ImportNotificationStatus.SplitConsignment => DecisionEngineResult.X00E75,
+            ImportNotificationStatus.Modify => DecisionEngineResult.H01E81,
             _ => next(context),
         };
     }

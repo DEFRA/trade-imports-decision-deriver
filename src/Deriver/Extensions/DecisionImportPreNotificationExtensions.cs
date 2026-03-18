@@ -10,9 +10,7 @@ public static class DecisionImportPreNotificationExtensions
     {
         return decisionImportPreNotification.Status switch
         {
-            ImportNotificationStatus.Submitted 
-            or ImportNotificationStatus.InProgress
-            => true,
+            ImportNotificationStatus.Submitted or ImportNotificationStatus.InProgress => true,
             _ => false,
         };
     }

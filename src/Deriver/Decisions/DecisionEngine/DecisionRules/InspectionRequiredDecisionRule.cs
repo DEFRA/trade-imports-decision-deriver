@@ -1,5 +1,5 @@
-using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using System.Runtime.CompilerServices;
+using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 

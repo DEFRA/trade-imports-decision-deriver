@@ -29,7 +29,6 @@ public class CvedpDecisionRuleTests
     )
     {
         // Arrange
-
         var notification = DecisionImportPreNotificationBuilder
             .Create()
             .WithId("Test")
@@ -102,7 +101,7 @@ public class CvedpDecisionRuleTests
         var notification = DecisionImportPreNotificationBuilder
             .Create()
             .WithId("Test")
-            .WithStatus(ImportNotificationStatus.Submitted)
+            .WithStatus(ImportNotificationStatus.Validated)
             .WithNotAcceptableReasons(["Reason1", "Reason2"])
             .Build();
         var c = new DecisionEngineContext(
@@ -132,7 +131,7 @@ public class CvedpDecisionRuleTests
         var notification = DecisionImportPreNotificationBuilder
             .Create()
             .WithId("Test")
-            .WithStatus(ImportNotificationStatus.Submitted)
+            .WithStatus(ImportNotificationStatus.Validated)
             .WithInspectionRequired("Other")
             .Build();
         var c = new DecisionEngineContext(
@@ -152,5 +151,36 @@ public class CvedpDecisionRuleTests
         _mockNext.Received(0).Invoke(c);
         result.Code.Should().Be(DecisionCode.X00);
         result.FurtherDetail.Should().Be(DecisionInternalFurtherDetail.E99);
+    }
+
+    // ---------- Transient Status (Submitted / In Progress - Amend is handled by AmendDecisionRule)  ----------
+    [Theory]
+    [InlineData(ImportNotificationStatus.Submitted)]
+    [InlineData(ImportNotificationStatus.InProgress)]
+    public void Execute_WhenStatusIsTransient_ReturnsH01(string importNotificationStatus)
+    {
+        var notification = DecisionImportPreNotificationBuilder
+            .Create()
+            .WithId("Test")
+            .WithStatus(importNotificationStatus)
+            .Build();
+        var c = new DecisionEngineContext(
+            new DecisionContext([notification], []),
+            notification,
+            new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
+            new Commodity(),
+            new CheckCode() { Value = "H221" },
+            new ImportDocument()
+        )
+        {
+            Logger = NullLogger.Instance,
+        };
+
+        var expectedResult = DecisionEngineResult.Create(DecisionCode.H01);
+
+        var result = _rule.Execute(c, _mockNext);
+
+        result.Should().BeEquivalentTo(expectedResult);
+        _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionEngineContext>());
     }
 }

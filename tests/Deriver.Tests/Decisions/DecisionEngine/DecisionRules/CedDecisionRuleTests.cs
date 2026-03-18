@@ -29,7 +29,7 @@ public class CedDecisionRuleTests
         var notification = DecisionImportPreNotificationBuilder
             .Create()
             .WithId("Test")
-            .WithStatus(ImportNotificationStatus.Submitted)
+            .WithStatus(ImportNotificationStatus.Validated)
             .WithConsignmentDecision(consignmentDecision)
             .Build();
 
@@ -73,7 +73,7 @@ public class CedDecisionRuleTests
         var notificationBuilder = DecisionImportPreNotificationBuilder
             .Create()
             .WithId("Test")
-            .WithStatus(ImportNotificationStatus.Submitted);
+            .WithStatus(ImportNotificationStatus.Validated);
 
         if (action != null)
             notificationBuilder = notificationBuilder.WithNotAcceptableAction(action);
@@ -129,5 +129,41 @@ public class CedDecisionRuleTests
         // Assert
         result.Should().BeEquivalentTo(expectedResult);
         _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionEngineContext>()); // Ensure the next delegate was not called
+    }
+
+    // ---------- Transient Status (Submitted / In Progress - Amend is handled by AmendDecisionRule)  ----------
+    [Theory]
+    [InlineData(ImportNotificationStatus.Submitted)]
+    [InlineData(ImportNotificationStatus.InProgress)]
+    public void Execute_WhenStatusIsTransient_ReturnsH01(string importNotificationStatus)
+    {
+        // Arrange
+        var notificationBuilder = DecisionImportPreNotificationBuilder
+            .Create()
+            .WithId("Test")
+            .WithStatus(importNotificationStatus);
+
+        var notification = notificationBuilder.Build();
+
+        var context = new DecisionEngineContext(
+            new DecisionContext([notification], []),
+            notification,
+            new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
+            new Commodity(),
+            new CheckCode() { Value = "H221" },
+            new ImportDocument()
+        )
+        {
+            Logger = NullLogger.Instance,
+        };
+
+        var expectedResult = DecisionEngineResult.Create(DecisionCode.H01);
+
+        // Act
+        var result = _rule.Execute(context, _mockNext);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedResult);
+        _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionEngineContext>());
     }
 }

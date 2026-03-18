@@ -159,4 +159,35 @@ public class CvedaDecisionRuleTests
         // Assert
         _mockNext.Received(1).Invoke(c);
     }
+
+    // ---------- Transient Status (Submitted / In Progress - Amend is handled by AmendDecisionRule)  ----------
+    [Theory]
+    [InlineData(ImportNotificationStatus.Submitted)]
+    [InlineData(ImportNotificationStatus.InProgress)]
+    public void Execute_WhenStatusIsTransient_ReturnsH01(string importNotificationStatus)
+    {
+        var notification = DecisionImportPreNotificationBuilder
+            .Create()
+            .WithId("Test")
+            .WithStatus(importNotificationStatus)
+            .Build();
+        var c = new DecisionEngineContext(
+            new DecisionContext([notification], []),
+            notification,
+            new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
+            new Commodity(),
+            new CheckCode() { Value = "H221" },
+            new ImportDocument()
+        )
+        {
+            Logger = NullLogger.Instance,
+        };
+
+        var expectedResult = DecisionEngineResult.Create(DecisionCode.H01);
+
+        var result = _rule.Execute(c, _mockNext);
+
+        result.Should().BeEquivalentTo(expectedResult);
+        _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionEngineContext>());
+    }
 }

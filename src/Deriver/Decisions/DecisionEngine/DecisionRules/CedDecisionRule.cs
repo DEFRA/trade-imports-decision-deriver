@@ -1,3 +1,5 @@
+using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
+
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
 public sealed class CedDecisionRule : IDecisionRule
@@ -5,6 +7,11 @@ public sealed class CedDecisionRule : IDecisionRule
     public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
         var notification = context.Notification;
+
+        if (notification.StatusIsSubmittedOrInProgress())
+        {
+            return DecisionEngineResult.H01;
+        }
 
         if (notification.HasAcceptableConsignmentDecision())
         {

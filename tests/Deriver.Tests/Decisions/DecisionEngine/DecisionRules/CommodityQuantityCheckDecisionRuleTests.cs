@@ -74,6 +74,22 @@ public class CommodityQuantityCheckDecisionRuleTests
         {
             Logger = _mockLogger,
         };
+
+        ////var commodity = new Commodity
+        ////{
+        ////    NetMass = 100,
+        ////    SupplementaryUnits = null,
+        ////    TaricCommodityCode = "12345"
+        ////};
+
+        ////var commodities = new List<DecisionCommodityComplement>
+        ////{
+        ////    new DecisionCommodityComplement { Weight = 120, Quantity = 0 },
+        ////    new DecisionCommodityComplement { Weight = 50, Quantity = 0 }
+        ////};
+
+        ////_mockContext.Commodity.Returns(commodity);
+        ////_mockContext.Notification.Commodities.Returns(commodities);
         var result = DecisionEngineResult.Create(DecisionCode.H01);
         _mockNext(Arg.Any<DecisionEngineContext>()).Returns(result);
 
@@ -113,6 +129,21 @@ public class CommodityQuantityCheckDecisionRuleTests
             Logger = _mockLogger,
         };
 
+        ////var commodity = new Commodity
+        ////{
+        ////    NetMass = 200,
+        ////    SupplementaryUnits = null,
+        ////    TaricCommodityCode = "12345"
+        ////};
+
+        ////var commodities = new List<DecisionCommodityComplement>
+        ////{
+        ////    new DecisionCommodityComplement { Weight = 80, Quantity = 0 },
+        ////    new DecisionCommodityComplement { Weight = 60, Quantity = 0 }
+        ////};
+
+        ////_mockContext.Commodity.Returns(commodity);
+        ////_mockContext.Notification.Commodities.Returns(commodities);
         var result = DecisionEngineResult.Create(DecisionCode.H01);
         _mockNext(Arg.Any<DecisionEngineContext>()).Returns(result);
 
@@ -152,6 +183,21 @@ public class CommodityQuantityCheckDecisionRuleTests
             Logger = _mockLogger,
         };
 
+        ////var commodity = new Commodity
+        ////{
+        ////    SupplementaryUnits = 100,
+        ////    NetMass = null,
+        ////    TaricCommodityCode = "12345"
+        ////};
+
+        ////var commodities = new List<DecisionCommodityComplement>
+        ////{
+        ////    new DecisionCommodityComplement { Weight = 0, Quantity = 120 },
+        ////    new DecisionCommodityComplement { Weight = 0, Quantity = 50 }
+        ////};
+
+        ////_mockContext.Commodity.Returns(commodity);
+        ////_mockContext.Notification.Commodities.Returns(commodities);
         var result = DecisionEngineResult.Create(DecisionCode.H01);
         _mockNext(Arg.Any<DecisionEngineContext>()).Returns(result);
 
@@ -191,6 +237,21 @@ public class CommodityQuantityCheckDecisionRuleTests
             Logger = _mockLogger,
         };
 
+        ////var commodity = new Commodity
+        ////{
+        ////    SupplementaryUnits = 200,
+        ////    NetMass = null,
+        ////    TaricCommodityCode = "12345"
+        ////};
+
+        ////var commodities = new List<DecisionCommodityComplement>
+        ////{
+        ////    new DecisionCommodityComplement { Weight = 0, Quantity = 80 },
+        ////    new DecisionCommodityComplement { Weight = 0, Quantity = 60 }
+        ////};
+
+        ////_mockContext.Commodity.Returns(commodity);
+        ////_mockContext.Notification.Commodities.Returns(commodities);
         var result = DecisionEngineResult.Create(DecisionCode.H01);
         _mockNext(Arg.Any<DecisionEngineContext>()).Returns(result);
 

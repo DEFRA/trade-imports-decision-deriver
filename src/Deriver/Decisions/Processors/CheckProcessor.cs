@@ -200,17 +200,9 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
         string documentIdentifier
     )
     {
-        // Manual loop instead of List.Find + lambda
-        for (var i = 0; i < notifications.Count; i++)
-        {
-            var candidate = notifications[i];
-
-            var candidateIdentifier = new ImportDocumentReference(candidate.Id!).GetIdentifier(documentCode);
-
-            if (candidateIdentifier == documentIdentifier)
-            {
-                yield return candidate;
-            }
-        }
+        return from candidate in notifications
+            let candidateIdentifier = new ImportDocumentReference(candidate.Id!).GetIdentifier(documentCode)
+            where candidateIdentifier == documentIdentifier
+            select candidate;
     }
 }

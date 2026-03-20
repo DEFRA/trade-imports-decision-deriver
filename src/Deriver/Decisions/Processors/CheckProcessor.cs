@@ -57,56 +57,18 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                 notifications as DecisionImportPreNotification[] ?? notifications.ToArray();
             if (decisionImportPreNotifications.Any())
             {
-                foreach (var notification in notifications)
-                {
-                    var resolverContext = new DecisionEngineContext(
-                        context,
-                        notification,
-                        clearanceRequest,
-                        commodity,
-                        checkCode,
-                        document
-                    );
-
-                    var result = decisionEngine.Run(resolverContext);
-                    output.Add(
-                        new CheckDecisionResult(
-                            notification,
-                            clearanceRequest.MovementReferenceNumber,
-                            commodity.ItemNumber!.Value,
-                            document.DocumentReference?.Value,
-                            documentCode,
-                            checkCodeValue,
-                            result.Code,
-                            result.RuleName,
-                            result.Mode,
-                            result.Level,
-                            result.FurtherDetail
-                        )
-                    );
-
-                    if (result.PassiveResults != null)
-                    {
-                        foreach (var passiveResult in result.PassiveResults)
-                        {
-                            output.Add(
-                                new CheckDecisionResult(
-                                    notification,
-                                    clearanceRequest.MovementReferenceNumber,
-                                    commodity.ItemNumber!.Value,
-                                    document.DocumentReference?.Value,
-                                    documentCode,
-                                    checkCodeValue,
-                                    passiveResult.Code,
-                                    passiveResult.RuleName,
-                                    passiveResult.Mode,
-                                    passiveResult.Level,
-                                    passiveResult.FurtherDetail
-                                )
-                            );
-                        }
-                    }
-                }
+                ProcessNotification(
+                    context,
+                    clearanceRequest,
+                    commodity,
+                    notifications,
+                    checkCode,
+                    document,
+                    decisionEngine,
+                    output,
+                    documentCode,
+                    checkCodeValue
+                );
             }
             else
             {
@@ -168,6 +130,71 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
         }
 
         return output.Distinct().ToList();
+    }
+
+    private static void ProcessNotification(
+        DecisionContext context,
+        CustomsDeclarationWrapper clearanceRequest,
+        Commodity commodity,
+        IEnumerable<DecisionImportPreNotification> notifications,
+        CheckCode checkCode,
+        ImportDocument document,
+        DecisionRulesEngine decisionEngine,
+        List<CheckDecisionResult> output,
+        string documentCode,
+        string checkCodeValue
+    )
+    {
+        foreach (var notification in notifications)
+        {
+            var resolverContext = new DecisionEngineContext(
+                context,
+                notification,
+                clearanceRequest,
+                commodity,
+                checkCode,
+                document
+            );
+
+            var result = decisionEngine.Run(resolverContext);
+            output.Add(
+                new CheckDecisionResult(
+                    notification,
+                    clearanceRequest.MovementReferenceNumber,
+                    commodity.ItemNumber!.Value,
+                    document.DocumentReference?.Value,
+                    documentCode,
+                    checkCodeValue,
+                    result.Code,
+                    result.RuleName,
+                    result.Mode,
+                    result.Level,
+                    result.FurtherDetail
+                )
+            );
+
+            if (result.PassiveResults != null)
+            {
+                foreach (var passiveResult in result.PassiveResults)
+                {
+                    output.Add(
+                        new CheckDecisionResult(
+                            notification,
+                            clearanceRequest.MovementReferenceNumber,
+                            commodity.ItemNumber!.Value,
+                            document.DocumentReference?.Value,
+                            documentCode,
+                            checkCodeValue,
+                            passiveResult.Code,
+                            passiveResult.RuleName,
+                            passiveResult.Mode,
+                            passiveResult.Level,
+                            passiveResult.FurtherDetail
+                        )
+                    );
+                }
+            }
+        }
     }
 
     private static IEnumerable<DecisionImportPreNotification> FindDecisionImportPreNotification(

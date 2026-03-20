@@ -30,6 +30,6 @@ public sealed record DecisionEngineResult(
             throw new InvalidOperationException("Only passive results can be added to an active result.");
 
         PassiveResults ??= new List<DecisionEngineResult>();
-        PassiveResults?.Add(passive);
+        PassiveResults.Add(passive);
     }
 }

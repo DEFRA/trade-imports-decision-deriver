@@ -12,10 +12,23 @@ public sealed class CvedpDecisionRule : IDecisionRule
             {
                 ConsignmentDecision.AcceptableForTranshipment
                 or ConsignmentDecision.AcceptableForTransit
-                or ConsignmentDecision.AcceptableForSpecificWarehouse => DecisionEngineResult.E03,
-                ConsignmentDecision.AcceptableForInternalMarket => DecisionEngineResult.C03,
-                ConsignmentDecision.AcceptableIfChanneled => DecisionEngineResult.C06,
-                _ => DecisionEngineResult.X00E96,
+                or ConsignmentDecision.AcceptableForSpecificWarehouse => new DecisionEngineResult(
+                    DecisionCode.E03,
+                    nameof(CvedpDecisionRule)
+                ),
+                ConsignmentDecision.AcceptableForInternalMarket => new DecisionEngineResult(
+                    DecisionCode.C03,
+                    nameof(CvedpDecisionRule)
+                ),
+                ConsignmentDecision.AcceptableIfChanneled => new DecisionEngineResult(
+                    DecisionCode.C06,
+                    nameof(CvedpDecisionRule)
+                ),
+                _ => new DecisionEngineResult(
+                    DecisionCode.X00,
+                    nameof(CvedpDecisionRule),
+                    DecisionInternalFurtherDetail.E96
+                ),
             };
         }
 
@@ -23,19 +36,35 @@ public sealed class CvedpDecisionRule : IDecisionRule
         {
             return notification.NotAcceptableAction switch
             {
-                DecisionNotAcceptableAction.Destruction => DecisionEngineResult.N02,
-                DecisionNotAcceptableAction.Reexport => DecisionEngineResult.N04,
-                DecisionNotAcceptableAction.Transformation => DecisionEngineResult.N03,
-                DecisionNotAcceptableAction.Other => DecisionEngineResult.N07,
-                _ => DecisionEngineResult.X00E97,
+                DecisionNotAcceptableAction.Destruction => new DecisionEngineResult(
+                    DecisionCode.N02,
+                    nameof(CvedpDecisionRule)
+                ),
+                DecisionNotAcceptableAction.Reexport => new DecisionEngineResult(
+                    DecisionCode.N04,
+                    nameof(CvedpDecisionRule)
+                ),
+                DecisionNotAcceptableAction.Transformation => new DecisionEngineResult(
+                    DecisionCode.N03,
+                    nameof(CvedpDecisionRule)
+                ),
+                DecisionNotAcceptableAction.Other => new DecisionEngineResult(
+                    DecisionCode.N07,
+                    nameof(CvedpDecisionRule)
+                ),
+                _ => new DecisionEngineResult(
+                    DecisionCode.X00,
+                    nameof(CvedpDecisionRule),
+                    DecisionInternalFurtherDetail.E97
+                ),
             };
         }
 
         if (notification.NotAcceptableReasons?.Length > 0)
         {
-            return DecisionEngineResult.N04;
+            return new DecisionEngineResult(DecisionCode.N04, nameof(CvedpDecisionRule));
         }
 
-        return DecisionEngineResult.X00E99;
+        return new DecisionEngineResult(DecisionCode.X00, nameof(CvedpDecisionRule), DecisionInternalFurtherDetail.E99);
     }
 }

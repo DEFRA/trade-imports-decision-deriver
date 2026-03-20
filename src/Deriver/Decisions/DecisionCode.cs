@@ -26,6 +26,8 @@ public enum DecisionCode
 public enum DecisionInternalFurtherDetail
 {
     E20, // Level 2
+    E30, // Level 3 - Net mass
+    E31, // Level 3 - Supplementary units
     E70, // No Match
     E71, // Cancelled
     E72, // Replaced

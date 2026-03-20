@@ -11,11 +11,24 @@ public sealed class CvedaDecisionRule : IDecisionRule
             return notification.ConsignmentDecision switch
             {
                 ConsignmentDecision.AcceptableForTranshipment or ConsignmentDecision.AcceptableForTransit =>
-                    DecisionEngineResult.E03,
-                ConsignmentDecision.AcceptableForInternalMarket => DecisionEngineResult.C03,
-                ConsignmentDecision.AcceptableForTemporaryImport => DecisionEngineResult.C05,
-                ConsignmentDecision.HorseReEntry => DecisionEngineResult.C06,
-                _ => DecisionEngineResult.X00E96,
+                    new DecisionEngineResult(DecisionCode.E03, nameof(CvedaDecisionRule)),
+                ConsignmentDecision.AcceptableForInternalMarket => new DecisionEngineResult(
+                    DecisionCode.C03,
+                    nameof(CvedaDecisionRule)
+                ),
+                ConsignmentDecision.AcceptableForTemporaryImport => new DecisionEngineResult(
+                    DecisionCode.C05,
+                    nameof(CvedaDecisionRule)
+                ),
+                ConsignmentDecision.HorseReEntry => new DecisionEngineResult(
+                    DecisionCode.C06,
+                    nameof(CvedaDecisionRule)
+                ),
+                _ => new DecisionEngineResult(
+                    DecisionCode.X00,
+                    nameof(CvedaDecisionRule),
+                    DecisionInternalFurtherDetail.E96
+                ),
             };
         }
 
@@ -24,15 +37,22 @@ public sealed class CvedaDecisionRule : IDecisionRule
             return notification.NotAcceptableAction switch
             {
                 DecisionNotAcceptableAction.Euthanasia or DecisionNotAcceptableAction.Slaughter =>
-                    DecisionEngineResult.N02,
-                DecisionNotAcceptableAction.Reexport => DecisionEngineResult.N04,
-                _ => DecisionEngineResult.X00E97,
+                    new DecisionEngineResult(DecisionCode.N02, nameof(CvedaDecisionRule)),
+                DecisionNotAcceptableAction.Reexport => new DecisionEngineResult(
+                    DecisionCode.N04,
+                    nameof(CvedaDecisionRule)
+                ),
+                _ => new DecisionEngineResult(
+                    DecisionCode.X00,
+                    nameof(CvedaDecisionRule),
+                    DecisionInternalFurtherDetail.E97
+                ),
             };
         }
 
         if (notification.NotAcceptableReasons?.Length > 0)
         {
-            return DecisionEngineResult.N04;
+            return new DecisionEngineResult(DecisionCode.N04, nameof(CvedaDecisionRule));
         }
 
         return next(context);

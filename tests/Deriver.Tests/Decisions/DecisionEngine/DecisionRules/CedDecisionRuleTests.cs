@@ -157,7 +157,7 @@ public class CedDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult =  new DecisionEngineResult(DecisionCode.H01, nameof(CedDecisionRule));
+        var expectedResult = new DecisionEngineResult(DecisionCode.H01, nameof(CedDecisionRule));
 
         // Act
         var result = _rule.Execute(context, _mockNext);

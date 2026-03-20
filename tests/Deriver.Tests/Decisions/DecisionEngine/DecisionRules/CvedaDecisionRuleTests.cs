@@ -179,10 +179,7 @@ public class CvedaDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = new DecisionEngineResult(
-            DecisionCode.H01,
-            nameof(CvedaDecisionRule)
-        );
+        var expectedResult = new DecisionEngineResult(DecisionCode.H01, nameof(CvedaDecisionRule));
 
         var result = _rule.Execute(c, _mockNext);
 

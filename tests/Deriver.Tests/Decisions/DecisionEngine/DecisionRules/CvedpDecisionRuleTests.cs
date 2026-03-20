@@ -174,7 +174,7 @@ public class CvedpDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult =  new DecisionEngineResult(DecisionCode.H01, nameof(CvedpDecisionRule));
+        var expectedResult = new DecisionEngineResult(DecisionCode.H01, nameof(CvedpDecisionRule));
 
         var result = _rule.Execute(c, _mockNext);
 

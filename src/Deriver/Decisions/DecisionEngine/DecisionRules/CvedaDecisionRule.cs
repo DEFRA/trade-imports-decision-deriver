@@ -10,10 +10,7 @@ public sealed class CvedaDecisionRule : IDecisionRule
 
         if (notification.StatusIsSubmittedOrInProgress())
         {
-            return new DecisionEngineResult(
-                DecisionCode.H01,
-                nameof(CvedaDecisionRule)
-            );
+            return new DecisionEngineResult(DecisionCode.H01, nameof(CvedaDecisionRule));
         }
 
         if (notification.HasAcceptableConsignmentDecision())

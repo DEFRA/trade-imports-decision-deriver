@@ -18,8 +18,6 @@ public class CommodityCodeDecisionRuleTests
     private readonly DecisionRuleDelegate _mockNext = Substitute.For<DecisionRuleDelegate>();
     private readonly ILogger _mockLogger = Substitute.For<ILogger>();
 
-    // Initialize the rule, mock context, mock next delegate, and logger
-
     [Fact]
     public void Execute_WhenResultCodeIsNotReleaseOrHold_ReturnsNextResult()
     {
@@ -97,9 +95,6 @@ public class CommodityCodeDecisionRuleTests
                 )
             );
         _mockNext.Received(1).Invoke(Arg.Any<DecisionEngineContext>());
-        ////var msg = GetFormattedMessageFromLoggerCall(_mockLogger);
-        ////msg.Should()
-        ////    .Contain("Level 2 would have resulted in an X00 as could not match MRN mrn CommodityCode 12345 for Item 1");
     }
 
     [Fact]

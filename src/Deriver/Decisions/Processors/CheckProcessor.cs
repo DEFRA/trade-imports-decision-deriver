@@ -57,14 +57,16 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                 notifications as DecisionImportPreNotification[] ?? notifications.ToArray();
             if (decisionImportPreNotifications.Any())
             {
-                output = ProcessNotification(
-                    context,
-                    clearanceRequest,
-                    commodity,
-                    notifications,
-                    checkCode,
-                    document,
-                    decisionEngine
+                output.AddRange(
+                    ProcessNotification(
+                        context,
+                        clearanceRequest,
+                        commodity,
+                        notifications,
+                        checkCode,
+                        document,
+                        decisionEngine
+                    )
                 );
             }
             else

@@ -57,17 +57,14 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                 notifications as DecisionImportPreNotification[] ?? notifications.ToArray();
             if (decisionImportPreNotifications.Any())
             {
-                ProcessNotification(
+                output = ProcessNotification(
                     context,
                     clearanceRequest,
                     commodity,
                     notifications,
                     checkCode,
                     document,
-                    decisionEngine,
-                    output,
-                    documentCode,
-                    checkCodeValue
+                    decisionEngine
                 );
             }
             else
@@ -132,19 +129,17 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
         return output.Distinct().ToList();
     }
 
-    private static void ProcessNotification(
+    private static List<CheckDecisionResult> ProcessNotification(
         DecisionContext context,
         CustomsDeclarationWrapper clearanceRequest,
         Commodity commodity,
         IEnumerable<DecisionImportPreNotification> notifications,
         CheckCode checkCode,
         ImportDocument document,
-        DecisionRulesEngine decisionEngine,
-        List<CheckDecisionResult> output,
-        string documentCode,
-        string checkCodeValue
+        DecisionRulesEngine decisionEngine
     )
     {
+        var output = new List<CheckDecisionResult>();
         foreach (var notification in notifications)
         {
             var resolverContext = new DecisionEngineContext(
@@ -163,8 +158,8 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                     clearanceRequest.MovementReferenceNumber,
                     commodity.ItemNumber!.Value,
                     document.DocumentReference?.Value,
-                    documentCode,
-                    checkCodeValue,
+                    document.DocumentCode,
+                    checkCode.Value,
                     result.Code,
                     result.RuleName,
                     result.Mode,
@@ -183,8 +178,8 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                             clearanceRequest.MovementReferenceNumber,
                             commodity.ItemNumber!.Value,
                             document.DocumentReference?.Value,
-                            documentCode,
-                            checkCodeValue,
+                            document.DocumentCode,
+                            checkCode.Value,
                             passiveResult.Code,
                             passiveResult.RuleName,
                             passiveResult.Mode,
@@ -195,6 +190,8 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                 }
             }
         }
+
+        return output;
     }
 
     private static IEnumerable<DecisionImportPreNotification> FindDecisionImportPreNotification(

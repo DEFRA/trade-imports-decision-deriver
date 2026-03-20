@@ -78,9 +78,34 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                             documentCode,
                             checkCodeValue,
                             result.Code,
+                            result.RuleName,
+                            result.Mode,
+                            result.Level,
                             result.FurtherDetail
                         )
                     );
+
+                    if (result.PassiveResults != null)
+                    {
+                        foreach (var passiveResult in result.PassiveResults)
+                        {
+                            output.Add(
+                                new CheckDecisionResult(
+                                    notification,
+                                    clearanceRequest.MovementReferenceNumber,
+                                    commodity.ItemNumber!.Value,
+                                    document.DocumentReference?.Value,
+                                    documentCode,
+                                    checkCodeValue,
+                                    passiveResult.Code,
+                                    passiveResult.RuleName,
+                                    passiveResult.Mode,
+                                    passiveResult.Level,
+                                    passiveResult.FurtherDetail
+                                )
+                            );
+                        }
+                    }
                 }
             }
             else
@@ -104,6 +129,9 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                         documentCode,
                         checkCodeValue,
                         result.Code,
+                        result.RuleName,
+                        result.Mode,
+                        result.Level,
                         result.FurtherDetail
                     )
                 );
@@ -131,6 +159,9 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                     null,
                     checkCodeValue,
                     result.Code,
+                    result.RuleName,
+                    result.Mode,
+                    result.Level,
                     result.FurtherDetail
                 )
             );

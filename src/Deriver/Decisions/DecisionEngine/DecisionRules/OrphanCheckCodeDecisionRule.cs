@@ -18,6 +18,7 @@ public sealed class OrphanCheckCodeDecisionRule : IDecisionRule
 
             internalFurtherDetail = hasH219 ? DecisionInternalFurtherDetail.E82 : DecisionInternalFurtherDetail.E87;
         }
-        return DecisionEngineResult.Create(DecisionCode.X00, internalFurtherDetail);
+
+        return new DecisionEngineResult(DecisionCode.X00, nameof(OrphanCheckCodeDecisionRule), internalFurtherDetail);
     }
 }

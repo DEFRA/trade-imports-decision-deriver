@@ -1,4 +1,5 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 
@@ -43,6 +44,9 @@ public class ClearanceDecisionBuilder(ICorrelationIdGenerator correlationIdGener
                     DecisionCode = x.DecisionCode.ToString(),
                     DecisionReason = x.DecisionReason,
                     InternalDecisionCode = x.InternalDecisionCode?.ToString(),
+                    Mode = x.Mode.ToString(),
+                    Level = (int)x.Level,
+                    RuleName = x.RuleName,
                 })
                 .ToArray(),
         };
@@ -55,7 +59,9 @@ public class ClearanceDecisionBuilder(ICorrelationIdGenerator correlationIdGener
     {
         if (clearanceRequest is not null)
         {
-            var decisionsByItem = movementDecisions.GroupBy(x => x.ItemNumber);
+            var decisionsByItem = movementDecisions
+                .Where(x => x.Mode == DecisionResultMode.Active)
+                .GroupBy(x => x.ItemNumber);
             foreach (var itemDecisions in decisionsByItem)
             {
                 if (clearanceRequest.Commodities != null)

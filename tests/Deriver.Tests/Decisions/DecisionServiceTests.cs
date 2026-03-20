@@ -1,6 +1,7 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
@@ -227,7 +228,11 @@ public class DecisionServiceTests(ITestOutputHelper output)
         // Act
         var decisionResult = decisionService.Process(decisionContext);
 
-        decisionResult[0].Decision.Results!.Max(x => x.DecisionCode).Should().Be(nameof(DecisionCode.H01));
+        // Assert
+        var activeResults = decisionResult[0]
+            .Decision.Results!.Where(x => x.Mode == nameof(DecisionResultMode.Active))
+            .ToArray();
+        activeResults.Max(x => x.DecisionCode).Should().Be(nameof(DecisionCode.H01));
     }
 
     [Fact]
@@ -351,11 +356,14 @@ public class DecisionServiceTests(ITestOutputHelper output)
 
         // Act
         var decisionResult = decisionService.Process(decisionContext);
+        var activeResults = decisionResult[0]
+            .Decision.Results!.Where(x => x.Mode == nameof(DecisionResultMode.Active))
+            .ToArray();
 
-        decisionResult[0].Decision.Results?.Length.Should().Be(3);
-        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(nameof(DecisionCode.N01));
-        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(nameof(DecisionCode.C03));
-        decisionResult[0].Decision.Results?[2].DecisionCode.Should().Be(nameof(DecisionCode.C03));
+        activeResults.Length.Should().Be(3);
+        activeResults[0].DecisionCode.Should().Be(nameof(DecisionCode.N01));
+        activeResults[1].DecisionCode.Should().Be(nameof(DecisionCode.C03));
+        activeResults[2].DecisionCode.Should().Be(nameof(DecisionCode.C03));
     }
 
     [Theory]
@@ -585,14 +593,17 @@ public class DecisionServiceTests(ITestOutputHelper output)
         // Assert
 
         decisionResult.Should().NotBeNull();
-        decisionResult[0].Decision.Results?.Length.Should().Be(2);
-        decisionResult[0].Decision.Results?[0].CheckCode.Should().Be("H219");
-        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(nameof(DecisionCode.C03));
-        decisionResult[0].Decision.Results?[0].DocumentCode.Should().Be("N851");
+        var activeResults = decisionResult[0]
+            .Decision.Results!.Where(x => x.Mode == nameof(DecisionResultMode.Active))
+            .ToArray();
+        activeResults.Length.Should().Be(2);
+        activeResults[0].CheckCode.Should().Be("H219");
+        activeResults[0].DecisionCode.Should().Be(nameof(DecisionCode.C03));
+        activeResults[0].DocumentCode.Should().Be("N851");
 
-        decisionResult[0].Decision.Results?[1].CheckCode.Should().Be("H218");
-        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(nameof(DecisionCode.H01));
-        decisionResult[0].Decision.Results?[1].DocumentCode.Should().Be("N002");
+        activeResults[1].CheckCode.Should().Be("H218");
+        activeResults[1].DecisionCode.Should().Be(nameof(DecisionCode.H01));
+        activeResults[1].DocumentCode.Should().Be("N002");
     }
 
     [Fact]
@@ -675,14 +686,17 @@ public class DecisionServiceTests(ITestOutputHelper output)
         // Assert
 
         decisionResult.Should().NotBeNull();
-        decisionResult[0].Decision.Results?.Length.Should().Be(2);
-        decisionResult[0].Decision.Results?[0].CheckCode.Should().Be("H219");
-        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(nameof(DecisionCode.H01));
-        decisionResult[0].Decision.Results?[0].DocumentCode.Should().Be("N851");
+        var activeResults = decisionResult[0]
+            .Decision.Results!.Where(x => x.Mode == nameof(DecisionResultMode.Active))
+            .ToArray();
+        activeResults.Length.Should().Be(2);
+        activeResults[0].CheckCode.Should().Be("H219");
+        activeResults[0].DecisionCode.Should().Be(nameof(DecisionCode.H01));
+        activeResults[0].DocumentCode.Should().Be("N851");
 
-        decisionResult[0].Decision.Results?[1].CheckCode.Should().Be("H220");
-        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(nameof(DecisionCode.C03));
-        decisionResult[0].Decision.Results?[1].DocumentCode.Should().Be("N002");
+        activeResults[1].CheckCode.Should().Be("H220");
+        activeResults[1].DecisionCode.Should().Be(nameof(DecisionCode.C03));
+        activeResults[1].DocumentCode.Should().Be("N002");
     }
 
     [Fact]
@@ -766,19 +780,23 @@ public class DecisionServiceTests(ITestOutputHelper output)
         var decisionResult = decisionService.Process(decisionContext);
 
         // Assert
+
         decisionResult.Should().NotBeNull();
-        decisionResult[0].Decision.Results?.Length.Should().Be(3);
-        decisionResult[0].Decision.Results?[0].CheckCode.Should().Be("H219");
-        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(nameof(DecisionCode.H01));
-        decisionResult[0].Decision.Results?[0].DocumentCode.Should().Be("N851");
+        var activeResults = decisionResult[0]
+            .Decision.Results!.Where(x => x.Mode == nameof(DecisionResultMode.Active))
+            .ToArray();
+        activeResults.Length.Should().Be(3);
+        activeResults[0].CheckCode.Should().Be("H219");
+        activeResults[0].DecisionCode.Should().Be(nameof(DecisionCode.H01));
+        activeResults[0].DocumentCode.Should().Be("N851");
 
-        decisionResult[0].Decision.Results?[1].CheckCode.Should().Be("H219");
-        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(nameof(DecisionCode.H01));
-        decisionResult[0].Decision.Results?[1].DocumentCode.Should().Be("C085");
+        activeResults[1].CheckCode.Should().Be("H219");
+        activeResults[1].DecisionCode.Should().Be(nameof(DecisionCode.H01));
+        activeResults[1].DocumentCode.Should().Be("C085");
 
-        decisionResult[0].Decision.Results?[2].CheckCode.Should().Be("H219");
-        decisionResult[0].Decision.Results?[2].DecisionCode.Should().Be(nameof(DecisionCode.H01));
-        decisionResult[0].Decision.Results?[2].DocumentCode.Should().Be("9115");
+        activeResults[2].CheckCode.Should().Be("H219");
+        activeResults[2].DecisionCode.Should().Be(nameof(DecisionCode.H01));
+        activeResults[2].DocumentCode.Should().Be("9115");
     }
 
     [Fact]

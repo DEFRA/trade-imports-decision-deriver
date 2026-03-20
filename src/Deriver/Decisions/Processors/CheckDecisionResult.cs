@@ -1,3 +1,5 @@
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
+
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 
 public record CheckDecisionResult(
@@ -8,6 +10,9 @@ public record CheckDecisionResult(
     string? DocumentCode,
     string CheckCode,
     DecisionCode DecisionCode,
+    string RuleName,
+    DecisionResultMode Mode,
+    DecisionRuleLevel Level,
     DecisionInternalFurtherDetail? InternalDecisionCode = null
 )
 {

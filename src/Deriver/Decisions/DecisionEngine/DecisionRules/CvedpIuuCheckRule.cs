@@ -14,12 +14,29 @@ public sealed class CvedpIuuCheckRule : IDecisionRule
         {
             true => notification.IuuOption switch
             {
-                ControlAuthorityIuuOption.IUUOK => DecisionEngineResult.C07,
-                ControlAuthorityIuuOption.IUUNotCompliant => DecisionEngineResult.X00,
-                ControlAuthorityIuuOption.IUUNA => DecisionEngineResult.C08,
-                _ => DecisionEngineResult.H02E93,
+                ControlAuthorityIuuOption.IUUOK => new DecisionEngineResult(
+                    DecisionCode.C07,
+                    nameof(CvedpIuuCheckRule)
+                ),
+                ControlAuthorityIuuOption.IUUNotCompliant => new DecisionEngineResult(
+                    DecisionCode.X00,
+                    nameof(CvedpIuuCheckRule)
+                ),
+                ControlAuthorityIuuOption.IUUNA => new DecisionEngineResult(
+                    DecisionCode.C08,
+                    nameof(CvedpIuuCheckRule)
+                ),
+                _ => new DecisionEngineResult(
+                    DecisionCode.H02,
+                    nameof(CvedpIuuCheckRule),
+                    DecisionInternalFurtherDetail.E93
+                ),
             },
-            false => DecisionEngineResult.H02E94,
+            false => new DecisionEngineResult(
+                DecisionCode.H02,
+                nameof(CvedpIuuCheckRule),
+                DecisionInternalFurtherDetail.E94
+            ),
         };
     }
 }

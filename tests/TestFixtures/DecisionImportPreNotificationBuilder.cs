@@ -144,6 +144,8 @@ public sealed class DecisionImportPreNotificationBuilder
         private string? _hmiDecision;
         private string? _phsiDecision;
         private string? _commodityCode;
+        private int? _quantity;
+        private decimal? _weight;
 
         public DecisionCommodityComplementBuilder WithHmiDecision(string? hmi)
         {
@@ -163,12 +165,26 @@ public sealed class DecisionImportPreNotificationBuilder
             return this;
         }
 
+        public DecisionCommodityComplementBuilder WithWeight(decimal value)
+        {
+            _weight = value;
+            return this;
+        }
+
+        public DecisionCommodityComplementBuilder WithQuantity(int value)
+        {
+            _quantity = value;
+            return this;
+        }
+
         public DecisionCommodityComplement Build() =>
             new DecisionCommodityComplement
             {
                 CommodityCode = _commodityCode,
                 HmiDecision = _hmiDecision,
                 PhsiDecision = _phsiDecision,
+                Quantity = _quantity,
+                Weight = _weight,
             };
     }
 

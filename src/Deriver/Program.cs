@@ -1,6 +1,7 @@
 using Defra.TradeImports.Api.Auth;
 using Defra.TradeImports.EmfExporter;
-using Defra.TradeImportsDecisionDeriver.Deriver.Endpoints.Admin;
+using Defra.TradeImports.SQS.Endpoints.Endpoints;
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Endpoints.Decision;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Health;
@@ -9,6 +10,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Utils;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.Logging;
 using Elastic.CommonSchema.Serilog;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console(new EcsTextFormatter()).CreateBootstrapLogger();
@@ -60,6 +62,7 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
 static WebApplication BuildWebApplication(WebApplicationBuilder builder)
 {
     var app = builder.Build();
+    var awsSqsOptions = app.Services.GetRequiredService<IOptions<AwsSqsOptions>>();
 
     app.UseEmfExporter(MetricNames.MeterName);
     app.UseHeaderPropagation();
@@ -67,7 +70,12 @@ static WebApplication BuildWebApplication(WebApplicationBuilder builder)
     app.UseAuthorization();
     app.MapHealth();
     app.MapDecisionEndpoints();
-    app.MapAdminEndpoints();
+    app.MapDeadLetterQueueEndpoints(
+        awsSqsOptions.Value.ResourceEventsQueueName,
+        awsSqsOptions.Value.ResourceEventsDeadLetterQueueName,
+        policyName: PolicyNames.Execute,
+        tags: "Admin"
+    );
     app.UseStatusCodePages();
     app.UseExceptionHandler(
         new ExceptionHandlerOptions

@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
@@ -6,9 +7,13 @@ public sealed class ChedppDecisionRule : IDecisionRule
 {
     public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
+        if (context.Notification.StatusIsSubmittedOrInProgress())
+        {
+            return DecisionEngineResult.H02;
+        }
+
         return context.Notification.Status switch
         {
-            ImportNotificationStatus.Submitted or ImportNotificationStatus.InProgress => DecisionEngineResult.H02,
             ImportNotificationStatus.Validated or ImportNotificationStatus.Rejected => context.CheckCode.Value switch
             {
                 "H218" or "H220" => ProcessHmi(context.Notification),

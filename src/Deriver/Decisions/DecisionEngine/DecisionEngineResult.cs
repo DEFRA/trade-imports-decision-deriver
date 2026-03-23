@@ -33,7 +33,6 @@ public readonly record struct DecisionEngineResult
     public static readonly DecisionEngineResult H02E94 = new(DecisionCode.H02, DecisionInternalFurtherDetail.E94);
     public static readonly DecisionEngineResult H01E99 = new(DecisionCode.H01, DecisionInternalFurtherDetail.E99);
     public static readonly DecisionEngineResult X00 = new(DecisionCode.X00);
-    public static readonly DecisionEngineResult X00E20 = new(DecisionCode.X00, DecisionInternalFurtherDetail.E20);
     public static readonly DecisionEngineResult X00E99 = new(DecisionCode.X00, DecisionInternalFurtherDetail.E99);
     public static readonly DecisionEngineResult X00E97 = new(DecisionCode.X00, DecisionInternalFurtherDetail.E97);
     public static readonly DecisionEngineResult X00E96 = new(DecisionCode.X00, DecisionInternalFurtherDetail.E96);

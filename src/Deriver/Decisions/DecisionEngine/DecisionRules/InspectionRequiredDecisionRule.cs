@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
@@ -13,7 +14,7 @@ public sealed class InspectionRequiredDecisionRule : IDecisionRule
 
         var notification = context.Notification;
 
-        if (notification.Status is not (ImportNotificationStatus.Submitted or ImportNotificationStatus.InProgress))
+        if (!notification.StatusIsSubmittedOrInProgress())
         {
             return next(context);
         }

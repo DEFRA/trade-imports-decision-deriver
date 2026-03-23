@@ -25,6 +25,7 @@ public readonly record struct DecisionEngineResult
     public static readonly DecisionEngineResult H02 = new(DecisionCode.H02);
     public static readonly DecisionEngineResult H01E74 = new(DecisionCode.H01, DecisionInternalFurtherDetail.E74);
     public static readonly DecisionEngineResult H01E80 = new(DecisionCode.H01, DecisionInternalFurtherDetail.E80);
+    public static readonly DecisionEngineResult H01E81 = new(DecisionCode.H01, DecisionInternalFurtherDetail.E81);
     public static readonly DecisionEngineResult H01E88 = new(DecisionCode.H01, DecisionInternalFurtherDetail.E88);
     public static readonly DecisionEngineResult H01E85 = new(DecisionCode.H01, DecisionInternalFurtherDetail.E85);
     public static readonly DecisionEngineResult H01E86 = new(DecisionCode.H01, DecisionInternalFurtherDetail.E86);

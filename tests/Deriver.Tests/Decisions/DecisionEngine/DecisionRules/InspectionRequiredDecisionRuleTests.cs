@@ -43,14 +43,16 @@ public class InspectionRequiredDecisionRuleTests
         _mockNext.Received(1).Invoke(Arg.Any<DecisionEngineContext>());
     }
 
-    [Fact]
-    public void Execute_WhenStatusIsNotSubmittedInProgressOrAmend_CallsNextDelegate()
+    [Theory]
+    [InlineData(ImportNotificationStatus.Submitted)]
+    [InlineData(ImportNotificationStatus.InProgress)]
+    public void Execute_WhenStatusIsNotSubmittedInProgress_CallsNextDelegate(string importNotificationStatus)
     {
         // Arrange
         var notification = DecisionImportPreNotificationBuilder
             .Create()
             .WithId("Test")
-            .WithStatus(ImportNotificationStatus.Submitted)
+            .WithStatus(importNotificationStatus)
             .Build();
         var c = new DecisionEngineContext(
             new DecisionContext([notification], []),

@@ -1,5 +1,3 @@
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
-
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
 public sealed class UnlinkedNotificationDecisionRule : IDecisionRule
@@ -8,7 +6,11 @@ public sealed class UnlinkedNotificationDecisionRule : IDecisionRule
     {
         if (context.Notification is null)
         {
-            return DecisionEngineResult.Unlinked;
+            return new DecisionEngineResult(
+                DecisionCode.X00,
+                nameof(UnlinkedNotificationDecisionRule),
+                DecisionInternalFurtherDetail.E70
+            );
         }
 
         return next(context);

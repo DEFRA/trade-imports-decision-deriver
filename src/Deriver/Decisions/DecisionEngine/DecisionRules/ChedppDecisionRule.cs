@@ -9,19 +9,35 @@ public sealed class ChedppDecisionRule : IDecisionRule
     {
         if (context.Notification.StatusIsSubmittedOrInProgress())
         {
-            return DecisionEngineResult.H02;
+            return new DecisionEngineResult(DecisionCode.H02, nameof(ChedppDecisionRule));
         }
 
         return context.Notification.Status switch
         {
+            ImportNotificationStatus.Submitted or ImportNotificationStatus.InProgress => new DecisionEngineResult(
+                DecisionCode.H02,
+                nameof(ChedppDecisionRule)
+            ),
             ImportNotificationStatus.Validated or ImportNotificationStatus.Rejected => context.CheckCode.Value switch
             {
                 "H218" or "H220" => ProcessHmi(context.Notification),
                 "H219" => ProcessPhsi(context.Notification),
-                _ => DecisionEngineResult.X00E99,
+                _ => new DecisionEngineResult(
+                    DecisionCode.X00,
+                    nameof(ChedppDecisionRule),
+                    DecisionInternalFurtherDetail.E99
+                ),
             },
-            ImportNotificationStatus.PartiallyRejected => DecisionEngineResult.H01E74,
-            _ => DecisionEngineResult.X00E99,
+            ImportNotificationStatus.PartiallyRejected => new DecisionEngineResult(
+                DecisionCode.H01,
+                nameof(ChedppDecisionRule),
+                DecisionInternalFurtherDetail.E74
+            ),
+            _ => new DecisionEngineResult(
+                DecisionCode.X00,
+                nameof(ChedppDecisionRule),
+                DecisionInternalFurtherDetail.E99
+            ),
         };
     }
 
@@ -32,7 +48,11 @@ public sealed class ChedppDecisionRule : IDecisionRule
 
         if (hmiCheck is null)
         {
-            return DecisionEngineResult.H01E86;
+            return new DecisionEngineResult(
+                DecisionCode.H01,
+                nameof(ChedppDecisionRule),
+                DecisionInternalFurtherDetail.E86
+            );
         }
 
         return GetDecisionFromStatus(hmiCheck.Status);
@@ -47,7 +67,11 @@ public sealed class ChedppDecisionRule : IDecisionRule
 
         if (documentCheck is null || physicalCheck is null || identifyCheck is null)
         {
-            return DecisionEngineResult.H01E85;
+            return new DecisionEngineResult(
+                DecisionCode.H01,
+                nameof(ChedppDecisionRule),
+                DecisionInternalFurtherDetail.E85
+            );
         }
 
         var decisions = new List<DecisionEngineResult>
@@ -65,12 +89,16 @@ public sealed class ChedppDecisionRule : IDecisionRule
     {
         return status switch
         {
-            "To do" or "Hold" => DecisionEngineResult.H01,
-            "To be inspected" => DecisionEngineResult.H02,
-            "Compliant" or "Auto cleared" => DecisionEngineResult.C03,
-            "Non compliant" => DecisionEngineResult.N01,
-            "Not inspected" => DecisionEngineResult.C02,
-            _ => DecisionEngineResult.X00E99,
+            "To do" or "Hold" => new DecisionEngineResult(DecisionCode.H01, nameof(ChedppDecisionRule)),
+            "To be inspected" => new DecisionEngineResult(DecisionCode.H02, nameof(ChedppDecisionRule)),
+            "Compliant" or "Auto cleared" => new DecisionEngineResult(DecisionCode.C03, nameof(ChedppDecisionRule)),
+            "Non compliant" => new DecisionEngineResult(DecisionCode.N01, nameof(ChedppDecisionRule)),
+            "Not inspected" => new DecisionEngineResult(DecisionCode.C02, nameof(ChedppDecisionRule)),
+            _ => new DecisionEngineResult(
+                DecisionCode.X00,
+                nameof(ChedppDecisionRule),
+                DecisionInternalFurtherDetail.E99
+            ),
         };
     }
 }

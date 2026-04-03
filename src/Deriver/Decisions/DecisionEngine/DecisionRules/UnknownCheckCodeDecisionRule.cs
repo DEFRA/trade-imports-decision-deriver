@@ -4,6 +4,10 @@ public sealed class UnknownCheckCodeDecisionRule : IDecisionRule
 {
     public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
-        return DecisionEngineResult.X00E88;
+        return new DecisionEngineResult(
+            DecisionCode.X00,
+            nameof(UnknownCheckCodeDecisionRule),
+            DecisionInternalFurtherDetail.E88
+        );
     }
 }

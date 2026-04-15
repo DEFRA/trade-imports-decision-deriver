@@ -48,7 +48,12 @@ jobs:
           push: false
           tags: trade-imports-decision-deriver:latest
       - name: Check with Trivy
-        run: docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.69.3 image trade-imports-decision-deriver:latest --ignore-unfixed
+        run: |
+          docker run -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:0.69.3 image \
+            --ignore-unfixed \
+            --exit-code 1 \
+            trade-imports-decision-deriver:latest
   sonarcloud-scan:
     name: CDP SonarCloud Scan
     uses: ./.github/workflows/sonarcloud.yml

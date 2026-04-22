@@ -53,6 +53,6 @@ services:
   wiremock:
     environment:
       TZ: Europe/London
-    image: sheyenrath/wiremock.net:latest
+    image: sheyenrath/wiremock.net:1.24.0
     ports:
       - "9090:80"

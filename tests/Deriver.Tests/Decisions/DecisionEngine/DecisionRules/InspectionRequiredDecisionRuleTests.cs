@@ -21,7 +21,7 @@ public class InspectionRequiredDecisionRuleTests
         var notification = DecisionImportPreNotificationBuilder
             .Create()
             .WithId("Test")
-            .WithStatus(ImportNotificationStatus.Submitted)
+            .WithStatus(ImportNotificationStatus.InProgress)
             .Build();
         var c = new DecisionEngineContext(
             new DecisionContext([notification], []),
@@ -225,7 +225,11 @@ public class InspectionRequiredDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = DecisionEngineResult.Create(DecisionCode.C02, DecisionInternalFurtherDetail.E84);
+        var expectedResult = new DecisionEngineResult(
+            DecisionCode.C02,
+            nameof(InspectionRequiredDecisionRule),
+            DecisionInternalFurtherDetail.E84
+        );
         _mockNext.Invoke(Arg.Any<DecisionEngineContext>()).Returns(expectedResult);
 
         // Act

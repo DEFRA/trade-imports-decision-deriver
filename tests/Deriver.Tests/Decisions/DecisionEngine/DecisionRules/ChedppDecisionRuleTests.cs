@@ -41,9 +41,7 @@ public class ChedppDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = expectedDetail.HasValue
-            ? DecisionEngineResult.Create(expectedCode, expectedDetail.Value)
-            : DecisionEngineResult.Create(expectedCode);
+        var expectedResult = new DecisionEngineResult(expectedCode, nameof(ChedppDecisionRule), expectedDetail);
 
         // Act
         var result = _rule.Execute(c, _mockNext);
@@ -89,9 +87,7 @@ public class ChedppDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = expectedDetail.HasValue
-            ? DecisionEngineResult.Create(expectedCode, expectedDetail.Value)
-            : DecisionEngineResult.Create(expectedCode);
+        var expectedResult = new DecisionEngineResult(expectedCode, nameof(ChedppDecisionRule), expectedDetail);
 
         // Act
         var result = _rule.Execute(c, _mockNext);
@@ -135,7 +131,7 @@ public class ChedppDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = DecisionEngineResult.Create(expectedCode);
+        var expectedResult = new DecisionEngineResult(expectedCode, nameof(ChedppDecisionRule));
 
         // Act
         var result = _rule.Execute(c, _mockNext);
@@ -167,7 +163,11 @@ public class ChedppDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = DecisionEngineResult.Create(DecisionCode.H01, DecisionInternalFurtherDetail.E86);
+        var expectedResult = new DecisionEngineResult(
+            DecisionCode.H01,
+            nameof(ChedppDecisionRule),
+            DecisionInternalFurtherDetail.E86
+        );
 
         var result = _rule.Execute(c, _mockNext);
 
@@ -196,7 +196,11 @@ public class ChedppDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = DecisionEngineResult.Create(DecisionCode.H01, DecisionInternalFurtherDetail.E85);
+        var expectedResult = new DecisionEngineResult(
+            DecisionCode.H01,
+            nameof(ChedppDecisionRule),
+            DecisionInternalFurtherDetail.E85
+        );
 
         var result = _rule.Execute(c, _mockNext);
 

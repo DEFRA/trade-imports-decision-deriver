@@ -15,10 +15,16 @@ public sealed class AmendDecisionRule : IDecisionRule
 
         if (notification.InspectionRequired is InspectionRequired.NotRequired or InspectionRequired.Inconclusive)
         {
-            return DecisionEngineResult.H01E80;
+            return new DecisionEngineResult(
+                DecisionCode.H01,
+                nameof(AmendDecisionRule),
+                DecisionInternalFurtherDetail.E80
+            );
         }
 
-        return IsInspectionRequired(notification) ? DecisionEngineResult.H02E80 : DecisionEngineResult.H01E88;
+        return IsInspectionRequired(notification)
+            ? new DecisionEngineResult(DecisionCode.H02, nameof(AmendDecisionRule), DecisionInternalFurtherDetail.E80)
+            : new DecisionEngineResult(DecisionCode.H01, nameof(AmendDecisionRule), DecisionInternalFurtherDetail.E88);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

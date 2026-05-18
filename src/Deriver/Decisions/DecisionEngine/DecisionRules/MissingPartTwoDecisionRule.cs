@@ -6,7 +6,11 @@ public sealed class MissingPartTwoDecisionRule : IDecisionRule
     {
         if (!context.Notification.HasPartTwo)
         {
-            return DecisionEngineResult.H01E88;
+            return new DecisionEngineResult(
+                DecisionCode.H01,
+                nameof(MissingPartTwoDecisionRule),
+                DecisionInternalFurtherDetail.E88
+            );
         }
 
         return next(context);

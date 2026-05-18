@@ -10,7 +10,7 @@ public sealed class CedDecisionRule : IDecisionRule
 
         if (notification.StatusIsSubmittedOrInProgress())
         {
-            return DecisionEngineResult.H01;
+            return new DecisionEngineResult(DecisionCode.H01, nameof(CedDecisionRule));
         }
 
         if (notification.HasAcceptableConsignmentDecision())
@@ -18,8 +18,12 @@ public sealed class CedDecisionRule : IDecisionRule
             return notification.ConsignmentDecision switch
             {
                 ConsignmentDecision.AcceptableForInternalMarket or ConsignmentDecision.AcceptableForNonInternalMarket =>
-                    DecisionEngineResult.C03,
-                _ => DecisionEngineResult.X00E96,
+                    new DecisionEngineResult(DecisionCode.C03, nameof(CedDecisionRule)),
+                _ => new DecisionEngineResult(
+                    DecisionCode.X00,
+                    nameof(CedDecisionRule),
+                    DecisionInternalFurtherDetail.E96
+                ),
             };
         }
 
@@ -27,19 +31,35 @@ public sealed class CedDecisionRule : IDecisionRule
         {
             return notification.NotAcceptableAction switch
             {
-                DecisionNotAcceptableAction.Destruction => DecisionEngineResult.N02,
-                DecisionNotAcceptableAction.Redispatching => DecisionEngineResult.N04,
-                DecisionNotAcceptableAction.Transformation => DecisionEngineResult.N03,
-                DecisionNotAcceptableAction.Other => DecisionEngineResult.N07,
-                _ => DecisionEngineResult.X00E97,
+                DecisionNotAcceptableAction.Destruction => new DecisionEngineResult(
+                    DecisionCode.N02,
+                    nameof(CedDecisionRule)
+                ),
+                DecisionNotAcceptableAction.Redispatching => new DecisionEngineResult(
+                    DecisionCode.N04,
+                    nameof(CedDecisionRule)
+                ),
+                DecisionNotAcceptableAction.Transformation => new DecisionEngineResult(
+                    DecisionCode.N03,
+                    nameof(CedDecisionRule)
+                ),
+                DecisionNotAcceptableAction.Other => new DecisionEngineResult(
+                    DecisionCode.N07,
+                    nameof(CedDecisionRule)
+                ),
+                _ => new DecisionEngineResult(
+                    DecisionCode.X00,
+                    nameof(CedDecisionRule),
+                    DecisionInternalFurtherDetail.E97
+                ),
             };
         }
 
         if (notification.NotAcceptableReasons?.Length > 0)
         {
-            return DecisionEngineResult.N04;
+            return new DecisionEngineResult(DecisionCode.N04, nameof(CedDecisionRule));
         }
 
-        return DecisionEngineResult.X00E99;
+        return new DecisionEngineResult(DecisionCode.X00, nameof(CedDecisionRule), DecisionInternalFurtherDetail.E99);
     }
 }

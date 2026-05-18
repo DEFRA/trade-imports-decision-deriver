@@ -34,7 +34,10 @@
         checkCode: H218,
         decisionCode: X00,
         decisionReason: CHED reference GBCHD2025.6244952 cannot be found in IPAFFS. Check that the reference is correct.,
-        internalDecisionCode: E70
+        internalDecisionCode: E70,
+        mode: Active,
+        level: 1,
+        ruleName: UnlinkedNotificationDecisionRule
       }
     ]
   }

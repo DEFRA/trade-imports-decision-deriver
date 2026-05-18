@@ -21,12 +21,12 @@ public sealed class InspectionRequiredDecisionRule : IDecisionRule
 
         if (notification.InspectionRequired is InspectionRequired.NotRequired or InspectionRequired.Inconclusive)
         {
-            return DecisionEngineResult.H01;
+            return new DecisionEngineResult(DecisionCode.H01, nameof(InspectionRequiredDecisionRule));
         }
 
         if (IsInspectionRequired(notification))
         {
-            return DecisionEngineResult.H02;
+            return new DecisionEngineResult(DecisionCode.H02, nameof(InspectionRequiredDecisionRule));
         }
 
         return next(context);

@@ -165,7 +165,11 @@ public class TerminalStatusDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = DecisionEngineResult.Create(DecisionCode.C02, DecisionInternalFurtherDetail.E84);
+        var expectedResult = new DecisionEngineResult(
+            DecisionCode.C02,
+            nameof(TerminalStatusDecisionRule),
+            DecisionInternalFurtherDetail.E84
+        );
         _mockNext.Invoke(Arg.Any<DecisionEngineContext>()).Returns(expectedResult);
 
         // Act

@@ -24,20 +24,63 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
             )
             .ToList();
 
-        if (commodity.NetMass.HasValue)
+        if (
+            commodity.NetMass.HasValue
+            && !WeightValid(context.ClearanceRequest.MovementReferenceNumber, commodity, commodities, context.Logger)
+        )
         {
-            CompareWeight(context.ClearanceRequest.MovementReferenceNumber, commodity, commodities, context.Logger);
+            var liveResult = ApplyLevel3Result(result, DecisionInternalFurtherDetail.E30);
+            if (liveResult != null)
+                return liveResult;
         }
-        else if (commodity.SupplementaryUnits.HasValue)
+        else if (
+            commodity.SupplementaryUnits.HasValue
+            && !QuantityValid(context.ClearanceRequest.MovementReferenceNumber, commodity, commodities, context.Logger)
+        )
         {
-            CompareQuantity(context.ClearanceRequest.MovementReferenceNumber, commodity, commodities, context.Logger);
+            var liveResult = ApplyLevel3Result(result, DecisionInternalFurtherDetail.E31);
+            if (liveResult != null)
+                return liveResult;
         }
 
         return result;
     }
 
+    private DecisionEngineResult? ApplyLevel3Result(
+        DecisionEngineResult result,
+        DecisionInternalFurtherDetail furtherDetail
+    ) =>
+        options.Value.Level3Mode switch
+        {
+            RuleMode.DryRun => AddPassiveResult(result, furtherDetail),
+            RuleMode.Live => new DecisionEngineResult(
+                DecisionCode.X00,
+                nameof(CommodityQuantityCheckDecisionRule),
+                furtherDetail,
+                Level: DecisionRuleLevel.Level3
+            ),
+            _ => null,
+        };
+
+    private static DecisionEngineResult? AddPassiveResult(
+        DecisionEngineResult result,
+        DecisionInternalFurtherDetail furtherDetail
+    )
+    {
+        result.AddResult(
+            new DecisionEngineResult(
+                DecisionCode.X00,
+                nameof(CommodityQuantityCheckDecisionRule),
+                furtherDetail,
+                DecisionResultMode.Passive,
+                DecisionRuleLevel.Level3
+            )
+        );
+        return null;
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void CompareQuantity(
+    private static bool QuantityValid(
         string mrn,
         Commodity commodity,
         List<DecisionCommodityComplement> commodities,
@@ -45,59 +88,20 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
     )
     {
         var totalQuantity = commodities.Sum(x => x.Quantity);
-        if (totalQuantity < commodity.SupplementaryUnits)
-        {
-            logger.LogWarning(
-                "{MRN} - Level 3 would have resulted in an X00 as IPAFFS NetQuantity {NetQuantity} is less than allow in ClearanceRequest {CRNetQuantity}",
-                mrn,
-                totalQuantity,
-                commodity.NetMass
-            );
-        }
-
-        if (totalQuantity > commodity.SupplementaryUnits)
-        {
-            logger.LogInformation(
-                "{MRN} - Level 3 would have succeeded as IPAFFS NetQuantity {NetQuantity} is greater than allow in ClearanceRequest {CRNetWeight}",
-                mrn,
-                totalQuantity,
-                commodity.NetMass
-            );
-        }
+        return totalQuantity <= commodity.SupplementaryUnits;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void CompareWeight(
+    private bool WeightValid(
         string mrn,
         Commodity commodity,
         List<DecisionCommodityComplement> commodities,
         ILogger logger
     )
     {
-        // Sum of nullable decimals returns nullable decimal; coalesce to 0 if null.
         var totalWeight = commodities.Sum(x => x.Weight) ?? 0m;
-
         var allowedWeight =
             commodity.NetMass.GetValueOrDefault() + options.Value.QuantityManagementCheckNetMassTolerance;
-
-        if (totalWeight > allowedWeight)
-        {
-            logger.LogWarning(
-                "{MRN} - Level 3 would have resulted in an X00 as IPAFFS NetWeight {NetWeight} is less than allow in ClearanceRequest {CRNetWeight}",
-                mrn,
-                totalWeight,
-                commodity.NetMass
-            );
-        }
-
-        if (totalWeight <= allowedWeight)
-        {
-            logger.LogInformation(
-                "{MRN} - Level 3 would have succeeded as IPAFFS NetWeight {NetWeight} is greather than allow in ClearanceRequest {CRNetWeight}",
-                mrn,
-                totalWeight,
-                commodity.NetMass
-            );
-        }
+        return totalWeight <= allowedWeight;
     }
 }

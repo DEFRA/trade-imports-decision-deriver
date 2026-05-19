@@ -24,14 +24,14 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
             )
             .ToList();
 
-        if (
-            commodity.NetMass.HasValue
-            && !WeightValid(context.ClearanceRequest.MovementReferenceNumber, commodity, commodities, context.Logger)
-        )
+        if (commodity.NetMass.HasValue)
         {
-            var liveResult = ApplyLevel3Result(result, DecisionInternalFurtherDetail.E30);
-            if (liveResult != null)
-                return liveResult;
+            if (!WeightValid(context.ClearanceRequest.MovementReferenceNumber, commodity, commodities, context.Logger))
+            {
+                var liveResult = ApplyLevel3Result(result, DecisionInternalFurtherDetail.E30);
+                if (liveResult != null)
+                    return liveResult;
+            }
         }
         else if (
             commodity.SupplementaryUnits.HasValue
@@ -88,7 +88,24 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
     )
     {
         var totalQuantity = commodities.Sum(x => x.Quantity);
-        return totalQuantity <= commodity.SupplementaryUnits;
+
+        var allowedQuantity = commodity.SupplementaryUnits.GetValueOrDefault();
+        var difference = allowedQuantity - totalQuantity;
+
+        if (difference < 0)
+        {
+            logger.LogWarning(
+                "{MRN} would not match at Level 3 due to a discrepancy on the quantity values. The item with the discrepancy is {TaricCommodityCode} & {GoodsDescription}, the weight on the MRN is {ItemQuantity}, the weight on the CHED is {ChedQuantity}, the difference is {Difference}",
+                mrn,
+                commodity.TaricCommodityCode,
+                commodity.GoodsDescription,
+                allowedQuantity,
+                totalQuantity,
+                difference
+            );
+        }
+
+        return difference >= 0;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -102,6 +119,22 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
         var totalWeight = commodities.Sum(x => x.Weight) ?? 0m;
         var allowedWeight =
             commodity.NetMass.GetValueOrDefault() + options.Value.QuantityManagementCheckNetMassTolerance;
-        return totalWeight <= allowedWeight;
+
+        var difference = allowedWeight - totalWeight;
+
+        if (difference < 0)
+        {
+            logger.LogWarning(
+                "{MRN} would not match at Level 3 due to a discrepancy on the weight values. The item with the discrepancy is {TaricCommodityCode} & {GoodsDescription}, the weight on the MRN is {ItemNetMass}, the weight on the CHED is {ChedWeight}, the difference is {Difference}",
+                mrn,
+                commodity.TaricCommodityCode,
+                commodity.GoodsDescription,
+                commodity.NetMass,
+                totalWeight,
+                difference
+            );
+        }
+
+        return difference >= 0;
     }
 }

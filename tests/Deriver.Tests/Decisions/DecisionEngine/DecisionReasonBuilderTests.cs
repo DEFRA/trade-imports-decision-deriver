@@ -1,5 +1,6 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions.DecisionEngine;
@@ -11,7 +12,18 @@ public class DecisionReasonBuilderTests
     {
         CheckDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test1234567", "C640", "H221", DecisionCode.X00, null),
+            new(
+                null,
+                "Test",
+                1,
+                "Test1234567",
+                "C640",
+                "H221",
+                DecisionCode.X00,
+                "TestRule",
+                DecisionResultMode.Active,
+                DecisionRuleLevel.Level1
+            ),
         ];
         // Act
         var result = DecisionReasonBuilder.Build(
@@ -42,7 +54,18 @@ public class DecisionReasonBuilderTests
     {
         CheckDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test1234567", "C641", "H221", DecisionCode.X00),
+            new(
+                null,
+                "Test",
+                1,
+                "Test1234567",
+                "C641",
+                "H221",
+                DecisionCode.X00,
+                "TestRule",
+                DecisionResultMode.Active,
+                DecisionRuleLevel.Level1
+            ),
         ];
         // Act
         var result = DecisionReasonBuilder.Build(
@@ -73,7 +96,18 @@ public class DecisionReasonBuilderTests
     {
         CheckDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test1234567", "9115", "H221", DecisionCode.X00),
+            new(
+                null,
+                "Test",
+                1,
+                "Test1234567",
+                "9115",
+                "H221",
+                DecisionCode.X00,
+                "TestRule",
+                DecisionResultMode.Active,
+                DecisionRuleLevel.Level1
+            ),
         ];
         // Act
         var result = DecisionReasonBuilder.Build(
@@ -104,7 +138,18 @@ public class DecisionReasonBuilderTests
     {
         CheckDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test Doc Ref", "Test Doc Code", "H220", DecisionCode.X00),
+            new(
+                null,
+                "Test",
+                1,
+                "Test Doc Ref",
+                "Test Doc Code",
+                "H220",
+                DecisionCode.X00,
+                "TestRule",
+                DecisionResultMode.Active,
+                DecisionRuleLevel.Level1
+            ),
         ];
 
         // Act
@@ -137,7 +182,21 @@ public class DecisionReasonBuilderTests
     [Fact]
     public void WhenDecisionResultIsNotLinkedToChed_AndHasNoDocuments_AndCheckCodeIsH220_ThenShouldBeHmiGmsReason()
     {
-        CheckDecisionResult[] documentDecisionResults = [new(null, "Test", 1, "", "", "H220", DecisionCode.X00)];
+        CheckDecisionResult[] documentDecisionResults =
+        [
+            new(
+                null,
+                "Test",
+                1,
+                "",
+                "",
+                "H220",
+                DecisionCode.X00,
+                "TestRule",
+                DecisionResultMode.Active,
+                DecisionRuleLevel.Level1
+            ),
+        ];
 
         // Act
         var cr = new ClearanceRequest() { DeclarationUcr = "TestUcr" };
@@ -164,7 +223,18 @@ public class DecisionReasonBuilderTests
     {
         CheckDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test Doc Ref", "Test Doc Code", "H221", DecisionCode.X00),
+            new(
+                null,
+                "Test",
+                1,
+                "Test Doc Ref",
+                "Test Doc Code",
+                "H221",
+                DecisionCode.X00,
+                "TestRule",
+                DecisionResultMode.Active,
+                DecisionRuleLevel.Level1
+            ),
         ];
 
         // Act
@@ -184,7 +254,18 @@ public class DecisionReasonBuilderTests
     {
         CheckDecisionResult[] documentDecisionResults =
         [
-            new(null, "Test", 1, "Test Doc Ref", "Test Doc Code", "H224", DecisionCode.X00),
+            new(
+                null,
+                "Test",
+                1,
+                "Test Doc Ref",
+                "Test Doc Code",
+                "H224",
+                DecisionCode.X00,
+                "TestRule",
+                DecisionResultMode.Active,
+                DecisionRuleLevel.Level1
+            ),
         ];
 
         // Act

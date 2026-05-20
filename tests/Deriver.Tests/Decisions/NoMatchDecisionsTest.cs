@@ -1,6 +1,8 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
@@ -567,22 +569,21 @@ public class NoMatchDecisionsTest
         // Assert
 
         decisionResult.Should().NotBeNull();
-        decisionResult[0].Decision.Results?.Length.Should().Be(3);
-        decisionResult[0].Decision.Results?[0].CheckCode.Should().Be("H222");
-        decisionResult[0].Decision.Results?[0].DecisionCode.Should().Be(nameof(DecisionCode.C03));
-        decisionResult[0].Decision.Results?[0].DocumentCode.Should().Be("N853");
+        var activeResults = decisionResult[0]
+            .Decision.Results!.Where(x => x.Mode == nameof(DecisionResultMode.Active))
+            .ToArray();
+        activeResults.Length.Should().Be(3);
+        activeResults[0].CheckCode.Should().Be("H222");
+        activeResults[0].DecisionCode.Should().Be(nameof(DecisionCode.C03));
+        activeResults[0].DocumentCode.Should().Be("N853");
 
-        decisionResult[0].Decision.Results?[1].CheckCode.Should().Be("H223");
-        decisionResult[0].Decision.Results?[1].DecisionCode.Should().Be(nameof(DecisionCode.X00));
-        decisionResult[0]
-            .Decision.Results?[1].InternalDecisionCode.Should()
-            .Be(nameof(DecisionInternalFurtherDetail.E84));
+        activeResults[1].CheckCode.Should().Be("H223");
+        activeResults[1].DecisionCode.Should().Be(nameof(DecisionCode.X00));
+        activeResults[1].InternalDecisionCode.Should().Be(nameof(DecisionInternalFurtherDetail.E84));
 
-        decisionResult[0].Decision.Results?[2].CheckCode.Should().Be("H219");
-        decisionResult[0].Decision.Results?[2].DecisionCode.Should().Be(nameof(DecisionCode.X00));
-        decisionResult[0]
-            .Decision.Results?[2].InternalDecisionCode.Should()
-            .Be(nameof(DecisionInternalFurtherDetail.E83));
+        activeResults[2].CheckCode.Should().Be("H219");
+        activeResults[2].DecisionCode.Should().Be(nameof(DecisionCode.X00));
+        activeResults[2].InternalDecisionCode.Should().Be(nameof(DecisionInternalFurtherDetail.E83));
     }
 
     [Fact]

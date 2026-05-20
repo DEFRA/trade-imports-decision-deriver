@@ -1,8 +1,10 @@
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
-public sealed class CommodityCodeDecisionRule : IDecisionRule
+public sealed class CommodityCodeDecisionRule(IOptions<DecisionRulesOptions> options) : IDecisionRule
 {
     public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
@@ -24,12 +26,27 @@ public sealed class CommodityCodeDecisionRule : IDecisionRule
 
         if (commodities.Count == 0)
         {
-            context.Logger.LogWarning(
-                "Level 2 would have resulted in an X00 as could not match MRN {Mrn} CommodityCode {CommodityCode} for Item {Item}",
-                context.ClearanceRequest.MovementReferenceNumber,
-                commodity.TaricCommodityCode,
-                commodity.ItemNumber
-            );
+            switch (options.Value.Level2Mode)
+            {
+                case RuleMode.DryRun:
+                    result.AddResult(
+                        new DecisionEngineResult(
+                            DecisionCode.X00,
+                            nameof(CommodityCodeDecisionRule),
+                            DecisionInternalFurtherDetail.E20,
+                            DecisionResultMode.Passive,
+                            DecisionRuleLevel.Level2
+                        )
+                    );
+                    break;
+                case RuleMode.Live:
+                    return new DecisionEngineResult(
+                        DecisionCode.X00,
+                        nameof(CommodityCodeDecisionRule),
+                        DecisionInternalFurtherDetail.E20,
+                        Level: DecisionRuleLevel.Level2
+                    );
+            }
         }
 
         return result;

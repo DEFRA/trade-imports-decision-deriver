@@ -68,7 +68,11 @@ public class OrphanCheckCodeDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = DecisionEngineResult.Create(DecisionCode.X00, expectedDetail);
+        var expectedResult = new DecisionEngineResult(
+            DecisionCode.X00,
+            nameof(OrphanCheckCodeDecisionRule),
+            expectedDetail
+        );
 
         var result = _rule.Execute(c, _mockNext);
 
@@ -103,7 +107,11 @@ public class OrphanCheckCodeDecisionRuleTests
             Logger = NullLogger.Instance,
         };
 
-        var expectedResult = DecisionEngineResult.Create(DecisionCode.X00, expectedDetail);
+        var expectedResult = new DecisionEngineResult(
+            DecisionCode.X00,
+            nameof(OrphanCheckCodeDecisionRule),
+            expectedDetail
+        );
 
         var result = _rule.Execute(c, _mockNext);
 

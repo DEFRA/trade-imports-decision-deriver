@@ -8,11 +8,31 @@ public sealed class TerminalStatusDecisionRule : IDecisionRule
 
         return notification.Status switch
         {
-            ImportNotificationStatus.Cancelled => DecisionEngineResult.X00E71,
-            ImportNotificationStatus.Replaced => DecisionEngineResult.X00E72,
-            ImportNotificationStatus.Deleted => DecisionEngineResult.X00E73,
-            ImportNotificationStatus.SplitConsignment => DecisionEngineResult.X00E75,
-            ImportNotificationStatus.Modify => DecisionEngineResult.H01E81,
+            ImportNotificationStatus.Cancelled => new DecisionEngineResult(
+                DecisionCode.X00,
+                nameof(TerminalStatusDecisionRule),
+                DecisionInternalFurtherDetail.E71
+            ),
+            ImportNotificationStatus.Replaced => new DecisionEngineResult(
+                DecisionCode.X00,
+                nameof(TerminalStatusDecisionRule),
+                DecisionInternalFurtherDetail.E72
+            ),
+            ImportNotificationStatus.Deleted => new DecisionEngineResult(
+                DecisionCode.X00,
+                nameof(TerminalStatusDecisionRule),
+                DecisionInternalFurtherDetail.E73
+            ),
+            ImportNotificationStatus.SplitConsignment => new DecisionEngineResult(
+                DecisionCode.X00,
+                nameof(TerminalStatusDecisionRule),
+                DecisionInternalFurtherDetail.E75
+            ),
+             ImportNotificationStatus.Modify => new DecisionEngineResult(
+                DecisionCode.H01,
+                nameof(TerminalStatusDecisionRule),
+                DecisionInternalFurtherDetail.E81
+            ),
             _ => next(context),
         };
     }

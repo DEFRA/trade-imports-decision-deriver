@@ -28,7 +28,7 @@ public sealed class TerminalStatusDecisionRule : IDecisionRule
                 nameof(TerminalStatusDecisionRule),
                 DecisionInternalFurtherDetail.E75
             ),
-             ImportNotificationStatus.Modify => new DecisionEngineResult(
+            ImportNotificationStatus.Modify => new DecisionEngineResult(
                 DecisionCode.H01,
                 nameof(TerminalStatusDecisionRule),
                 DecisionInternalFurtherDetail.E81

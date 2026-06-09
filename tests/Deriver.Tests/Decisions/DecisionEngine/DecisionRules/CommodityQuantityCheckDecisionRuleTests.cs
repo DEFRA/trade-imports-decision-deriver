@@ -243,7 +243,7 @@ public class CommodityQuantityCheckDecisionRuleTests
 
         var notification = DecisionImportPreNotificationBuilder
             .Create()
-            .WithId("Test")
+            .WithId("1234567")
             .WithStatus(ImportNotificationStatus.Validated)
             .WithInspectionRequired("Other")
             .AddCommodity(c => c.WithWeight(19620).WithCommodityCode("020714"))
@@ -262,12 +262,42 @@ public class CommodityQuantityCheckDecisionRuleTests
                             ItemNumber = 1,
                             NetMass = 3750,
                             TaricCommodityCode = "0207146000",
+                            Documents =
+                            [
+                                new ImportDocument()
+                                {
+                                    DocumentReference = new ImportDocumentReference("1234567"),
+                                    DocumentCode = "C640",
+                                },
+                            ],
                         },
                         new Commodity()
                         {
                             ItemNumber = 2,
                             NetMass = 15870,
                             TaricCommodityCode = "0207146000",
+                            Documents =
+                            [
+                                new ImportDocument()
+                                {
+                                    DocumentReference = new ImportDocumentReference("1234567"),
+                                    DocumentCode = "C640",
+                                },
+                            ],
+                        },
+                        new Commodity()
+                        {
+                            ItemNumber = 2,
+                            NetMass = 15870,
+                            TaricCommodityCode = "0207146000",
+                            Documents =
+                            [
+                                new ImportDocument()
+                                {
+                                    DocumentReference = new ImportDocumentReference("7654321"),
+                                    DocumentCode = "C640",
+                                },
+                            ],
                         },
                     ],
                 },
@@ -285,14 +315,9 @@ public class CommodityQuantityCheckDecisionRuleTests
             new DecisionContext([notification], [customsDeclaration]),
             notification!,
             customsDeclaration,
-            new Commodity()
-            {
-                ItemNumber = 1,
-                NetMass = 3750,
-                TaricCommodityCode = "0207146000",
-            },
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0]
         )
         {
             Logger = NullLogger.Instance,

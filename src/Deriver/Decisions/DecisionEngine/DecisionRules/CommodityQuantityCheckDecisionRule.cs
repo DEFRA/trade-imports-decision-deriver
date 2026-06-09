@@ -29,6 +29,12 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
 
         var mrnCommodities = commodities
             .Where(mrn => chedCommodities.Any(ched => mrn.TaricCommodityCode?.StartsWith(ched.CommodityCode!) == true))
+            .Where(mrn =>
+                mrn.Documents != null
+                && mrn.Documents.Any(d =>
+                    d.GetDocumentReferenceIdentifier() == context.ImportDocument?.GetDocumentReferenceIdentifier()
+                )
+            )
             .ToList();
 
         if (mrnCommodity.NetMass.HasValue)

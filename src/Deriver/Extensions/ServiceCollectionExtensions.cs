@@ -81,7 +81,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<CedDecisionRule>();
         services.AddSingleton<CommodityCodeDecisionRule>();
         services.AddSingleton<CommodityQuantityCheckDecisionRule>();
-        services.AddSingleton<UnknownCheckCodeDecisionRule>();
+        services.AddSingleton<UnknownChedTypeDecisionRule>();
 
         // Order of interceptors is important here
         services.AddTraceContextInterceptor();

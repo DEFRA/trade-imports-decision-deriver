@@ -11,7 +11,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions.DecisionEngi
 
 public class UnknownCheckCodeDecisionRuleTests
 {
-    private readonly UnknownCheckCodeDecisionRule _rule = new();
+    private readonly UnknownChedTypeDecisionRule _rule = new();
     private readonly DecisionRuleDelegate _mockNext = Substitute.For<DecisionRuleDelegate>();
 
     [Fact]
@@ -34,8 +34,8 @@ public class UnknownCheckCodeDecisionRuleTests
 
         var expected = new DecisionEngineResult(
             DecisionCode.X00,
-            nameof(UnknownCheckCodeDecisionRule),
-            DecisionInternalFurtherDetail.E88
+            nameof(UnknownChedTypeDecisionRule),
+            DecisionInternalFurtherDetail.E81
         );
 
         // Act
@@ -66,7 +66,7 @@ public class UnknownCheckCodeDecisionRuleTests
         // Make the next delegate return a different result to prove it is not used
         _mockNext
             .Invoke(Arg.Any<DecisionEngineContext>())
-            .Returns(new DecisionEngineResult(DecisionCode.C02, nameof(UnknownCheckCodeDecisionRule)));
+            .Returns(new DecisionEngineResult(DecisionCode.C02, nameof(UnknownChedTypeDecisionRule)));
 
         // Act
         var result = _rule.Execute(context, _mockNext);
@@ -77,8 +77,8 @@ public class UnknownCheckCodeDecisionRuleTests
             .BeEquivalentTo(
                 new DecisionEngineResult(
                     DecisionCode.X00,
-                    nameof(UnknownCheckCodeDecisionRule),
-                    DecisionInternalFurtherDetail.E88
+                    nameof(UnknownChedTypeDecisionRule),
+                    DecisionInternalFurtherDetail.E81
                 )
             );
         _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionEngineContext>());

@@ -197,7 +197,7 @@ public class AmendDecisionRuleTests
 
         // Assert
         result.Code.Should().Be(DecisionCode.H01);
-        result.FurtherDetail.Should().Be(DecisionInternalFurtherDetail.E88);
+        result.FurtherDetail.Should().Be(DecisionInternalFurtherDetail.E80);
         _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionEngineContext>()); // Ensure the next delegate was NOT called
     }
 }

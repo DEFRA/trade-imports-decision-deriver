@@ -112,7 +112,7 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output, WireMock
             {
                 var requestModel = new RequestModel { Methods = ["PUT"], Path = createPath };
                 var requests = (await _wireMockAdminApi.FindRequestsAsync(requestModel)).Where(x =>
-                    x.Request.Headers != null
+                    x.Request?.Headers != null
                     && x.Request.Headers.ContainsKey(traceHeader)
                     && x.Request.Headers.TryGetValue(traceHeader, out var list)
                     && list.Contains(traceId)

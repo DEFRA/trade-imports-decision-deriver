@@ -43,11 +43,38 @@ public class CommodityQuantityCheckDecisionRuleTests
         );
         var notification = DecisionImportPreNotificationBuilder
             .Create()
-            .WithId("Test")
+            .WithId("7654321")
             .WithStatus(ImportNotificationStatus.Submitted)
             .WithInspectionRequired("Other")
             .AddCommodity(c => c.WithWeight(notificationWeight).WithCommodityCode("123"))
             .Build();
+
+        var customsDeclaration = new CustomsDeclarationWrapper(
+            "mrn",
+            new CustomsDeclaration()
+            {
+                ClearanceRequest = new ClearanceRequest()
+                {
+                    Commodities =
+                    [
+                        new Commodity()
+                        {
+                            ItemNumber = 1,
+                            NetMass = clearanceRequestWeight,
+                            TaricCommodityCode = "123",
+                            Documents =
+                            [
+                                new ImportDocument()
+                                {
+                                    DocumentReference = new ImportDocumentReference("7654321"),
+                                    DocumentCode = "C640",
+                                },
+                            ],
+                        },
+                    ],
+                },
+            }
+        );
 
         _mockNext(Arg.Any<DecisionEngineContext>())
             .Returns(
@@ -59,12 +86,12 @@ public class CommodityQuantityCheckDecisionRuleTests
             );
 
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [customsDeclaration]),
             notification,
-            new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
-            new Commodity() { NetMass = clearanceRequestWeight, TaricCommodityCode = "123" },
+            customsDeclaration,
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0]
         )
         {
             Logger = NullLogger.Instance,
@@ -113,11 +140,38 @@ public class CommodityQuantityCheckDecisionRuleTests
         );
         var notification = DecisionImportPreNotificationBuilder
             .Create()
-            .WithId("Test")
+            .WithId("7654321")
             .WithStatus(ImportNotificationStatus.Submitted)
             .WithInspectionRequired("Other")
             .AddCommodity(c => c.WithQuantity(notificationQuantity).WithCommodityCode("123"))
             .Build();
+
+        var customsDeclaration = new CustomsDeclarationWrapper(
+            "mrn",
+            new CustomsDeclaration()
+            {
+                ClearanceRequest = new ClearanceRequest()
+                {
+                    Commodities =
+                    [
+                        new Commodity()
+                        {
+                            ItemNumber = 1,
+                            SupplementaryUnits = clearanceRequestQuantity,
+                            TaricCommodityCode = "123",
+                            Documents =
+                            [
+                                new ImportDocument()
+                                {
+                                    DocumentReference = new ImportDocumentReference("7654321"),
+                                    DocumentCode = "C640",
+                                },
+                            ],
+                        },
+                    ],
+                },
+            }
+        );
 
         _mockNext(Arg.Any<DecisionEngineContext>())
             .Returns(
@@ -129,12 +183,12 @@ public class CommodityQuantityCheckDecisionRuleTests
             );
 
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [customsDeclaration]),
             notification,
-            new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
-            new Commodity() { SupplementaryUnits = clearanceRequestQuantity, TaricCommodityCode = "123" },
+            customsDeclaration,
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0]
         )
         {
             Logger = NullLogger.Instance,
@@ -183,6 +237,103 @@ public class CommodityQuantityCheckDecisionRuleTests
             new Commodity(),
             new CheckCode() { Value = "H221" },
             new ImportDocument()
+        )
+        {
+            Logger = NullLogger.Instance,
+        };
+
+        // Act
+        var returnedResult = rule.Execute(c, _mockNext);
+
+        // Assert
+        returnedResult.Should().BeEquivalentTo(result);
+    }
+
+    [Fact]
+    public void Execute_WhenCustomsDeclarationHasMultipleItemsWithMatchingCommodity_SumsTheValuesReturnsResult()
+    {
+        // Arrange
+        var rule = new CommodityQuantityCheckDecisionRule(
+            Options.Create(new DecisionRulesOptions() { Level3Mode = RuleMode.DryRun })
+        );
+
+        var notification = DecisionImportPreNotificationBuilder
+            .Create()
+            .WithId("1234567")
+            .WithStatus(ImportNotificationStatus.Validated)
+            .WithInspectionRequired("Other")
+            .AddCommodity(c => c.WithWeight(19620).WithCommodityCode("020714"))
+            .Build();
+
+        var customsDeclaration = new CustomsDeclarationWrapper(
+            "mrn",
+            new CustomsDeclaration()
+            {
+                ClearanceRequest = new ClearanceRequest()
+                {
+                    Commodities =
+                    [
+                        new Commodity()
+                        {
+                            ItemNumber = 1,
+                            NetMass = 3750,
+                            TaricCommodityCode = "0207146000",
+                            Documents =
+                            [
+                                new ImportDocument()
+                                {
+                                    DocumentReference = new ImportDocumentReference("1234567"),
+                                    DocumentCode = "C640",
+                                },
+                            ],
+                        },
+                        new Commodity()
+                        {
+                            ItemNumber = 2,
+                            NetMass = 15870,
+                            TaricCommodityCode = "0207146000",
+                            Documents =
+                            [
+                                new ImportDocument()
+                                {
+                                    DocumentReference = new ImportDocumentReference("1234567"),
+                                    DocumentCode = "C640",
+                                },
+                            ],
+                        },
+                        new Commodity()
+                        {
+                            ItemNumber = 2,
+                            NetMass = 15870,
+                            TaricCommodityCode = "0207146000",
+                            Documents =
+                            [
+                                new ImportDocument()
+                                {
+                                    DocumentReference = new ImportDocumentReference("7654321"),
+                                    DocumentCode = "C640",
+                                },
+                            ],
+                        },
+                    ],
+                },
+            }
+        );
+
+        var result = new DecisionEngineResult(
+            DecisionCode.C02,
+            nameof(CommodityQuantityCheckDecisionRule),
+            DecisionInternalFurtherDetail.E99
+        );
+        _mockNext(Arg.Any<DecisionEngineContext>()).Returns(result);
+
+        var c = new DecisionEngineContext(
+            new DecisionContext([notification], [customsDeclaration]),
+            notification!,
+            customsDeclaration,
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
+            new CheckCode() { Value = "H221" },
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0]
         )
         {
             Logger = NullLogger.Instance,

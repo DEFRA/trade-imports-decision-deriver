@@ -42,7 +42,7 @@ public enum DecisionInternalFurtherDetail
     E85, // Missing PHSI check
     E86, // No HMI check
     E87, // No Documents
-    E88, // No PartTwo
+    E88, // [OBSOLETE] No PartTwo
     E89, // [OBSOLETE] Item with document references where none are valid format
     E90, // [OBSOLETE] No Decision Finder found
     E92, // [OBSOLETE] IUU Not compliant

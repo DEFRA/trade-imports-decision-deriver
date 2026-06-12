@@ -11,7 +11,6 @@ public class TestDecisionRulesEngineFactory : IDecisionRulesEngineFactory
         .AddSingleton<OrphanCheckCodeDecisionRule>()
         .AddSingleton<UnlinkedNotificationDecisionRule>()
         .AddSingleton<WrongChedTypeDecisionRule>()
-        .AddSingleton<MissingPartTwoDecisionRule>()
         .AddSingleton<TerminalStatusDecisionRule>()
         .AddSingleton<AmendDecisionRule>()
         .AddSingleton<InspectionRequiredDecisionRule>()

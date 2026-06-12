@@ -22,7 +22,7 @@ public class TestDecisionRulesEngineFactory : IDecisionRulesEngineFactory
         .AddSingleton<CedDecisionRule>()
         .AddSingleton<CommodityCodeDecisionRule>()
         .AddSingleton<CommodityQuantityCheckDecisionRule>()
-        .AddSingleton<UnknownCheckCodeDecisionRule>()
+        .AddSingleton<UnknownChedTypeDecisionRule>()
         .AddOptions()
         .Configure<DecisionRulesOptions>(_ => { })
         .AddLogging()

@@ -54,7 +54,9 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
             {
                 QuantityComparisonType.Weight => DecisionInternalFurtherDetail.E30,
                 QuantityComparisonType.Quantity => DecisionInternalFurtherDetail.E31,
-                _ => throw new InvalidOperationException(),
+                _ => rule.ComparisonType == QuantityComparisonType.Weight
+                    ? DecisionInternalFurtherDetail.E30
+                    : DecisionInternalFurtherDetail.E31,
             };
 
             var liveResult = ApplyLevel3Result(result, detail);
@@ -108,7 +110,7 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
             }
         }
 
-        return new ValidationResult(true, null);
+        return new ValidationResult(false, null);
     }
 
     private static IEnumerable<QuantityComparisonType> GetComparisonOrder(
@@ -133,7 +135,7 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
     )
     {
         var chedType = context.Notification.ImportNotificationType;
-        var checkCode = context.ImportDocument?.DocumentCode;
+        var checkCode = context.CheckCode.Value;
 
         var rule = options
             .Value.CommodityQuantityCheckDecisionRule.ComparisonEntries.Select(rule => new
@@ -160,33 +162,21 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
 
         var score = 0;
 
-        if (rule.ChedType is not null)
+        if (rule.ChedType is not null && string.Equals(rule.ChedType, chedType, StringComparison.OrdinalIgnoreCase))
         {
-            if (!string.Equals(rule.ChedType, chedType, StringComparison.OrdinalIgnoreCase))
-            {
-                return -1;
-            }
-
             score += scoring.ChedTypeWeight;
         }
 
-        if (rule.CheckCode is not null)
+        if (rule.CheckCode is not null && string.Equals(rule.CheckCode, checkCode, StringComparison.OrdinalIgnoreCase))
         {
-            if (!string.Equals(rule.CheckCode, checkCode, StringComparison.OrdinalIgnoreCase))
-            {
-                return -1;
-            }
-
             score += scoring.CheckCodeWeight;
         }
 
-        if (rule.CommodityCode is not null)
+        if (
+            rule.CommodityCode is not null
+            && string.Equals(rule.CommodityCode, commodityCode, StringComparison.OrdinalIgnoreCase)
+        )
         {
-            if (commodityCode?.StartsWith(rule.CommodityCode, StringComparison.Ordinal) != true)
-            {
-                return -1;
-            }
-
             score += scoring.CommodityWeight;
         }
 

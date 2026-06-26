@@ -33,7 +33,14 @@ public class CommodityQuantityCheckDecisionRuleTests
     {
         // Arrange
         var rule = new CommodityQuantityCheckDecisionRule(
-            Options.Create(new DecisionRulesOptions() { Level3Mode = ruleMode })
+            Options.Create(
+                new DecisionRulesOptions()
+                {
+                    Level3Mode = ruleMode,
+                    CommodityQuantityCheckDecisionRule =
+                        TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+                }
+            )
         );
         var notification = DecisionImportPreNotificationBuilder
             .Create()
@@ -130,7 +137,14 @@ public class CommodityQuantityCheckDecisionRuleTests
     {
         // Arrange
         var rule = new CommodityQuantityCheckDecisionRule(
-            Options.Create(new DecisionRulesOptions() { Level3Mode = ruleMode })
+            Options.Create(
+                new DecisionRulesOptions()
+                {
+                    Level3Mode = ruleMode,
+                    CommodityQuantityCheckDecisionRule =
+                        TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+                }
+            )
         );
         var notification = DecisionImportPreNotificationBuilder
             .Create()
@@ -214,7 +228,14 @@ public class CommodityQuantityCheckDecisionRuleTests
     {
         // Arrange
         var rule = new CommodityQuantityCheckDecisionRule(
-            Options.Create(new DecisionRulesOptions() { Level3Mode = RuleMode.DryRun })
+            Options.Create(
+                new DecisionRulesOptions()
+                {
+                    Level3Mode = RuleMode.DryRun,
+                    CommodityQuantityCheckDecisionRule =
+                        TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+                }
+            )
         );
 
         var result = new DecisionEngineResult(
@@ -248,7 +269,14 @@ public class CommodityQuantityCheckDecisionRuleTests
     {
         // Arrange
         var rule = new CommodityQuantityCheckDecisionRule(
-            Options.Create(new DecisionRulesOptions() { Level3Mode = RuleMode.DryRun })
+            Options.Create(
+                new DecisionRulesOptions()
+                {
+                    Level3Mode = RuleMode.DryRun,
+                    CommodityQuantityCheckDecisionRule =
+                        TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+                }
+            )
         );
 
         var notification = DecisionImportPreNotificationBuilder

@@ -33,6 +33,7 @@ public enum RuleMode
     Live,
 }
 
+[ExcludeFromCodeCoverage]
 public sealed class CommodityQuantityCheckDecisionRuleOptions
 {
     public CommodityQuantityCheckDecisionRuleScoringOptions Scoring { get; init; } = new();
@@ -40,6 +41,7 @@ public sealed class CommodityQuantityCheckDecisionRuleOptions
     public List<CommodityQuantityCheckDecisionRuleComparisonEntry> ComparisonEntries { get; init; } = [];
 }
 
+[ExcludeFromCodeCoverage]
 public sealed class CommodityQuantityCheckDecisionRuleScoringOptions
 {
     [Required]
@@ -58,6 +60,7 @@ public enum QuantityComparisonType
     Quantity,
 }
 
+[ExcludeFromCodeCoverage]
 public sealed class CommodityQuantityCheckDecisionRuleComparisonEntry
 {
     public string? ChedType { get; init; }

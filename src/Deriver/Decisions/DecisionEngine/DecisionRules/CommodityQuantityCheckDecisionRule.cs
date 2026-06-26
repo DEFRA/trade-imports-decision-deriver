@@ -115,10 +115,10 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
         ILogger logger
     )
     {
-        var totalQuantity = commodities.Sum(x => x.Quantity);
+        var chedWeight = commodities.Sum(x => x.Quantity);
 
-        var allowedQuantity = mrnCommodities.Sum(x => x.SupplementaryUnits);
-        var difference = allowedQuantity - totalQuantity;
+        var mrnWeight = mrnCommodities.Sum(x => x.SupplementaryUnits);
+        var difference = chedWeight - mrnWeight;
 
         if (difference < 0)
         {
@@ -127,8 +127,8 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
                 mrn,
                 commodity.TaricCommodityCode,
                 commodity.GoodsDescription,
-                allowedQuantity,
-                totalQuantity,
+                mrnWeight,
+                chedWeight,
                 difference
             );
         }
@@ -147,9 +147,9 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
     {
         var totalWeight = commodities.Sum(x => x.Weight) ?? 0m;
         var mrnWeight = mrnCommodities.Sum(x => x.NetMass);
-        var allowedWeight = mrnWeight + options.Value.QuantityManagementCheckNetMassTolerance;
+        var chedWeight = totalWeight + options.Value.QuantityManagementCheckNetMassTolerance;
 
-        var difference = allowedWeight - totalWeight;
+        var difference = chedWeight - mrnWeight;
 
         if (difference < 0)
         {

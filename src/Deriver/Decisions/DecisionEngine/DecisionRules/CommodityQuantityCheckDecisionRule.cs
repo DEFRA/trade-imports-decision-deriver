@@ -131,6 +131,20 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
                 chedWeight,
                 difference
             );
+
+            var mrnWeights = string.Join(
+                ", ",
+                mrnCommodities.Select(x =>
+                    $"Item: {x.ItemNumber} - Code: {x.TaricCommodityCode} - Quantity: {x.SupplementaryUnits}"
+                )
+            );
+
+            var chedWeights = string.Join(
+                ", ",
+                commodities.Select(x => $"Code: {x.CommodityCode} - Quantity: {x.Quantity}")
+            );
+
+            logger.LogWarning("Weights used. MRN: [{MrnQuantities}] CHED: [{ChedQuantities}]", mrnWeights, chedWeights);
         }
 
         return difference >= 0;
@@ -163,6 +177,18 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
                 difference,
                 options.Value.QuantityManagementCheckNetMassTolerance
             );
+
+            var mrnWeights = string.Join(
+                ", ",
+                mrnCommodities.Select(x => $"Item: {x.ItemNumber} - Code: {x.TaricCommodityCode} - Weight: {x.NetMass}")
+            );
+
+            var chedWeights = string.Join(
+                ", ",
+                commodities.Select(x => $"Code: {x.CommodityCode} - Weight: {x.Weight}")
+            );
+
+            logger.LogWarning("Weights used. MRN: [{MrnWeights}] CHED: [{ChedWeights}]", mrnWeights, chedWeights);
         }
 
         return difference >= 0;

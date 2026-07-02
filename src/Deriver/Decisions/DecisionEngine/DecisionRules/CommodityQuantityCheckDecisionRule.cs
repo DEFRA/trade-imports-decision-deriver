@@ -144,7 +144,7 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
                 commodities.Select(x => $"Code: {x.CommodityCode} - Quantity: {x.Quantity}")
             );
 
-            logger.LogWarning("Weights used. MRN: [{MrnQuantities}] CHED: [{ChedQuantities}]", mrnWeights, chedWeights);
+            logger.LogInformation("Weights used. MRN: [{MrnQuantities}] CHED: [{ChedQuantities}]", mrnWeights, chedWeights);
         }
 
         return difference >= 0;
@@ -188,7 +188,7 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
                 commodities.Select(x => $"Code: {x.CommodityCode} - Weight: {x.Weight}")
             );
 
-            logger.LogWarning("Weights used. MRN: [{MrnWeights}] CHED: [{ChedWeights}]", mrnWeights, chedWeights);
+            logger.LogInformation("Weights used. MRN: [{MrnWeights}] CHED: [{ChedWeights}]", mrnWeights, chedWeights);
         }
 
         return difference >= 0;

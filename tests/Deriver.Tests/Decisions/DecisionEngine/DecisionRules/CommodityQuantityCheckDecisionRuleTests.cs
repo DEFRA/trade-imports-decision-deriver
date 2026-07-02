@@ -5,6 +5,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
+using HandlebarsDotNet;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -33,7 +34,14 @@ public class CommodityQuantityCheckDecisionRuleTests
     {
         // Arrange
         var rule = new CommodityQuantityCheckDecisionRule(
-            Options.Create(new DecisionRulesOptions() { Level3Mode = ruleMode })
+            Options.Create(
+                new DecisionRulesOptions()
+                {
+                    Level3Mode = ruleMode,
+                    CommodityQuantityCheckDecisionRule =
+                        TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+                }
+            )
         );
         var notification = DecisionImportPreNotificationBuilder
             .Create()
@@ -84,7 +92,7 @@ public class CommodityQuantityCheckDecisionRuleTests
             notification,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
-            new CheckCode() { Value = "H221" },
+            new CheckCode() { Value = "H222" },
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0]
         )
         {
@@ -130,7 +138,14 @@ public class CommodityQuantityCheckDecisionRuleTests
     {
         // Arrange
         var rule = new CommodityQuantityCheckDecisionRule(
-            Options.Create(new DecisionRulesOptions() { Level3Mode = ruleMode })
+            Options.Create(
+                new DecisionRulesOptions()
+                {
+                    Level3Mode = ruleMode,
+                    CommodityQuantityCheckDecisionRule =
+                        TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+                }
+            )
         );
         var notification = DecisionImportPreNotificationBuilder
             .Create()
@@ -214,7 +229,14 @@ public class CommodityQuantityCheckDecisionRuleTests
     {
         // Arrange
         var rule = new CommodityQuantityCheckDecisionRule(
-            Options.Create(new DecisionRulesOptions() { Level3Mode = RuleMode.DryRun })
+            Options.Create(
+                new DecisionRulesOptions()
+                {
+                    Level3Mode = RuleMode.DryRun,
+                    CommodityQuantityCheckDecisionRule =
+                        TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+                }
+            )
         );
 
         var result = new DecisionEngineResult(
@@ -248,7 +270,14 @@ public class CommodityQuantityCheckDecisionRuleTests
     {
         // Arrange
         var rule = new CommodityQuantityCheckDecisionRule(
-            Options.Create(new DecisionRulesOptions() { Level3Mode = RuleMode.DryRun })
+            Options.Create(
+                new DecisionRulesOptions()
+                {
+                    Level3Mode = RuleMode.DryRun,
+                    CommodityQuantityCheckDecisionRule =
+                        TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+                }
+            )
         );
 
         var notification = DecisionImportPreNotificationBuilder
@@ -326,7 +355,7 @@ public class CommodityQuantityCheckDecisionRuleTests
             notification!,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
-            new CheckCode() { Value = "H221" },
+            new CheckCode() { Value = "H222" },
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0]
         )
         {
@@ -338,5 +367,336 @@ public class CommodityQuantityCheckDecisionRuleTests
 
         // Assert
         returnedResult.Should().BeEquivalentTo(result);
+    }
+
+    [Fact]
+    public void Execute_ShouldNotFallback_WhenUseFallbackIsFalse()
+    {
+        // Arrange
+        var options = Options.Create(
+            new DecisionRulesOptions()
+            {
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                {
+                    ComparisonEntries =
+                    [
+                        new CommodityQuantityCheckDecisionRuleComparisonEntry
+                        {
+                            ComparisonType = QuantityComparisonType.Weight,
+                            UseFallback = false,
+                        },
+                    ],
+                },
+            }
+        );
+
+        var rule = new CommodityQuantityCheckDecisionRule(options);
+
+        var context = CreateContext();
+        context.Commodity.NetMass = null;
+        context.Commodity.SupplementaryUnits = 100;
+
+        var mockResult = new DecisionEngineResult(
+            DecisionCode.C02,
+            nameof(CommodityQuantityCheckDecisionRule),
+            DecisionInternalFurtherDetail.E99
+        );
+        _mockNext(Arg.Any<DecisionEngineContext>()).Returns(mockResult);
+
+        // Act
+        var result = rule.Execute(context, _mockNext);
+
+        // Assert
+        result.Code.Should().Be(mockResult.Code);
+    }
+
+    [Fact]
+    public void Execute_ShouldReturnValid_WhenNoComparisonCanBePerformed()
+    {
+        var options = Options.Create(
+            new DecisionRulesOptions()
+            {
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                {
+                    ComparisonEntries =
+                    [
+                        new CommodityQuantityCheckDecisionRuleComparisonEntry
+                        {
+                            ComparisonType = QuantityComparisonType.Weight,
+                            UseFallback = true,
+                        },
+                    ],
+                },
+            }
+        );
+
+        var rule = new CommodityQuantityCheckDecisionRule(options);
+
+        var context = CreateContext();
+
+        context.Commodity.NetMass = null;
+        context.Commodity.SupplementaryUnits = null;
+
+        // Act
+        var result = rule.Execute(context, CreateSuccessfulDelegate());
+        result.Code.Should().Be(DecisionCode.C02);
+    }
+
+    [Fact]
+    public void Execute_ShouldThrow_WhenComparisonTypeIsInvalid()
+    {
+        var options = Options.Create(
+            new DecisionRulesOptions()
+            {
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                {
+                    ComparisonEntries =
+                    [
+                        new CommodityQuantityCheckDecisionRuleComparisonEntry
+                        {
+                            ComparisonType = (QuantityComparisonType)999,
+                            UseFallback = false,
+                        },
+                    ],
+                },
+            }
+        );
+
+        var rule = new CommodityQuantityCheckDecisionRule(options);
+
+        var context = CreateContext();
+
+        var result = rule.Execute(context, CreateSuccessfulDelegate());
+        result.Code.Should().Be(DecisionCode.C02);
+    }
+
+    [Fact]
+    public void GetBestMatchingRule_ShouldPreferMatchingChedType()
+    {
+        var options = Options.Create(
+            new DecisionRulesOptions()
+            {
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                {
+                    ComparisonEntries =
+                    [
+                        new CommodityQuantityCheckDecisionRuleComparisonEntry
+                        {
+                            ChedType = "CHEDP",
+                            ComparisonType = QuantityComparisonType.Weight,
+                        },
+                    ],
+                },
+            }
+        );
+
+        var rule = new CommodityQuantityCheckDecisionRule(options);
+
+        var context = CreateContext();
+        context.Notification.ImportNotificationType = "CHEDP";
+
+        var result = rule.Execute(context, CreateSuccessfulDelegate());
+        result.Code.Should().Be(DecisionCode.C02);
+    }
+
+    [Fact]
+    public void GetBestMatchingRule_ShouldScoreMatchingCheckCode()
+    {
+        var options = Options.Create(
+            new DecisionRulesOptions()
+            {
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                {
+                    ComparisonEntries =
+                    [
+                        new CommodityQuantityCheckDecisionRuleComparisonEntry
+                        {
+                            CheckCode = "H221",
+                            ComparisonType = QuantityComparisonType.Weight,
+                        },
+                    ],
+                },
+            }
+        );
+
+        var rule = new CommodityQuantityCheckDecisionRule(options);
+
+        var context = CreateContext();
+        context.ImportDocument!.DocumentCode = "N853";
+
+        var result = rule.Execute(context, CreateSuccessfulDelegate());
+        result.Code.Should().Be(DecisionCode.C02);
+    }
+
+    [Fact]
+    public void GetBestMatchingRule_ShouldIgnoreRule_WhenCheckCodeDoesNotMatch()
+    {
+        var options = Options.Create(
+            new DecisionRulesOptions()
+            {
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                {
+                    ComparisonEntries =
+                    [
+                        new CommodityQuantityCheckDecisionRuleComparisonEntry { CommodityCode = "N853" },
+                        new CommodityQuantityCheckDecisionRuleComparisonEntry(),
+                    ],
+                },
+            }
+        );
+
+        var rule = new CommodityQuantityCheckDecisionRule(options);
+
+        var context = CreateContext();
+        context.ImportDocument!.DocumentCode = "C678";
+
+        var result = rule.Execute(context, CreateSuccessfulDelegate());
+        result.Code.Should().Be(DecisionCode.C02);
+    }
+
+    [Fact]
+    public void GetBestMatchingRule_ShouldScoreMatchingCommodityCode()
+    {
+        var options = Options.Create(
+            new DecisionRulesOptions()
+            {
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                {
+                    ComparisonEntries =
+                    [
+                        new CommodityQuantityCheckDecisionRuleComparisonEntry { CommodityCode = "0207146000" },
+                    ],
+                },
+            }
+        );
+
+        var rule = new CommodityQuantityCheckDecisionRule(options);
+
+        var context = CreateContext();
+
+        var result = rule.Execute(context, CreateSuccessfulDelegate());
+        result.Code.Should().Be(DecisionCode.C02);
+    }
+
+    [Fact]
+    public void GetBestMatchingRule_ShouldIgnoreRule_WhenCommodityCodeDoesNotMatch()
+    {
+        var options = Options.Create(
+            new DecisionRulesOptions()
+            {
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                {
+                    ComparisonEntries =
+                    [
+                        new CommodityQuantityCheckDecisionRuleComparisonEntry { CommodityCode = "0201" },
+                        new CommodityQuantityCheckDecisionRuleComparisonEntry(),
+                    ],
+                },
+            }
+        );
+
+        var rule = new CommodityQuantityCheckDecisionRule(options);
+
+        var context = CreateContext();
+
+        var result = rule.Execute(context, CreateSuccessfulDelegate());
+        result.Code.Should().Be(DecisionCode.C02);
+    }
+
+    private DecisionRuleDelegate CreateSuccessfulDelegate()
+    {
+        var mockResult = new DecisionEngineResult(
+            DecisionCode.C02,
+            nameof(CommodityQuantityCheckDecisionRule),
+            DecisionInternalFurtherDetail.E99
+        );
+        _mockNext(Arg.Any<DecisionEngineContext>()).Returns(mockResult);
+        return _mockNext;
+    }
+
+    private DecisionEngineContext CreateContext()
+    {
+        var notification = DecisionImportPreNotificationBuilder
+            .Create()
+            .WithId("1234567")
+            .WithStatus(ImportNotificationStatus.Validated)
+            .WithInspectionRequired("Other")
+            .AddCommodity(c => c.WithWeight(19620).WithCommodityCode("020714"))
+            .Build();
+
+        var customsDeclaration = new CustomsDeclarationWrapper(
+            "mrn",
+            new CustomsDeclaration()
+            {
+                ClearanceRequest = new ClearanceRequest()
+                {
+                    Commodities =
+                    [
+                        new Commodity()
+                        {
+                            ItemNumber = 1,
+                            NetMass = 3750,
+                            TaricCommodityCode = "0207146000",
+                            Documents =
+                            [
+                                new ImportDocument()
+                                {
+                                    DocumentReference = new ImportDocumentReference("1234567"),
+                                    DocumentCode = "C640",
+                                },
+                            ],
+                        },
+                        new Commodity()
+                        {
+                            ItemNumber = 2,
+                            NetMass = 15870,
+                            TaricCommodityCode = "0207146000",
+                            Documents =
+                            [
+                                new ImportDocument()
+                                {
+                                    DocumentReference = new ImportDocumentReference("1234567"),
+                                    DocumentCode = "C640",
+                                },
+                            ],
+                        },
+                        new Commodity()
+                        {
+                            ItemNumber = 2,
+                            NetMass = 15870,
+                            TaricCommodityCode = "0207146000",
+                            Documents =
+                            [
+                                new ImportDocument()
+                                {
+                                    DocumentReference = new ImportDocumentReference("7654321"),
+                                    DocumentCode = "C640",
+                                },
+                            ],
+                        },
+                    ],
+                },
+            }
+        );
+
+        return new DecisionEngineContext(
+            new DecisionContext([notification], []),
+            notification!,
+            customsDeclaration,
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
+            new CheckCode() { Value = "H222" },
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0]
+        )
+        {
+            Logger = NullLogger.Instance,
+        };
     }
 }

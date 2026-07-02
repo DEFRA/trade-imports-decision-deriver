@@ -41,9 +41,6 @@ public class DecisionImportPreNotification
     [JsonPropertyName("commodityChecks")]
     public DecisionCommodityCheck.Check[] CommodityChecks { get; set; } = [];
 
-    [JsonPropertyName("hasPartTwo")]
-    public bool HasPartTwo { get; set; }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool HasAcceptableConsignmentDecision()
     {

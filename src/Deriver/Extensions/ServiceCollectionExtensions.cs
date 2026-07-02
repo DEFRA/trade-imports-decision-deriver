@@ -70,7 +70,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<OrphanCheckCodeDecisionRule>();
         services.AddSingleton<UnlinkedNotificationDecisionRule>();
         services.AddSingleton<WrongChedTypeDecisionRule>();
-        services.AddSingleton<MissingPartTwoDecisionRule>();
         services.AddSingleton<TerminalStatusDecisionRule>();
         services.AddSingleton<AmendDecisionRule>();
         services.AddSingleton<InspectionRequiredDecisionRule>();

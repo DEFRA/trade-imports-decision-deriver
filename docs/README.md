@@ -189,7 +189,6 @@ src/Deriver/Decisions/V2/DecisionEngine/
     ├── OrphanCheckCodeDecisionRule.cs        # Common validation
     ├── UnlinkedNotificationDecisionRule.cs   # Common validation
     ├── WrongChedTypeDecisionRule.cs          # Common validation
-    ├── MissingPartTwoDecisionRule.cs         # Common validation
     ├── TerminalStatusDecisionRule.cs         # Common status
     ├── AmendDecisionRule.cs                  # Common status
     ├── InspectionRequiredDecisionRule.cs     # Common inspection
@@ -283,7 +282,6 @@ For questions or issues:
   - `OrphanCheckCodeDecisionRule` (check code validation)
   - `UnlinkedNotificationDecisionRule` (notification linking)
   - `WrongChedTypeDecisionRule` (CHED type validation)
-  - `MissingPartTwoDecisionRule` (Part Two validation)
   - `TerminalStatusDecisionRule` (terminal status handling)
   - `AmendDecisionRule` (Amend status handling)
   - `InspectionRequiredDecisionRule` (inspection hold logic)

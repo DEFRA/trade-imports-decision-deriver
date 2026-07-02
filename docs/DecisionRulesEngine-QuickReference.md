@@ -8,13 +8,12 @@
 | 1 | `OrphanCheckCodeDecisionRule` | Validation | X00 if invalid, else continue |
 | 2 | `UnlinkedNotificationDecisionRule` | Validation | X00 if not linked, else continue |
 | 3 | `WrongChedTypeDecisionRule` | Validation | X00 if wrong type, else continue |
-| 4 | `MissingPartTwoDecisionRule` | Validation | X00 if missing, else continue |
-| 5 | `TerminalStatusDecisionRule` | Decision | X00 for terminal statuses, else continue |
-| 6 | `AmendDecisionRule` | Decision | Previous decision or X00 for Amend, else continue |
-| 7 | `InspectionRequiredDecisionRule` | Decision | H01 for Submitted, H02 for InProgress, else continue |
-| 8 | `CvedaDecisionRule` | Decision | C02, N01-N07, or X00 (terminal) |
-| 9 | `CommodityCodeValidationRule` | Post-process | Logs warnings, returns result from next |
-| 10 | `CommodityWeightOrQuantityValidationRule` | Post-process | Logs warnings, returns result from next |
+| 4 | `TerminalStatusDecisionRule` | Decision | X00 for terminal statuses, else continue |
+| 5 | `AmendDecisionRule` | Decision | Previous decision or X00 for Amend, else continue |
+| 6 | `InspectionRequiredDecisionRule` | Decision | H01 for Submitted, H02 for InProgress, else continue |
+| 7 | `CvedaDecisionRule` | Decision | C02, N01-N07, or X00 (terminal) |
+| 8 | `CommodityCodeValidationRule` | Post-process | Logs warnings, returns result from next |
+| 9 | `CommodityWeightOrQuantityValidationRule` | Post-process | Logs warnings, returns result from next |
 
 ### CVEDP Pipeline (11 rules)
 | # | Rule | Type | Returns |
@@ -211,7 +210,6 @@ private static DecisionRulesEngine CreateEngineForMyNewChed()
         new OrphanCheckCodeDecisionRule(),
         new UnlinkedNotificationDecisionRule(),
         new WrongChedTypeDecisionRule(ImportNotificationType.MyNewChed),
-        new MissingPartTwoDecisionRule(),
         new TerminalStatusDecisionRule(),
         new AmendDecisionRule(),
         new InspectionRequiredDecisionRule(),
@@ -372,7 +370,6 @@ src/Deriver/Decisions/V2/DecisionEngine/
     ├── OrphanCheckCodeDecisionRule.cs
     ├── UnlinkedNotificationDecisionRule.cs
     ├── WrongChedTypeDecisionRule.cs
-    ├── MissingPartTwoDecisionRule.cs
     ├── TerminalStatusDecisionRule.cs
     ├── AmendDecisionRule.cs
     ├── InspectionRequiredDecisionRule.cs

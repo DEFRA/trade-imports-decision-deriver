@@ -144,7 +144,11 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
                 commodities.Select(x => $"Code: {x.CommodityCode} - Quantity: {x.Quantity}")
             );
 
-            logger.LogInformation("Weights used. MRN: [{MrnQuantities}] CHED: [{ChedQuantities}]", mrnWeights, chedWeights);
+            logger.LogInformation(
+                "Weights used. MRN: [{MrnQuantities}] CHED: [{ChedQuantities}]",
+                mrnWeights,
+                chedWeights
+            );
         }
 
         return difference >= 0;

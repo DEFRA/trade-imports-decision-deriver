@@ -1,6 +1,8 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
+using Microsoft.Extensions.Options;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 
@@ -14,7 +16,10 @@ public interface ICheckProcessor
     );
 }
 
-public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFactory) : ICheckProcessor
+public class CheckProcessor(
+    IDecisionRulesEngineFactory decisionRulesEngineFactory,
+    IOptions<DecisionRulesOptions> decisionRulesOptions
+) : ICheckProcessor
 {
     private static readonly ImportDocument[] s_emptyDocuments = Array.Empty<ImportDocument>();
 
@@ -65,7 +70,8 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                         notifications,
                         checkCode,
                         document,
-                        decisionEngine
+                        decisionEngine,
+                        decisionRulesOptions.Value
                     )
                 );
             }
@@ -73,6 +79,7 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
             {
                 var resolverContext = new DecisionEngineContext(
                     context,
+                    decisionRulesOptions.Value,
                     null!,
                     clearanceRequest,
                     commodity,
@@ -103,6 +110,7 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
         {
             var resolverContext = new DecisionEngineContext(
                 context,
+                decisionRulesOptions.Value,
                 null!,
                 clearanceRequest,
                 commodity,
@@ -138,7 +146,8 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
         IEnumerable<DecisionImportPreNotification> notifications,
         CheckCode checkCode,
         ImportDocument document,
-        DecisionRulesEngine decisionEngine
+        DecisionRulesEngine decisionEngine,
+        DecisionRulesOptions decisionRulesOptions
     )
     {
         var output = new List<CheckDecisionResult>();
@@ -146,6 +155,7 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
         {
             var resolverContext = new DecisionEngineContext(
                 context,
+                decisionRulesOptions,
                 notification,
                 clearanceRequest,
                 commodity,

@@ -6,6 +6,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.Decisio
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using HandlebarsDotNet;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -33,16 +34,13 @@ public class CommodityQuantityCheckDecisionRuleTests
     )
     {
         // Arrange
-        var rule = new CommodityQuantityCheckDecisionRule(
-            Options.Create(
-                new DecisionRulesOptions()
-                {
-                    Level3Mode = ruleMode,
-                    CommodityQuantityCheckDecisionRule =
-                        TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
-                }
-            )
-        );
+        var ruleOptions = new DecisionRulesOptions()
+        {
+            Level3Mode = ruleMode,
+            CommodityQuantityCheckDecisionRule =
+                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+        };
+        var rule = new CommodityQuantityCheckDecisionRule();
         var notification = DecisionImportPreNotificationBuilder
             .Create()
             .WithId("7654321")
@@ -89,6 +87,7 @@ public class CommodityQuantityCheckDecisionRuleTests
 
         var c = new DecisionEngineContext(
             new DecisionContext([notification], [customsDeclaration]),
+            ruleOptions,
             notification,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
@@ -137,16 +136,13 @@ public class CommodityQuantityCheckDecisionRuleTests
     )
     {
         // Arrange
-        var rule = new CommodityQuantityCheckDecisionRule(
-            Options.Create(
-                new DecisionRulesOptions()
-                {
-                    Level3Mode = ruleMode,
-                    CommodityQuantityCheckDecisionRule =
-                        TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
-                }
-            )
-        );
+        var ruleOptions = new DecisionRulesOptions()
+        {
+            Level3Mode = ruleMode,
+            CommodityQuantityCheckDecisionRule =
+                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+        };
+        var rule = new CommodityQuantityCheckDecisionRule();
         var notification = DecisionImportPreNotificationBuilder
             .Create()
             .WithId("7654321")
@@ -193,6 +189,7 @@ public class CommodityQuantityCheckDecisionRuleTests
 
         var c = new DecisionEngineContext(
             new DecisionContext([notification], [customsDeclaration]),
+            ruleOptions,
             notification,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
@@ -228,16 +225,13 @@ public class CommodityQuantityCheckDecisionRuleTests
     public void Execute_WhenResultCodeIsNotReleaseOrHold_ReturnsResultFromNextDelegate()
     {
         // Arrange
-        var rule = new CommodityQuantityCheckDecisionRule(
-            Options.Create(
-                new DecisionRulesOptions()
-                {
-                    Level3Mode = RuleMode.DryRun,
-                    CommodityQuantityCheckDecisionRule =
-                        TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
-                }
-            )
-        );
+        var ruleOptions = new DecisionRulesOptions()
+        {
+            Level3Mode = RuleMode.DryRun,
+            CommodityQuantityCheckDecisionRule =
+                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+        };
+        var rule = new CommodityQuantityCheckDecisionRule();
 
         var result = new DecisionEngineResult(
             DecisionCode.X00,
@@ -248,6 +242,7 @@ public class CommodityQuantityCheckDecisionRuleTests
 
         var c = new DecisionEngineContext(
             new DecisionContext([], []),
+            ruleOptions,
             null!,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
@@ -269,16 +264,13 @@ public class CommodityQuantityCheckDecisionRuleTests
     public void Execute_WhenCustomsDeclarationHasMultipleItemsWithMatchingCommodity_SumsTheValuesReturnsResult()
     {
         // Arrange
-        var rule = new CommodityQuantityCheckDecisionRule(
-            Options.Create(
-                new DecisionRulesOptions()
-                {
-                    Level3Mode = RuleMode.DryRun,
-                    CommodityQuantityCheckDecisionRule =
-                        TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
-                }
-            )
-        );
+        var ruleOptions = new DecisionRulesOptions()
+        {
+            Level3Mode = RuleMode.DryRun,
+            CommodityQuantityCheckDecisionRule =
+                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+        };
+        var rule = new CommodityQuantityCheckDecisionRule();
 
         var notification = DecisionImportPreNotificationBuilder
             .Create()
@@ -352,6 +344,7 @@ public class CommodityQuantityCheckDecisionRuleTests
 
         var c = new DecisionEngineContext(
             new DecisionContext([notification], [customsDeclaration]),
+            ruleOptions,
             notification!,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
@@ -373,7 +366,7 @@ public class CommodityQuantityCheckDecisionRuleTests
     public void Execute_ShouldNotFallback_WhenUseFallbackIsFalse()
     {
         // Arrange
-        var options = Options.Create(
+        var ruleOptions = Options.Create(
             new DecisionRulesOptions()
             {
                 Level3Mode = RuleMode.DryRun,
@@ -391,9 +384,9 @@ public class CommodityQuantityCheckDecisionRuleTests
             }
         );
 
-        var rule = new CommodityQuantityCheckDecisionRule(options);
+        var rule = new CommodityQuantityCheckDecisionRule();
 
-        var context = CreateContext();
+        var context = CreateContext(ruleOptions.Value);
         context.Commodity.NetMass = null;
         context.Commodity.SupplementaryUnits = 100;
 
@@ -414,7 +407,7 @@ public class CommodityQuantityCheckDecisionRuleTests
     [Fact]
     public void Execute_ShouldReturnValid_WhenNoComparisonCanBePerformed()
     {
-        var options = Options.Create(
+        var ruleOptions = Options.Create(
             new DecisionRulesOptions()
             {
                 Level3Mode = RuleMode.DryRun,
@@ -432,9 +425,9 @@ public class CommodityQuantityCheckDecisionRuleTests
             }
         );
 
-        var rule = new CommodityQuantityCheckDecisionRule(options);
+        var rule = new CommodityQuantityCheckDecisionRule();
 
-        var context = CreateContext();
+        var context = CreateContext(ruleOptions.Value);
 
         context.Commodity.NetMass = null;
         context.Commodity.SupplementaryUnits = null;
@@ -447,7 +440,7 @@ public class CommodityQuantityCheckDecisionRuleTests
     [Fact]
     public void Execute_ShouldThrow_WhenComparisonTypeIsInvalid()
     {
-        var options = Options.Create(
+        var ruleOptions = Options.Create(
             new DecisionRulesOptions()
             {
                 Level3Mode = RuleMode.DryRun,
@@ -465,9 +458,9 @@ public class CommodityQuantityCheckDecisionRuleTests
             }
         );
 
-        var rule = new CommodityQuantityCheckDecisionRule(options);
+        var rule = new CommodityQuantityCheckDecisionRule();
 
-        var context = CreateContext();
+        var context = CreateContext(ruleOptions.Value);
 
         var result = rule.Execute(context, CreateSuccessfulDelegate());
         result.Code.Should().Be(DecisionCode.C02);
@@ -476,7 +469,8 @@ public class CommodityQuantityCheckDecisionRuleTests
     [Fact]
     public void GetBestMatchingRule_ShouldPreferMatchingChedType()
     {
-        var options = Options.Create(
+        var rule = new CommodityQuantityCheckDecisionRule();
+        var ruleOptions = Options.Create(
             new DecisionRulesOptions()
             {
                 Level3Mode = RuleMode.DryRun,
@@ -494,9 +488,7 @@ public class CommodityQuantityCheckDecisionRuleTests
             }
         );
 
-        var rule = new CommodityQuantityCheckDecisionRule(options);
-
-        var context = CreateContext();
+        var context = CreateContext(ruleOptions.Value);
         context.Notification.ImportNotificationType = "CHEDP";
 
         var result = rule.Execute(context, CreateSuccessfulDelegate());
@@ -506,7 +498,8 @@ public class CommodityQuantityCheckDecisionRuleTests
     [Fact]
     public void GetBestMatchingRule_ShouldScoreMatchingCheckCode()
     {
-        var options = Options.Create(
+        var rule = new CommodityQuantityCheckDecisionRule();
+        var ruleOptions = Options.Create(
             new DecisionRulesOptions()
             {
                 Level3Mode = RuleMode.DryRun,
@@ -524,9 +517,7 @@ public class CommodityQuantityCheckDecisionRuleTests
             }
         );
 
-        var rule = new CommodityQuantityCheckDecisionRule(options);
-
-        var context = CreateContext();
+        var context = CreateContext(ruleOptions.Value);
         context.ImportDocument!.DocumentCode = "N853";
 
         var result = rule.Execute(context, CreateSuccessfulDelegate());
@@ -536,24 +527,21 @@ public class CommodityQuantityCheckDecisionRuleTests
     [Fact]
     public void GetBestMatchingRule_ShouldIgnoreRule_WhenCheckCodeDoesNotMatch()
     {
-        var options = Options.Create(
-            new DecisionRulesOptions()
+        var rule = new CommodityQuantityCheckDecisionRule();
+        var ruleOptions = new DecisionRulesOptions()
+        {
+            Level3Mode = RuleMode.DryRun,
+            CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
             {
-                Level3Mode = RuleMode.DryRun,
-                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
-                {
-                    ComparisonEntries =
-                    [
-                        new CommodityQuantityCheckDecisionRuleComparisonEntry { CommodityCode = "N853" },
-                        new CommodityQuantityCheckDecisionRuleComparisonEntry(),
-                    ],
-                },
-            }
-        );
+                ComparisonEntries =
+                [
+                    new CommodityQuantityCheckDecisionRuleComparisonEntry { CommodityCode = "N853" },
+                    new CommodityQuantityCheckDecisionRuleComparisonEntry(),
+                ],
+            },
+        };
 
-        var rule = new CommodityQuantityCheckDecisionRule(options);
-
-        var context = CreateContext();
+        var context = CreateContext(ruleOptions);
         context.ImportDocument!.DocumentCode = "C678";
 
         var result = rule.Execute(context, CreateSuccessfulDelegate());
@@ -563,23 +551,21 @@ public class CommodityQuantityCheckDecisionRuleTests
     [Fact]
     public void GetBestMatchingRule_ShouldScoreMatchingCommodityCode()
     {
-        var options = Options.Create(
-            new DecisionRulesOptions()
+        var ruleOptions = new DecisionRulesOptions()
+        {
+            Level3Mode = RuleMode.DryRun,
+            CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
             {
-                Level3Mode = RuleMode.DryRun,
-                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
-                {
-                    ComparisonEntries =
-                    [
-                        new CommodityQuantityCheckDecisionRuleComparisonEntry { CommodityCode = "0207146000" },
-                    ],
-                },
-            }
-        );
+                ComparisonEntries =
+                [
+                    new CommodityQuantityCheckDecisionRuleComparisonEntry { CommodityCode = "0207146000" },
+                ],
+            },
+        };
 
-        var rule = new CommodityQuantityCheckDecisionRule(options);
+        var rule = new CommodityQuantityCheckDecisionRule();
 
-        var context = CreateContext();
+        var context = CreateContext(ruleOptions);
 
         var result = rule.Execute(context, CreateSuccessfulDelegate());
         result.Code.Should().Be(DecisionCode.C02);
@@ -588,24 +574,21 @@ public class CommodityQuantityCheckDecisionRuleTests
     [Fact]
     public void GetBestMatchingRule_ShouldIgnoreRule_WhenCommodityCodeDoesNotMatch()
     {
-        var options = Options.Create(
-            new DecisionRulesOptions()
+        var ruleOptions = new DecisionRulesOptions()
+        {
+            Level3Mode = RuleMode.DryRun,
+            CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
             {
-                Level3Mode = RuleMode.DryRun,
-                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
-                {
-                    ComparisonEntries =
-                    [
-                        new CommodityQuantityCheckDecisionRuleComparisonEntry { CommodityCode = "0201" },
-                        new CommodityQuantityCheckDecisionRuleComparisonEntry(),
-                    ],
-                },
-            }
-        );
+                ComparisonEntries =
+                [
+                    new CommodityQuantityCheckDecisionRuleComparisonEntry { CommodityCode = "0201" },
+                    new CommodityQuantityCheckDecisionRuleComparisonEntry(),
+                ],
+            },
+        };
+        var rule = new CommodityQuantityCheckDecisionRule();
 
-        var rule = new CommodityQuantityCheckDecisionRule(options);
-
-        var context = CreateContext();
+        var context = CreateContext(ruleOptions);
 
         var result = rule.Execute(context, CreateSuccessfulDelegate());
         result.Code.Should().Be(DecisionCode.C02);
@@ -622,7 +605,7 @@ public class CommodityQuantityCheckDecisionRuleTests
         return _mockNext;
     }
 
-    private DecisionEngineContext CreateContext()
+    private DecisionEngineContext CreateContext(DecisionRulesOptions rulesOptions)
     {
         var notification = DecisionImportPreNotificationBuilder
             .Create()
@@ -689,6 +672,7 @@ public class CommodityQuantityCheckDecisionRuleTests
 
         return new DecisionEngineContext(
             new DecisionContext([notification], []),
+            rulesOptions,
             notification!,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,

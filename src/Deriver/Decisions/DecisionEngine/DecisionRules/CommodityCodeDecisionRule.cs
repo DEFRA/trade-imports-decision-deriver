@@ -4,9 +4,9 @@ using Microsoft.Extensions.Options;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
-public sealed class CommodityCodeDecisionRule(IOptions<DecisionRulesOptions> options) : IDecisionRule
+public sealed class CommodityCodeDecisionRule(IOptions<DecisionRulesOptions> options) : DecisionRule
 {
-    public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
+    protected override DecisionEngineResult DoExecute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
         var result = next(context);
 

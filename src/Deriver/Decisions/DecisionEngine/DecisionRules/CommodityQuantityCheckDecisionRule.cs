@@ -82,7 +82,7 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
         DecisionEngineContext context,
         Commodity commodity,
         List<Commodity> mrnCommodities,
-        List<DecisionCommodityComplement> chedCommodities
+        List<NotificationCommodity> chedCommodities
     )
     {
         foreach (var comparison in GetComparisonOrder(rule))
@@ -233,7 +233,7 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
         ILogger logger
     )
     {
-        var chedWeight = commodities.Sum(x => x.Commodity.Quantity);
+        var chedQuantity = commodities.Sum(x => x.Commodity.Quantity);
 
         var mrnQuantity = mrnCommodities.Sum(x => x.SupplementaryUnits);
 
@@ -323,5 +323,6 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
     }
 
     private readonly record struct ValidationResult(bool IsValid, QuantityComparisonType? ComparisonType);
+
     private readonly record struct NotificationCommodity(string Id, DecisionCommodityComplement Commodity);
 }

@@ -70,8 +70,7 @@ public class CheckProcessor(
                         notifications,
                         checkCode,
                         document,
-                        decisionEngine,
-                        decisionRulesOptions.Value
+                        decisionEngine
                     )
                 );
             }
@@ -139,15 +138,14 @@ public class CheckProcessor(
         return output.Distinct().ToList();
     }
 
-    private static List<CheckDecisionResult> ProcessNotification(
+    private List<CheckDecisionResult> ProcessNotification(
         DecisionContext context,
         CustomsDeclarationWrapper clearanceRequest,
         Commodity commodity,
         IEnumerable<DecisionImportPreNotification> notifications,
         CheckCode checkCode,
         ImportDocument document,
-        DecisionRulesEngine decisionEngine,
-        DecisionRulesOptions decisionRulesOptions
+        DecisionRulesEngine decisionEngine
     )
     {
         var output = new List<CheckDecisionResult>();
@@ -155,7 +153,7 @@ public class CheckProcessor(
         {
             var resolverContext = new DecisionEngineContext(
                 context,
-                decisionRulesOptions,
+                decisionRulesOptions.Value,
                 notification,
                 clearanceRequest,
                 commodity,

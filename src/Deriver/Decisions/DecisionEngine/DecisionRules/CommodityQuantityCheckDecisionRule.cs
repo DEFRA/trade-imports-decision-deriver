@@ -20,8 +20,13 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
         var mrnCommodity = context.Commodity;
 
         var chedCommodities = context
-            .Notification.Commodities.Where(x =>
-                x.CommodityCode != null && mrnCommodity.TaricCommodityCode?.StartsWith(x.CommodityCode) == true
+            .DecisionContext.Notifications.SelectMany(
+                notification => notification.Commodities,
+                (notification, commodity) => new NotificationCommodity(notification.Id, commodity)
+            )
+            .Where(x =>
+                x.Commodity.CommodityCode != null
+                && mrnCommodity.TaricCommodityCode?.StartsWith(x.Commodity.CommodityCode) == true
             )
             .ToList();
 
@@ -29,7 +34,9 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
             context.ClearanceRequest.CustomsDeclaration.ClearanceRequest?.Commodities ?? Enumerable.Empty<Commodity>();
 
         var mrnCommodities = commodities
-            .Where(mrn => chedCommodities.Any(ched => mrn.TaricCommodityCode?.StartsWith(ched.CommodityCode!) == true))
+            .Where(mrn =>
+                chedCommodities.Any(ched => mrn.TaricCommodityCode?.StartsWith(ched.Commodity.CommodityCode!) == true)
+            )
             .Where(mrn =>
                 mrn.Documents != null
                 && mrn.Documents.Any(d =>
@@ -222,11 +229,11 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
         string mrn,
         Commodity commodity,
         List<Commodity> mrnCommodities,
-        List<DecisionCommodityComplement> commodities,
+        List<NotificationCommodity> commodities,
         ILogger logger
     )
     {
-        var chedQuantity = commodities.Sum(x => x.Quantity);
+        var chedWeight = commodities.Sum(x => x.Commodity.Quantity);
 
         var mrnQuantity = mrnCommodities.Sum(x => x.SupplementaryUnits);
 
@@ -243,6 +250,26 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
                 chedQuantity,
                 difference
             );
+
+            var mrnWeights = string.Join(
+                ", ",
+                mrnCommodities.Select(x =>
+                    $"Item: {x.ItemNumber} - Code: {x.TaricCommodityCode} - Quantity: {x.SupplementaryUnits}"
+                )
+            );
+
+            var chedWeights = string.Join(
+                ", ",
+                commodities.Select(x =>
+                    $"CHED: {x.Id} - Code: {x.Commodity.CommodityCode} - Quantity: {x.Commodity.Quantity}"
+                )
+            );
+
+            logger.LogInformation(
+                "Weights used. MRN: [{MrnQuantities}] CHED: [{ChedQuantities}]",
+                mrnWeights,
+                chedWeights
+            );
         }
 
         return difference >= 0;
@@ -253,12 +280,11 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
         string mrn,
         Commodity commodity,
         List<Commodity> mrnCommodities,
-        List<DecisionCommodityComplement> commodities,
+        List<NotificationCommodity> commodities,
         ILogger logger
     )
     {
-        var totalWeight = commodities.Sum(x => x.Weight) ?? 0m;
-
+        var totalWeight = commodities.Sum(x => x.Commodity.Weight) ?? 0m;
         var mrnWeight = mrnCommodities.Sum(x => x.NetMass);
 
         var chedWeight = totalWeight + options.Value.QuantityManagementCheckNetMassTolerance;
@@ -277,10 +303,25 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
                 difference,
                 options.Value.QuantityManagementCheckNetMassTolerance
             );
+
+            var mrnWeights = string.Join(
+                ", ",
+                mrnCommodities.Select(x => $"Item: {x.ItemNumber} - Code: {x.TaricCommodityCode} - Weight: {x.NetMass}")
+            );
+
+            var chedWeights = string.Join(
+                ", ",
+                commodities.Select(x =>
+                    $"CHED: {x.Id} - Code: {x.Commodity.CommodityCode} - Weight: {x.Commodity.Weight}"
+                )
+            );
+
+            logger.LogInformation("Weights used. MRN: [{MrnWeights}] CHED: [{ChedWeights}]", mrnWeights, chedWeights);
         }
 
         return difference >= 0;
     }
 
     private readonly record struct ValidationResult(bool IsValid, QuantityComparisonType? ComparisonType);
+    private readonly record struct NotificationCommodity(string Id, DecisionCommodityComplement Commodity);
 }

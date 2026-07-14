@@ -5,7 +5,6 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -16,18 +15,13 @@ public class CommodityQuantityCheckDecisionRuleTests
 {
     private readonly DecisionRuleDelegate _mockNext = Substitute.For<DecisionRuleDelegate>();
 
-    ////private readonly ILogger _mockLogger = Substitute.For<ILogger>();
-
-    // Initialize the rule, mock context, mock next delegate, and logger
-    //mode netmass
-
     [Theory]
     [InlineData(RuleMode.Live, 1, 1, DecisionCode.C02, null, DecisionResultMode.Active)]
-    [InlineData(RuleMode.Live, 2, 1, DecisionCode.X00, DecisionInternalFurtherDetail.E30, DecisionResultMode.Active)]
-    [InlineData(RuleMode.Live, 2, 3, DecisionCode.C02, null, DecisionResultMode.Active)]
+    [InlineData(RuleMode.Live, 1, 2, DecisionCode.X00, DecisionInternalFurtherDetail.E30, DecisionResultMode.Active)]
+    [InlineData(RuleMode.Live, 3, 2, DecisionCode.C02, null, DecisionResultMode.Active)]
     [InlineData(RuleMode.DryRun, 1, 1, DecisionCode.C02, null, DecisionResultMode.Active)]
-    [InlineData(RuleMode.DryRun, 2, 1, DecisionCode.X00, DecisionInternalFurtherDetail.E30, DecisionResultMode.Passive)]
-    [InlineData(RuleMode.DryRun, 2, 3, DecisionCode.C02, null, DecisionResultMode.Active)]
+    [InlineData(RuleMode.DryRun, 1, 2, DecisionCode.X00, DecisionInternalFurtherDetail.E30, DecisionResultMode.Passive)]
+    [InlineData(RuleMode.DryRun, 3, 2, DecisionCode.C02, null, DecisionResultMode.Active)]
     public void NetMass_Tests(
         RuleMode ruleMode,
         decimal notificationWeight,
@@ -120,11 +114,11 @@ public class CommodityQuantityCheckDecisionRuleTests
 
     [Theory]
     [InlineData(RuleMode.Live, 1, 1, DecisionCode.C02, null, DecisionResultMode.Active)]
-    [InlineData(RuleMode.Live, 2, 1, DecisionCode.X00, DecisionInternalFurtherDetail.E31, DecisionResultMode.Active)]
-    [InlineData(RuleMode.Live, 2, 3, DecisionCode.C02, null, DecisionResultMode.Active)]
+    [InlineData(RuleMode.Live, 1, 2, DecisionCode.X00, DecisionInternalFurtherDetail.E31, DecisionResultMode.Active)]
+    [InlineData(RuleMode.Live, 3, 2, DecisionCode.C02, null, DecisionResultMode.Active)]
     [InlineData(RuleMode.DryRun, 1, 1, DecisionCode.C02, null, DecisionResultMode.Active)]
-    [InlineData(RuleMode.DryRun, 2, 1, DecisionCode.X00, DecisionInternalFurtherDetail.E31, DecisionResultMode.Passive)]
-    [InlineData(RuleMode.DryRun, 2, 3, DecisionCode.C02, null, DecisionResultMode.Active)]
+    [InlineData(RuleMode.DryRun, 1, 2, DecisionCode.X00, DecisionInternalFurtherDetail.E31, DecisionResultMode.Passive)]
+    [InlineData(RuleMode.DryRun, 3, 2, DecisionCode.C02, null, DecisionResultMode.Active)]
     public void NetQuantity_Tests(
         RuleMode ruleMode,
         int notificationQuantity,

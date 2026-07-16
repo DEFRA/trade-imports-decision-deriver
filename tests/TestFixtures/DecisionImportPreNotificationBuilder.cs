@@ -16,7 +16,6 @@ public sealed class DecisionImportPreNotificationBuilder
     private string? _status;
     private readonly List<DecisionCommodityComplement> _commodities = new();
     private readonly List<DecisionCommodityCheck.Check> _commodityChecks = new();
-    private bool _hasPartTwo;
 
     private DecisionImportPreNotificationBuilder() { }
 
@@ -91,12 +90,6 @@ public sealed class DecisionImportPreNotificationBuilder
         return this;
     }
 
-    public DecisionImportPreNotificationBuilder WithHasPartTwo(bool hasPartTwo)
-    {
-        _hasPartTwo = hasPartTwo;
-        return this;
-    }
-
     public DecisionImportPreNotificationBuilder AddCommodity(Action<DecisionCommodityComplementBuilder> configure)
     {
         var b = new DecisionCommodityComplementBuilder();
@@ -133,7 +126,6 @@ public sealed class DecisionImportPreNotificationBuilder
             Commodities = _commodities.Count == 0 ? Array.Empty<DecisionCommodityComplement>() : _commodities.ToArray(),
             CommodityChecks =
                 _commodityChecks.Count == 0 ? Array.Empty<DecisionCommodityCheck.Check>() : _commodityChecks.ToArray(),
-            HasPartTwo = _hasPartTwo,
         };
     }
 

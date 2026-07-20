@@ -38,7 +38,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
                     ImportNotificationType.Ced => CreateEngineForCed(k),
                     _ => new DecisionRulesEngine(
                         "Unknown",
-                        new List<IDecisionRule> { AddRule<UnknownCheckCodeDecisionRule>() },
+                        new List<IDecisionRule> { AddRule<UnknownChedTypeDecisionRule>() },
                         _logger,
                         _options
                     ),
@@ -59,7 +59,6 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<WrongChedTypeDecisionRule>(),
             AddRule<TerminalStatusDecisionRule>(),
             AddRule<AmendDecisionRule>(),
-            AddRule<MissingPartTwoDecisionRule>(),
             AddRule<InspectionRequiredDecisionRule>(),
             AddRule<CvedaDecisionRule>(),
         };
@@ -83,7 +82,6 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<WrongChedTypeDecisionRule>(),
             AddRule<TerminalStatusDecisionRule>(),
             AddRule<AmendDecisionRule>(),
-            AddRule<MissingPartTwoDecisionRule>(),
             AddRule<InspectionRequiredDecisionRule>(),
             AddRule<CvedpIuuCheckRule>(),
             AddRule<CvedpDecisionRule>(),
@@ -108,7 +106,6 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<WrongChedTypeDecisionRule>(),
             AddRule<TerminalStatusDecisionRule>(),
             AddRule<AmendDecisionRule>(),
-            AddRule<MissingPartTwoDecisionRule>(),
             AddRule<ChedppDecisionRule>(),
         };
 
@@ -131,7 +128,6 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<WrongChedTypeDecisionRule>(),
             AddRule<TerminalStatusDecisionRule>(),
             AddRule<AmendDecisionRule>(),
-            AddRule<MissingPartTwoDecisionRule>(),
             AddRule<InspectionRequiredDecisionRule>(),
             AddRule<CedDecisionRule>(),
         };

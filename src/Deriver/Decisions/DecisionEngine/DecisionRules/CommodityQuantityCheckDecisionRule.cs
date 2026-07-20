@@ -17,16 +17,44 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
             return result;
         }
 
-        var commodity = context.Commodity;
-        var commodities = context
-            .Notification.Commodities.Where(x =>
-                x.CommodityCode != null && commodity.TaricCommodityCode?.StartsWith(x.CommodityCode) == true
+        var mrnCommodity = context.Commodity;
+        var chedCommodities = context
+            .DecisionContext.Notifications.SelectMany(
+                notification => notification.Commodities,
+                (notification, commodity) => new NotificationCommodity(notification.Id, commodity)
+            )
+            .Where(x =>
+                x.Commodity.CommodityCode != null
+                && mrnCommodity.TaricCommodityCode?.StartsWith(x.Commodity.CommodityCode) == true
             )
             .ToList();
 
-        if (commodity.NetMass.HasValue)
+        var commodities =
+            context.ClearanceRequest.CustomsDeclaration.ClearanceRequest?.Commodities ?? Enumerable.Empty<Commodity>();
+
+        var mrnCommodities = commodities
+            .Where(mrn =>
+                chedCommodities.Any(ched => mrn.TaricCommodityCode?.StartsWith(ched.Commodity.CommodityCode!) == true)
+            )
+            .Where(mrn =>
+                mrn.Documents != null
+                && mrn.Documents.Any(d =>
+                    d.GetDocumentReferenceIdentifier() == context.ImportDocument?.GetDocumentReferenceIdentifier()
+                )
+            )
+            .ToList();
+
+        if (mrnCommodity.NetMass.HasValue)
         {
-            if (!WeightValid(context.ClearanceRequest.MovementReferenceNumber, commodity, commodities, context.Logger))
+            if (
+                !WeightValid(
+                    context.ClearanceRequest.MovementReferenceNumber,
+                    mrnCommodity,
+                    mrnCommodities,
+                    chedCommodities,
+                    context.Logger
+                )
+            )
             {
                 var liveResult = ApplyLevel3Result(result, DecisionInternalFurtherDetail.E30);
                 if (liveResult != null)
@@ -34,8 +62,14 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
             }
         }
         else if (
-            commodity.SupplementaryUnits.HasValue
-            && !QuantityValid(context.ClearanceRequest.MovementReferenceNumber, commodity, commodities, context.Logger)
+            mrnCommodity.SupplementaryUnits.HasValue
+            && !QuantityValid(
+                context.ClearanceRequest.MovementReferenceNumber,
+                mrnCommodity,
+                mrnCommodities,
+                chedCommodities,
+                context.Logger
+            )
         )
         {
             var liveResult = ApplyLevel3Result(result, DecisionInternalFurtherDetail.E31);
@@ -83,14 +117,15 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
     private static bool QuantityValid(
         string mrn,
         Commodity commodity,
-        List<DecisionCommodityComplement> commodities,
+        List<Commodity> mrnCommodities,
+        List<NotificationCommodity> commodities,
         ILogger logger
     )
     {
-        var totalQuantity = commodities.Sum(x => x.Quantity);
+        var chedWeight = commodities.Sum(x => x.Commodity.Quantity);
 
-        var allowedQuantity = commodity.SupplementaryUnits.GetValueOrDefault();
-        var difference = allowedQuantity - totalQuantity;
+        var mrnWeight = mrnCommodities.Sum(x => x.SupplementaryUnits);
+        var difference = chedWeight - mrnWeight;
 
         if (difference < 0)
         {
@@ -99,9 +134,29 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
                 mrn,
                 commodity.TaricCommodityCode,
                 commodity.GoodsDescription,
-                allowedQuantity,
-                totalQuantity,
+                mrnWeight,
+                chedWeight,
                 difference
+            );
+
+            var mrnWeights = string.Join(
+                ", ",
+                mrnCommodities.Select(x =>
+                    $"Item: {x.ItemNumber} - Code: {x.TaricCommodityCode} - Quantity: {x.SupplementaryUnits}"
+                )
+            );
+
+            var chedWeights = string.Join(
+                ", ",
+                commodities.Select(x =>
+                    $"CHED: {x.Id} - Code: {x.Commodity.CommodityCode} - Quantity: {x.Commodity.Quantity}"
+                )
+            );
+
+            logger.LogInformation(
+                "Weights used. MRN: [{MrnQuantities}] CHED: [{ChedQuantities}]",
+                mrnWeights,
+                chedWeights
             );
         }
 
@@ -112,29 +167,47 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
     private bool WeightValid(
         string mrn,
         Commodity commodity,
-        List<DecisionCommodityComplement> commodities,
+        List<Commodity> mrnCommodities,
+        List<NotificationCommodity> commodities,
         ILogger logger
     )
     {
-        var totalWeight = commodities.Sum(x => x.Weight) ?? 0m;
-        var allowedWeight =
-            commodity.NetMass.GetValueOrDefault() + options.Value.QuantityManagementCheckNetMassTolerance;
+        var totalWeight = commodities.Sum(x => x.Commodity.Weight) ?? 0m;
+        var mrnWeight = mrnCommodities.Sum(x => x.NetMass);
+        var chedWeight = totalWeight + options.Value.QuantityManagementCheckNetMassTolerance;
 
-        var difference = allowedWeight - totalWeight;
+        var difference = chedWeight - mrnWeight;
 
         if (difference < 0)
         {
             logger.LogWarning(
-                "{MRN} would not match at Level 3 due to a discrepancy on the weight values. The item with the discrepancy is {TaricCommodityCode} & {GoodsDescription}, the weight on the MRN is {ItemNetMass}, the weight on the CHED is {ChedWeight}, the difference is {Difference}",
+                "{MRN} would not match at Level 3 due to a discrepancy on the weight values. The item with the discrepancy is {TaricCommodityCode} & {GoodsDescription}, the weight on the MRN is {ItemNetMass}, the weight on the CHED is {ChedWeight}, the difference is {Difference}, and tolerance is {Tolerance}",
                 mrn,
                 commodity.TaricCommodityCode,
                 commodity.GoodsDescription,
-                commodity.NetMass,
+                mrnWeight,
                 totalWeight,
-                difference
+                difference,
+                options.Value.QuantityManagementCheckNetMassTolerance
             );
+
+            var mrnWeights = string.Join(
+                ", ",
+                mrnCommodities.Select(x => $"Item: {x.ItemNumber} - Code: {x.TaricCommodityCode} - Weight: {x.NetMass}")
+            );
+
+            var chedWeights = string.Join(
+                ", ",
+                commodities.Select(x =>
+                    $"CHED: {x.Id} - Code: {x.Commodity.CommodityCode} - Weight: {x.Commodity.Weight}"
+                )
+            );
+
+            logger.LogInformation("Weights used. MRN: [{MrnWeights}] CHED: [{ChedWeights}]", mrnWeights, chedWeights);
         }
 
         return difference >= 0;
     }
+
+    private readonly record struct NotificationCommodity(string Id, DecisionCommodityComplement Commodity);
 }

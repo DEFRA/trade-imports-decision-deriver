@@ -134,13 +134,7 @@ These rules are shared across multiple CHED types:
 **Returns**: `X00` if CHED type doesn't match  
 **Used in**: CVEDA, CVEDP, CHEDPP, CED
 
-### 4. `MissingPartTwoDecisionRule`
-**Purpose**: Validates that the notification has Part Two data  
-**Type**: Validation  
-**Returns**: `X00` if Part Two is missing  
-**Used in**: CVEDA, CVEDP, CED
-
-### 5. `TerminalStatusDecisionRule`
+### 4. `TerminalStatusDecisionRule`
 **Purpose**: Handles terminal notification statuses  
 **Type**: Decision  
 **Returns**:
@@ -327,26 +321,24 @@ return next(context);
 1. `OrphanCheckCodeDecisionRule` - Validate check code
 2. `UnlinkedNotificationDecisionRule` - Validate linked notification
 3. `WrongChedTypeDecisionRule` - Validate CHED type
-4. `MissingPartTwoDecisionRule` - Validate Part Two
-5. `TerminalStatusDecisionRule` - Handle terminal statuses
-6. `AmendDecisionRule` - Handle Amend status
-7. `InspectionRequiredDecisionRule` - Check if inspection required
-8. `CvedaDecisionRule` - Apply CVEDA business logic
-9. `CommodityCodeValidationRule` - Log commodity code warnings
-10. `CommodityWeightOrQuantityValidationRule` - Log weight/quantity warnings
+4. `TerminalStatusDecisionRule` - Handle terminal statuses
+5. `AmendDecisionRule` - Handle Amend status
+6. `InspectionRequiredDecisionRule` - Check if inspection required
+7. `CvedaDecisionRule` - Apply CVEDA business logic
+8. `CommodityCodeValidationRule` - Log commodity code warnings
+9. `CommodityWeightOrQuantityValidationRule` - Log weight/quantity warnings
 
 ### CVEDP Pipeline (11 rules)
 1. `OrphanCheckCodeDecisionRule` - Validate check code
 2. `UnlinkedNotificationDecisionRule` - Validate linked notification
 3. `WrongChedTypeDecisionRule` - Validate CHED type
-4. `MissingPartTwoDecisionRule` - Validate Part Two
-5. `TerminalStatusDecisionRule` - Handle terminal statuses
-6. `AmendDecisionRule` - Handle Amend status
-7. `InspectionRequiredDecisionRule` - Check if inspection required
-8. `CvedpIuuCheckRule` - Check IUU violations
-9. `CvedpDecisionRule` - Apply CVEDP business logic
-10. `CommodityCodeValidationRule` - Log commodity code warnings
-11. `CommodityWeightOrQuantityValidationRule` - Log weight/quantity warnings
+4. `TerminalStatusDecisionRule` - Handle terminal statuses
+5. `AmendDecisionRule` - Handle Amend status
+6. `InspectionRequiredDecisionRule` - Check if inspection required
+7. `CvedpIuuCheckRule` - Check IUU violations
+8. `CvedpDecisionRule` - Apply CVEDP business logic
+9. `CommodityCodeValidationRule` - Log commodity code warnings
+10. `CommodityWeightOrQuantityValidationRule` - Log weight/quantity warnings
 
 ### CHEDPP Pipeline (7 rules)
 1. `OrphanCheckCodeDecisionRule` - Validate check code
@@ -361,13 +353,12 @@ return next(context);
 1. `OrphanCheckCodeDecisionRule` - Validate check code
 2. `UnlinkedNotificationDecisionRule` - Validate linked notification
 3. `WrongChedTypeDecisionRule` - Validate CHED type
-4. `MissingPartTwoDecisionRule` - Validate Part Two
-5. `TerminalStatusDecisionRule` - Handle terminal statuses
-6. `AmendDecisionRule` - Handle Amend status
-7. `InspectionRequiredDecisionRule` - Check if inspection required
-8. `CedDecisionRule` - Apply CED business logic
-9. `CommodityCodeValidationRule` - Log commodity code warnings
-10. `CommodityWeightOrQuantityValidationRule` - Log weight/quantity warnings
+4. `TerminalStatusDecisionRule` - Handle terminal statuses
+5. `AmendDecisionRule` - Handle Amend status
+6. `InspectionRequiredDecisionRule` - Check if inspection required
+7. `CedDecisionRule` - Apply CED business logic
+8. `CommodityCodeValidationRule` - Log commodity code warnings
+9. `CommodityWeightOrQuantityValidationRule` - Log weight/quantity warnings
 
 ## Decision Code Reference
 
@@ -472,7 +463,6 @@ private static DecisionRulesEngine CreateEngineForMyNewChed()
         new OrphanCheckCodeDecisionRule(),
         new UnlinkedNotificationDecisionRule(),
         new WrongChedTypeDecisionRule(ImportNotificationType.MyNewChed),
-        new MissingPartTwoDecisionRule(),
         new TerminalStatusDecisionRule(),
         new AmendDecisionRule(),
         new InspectionRequiredDecisionRule(),
@@ -535,7 +525,6 @@ src/Deriver/Decisions/V2/DecisionEngine/
     ├── OrphanCheckCodeDecisionRule.cs        # Common validation
     ├── UnlinkedNotificationDecisionRule.cs   # Common validation
     ├── WrongChedTypeDecisionRule.cs          # Common validation
-    ├── MissingPartTwoDecisionRule.cs         # Common validation
     ├── TerminalStatusDecisionRule.cs         # Common status
     ├── AmendDecisionRule.cs                  # Common status
     ├── InspectionRequiredDecisionRule.cs     # Common hold

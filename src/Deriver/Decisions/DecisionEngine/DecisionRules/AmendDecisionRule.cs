@@ -24,7 +24,7 @@ public sealed class AmendDecisionRule : IDecisionRule
 
         return IsInspectionRequired(notification)
             ? new DecisionEngineResult(DecisionCode.H02, nameof(AmendDecisionRule), DecisionInternalFurtherDetail.E80)
-            : new DecisionEngineResult(DecisionCode.H01, nameof(AmendDecisionRule), DecisionInternalFurtherDetail.E88);
+            : new DecisionEngineResult(DecisionCode.H01, nameof(AmendDecisionRule), DecisionInternalFurtherDetail.E80);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -1,39 +1,10 @@
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces;
 
-public sealed class TerminalStatusDecisionRule : IDecisionRule
+public sealed class TerminalStatusDecisionRule
+    : Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.TerminalStatusDecisionRule
 {
-    public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
+    public new DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
-        var notification = context.Ched;
-
-        return notification?.ExchangedDocument.NotificationStatusCode switch
-        {
-            ImportNotificationStatus.Cancelled => new DecisionEngineResult(
-                DecisionCode.X00,
-                nameof(TerminalStatusDecisionRule),
-                DecisionInternalFurtherDetail.E71
-            ),
-            ImportNotificationStatus.Replaced => new DecisionEngineResult(
-                DecisionCode.X00,
-                nameof(TerminalStatusDecisionRule),
-                DecisionInternalFurtherDetail.E72
-            ),
-            ImportNotificationStatus.Deleted => new DecisionEngineResult(
-                DecisionCode.X00,
-                nameof(TerminalStatusDecisionRule),
-                DecisionInternalFurtherDetail.E73
-            ),
-            ImportNotificationStatus.SplitConsignment => new DecisionEngineResult(
-                DecisionCode.X00,
-                nameof(TerminalStatusDecisionRule),
-                DecisionInternalFurtherDetail.E75
-            ),
-            ImportNotificationStatus.Modify => new DecisionEngineResult(
-                DecisionCode.H01,
-                nameof(TerminalStatusDecisionRule),
-                DecisionInternalFurtherDetail.E81
-            ),
-            _ => next(context),
-        };
+        return ExecuteInternal(context.Ched?.ExchangedDocument.NotificationStatusCode!, next);
     }
 }

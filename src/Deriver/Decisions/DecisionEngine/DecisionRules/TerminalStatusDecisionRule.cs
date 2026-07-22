@@ -4,12 +4,14 @@ public class TerminalStatusDecisionRule : IDecisionRule
 {
     public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
-        var notification = context.Notification;
-
-        return ExecuteInternal(notification.Status!, next);
+        return ExecuteInternal(context.Notification.Status!, context, next);
     }
 
-    protected DecisionEngineResult ExecuteInternal(string status, DecisionRuleDelegate next)
+    protected static DecisionEngineResult ExecuteInternal(
+        string status,
+        DecisionEngineContext context,
+        DecisionRuleDelegate next
+    )
     {
         return status switch
         {

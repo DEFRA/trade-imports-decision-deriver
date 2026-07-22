@@ -692,12 +692,13 @@ public class CommodityQuantityCheckDecisionRuleTests
         );
 
         return new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification!,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
             new CheckCode() { Value = "H222" },
-            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0]
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0],
+            null!
         )
         {
             Logger = NullLogger.Instance,

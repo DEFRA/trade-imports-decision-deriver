@@ -5,6 +5,6 @@ public sealed class TerminalStatusDecisionRule
 {
     public new DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
-        return ExecuteInternal(context.Ched?.ExchangedDocument.NotificationStatusCode!, next);
+        return ExecuteInternal(context.Ched?.ExchangedDocument.NotificationStatusCode!, context, next);
     }
 }

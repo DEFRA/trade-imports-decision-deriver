@@ -92,7 +92,7 @@ public class CommodityQuantityCheckDecisionRuleTests
             notification,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
-            new CheckCode() { Value = "H221" },
+            new CheckCode() { Value = "H222" },
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0],
             null
         )
@@ -197,7 +197,7 @@ public class CommodityQuantityCheckDecisionRuleTests
             notification,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
-            new CheckCode() { Value = "H221" },
+            new CheckCode() { Value = "H222" },
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0],
             null
         )
@@ -253,7 +253,7 @@ public class CommodityQuantityCheckDecisionRuleTests
             null!,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
-            new CheckCode() { Value = "H221" },
+            new CheckCode() { Value = "H222" },
             new ImportDocument(),
             null
         )
@@ -358,7 +358,7 @@ public class CommodityQuantityCheckDecisionRuleTests
             notification!,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
-            new CheckCode() { Value = "H221" },
+            new CheckCode() { Value = "H222" },
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0],
             null
         )
@@ -520,7 +520,7 @@ public class CommodityQuantityCheckDecisionRuleTests
                     [
                         new CommodityQuantityCheckDecisionRuleComparisonEntry
                         {
-                            CheckCode = "H221",
+                            CheckCode = "H222",
                             ComparisonType = QuantityComparisonType.Weight,
                         },
                     ],

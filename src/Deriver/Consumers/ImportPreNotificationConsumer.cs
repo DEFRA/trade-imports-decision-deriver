@@ -16,7 +16,7 @@ public class ImportPreNotificationConsumer(
     ILogger<ImportPreNotificationConsumer> logger,
     ITradeImportsDataApiClient apiClient,
     IDecisionService decisionService
-) : ChedConsumer<ImportPreNotificationEvent>(apiClient)
+) : ChedConsumer<ImportPreNotificationEvent>(apiClient, logger)
 {
     public override async Task OnHandle(
         ResourceEvent<ImportPreNotificationEvent> message,
@@ -49,41 +49,7 @@ public class ImportPreNotificationConsumer(
 
         var decisionResults = decisionService.Process(new DecisionContext(notifications, customsDeclarations, cheds));
 
-        foreach (var result in decisionResults)
-        {
-            var existingCustomsDeclaration = await ApiClient.GetCustomsDeclaration(result.Mrn, cancellationToken);
-
-            logger.LogInformation(
-                "Fetched clearance request {ResourceId} with Etag {Etag} and resource version {Version}",
-                result.Mrn,
-                existingCustomsDeclaration?.ETag,
-                existingCustomsDeclaration?.ClearanceRequest.GetVersion()
-            );
-
-            var customsDeclaration = new CustomsDeclaration
-            {
-                ClearanceDecision = existingCustomsDeclaration?.ClearanceDecision,
-                Finalisation = existingCustomsDeclaration?.Finalisation,
-                ClearanceRequest = existingCustomsDeclaration?.ClearanceRequest,
-                ExternalErrors = existingCustomsDeclaration?.ExternalErrors,
-            };
-
-            if (!result.Decision.IsSameAs(customsDeclaration.ClearanceDecision))
-            {
-                customsDeclaration.ClearanceDecision = result.Decision;
-
-                await ApiClient.PutCustomsDeclaration(
-                    result.Mrn,
-                    customsDeclaration,
-                    existingCustomsDeclaration?.ETag,
-                    cancellationToken
-                );
-            }
-            else
-            {
-                logger.LogInformation("Decision already exists, not persisting");
-            }
-        }
+        await ProcessDecisionResult(cancellationToken, decisionResults);
     }
 
     private async Task<List<CustomsDeclarationWrapper>> GetCustomsDeclarations(

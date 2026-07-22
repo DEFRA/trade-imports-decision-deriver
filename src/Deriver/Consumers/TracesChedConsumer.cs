@@ -7,8 +7,6 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
-using SlimMessageBus;
-using Trade.Gateway.Api.Contract.Certificate;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 
@@ -16,9 +14,9 @@ public class TracesChedConsumer(
     ILogger<TracesChedConsumer> logger,
     ITradeImportsDataApiClient apiClient,
     IDecisionService decisionService
-) : IConsumer<ResourceEvent<TracesChedEvent>>, IConsumerWithContext
+) : ChedConsumer<TracesChedEvent>(apiClient)
 {
-    public async Task OnHandle(ResourceEvent<TracesChedEvent> message, CancellationToken cancellationToken)
+    public override async Task OnHandle(ResourceEvent<TracesChedEvent> message, CancellationToken cancellationToken)
     {
         logger.LogInformation(
             "Received Ched {ResourceId} with version {Version}",
@@ -47,7 +45,7 @@ public class TracesChedConsumer(
 
         foreach (var result in decisionResults)
         {
-            var existingCustomsDeclaration = await apiClient.GetCustomsDeclaration(result.Mrn, cancellationToken);
+            var existingCustomsDeclaration = await ApiClient.GetCustomsDeclaration(result.Mrn, cancellationToken);
 
             logger.LogInformation(
                 "Fetched clearance request {ResourceId} with Etag {Etag} and resource version {Version}",
@@ -68,7 +66,7 @@ public class TracesChedConsumer(
             {
                 customsDeclaration.ClearanceDecision = result.Decision;
 
-                await apiClient.PutCustomsDeclaration(
+                await ApiClient.PutCustomsDeclaration(
                     result.Mrn,
                     customsDeclaration,
                     existingCustomsDeclaration?.ETag,
@@ -87,7 +85,7 @@ public class TracesChedConsumer(
         CancellationToken cancellationToken
     )
     {
-        var customsDeclarations = await apiClient.GetCustomsDeclarationsByTracesChedId(chedId, cancellationToken);
+        var customsDeclarations = await ApiClient.GetCustomsDeclarationsByTracesChedId(chedId, cancellationToken);
 
         return customsDeclarations
             .CustomsDeclarations.Where(x => x.ClearanceRequest is not null)
@@ -111,7 +109,7 @@ public class TracesChedConsumer(
             mrns,
             async (mrn, cancellationToken) =>
             {
-                var apiResponse = await apiClient.GetImportPreNotificationsByMrn(mrn, cancellationToken);
+                var apiResponse = await ApiClient.GetImportPreNotificationsByMrn(mrn, cancellationToken);
 
                 foreach (
                     var notificationResponse in apiResponse
@@ -130,34 +128,4 @@ public class TracesChedConsumer(
 
         return notifications.Select(x => x.ToDecisionImportPreNotification()).ToList();
     }
-
-    private async Task<List<DefraUNVTDCHEDProfile>> GetTracesCheds(string[] mrns)
-    {
-        var cheds = new List<DefraUNVTDCHEDProfile>();
-
-        await Parallel.ForEachAsync(
-            mrns,
-            async (mrn, cancellationToken) =>
-            {
-                var apiResponse = await apiClient.GetTracesChedsByMrn(mrn, cancellationToken);
-
-                foreach (
-                    var chedResponse in apiResponse
-                        .Cheds.Where(notificationResponse =>
-                            !cheds.Exists(x =>
-                                x.ExchangedDocument.Identifier == notificationResponse.Ched.ExchangedDocument.Identifier
-                            )
-                        )
-                        .Select(x => x.Ched)
-                )
-                {
-                    cheds.Add(chedResponse);
-                }
-            }
-        );
-
-        return cheds;
-    }
-
-    public IConsumerContext Context { get; set; } = null!;
 }

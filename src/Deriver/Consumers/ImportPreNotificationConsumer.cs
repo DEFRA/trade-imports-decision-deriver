@@ -16,9 +16,12 @@ public class ImportPreNotificationConsumer(
     ILogger<ImportPreNotificationConsumer> logger,
     ITradeImportsDataApiClient apiClient,
     IDecisionService decisionService
-) : IConsumer<ResourceEvent<ImportPreNotificationEvent>>, IConsumerWithContext
+) : ChedConsumer<ImportPreNotificationEvent>(apiClient)
 {
-    public async Task OnHandle(ResourceEvent<ImportPreNotificationEvent> message, CancellationToken cancellationToken)
+    public override async Task OnHandle(
+        ResourceEvent<ImportPreNotificationEvent> message,
+        CancellationToken cancellationToken
+    )
     {
         logger.LogInformation(
             "Received notification {ResourceId} with version {Version}",
@@ -48,7 +51,7 @@ public class ImportPreNotificationConsumer(
 
         foreach (var result in decisionResults)
         {
-            var existingCustomsDeclaration = await apiClient.GetCustomsDeclaration(result.Mrn, cancellationToken);
+            var existingCustomsDeclaration = await ApiClient.GetCustomsDeclaration(result.Mrn, cancellationToken);
 
             logger.LogInformation(
                 "Fetched clearance request {ResourceId} with Etag {Etag} and resource version {Version}",
@@ -69,7 +72,7 @@ public class ImportPreNotificationConsumer(
             {
                 customsDeclaration.ClearanceDecision = result.Decision;
 
-                await apiClient.PutCustomsDeclaration(
+                await ApiClient.PutCustomsDeclaration(
                     result.Mrn,
                     customsDeclaration,
                     existingCustomsDeclaration?.ETag,
@@ -88,7 +91,7 @@ public class ImportPreNotificationConsumer(
         CancellationToken cancellationToken
     )
     {
-        var customsDeclarations = await apiClient.GetCustomsDeclarationsByChedId(chedId, cancellationToken);
+        var customsDeclarations = await ApiClient.GetCustomsDeclarationsByChedId(chedId, cancellationToken);
 
         return customsDeclarations
             .CustomsDeclarations.Where(x => x.ClearanceRequest is not null)
@@ -115,7 +118,7 @@ public class ImportPreNotificationConsumer(
             mrns,
             async (mrn, cancellationToken) =>
             {
-                var apiResponse = await apiClient.GetImportPreNotificationsByMrn(mrn, cancellationToken);
+                var apiResponse = await ApiClient.GetImportPreNotificationsByMrn(mrn, cancellationToken);
 
                 foreach (
                     var notificationResponse in apiResponse
@@ -151,34 +154,4 @@ public class ImportPreNotificationConsumer(
 
         return notifications.Select(x => x.ToDecisionImportPreNotification()).ToList();
     }
-
-    private async Task<List<DefraUNVTDCHEDProfile>> GetTracesCheds(string[] mrns)
-    {
-        var cheds = new List<DefraUNVTDCHEDProfile>();
-
-        await Parallel.ForEachAsync(
-            mrns,
-            async (mrn, cancellationToken) =>
-            {
-                var apiResponse = await apiClient.GetTracesChedsByMrn(mrn, cancellationToken);
-
-                foreach (
-                    var chedResponse in apiResponse
-                        .Cheds.Where(notificationResponse =>
-                            !cheds.Exists(x =>
-                                x.ExchangedDocument.Identifier == notificationResponse.Ched.ExchangedDocument.Identifier
-                            )
-                        )
-                        .Select(x => x.Ched)
-                )
-                {
-                    cheds.Add(chedResponse);
-                }
-            }
-        );
-
-        return cheds;
-    }
-
-    public IConsumerContext Context { get; set; } = null!;
 }

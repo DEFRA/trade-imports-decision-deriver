@@ -82,6 +82,12 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<CommodityQuantityCheckDecisionRule>();
         services.AddSingleton<UnknownChedTypeDecisionRule>();
 
+        services.AddSingleton<Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces.TerminalStatusDecisionRule>();
+        services.AddSingleton<Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces.CvedpDecisionRule>();
+        services.AddSingleton<Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces.CedDecisionRule>();
+        services.AddSingleton<Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces.ChedppDecisionRule>();
+        services.AddSingleton<Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces.CvedaDecisionRule>();
+
         // Order of interceptors is important here
         services.AddTraceContextInterceptor();
         services.AddConsumerMetrics(MetricNames.MeterName);
@@ -95,6 +101,7 @@ public static class ServiceCollectionExtensions
             services.AddSlimMessageBus(mbb =>
             {
                 var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");
+                var tracesChedsQueueName = configuration.GetValue<string>("TRACES_CHED_EVENTS_QUEUE_NAME");
                 var consumersPerHost = configuration.GetValue<int>("CONSUMERS_PER_HOST");
 
                 mbb.AddCompressedJsonSerializer()
@@ -110,6 +117,9 @@ public static class ServiceCollectionExtensions
                     )
                     .Consume<ResourceEvent<ImportPreNotificationEvent>>(x =>
                         x.WithConsumer<ImportPreNotificationConsumer>().Queue(queueName).Instances(consumersPerHost)
+                    )
+                    .Consume<ResourceEvent<TracesChedEvent>>(x =>
+                        x.WithConsumer<TracesChedConsumer>().Queue(tracesChedsQueueName).Instances(consumersPerHost)
                     );
             });
         }

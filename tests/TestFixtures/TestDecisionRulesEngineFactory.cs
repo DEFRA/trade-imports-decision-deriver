@@ -22,13 +22,18 @@ public class TestDecisionRulesEngineFactory : IDecisionRulesEngineFactory
         .AddSingleton<CommodityCodeDecisionRule>()
         .AddSingleton<CommodityQuantityCheckDecisionRule>()
         .AddSingleton<UnknownChedTypeDecisionRule>()
+        .AddSingleton<Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces.TerminalStatusDecisionRule>()
+        .AddSingleton<Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces.CvedpDecisionRule>()
+        .AddSingleton<Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces.CedDecisionRule>()
+        .AddSingleton<Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces.ChedppDecisionRule>()
+        .AddSingleton<Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces.CvedaDecisionRule>()
         .AddOptions()
         .Configure<DecisionRulesOptions>(_ => { })
         .AddLogging()
         .BuildServiceProvider();
 
-    public DecisionRulesEngine Get(string? notificationType)
+    public DecisionRulesEngine Get(string source, string? notificationType)
     {
-        return new DecisionRulesEngineFactory(sp).Get(notificationType);
+        return new DecisionRulesEngineFactory(sp).Get(source, notificationType);
     }
 }

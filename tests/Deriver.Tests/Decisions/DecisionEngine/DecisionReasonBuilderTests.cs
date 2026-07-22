@@ -14,6 +14,7 @@ public class DecisionReasonBuilderTests
         [
             new(
                 null,
+                null!,
                 "Test",
                 1,
                 "Test1234567",
@@ -56,6 +57,7 @@ public class DecisionReasonBuilderTests
         [
             new(
                 null,
+                null!,
                 "Test",
                 1,
                 "Test1234567",
@@ -98,6 +100,7 @@ public class DecisionReasonBuilderTests
         [
             new(
                 null,
+                null!,
                 "Test",
                 1,
                 "Test1234567",
@@ -140,6 +143,7 @@ public class DecisionReasonBuilderTests
         [
             new(
                 null,
+                null!,
                 "Test",
                 1,
                 "Test Doc Ref",
@@ -186,6 +190,7 @@ public class DecisionReasonBuilderTests
         [
             new(
                 null,
+                null!,
                 "Test",
                 1,
                 "",
@@ -225,6 +230,7 @@ public class DecisionReasonBuilderTests
         [
             new(
                 null,
+                null!,
                 "Test",
                 1,
                 "Test Doc Ref",
@@ -256,6 +262,7 @@ public class DecisionReasonBuilderTests
         [
             new(
                 null,
+                null!,
                 "Test",
                 1,
                 "Test Doc Ref",

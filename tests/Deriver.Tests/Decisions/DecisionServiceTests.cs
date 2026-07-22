@@ -39,7 +39,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -82,7 +83,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -131,7 +133,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -216,7 +219,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -343,7 +347,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -575,7 +580,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -667,7 +673,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -762,7 +769,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -870,7 +878,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var sut = new DecisionService(
@@ -937,7 +946,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -1059,7 +1069,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
     }
 }

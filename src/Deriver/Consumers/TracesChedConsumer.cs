@@ -12,18 +12,18 @@ using Trade.Gateway.Api.Contract.Certificate;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 
-public class ImportPreNotificationConsumer(
-    ILogger<ImportPreNotificationConsumer> logger,
+public class TracesChedConsumer(
+    ILogger<TracesChedConsumer> logger,
     ITradeImportsDataApiClient apiClient,
     IDecisionService decisionService
-) : IConsumer<ResourceEvent<ImportPreNotificationEvent>>, IConsumerWithContext
+) : IConsumer<ResourceEvent<TracesChedEvent>>, IConsumerWithContext
 {
-    public async Task OnHandle(ResourceEvent<ImportPreNotificationEvent> message, CancellationToken cancellationToken)
+    public async Task OnHandle(ResourceEvent<TracesChedEvent> message, CancellationToken cancellationToken)
     {
         logger.LogInformation(
-            "Received notification {ResourceId} with version {Version}",
+            "Received Ched {ResourceId} with version {Version}",
             message.ResourceId,
-            message.Resource?.ImportPreNotification.GetVersion()
+            message.Resource?.Ched.GetVersion()
         );
 
         var customsDeclarations = await GetCustomsDeclarations(message.ResourceId, cancellationToken);
@@ -37,12 +37,11 @@ public class ImportPreNotificationConsumer(
             return;
         }
 
+        var cheds = await GetTracesCheds(clearanceRequests.Select(x => x.MovementReferenceNumber).Distinct().ToArray());
+
         var notifications = await GetNotifications(
-            message,
             clearanceRequests.Select(x => x.MovementReferenceNumber).Distinct().ToArray()
         );
-
-        var cheds = await GetTracesCheds(clearanceRequests.Select(x => x.MovementReferenceNumber).Distinct().ToArray());
 
         var decisionResults = decisionService.Process(new DecisionContext(notifications, customsDeclarations, cheds));
 
@@ -88,7 +87,7 @@ public class ImportPreNotificationConsumer(
         CancellationToken cancellationToken
     )
     {
-        var customsDeclarations = await apiClient.GetCustomsDeclarationsByChedId(chedId, cancellationToken);
+        var customsDeclarations = await apiClient.GetCustomsDeclarationsByTracesChedId(chedId, cancellationToken);
 
         return customsDeclarations
             .CustomsDeclarations.Where(x => x.ClearanceRequest is not null)
@@ -104,10 +103,7 @@ public class ImportPreNotificationConsumer(
             .ToList();
     }
 
-    private async Task<List<DecisionImportPreNotification>> GetNotifications(
-        ResourceEvent<ImportPreNotificationEvent> message,
-        string[] mrns
-    )
+    private async Task<List<DecisionImportPreNotification>> GetNotifications(string[] mrns)
     {
         var notifications = new List<ImportPreNotification>();
 
@@ -128,23 +124,6 @@ public class ImportPreNotificationConsumer(
                 )
                 {
                     notifications.Add(notificationResponse);
-
-                    if (message.ResourceId == notificationResponse.ReferenceNumber)
-                    {
-                        if (message.Resource?.ImportPreNotification.GetVersion() != notificationResponse.GetVersion())
-                        {
-                            logger.LogInformation(
-                                message.Resource?.ImportPreNotification.UpdatedSource.TrimMicroseconds()
-                                > notificationResponse.UpdatedSource.TrimMicroseconds()
-                                    ? "ImportPreNotification ResourceEvent version does not match API response : ResourceEvent is newer"
-                                    : "ImportPreNotification ResourceEvent version does not match API response : API response is newer"
-                            );
-                        }
-                    }
-                    else
-                    {
-                        logger.LogInformation("ImportPreNotification ResourceEvent version matches API response");
-                    }
                 }
             }
         );

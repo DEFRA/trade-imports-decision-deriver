@@ -1,9 +1,11 @@
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
+using Trade.Gateway.Api.Contract.Certificate;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 
 public record CheckDecisionResult(
     DecisionImportPreNotification? PreNotification,
+    DefraUNVTDCHEDProfile? Ched,
     string Mrn,
     int ItemNumber,
     string? DocumentReference,

@@ -31,12 +31,13 @@ public class TerminalStatusDecisionRuleTests
         // Arrange
         var notification = DecisionImportPreNotificationBuilder.Create().WithId("Test").WithStatus(status).Build();
         var context = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,

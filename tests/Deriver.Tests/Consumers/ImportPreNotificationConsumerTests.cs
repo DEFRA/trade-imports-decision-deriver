@@ -63,6 +63,10 @@ public class ImportPreNotificationConsumerTests
             .Returns(new CustomsDeclarationsResponse([customsDeclaration]));
 
         apiClient
+            .GetTracesChedsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
+            .Returns(new TracesChedsResponse([]));
+
+        apiClient
             .GetImportPreNotificationsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
             .Returns(
                 new ImportPreNotificationsResponse([
@@ -82,7 +86,7 @@ public class ImportPreNotificationConsumerTests
         await consumer.OnHandle(createdEvent, CancellationToken.None);
 
         // ASSERT
-        apiClient.ReceivedCalls().Count().Should().Be(4);
+        apiClient.ReceivedCalls().Count().Should().Be(5);
     }
 
     [Fact]
@@ -106,6 +110,10 @@ public class ImportPreNotificationConsumerTests
             .Returns(new CustomsDeclarationsResponse([customsDeclaration]));
 
         apiClient
+            .GetTracesChedsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
+            .Returns(new TracesChedsResponse([]));
+
+        apiClient
             .GetImportPreNotificationsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
             .Returns(
                 new ImportPreNotificationsResponse([
@@ -125,7 +133,7 @@ public class ImportPreNotificationConsumerTests
         await consumer.OnHandle(createdEvent, CancellationToken.None);
 
         // ASSERT
-        apiClient.ReceivedCalls().Count().Should().Be(4);
+        apiClient.ReceivedCalls().Count().Should().Be(5);
     }
 
     [Fact]
@@ -204,6 +212,10 @@ public class ImportPreNotificationConsumerTests
             .Returns(customsDeclaration);
 
         apiClient
+            .GetTracesChedsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
+            .Returns(new TracesChedsResponse([]));
+
+        apiClient
             .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
             .Returns(new CustomsDeclarationsResponse([customsDeclaration]));
 
@@ -228,7 +240,7 @@ public class ImportPreNotificationConsumerTests
         await consumer.OnHandle(createdEvent, CancellationToken.None);
 
         // ASSERT
-        apiClient.ReceivedCalls().Count().Should().Be(3);
+        apiClient.ReceivedCalls().Count().Should().Be(4);
     }
 
     [Fact]

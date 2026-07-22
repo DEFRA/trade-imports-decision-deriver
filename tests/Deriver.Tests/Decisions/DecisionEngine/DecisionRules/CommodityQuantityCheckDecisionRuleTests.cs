@@ -80,12 +80,13 @@ public class CommodityQuantityCheckDecisionRuleTests
             );
 
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], [customsDeclaration]),
+            new DecisionContext([notification], [customsDeclaration], []),
             notification,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
             new CheckCode() { Value = "H221" },
-            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0]
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0],
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -177,12 +178,13 @@ public class CommodityQuantityCheckDecisionRuleTests
             );
 
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], [customsDeclaration]),
+            new DecisionContext([notification], [customsDeclaration], []),
             notification,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
             new CheckCode() { Value = "H221" },
-            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0]
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0],
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -225,12 +227,13 @@ public class CommodityQuantityCheckDecisionRuleTests
         _mockNext(Arg.Any<DecisionEngineContext>()).Returns(result);
 
         var c = new DecisionEngineContext(
-            new DecisionContext([], []),
+            new DecisionContext([], [], []),
             null!,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -322,12 +325,13 @@ public class CommodityQuantityCheckDecisionRuleTests
         _mockNext(Arg.Any<DecisionEngineContext>()).Returns(result);
 
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], [customsDeclaration]),
+            new DecisionContext([notification], [customsDeclaration], []),
             notification!,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
             new CheckCode() { Value = "H221" },
-            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0]
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0],
+            null
         )
         {
             Logger = NullLogger.Instance,

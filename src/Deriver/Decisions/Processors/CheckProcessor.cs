@@ -1,6 +1,7 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
+using Trade.Gateway.Api.Contract.Certificate;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 
@@ -31,7 +32,6 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
 
         var output = new List<CheckDecisionResult>(documents.Length);
         var foundValidDocument = false;
-        var decisionEngine = decisionRulesEngineFactory.Get(checkCode.GetImportNotificationType());
 
         for (var i = 0; i < documents.Length; i++)
         {
@@ -47,6 +47,8 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
             var documentCode = document.DocumentCode!;
             var documentIdentifier = document.GetDocumentReferenceIdentifier();
 
+            var cheds = FindTrachesCheds(context.Cheds, documentIdentifier!);
+
             var notifications = FindDecisionImportPreNotification(
                 context.Notifications,
                 documentCode,
@@ -55,18 +57,10 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
 
             var decisionImportPreNotifications =
                 notifications as DecisionImportPreNotification[] ?? notifications.ToArray();
-            if (decisionImportPreNotifications.Any())
+            if (decisionImportPreNotifications.Any() || cheds.Any())
             {
                 output.AddRange(
-                    ProcessNotification(
-                        context,
-                        clearanceRequest,
-                        commodity,
-                        notifications,
-                        checkCode,
-                        document,
-                        decisionEngine
-                    )
+                    ProcessNotification(context, clearanceRequest, commodity, notifications, checkCode, document, cheds)
                 );
             }
             else
@@ -77,13 +71,15 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                     clearanceRequest,
                     commodity,
                     checkCode,
-                    document
+                    document,
+                    null
                 );
 
-                var result = decisionEngine.Run(resolverContext);
+                var result = RunEngine("UNKNOWN", checkCode, resolverContext);
                 output.Add(
                     new CheckDecisionResult(
                         null,
+                        null!,
                         clearanceRequest.MovementReferenceNumber,
                         commodity.ItemNumber!.Value,
                         document.DocumentReference?.Value,
@@ -107,13 +103,15 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
                 clearanceRequest,
                 commodity,
                 checkCode,
+                null,
                 null
             );
 
-            var result = decisionEngine.Run(resolverContext);
+            var result = RunEngine("UNKNOWN", checkCode, resolverContext);
             output.Add(
                 new CheckDecisionResult(
                     null,
+                    null!,
                     clearanceRequest.MovementReferenceNumber,
                     commodity.ItemNumber!.Value,
                     string.Empty,
@@ -131,69 +129,138 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
         return output.Distinct().ToList();
     }
 
-    private static List<CheckDecisionResult> ProcessNotification(
+    private List<CheckDecisionResult> ProcessNotification(
         DecisionContext context,
         CustomsDeclarationWrapper clearanceRequest,
         Commodity commodity,
         IEnumerable<DecisionImportPreNotification> notifications,
         CheckCode checkCode,
         ImportDocument document,
-        DecisionRulesEngine decisionEngine
+        ////DecisionRulesEngine decisionEngine,
+        IEnumerable<DefraUNVTDCHEDProfile> cheds
     )
     {
         var output = new List<CheckDecisionResult>();
-        foreach (var notification in notifications)
+        if (cheds.Any())
         {
-            var resolverContext = new DecisionEngineContext(
-                context,
-                notification,
-                clearanceRequest,
-                commodity,
-                checkCode,
-                document
-            );
-
-            var result = decisionEngine.Run(resolverContext);
-            output.Add(
-                new CheckDecisionResult(
-                    notification,
-                    clearanceRequest.MovementReferenceNumber,
-                    commodity.ItemNumber!.Value,
-                    document.DocumentReference?.Value,
-                    document.DocumentCode,
-                    checkCode.Value,
-                    result.Code,
-                    result.RuleName,
-                    result.Mode,
-                    result.Level,
-                    result.FurtherDetail
-                )
-            );
-
-            if (result.PassiveResults != null)
+            foreach (var ched in cheds)
             {
-                foreach (var passiveResult in result.PassiveResults)
+                var resolverContext = new DecisionEngineContext(
+                    context,
+                    null!,
+                    clearanceRequest,
+                    commodity,
+                    checkCode,
+                    document,
+                    ched
+                );
+
+                var result = RunEngine("TRACES", checkCode, resolverContext);
+                output.Add(
+                    new CheckDecisionResult(
+                        null,
+                        ched,
+                        clearanceRequest.MovementReferenceNumber,
+                        commodity.ItemNumber!.Value,
+                        document.DocumentReference?.Value,
+                        document.DocumentCode,
+                        checkCode.Value,
+                        result.Code,
+                        result.RuleName,
+                        result.Mode,
+                        result.Level,
+                        result.FurtherDetail
+                    )
+                );
+
+                if (result.PassiveResults != null)
                 {
-                    output.Add(
-                        new CheckDecisionResult(
-                            notification,
-                            clearanceRequest.MovementReferenceNumber,
-                            commodity.ItemNumber!.Value,
-                            document.DocumentReference?.Value,
-                            document.DocumentCode,
-                            checkCode.Value,
-                            passiveResult.Code,
-                            passiveResult.RuleName,
-                            passiveResult.Mode,
-                            passiveResult.Level,
-                            passiveResult.FurtherDetail
-                        )
-                    );
+                    foreach (var passiveResult in result.PassiveResults)
+                    {
+                        output.Add(
+                            new CheckDecisionResult(
+                                null,
+                                ched,
+                                clearanceRequest.MovementReferenceNumber,
+                                commodity.ItemNumber!.Value,
+                                document.DocumentReference?.Value,
+                                document.DocumentCode,
+                                checkCode.Value,
+                                passiveResult.Code,
+                                passiveResult.RuleName,
+                                passiveResult.Mode,
+                                passiveResult.Level,
+                                passiveResult.FurtherDetail
+                            )
+                        );
+                    }
+                }
+            }
+        }
+        else
+        {
+            foreach (var notification in notifications)
+            {
+                var resolverContext = new DecisionEngineContext(
+                    context,
+                    notification,
+                    clearanceRequest,
+                    commodity,
+                    checkCode,
+                    document,
+                    null
+                );
+
+                var result = RunEngine("IPAFFS", checkCode, resolverContext);
+                output.Add(
+                    new CheckDecisionResult(
+                        notification,
+                        null,
+                        clearanceRequest.MovementReferenceNumber,
+                        commodity.ItemNumber!.Value,
+                        document.DocumentReference?.Value,
+                        document.DocumentCode,
+                        checkCode.Value,
+                        result.Code,
+                        result.RuleName,
+                        result.Mode,
+                        result.Level,
+                        result.FurtherDetail
+                    )
+                );
+
+                if (result.PassiveResults != null)
+                {
+                    foreach (var passiveResult in result.PassiveResults)
+                    {
+                        output.Add(
+                            new CheckDecisionResult(
+                                notification,
+                                null,
+                                clearanceRequest.MovementReferenceNumber,
+                                commodity.ItemNumber!.Value,
+                                document.DocumentReference?.Value,
+                                document.DocumentCode,
+                                checkCode.Value,
+                                passiveResult.Code,
+                                passiveResult.RuleName,
+                                passiveResult.Mode,
+                                passiveResult.Level,
+                                passiveResult.FurtherDetail
+                            )
+                        );
+                    }
                 }
             }
         }
 
         return output;
+    }
+
+    private DecisionEngineResult RunEngine(string source, CheckCode checkCode, DecisionEngineContext context)
+    {
+        var decisionEngine = decisionRulesEngineFactory.Get(source, checkCode.GetImportNotificationType());
+        return decisionEngine.Run(context);
     }
 
     private static IEnumerable<DecisionImportPreNotification> FindDecisionImportPreNotification(
@@ -205,6 +272,16 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
         return from candidate in notifications
             let candidateIdentifier = new ImportDocumentReference(candidate.Id!).GetIdentifier(documentCode)
             where candidateIdentifier == documentIdentifier
+            select candidate;
+    }
+
+    private static IEnumerable<DefraUNVTDCHEDProfile> FindTrachesCheds(
+        List<DefraUNVTDCHEDProfile> cheds,
+        string documentIdentifier
+    )
+    {
+        return from candidate in cheds
+            where candidate.ExchangedDocument.Identifier == documentIdentifier
             select candidate;
     }
 }

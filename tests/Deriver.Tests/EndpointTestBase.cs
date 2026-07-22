@@ -1,5 +1,9 @@
 using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using Defra.TradeImports.Api.Auth;
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
+using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +32,13 @@ public class EndpointTestBase : IClassFixture<ApiWebApplicationFactory>
     /// Use this to override DI services.
     /// </summary>
     /// <param name="services"></param>
-    protected virtual void ConfigureTestServices(IServiceCollection services) { }
+    protected virtual void ConfigureTestServices(IServiceCollection services)
+    {
+        services.Configure<DecisionRulesOptions>(c =>
+            c.CommodityQuantityCheckDecisionRule =
+                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions()
+        );
+    }
 
     protected HttpClient CreateClient(bool addDefaultAuthorizationHeader = true, TestUser testUser = TestUser.ReadWrite)
     {

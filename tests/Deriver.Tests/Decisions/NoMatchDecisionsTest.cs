@@ -512,7 +512,6 @@ public class NoMatchDecisionsTest
                     IuuCheckRequired = null,
                     IuuOption = null,
                     NotAcceptableReasons = null,
-                    HasPartTwo = true,
                 },
             ],
             [

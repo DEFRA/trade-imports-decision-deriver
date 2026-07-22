@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
@@ -15,6 +16,8 @@ public sealed class DecisionRulesOptions
     public RuleMode Level2Mode { get; set; } = RuleMode.DryRun;
 
     public RuleMode Level3Mode { get; set; } = RuleMode.DryRun;
+
+    public CommodityQuantityCheckDecisionRuleOptions CommodityQuantityCheckDecisionRule { get; set; } = new();
 }
 
 [ExcludeFromCodeCoverage]
@@ -28,4 +31,48 @@ public enum RuleMode
 {
     DryRun,
     Live,
+}
+
+[ExcludeFromCodeCoverage]
+public sealed class CommodityQuantityCheckDecisionRuleOptions
+{
+    public CommodityQuantityCheckDecisionRuleScoringOptions Scoring { get; init; } = new();
+
+    public List<CommodityQuantityCheckDecisionRuleComparisonEntry> ComparisonEntries { get; init; } = [];
+}
+
+[ExcludeFromCodeCoverage]
+public sealed class CommodityQuantityCheckDecisionRuleScoringOptions
+{
+    [Required]
+    public int CommodityWeight { get; init; } = 100;
+
+    [Required]
+    public int CheckCodeWeight { get; init; } = 10;
+
+    [Required]
+    public int ChedTypeWeight { get; init; } = 1;
+}
+
+public enum QuantityComparisonType
+{
+    Weight,
+    Quantity,
+}
+
+[ExcludeFromCodeCoverage]
+public sealed class CommodityQuantityCheckDecisionRuleComparisonEntry
+{
+    public string? ChedType { get; init; }
+    public string? CheckCode { get; init; }
+    public string? CommodityCode { get; init; }
+
+    public QuantityComparisonType ComparisonType { get; init; }
+
+    public bool UseFallback { get; init; } = true;
+
+    public override string ToString()
+    {
+        return $"ChedType: {ChedType ?? "Any"}, CheckCode: {CheckCode ?? "Any"}, CommodityCode: {CommodityCode ?? "Any"}, ComparisonType: {ComparisonType}, UseFallback: {UseFallback}";
+    }
 }

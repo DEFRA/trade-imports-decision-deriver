@@ -93,8 +93,7 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output, WireMock
 
         mappingBuilder.Given(m =>
             m.WithRequest(req =>
-                    req.UsingGet()
-                        .WithPath($"/customs-declarations/{customsDeclaration.ResourceId}/traces-cheds")
+                    req.UsingGet().WithPath($"/customs-declarations/{customsDeclaration.ResourceId}/traces-cheds")
                 )
                 .WithResponse(rsp =>
                     rsp.WithBody(JsonSerializer.Serialize(new TracesChedsResponse([])))
@@ -178,8 +177,7 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output, WireMock
 
         mappingBuilder.Given(m =>
             m.WithRequest(req =>
-                    req.UsingGet()
-                        .WithPath($"/customs-declarations/{customsDeclaration.ResourceId}/traces-cheds")
+                    req.UsingGet().WithPath($"/customs-declarations/{customsDeclaration.ResourceId}/traces-cheds")
                 )
                 .WithResponse(rsp =>
                     rsp.WithBody(JsonSerializer.Serialize(new TracesChedsResponse([])))

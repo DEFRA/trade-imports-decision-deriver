@@ -8,6 +8,7 @@ using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using SlimMessageBus.Host;
+using Trade.Gateway.Api.Contract.Certificate;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Consumers;
 
@@ -64,7 +65,19 @@ public class TracesChedConsumerTests
 
         apiClient
             .GetTracesChedsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
-            .Returns(new TracesChedsResponse([]));
+            .Returns(
+                new TracesChedsResponse([
+                    new TracesChedResponse(
+                        new DefraUNVTDCHEDProfile()
+                        {
+                            ExchangedDocument = new ExchangedDocument() { Identifier = "Test" },
+                            SpecifiedConsignment = new Consignment(),
+                        },
+                        DateTime.Now,
+                        DateTime.Now
+                    ),
+                ])
+            );
 
         apiClient
             .GetImportPreNotificationsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())

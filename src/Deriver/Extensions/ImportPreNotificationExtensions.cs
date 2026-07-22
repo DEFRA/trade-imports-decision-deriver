@@ -15,6 +15,7 @@ public static class TracesChedExtensions
 {
     public static string GetVersion(this DefraUNVTDCHEDProfile certificate)
     {
-        return $"{certificate.ExchangedDocument.Identifier}_{certificate.ExchangedDocument.NotificationStatusCode}_{certificate.ExchangedDocument.IncludedNote![0].CreationDateTime}";
+        var lastUpdated = certificate.ExchangedDocument.IncludedNote?.FirstOrDefault(x => x.Subject == "LAST_UPDATED");
+        return $"{certificate.ExchangedDocument.Identifier}_{certificate.ExchangedDocument.NotificationStatusCode}_{lastUpdated?.CreationDateTime}";
     }
 }

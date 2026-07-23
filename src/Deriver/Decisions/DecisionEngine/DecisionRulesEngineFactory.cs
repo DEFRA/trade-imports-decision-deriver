@@ -24,7 +24,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
 
     public DecisionRulesEngine Get(string source, string? notificationType)
     {
-        var key = notificationType ?? "Unknown";
+        var key = $"{source}_{notificationType ?? "Unknown"}";
 
         // Use a switch or mapping based on notificationType to resolve the correct set of rules.
         return _cache.GetOrAdd(

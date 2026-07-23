@@ -47,7 +47,7 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
             var documentCode = document.DocumentCode!;
             var documentIdentifier = document.GetDocumentReferenceIdentifier();
 
-            var cheds = FindTrachesCheds(context.Cheds, documentIdentifier!);
+            var cheds = FindTrachesCheds(context.Cheds, document.DocumentReference?.Value!);
 
             var notifications = FindDecisionImportPreNotification(
                 context.Notifications,

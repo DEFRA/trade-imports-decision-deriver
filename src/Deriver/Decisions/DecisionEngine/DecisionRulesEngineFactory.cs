@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces;
 using Microsoft.Extensions.Options;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
@@ -59,8 +60,8 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
     {
         var rules = new List<IDecisionRule>
         {
-            AddRule<DecisionRules.Traces.TerminalStatusDecisionRule>(),
-            AddRule<DecisionRules.Traces.CvedaDecisionRule>(),
+            AddRule<TracesTerminalStatusDecisionRule>(),
+            AddRule<TracesCvedaDecisionRule>(),
         };
 
         return new DecisionRulesEngine(
@@ -75,8 +76,8 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
     {
         var rules = new List<IDecisionRule>
         {
-            AddRule<DecisionRules.Traces.TerminalStatusDecisionRule>(),
-            AddRule<DecisionRules.Traces.CvedpDecisionRule>(),
+            AddRule<TracesTerminalStatusDecisionRule>(),
+            AddRule<TracesCvedpDecisionRule>(),
         };
 
         return new DecisionRulesEngine(
@@ -91,8 +92,8 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
     {
         var rules = new List<IDecisionRule>
         {
-            AddRule<DecisionRules.Traces.TerminalStatusDecisionRule>(),
-            AddRule<DecisionRules.Traces.ChedppDecisionRule>(),
+            AddRule<TracesTerminalStatusDecisionRule>(),
+            AddRule<TracesChedppDecisionRule>(),
         };
 
         return new DecisionRulesEngine(
@@ -107,8 +108,8 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
     {
         var rules = new List<IDecisionRule>
         {
-            AddRule<DecisionRules.Traces.TerminalStatusDecisionRule>(),
-            AddRule<DecisionRules.Traces.CedDecisionRule>(),
+            AddRule<TracesTerminalStatusDecisionRule>(),
+            AddRule<TracesCedDecisionRule>(),
         };
 
         return new DecisionRulesEngine(

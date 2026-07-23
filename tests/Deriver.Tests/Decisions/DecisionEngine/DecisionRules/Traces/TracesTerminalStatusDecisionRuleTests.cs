@@ -8,7 +8,7 @@ using Trade.Gateway.Api.Contract.Certificate;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions.DecisionEngine.DecisionRules.Traces;
 
-public class TerminalStatusDecisionRuleTests
+public class TracesTerminalStatusDecisionRuleTests
 {
     [Theory]
     [InlineData(ImportNotificationStatus.Cancelled, DecisionCode.X00, DecisionInternalFurtherDetail.E71)]
@@ -52,7 +52,7 @@ public class TerminalStatusDecisionRuleTests
         };
 
         // Act
-        var result = new TerminalStatusDecisionRule().Execute(
+        var result = new TracesTerminalStatusDecisionRule().Execute(
             context,
             engineContext => new DecisionEngineResult(DecisionCode.C02, "Test")
         );

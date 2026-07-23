@@ -2,7 +2,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.Dec
 
 public class TerminalStatusDecisionRule : IDecisionRule
 {
-    public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
+    public virtual DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
         return ExecuteInternal(context.Notification.Status!, context, next);
     }

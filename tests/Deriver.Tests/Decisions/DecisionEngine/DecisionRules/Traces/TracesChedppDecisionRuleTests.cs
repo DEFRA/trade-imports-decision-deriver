@@ -8,7 +8,7 @@ using Trade.Gateway.Api.Contract.Certificate;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions.DecisionEngine.DecisionRules.Traces;
 
-public class CvedpDecisionRuleTests
+public class TracesChedppDecisionRuleTests
 {
     [Fact]
     public void Execute_Test()
@@ -40,7 +40,7 @@ public class CvedpDecisionRuleTests
         };
 
         // Act
-        var result = new CvedpDecisionRule().Execute(
+        var result = new TracesChedppDecisionRule().Execute(
             context,
             engineContext => new DecisionEngineResult(DecisionCode.C02, "Test")
         );

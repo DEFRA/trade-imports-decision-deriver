@@ -12,6 +12,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
@@ -82,11 +83,11 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<CommodityQuantityCheckDecisionRule>();
         services.AddSingleton<UnknownChedTypeDecisionRule>();
 
-        services.AddSingleton<Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces.TerminalStatusDecisionRule>();
-        services.AddSingleton<Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces.CvedpDecisionRule>();
-        services.AddSingleton<Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces.CedDecisionRule>();
-        services.AddSingleton<Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces.ChedppDecisionRule>();
-        services.AddSingleton<Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces.CvedaDecisionRule>();
+        services.AddSingleton<TracesTerminalStatusDecisionRule>();
+        services.AddSingleton<TracesCvedpDecisionRule>();
+        services.AddSingleton<TracesCedDecisionRule>();
+        services.AddSingleton<TracesChedppDecisionRule>();
+        services.AddSingleton<TracesCvedaDecisionRule>();
 
         // Order of interceptors is important here
         services.AddTraceContextInterceptor();

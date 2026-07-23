@@ -2,13 +2,12 @@ using System.Runtime.CompilerServices;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
-using Microsoft.Extensions.Options;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
-public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOptions> options) : IDecisionRule
+public sealed class CommodityQuantityCheckDecisionRule : DecisionRule
 {
-    public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
+    protected override DecisionEngineResult DoExecute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
         var result = next(context);
 
@@ -66,7 +65,7 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
                     : DecisionInternalFurtherDetail.E31,
             };
 
-            var liveResult = ApplyLevel3Result(result, detail);
+            var liveResult = ApplyLevel3Result(result, detail, context.DecisionRulesOptions.Level3Mode);
 
             if (liveResult != null)
             {
@@ -97,6 +96,7 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
                             commodity,
                             mrnCommodities,
                             chedCommodities,
+                            context.DecisionRulesOptions.QuantityManagementCheckNetMassTolerance,
                             context.Logger
                         ),
                         QuantityComparisonType.Weight
@@ -144,11 +144,17 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
         var chedType = context.Notification.ImportNotificationType;
         var checkCode = context.CheckCode.Value;
 
-        var rule = options
-            .Value.CommodityQuantityCheckDecisionRule.ComparisonEntries.Select(rule => new
+        var rule = context
+            .DecisionRulesOptions.CommodityQuantityCheckDecisionRule.ComparisonEntries.Select(rule => new
             {
                 Rule = rule,
-                Score = CalculateScore(rule, chedType, checkCode, commodityCode),
+                Score = CalculateScore(
+                    context.DecisionRulesOptions.CommodityQuantityCheckDecisionRule.Scoring,
+                    rule,
+                    chedType,
+                    checkCode,
+                    commodityCode
+                ),
             })
             .Where(x => x.Score >= 0)
             .OrderByDescending(x => x.Score)
@@ -158,15 +164,14 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
         return rule;
     }
 
-    private int CalculateScore(
+    private static int CalculateScore(
+        CommodityQuantityCheckDecisionRuleScoringOptions scoring,
         CommodityQuantityCheckDecisionRuleComparisonEntry rule,
         string? chedType,
         string? checkCode,
         string? commodityCode
     )
     {
-        var scoring = options.Value.CommodityQuantityCheckDecisionRule.Scoring;
-
         var score = 0;
 
         if (rule.ChedType is not null && string.Equals(rule.ChedType, chedType, StringComparison.OrdinalIgnoreCase))
@@ -190,11 +195,12 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
         return score;
     }
 
-    private DecisionEngineResult? ApplyLevel3Result(
+    private static DecisionEngineResult? ApplyLevel3Result(
         DecisionEngineResult result,
-        DecisionInternalFurtherDetail furtherDetail
+        DecisionInternalFurtherDetail furtherDetail,
+        RuleMode mode
     ) =>
-        options.Value.Level3Mode switch
+        mode switch
         {
             RuleMode.DryRun => AddPassiveResult(result, furtherDetail),
             RuleMode.Live => new DecisionEngineResult(
@@ -281,13 +287,14 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
         Commodity commodity,
         List<Commodity> mrnCommodities,
         List<NotificationCommodity> commodities,
+        decimal? tolerance,
         ILogger logger
     )
     {
         var totalWeight = commodities.Sum(x => x.Commodity.Weight) ?? 0m;
         var mrnWeight = mrnCommodities.Sum(x => x.NetMass);
 
-        var chedWeight = totalWeight + options.Value.QuantityManagementCheckNetMassTolerance;
+        var chedWeight = totalWeight + tolerance;
 
         var difference = chedWeight - mrnWeight;
 
@@ -301,7 +308,7 @@ public sealed class CommodityQuantityCheckDecisionRule(IOptions<DecisionRulesOpt
                 mrnWeight,
                 totalWeight,
                 difference,
-                options.Value.QuantityManagementCheckNetMassTolerance
+                tolerance
             );
 
             var mrnWeights = string.Join(

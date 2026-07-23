@@ -6,6 +6,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
+using Microsoft.Extensions.Options;
 using ClearanceDecisionBuilder = Defra.TradeImportsDecisionDeriver.Deriver.Decisions.ClearanceDecisionBuilder;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions;
@@ -31,7 +32,7 @@ public class NoMatchDecisionsTest
 
         var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("test")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -70,7 +71,7 @@ public class NoMatchDecisionsTest
 
         var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -108,7 +109,7 @@ public class NoMatchDecisionsTest
 
         var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -140,7 +141,7 @@ public class NoMatchDecisionsTest
 
         var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -205,7 +206,7 @@ public class NoMatchDecisionsTest
 
         var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         var decisionResult = sut.Process(decisionContext);
@@ -253,7 +254,7 @@ public class NoMatchDecisionsTest
 
         var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         var decisionResult = sut.Process(decisionContext);
@@ -318,7 +319,7 @@ public class NoMatchDecisionsTest
 
         var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -371,7 +372,7 @@ public class NoMatchDecisionsTest
 
         var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -425,7 +426,7 @@ public class NoMatchDecisionsTest
 
         var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -475,7 +476,7 @@ public class NoMatchDecisionsTest
 
         var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -559,7 +560,7 @@ public class NoMatchDecisionsTest
 
         var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -635,7 +636,7 @@ public class NoMatchDecisionsTest
 
         var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("Test")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act

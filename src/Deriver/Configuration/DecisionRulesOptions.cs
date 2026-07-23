@@ -25,6 +25,10 @@ public sealed class DecisionRulesPerChedOptions
 {
     // Class names of rules to disable for this CHED (e.g. "CommodityCodeValidationRule")
     public IEnumerable<string> DisabledRules { get; set; } = Array.Empty<string>();
+
+    public IEnumerable<string> DisabledForEu { get; set; } = Array.Empty<string>();
+
+    public IEnumerable<string> DisabledForRoW { get; set; } = Array.Empty<string>();
 }
 
 public enum RuleMode
@@ -75,4 +79,44 @@ public sealed class CommodityQuantityCheckDecisionRuleComparisonEntry
     {
         return $"ChedType: {ChedType ?? "Any"}, CheckCode: {CheckCode ?? "Any"}, CommodityCode: {CommodityCode ?? "Any"}, ComparisonType: {ComparisonType}, UseFallback: {UseFallback}";
     }
+}
+
+public static class Region
+{
+    private static readonly string[] s_eu =
+    [
+        "AT",
+        "BE",
+        "BG",
+        "HR",
+        "CY",
+        "CZ",
+        "DK",
+        "EE",
+        "FI",
+        "FR",
+        "DE",
+        "GR",
+        "HU",
+        "IS",
+        "IE",
+        "IT",
+        "LV",
+        "LI",
+        "LT",
+        "LU",
+        "MT",
+        "NL",
+        "NO",
+        "PL",
+        "PT",
+        "RO",
+        "SK",
+        "SI",
+        "ES",
+        "SE",
+        "CH",
+    ];
+
+    public static bool IsEu(string? region) => s_eu.Contains(region);
 }

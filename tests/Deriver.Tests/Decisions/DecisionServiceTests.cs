@@ -957,7 +957,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
             new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
-        // Act
+        // Act -c
         var decisionResult = decisionService.Process(decisionContext);
 
         decisionResult.Should().NotBeNull();

@@ -31,7 +31,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             key,
             k =>
             {
-                return k switch
+                return notificationType switch
                 {
                     ImportNotificationType.Cveda => source == "TRACES"
                         ? CreateEngineForTracesCveda(k)

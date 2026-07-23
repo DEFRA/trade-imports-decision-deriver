@@ -142,7 +142,7 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
         var output = new List<CheckDecisionResult>();
         if (cheds.Any())
         {
-            ProcessChed(context, clearanceRequest, commodity, checkCode, document, cheds, output);
+            ProcessCheds(context, clearanceRequest, commodity, checkCode, document, cheds, output);
         }
         else
         {
@@ -225,7 +225,7 @@ public class CheckProcessor(IDecisionRulesEngineFactory decisionRulesEngineFacto
         }
     }
 
-    private void ProcessChed(
+    private void ProcessCheds(
         DecisionContext context,
         CustomsDeclarationWrapper clearanceRequest,
         Commodity commodity,

@@ -178,7 +178,6 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         new DecisionCommodityCheck.Check() { Type = "PHSI_IDENTITY", Status = "Auto cleared" },
                         new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "Auto cleared" },
                     ],
-                    HasPartTwo = true,
                 },
             ],
             [
@@ -260,7 +259,6 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         new DecisionCommodityCheck.Check() { Type = "PHSI_IDENTITY", Status = "Auto cleared" },
                         new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "Auto cleared" },
                     ],
-                    HasPartTwo = true,
                     Commodities =
                     [
                         new DecisionCommodityComplement()
@@ -288,7 +286,6 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         new DecisionCommodityCheck.Check() { Type = "PHSI_IDENTITY", Status = "Auto cleared" },
                         new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "Auto cleared" },
                     ],
-                    HasPartTwo = true,
                 },
             ],
             [
@@ -540,7 +537,6 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         new DecisionCommodityCheck.Check() { Type = "PHSI_IDENTITY", Status = "Auto cleared" },
                         new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "Auto cleared" },
                     ],
-                    HasPartTwo = true,
                 },
             ],
             [
@@ -633,7 +629,6 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "To do" },
                         new DecisionCommodityCheck.Check() { Type = "HMI", Status = "Auto cleared" },
                     ],
-                    HasPartTwo = true,
                 },
             ],
             [
@@ -726,7 +721,6 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "To do" },
                         new DecisionCommodityCheck.Check() { Type = "HMI", Status = "Auto cleared" },
                     ],
-                    HasPartTwo = true,
                 },
             ],
             [
@@ -827,7 +821,6 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         new DecisionCommodityCheck.Check() { Type = "PHSI_PHYSICAL", Status = "To do" },
                         new DecisionCommodityCheck.Check() { Type = "HMI", Status = "Auto cleared" },
                     ],
-                    HasPartTwo = true,
                     Commodities =
                     [
                         new DecisionCommodityComplement()
@@ -922,7 +915,6 @@ public class DecisionServiceTests(ITestOutputHelper output)
             .Create()
             .WithId("1234567")
             .WithImportNotificationType(ImportNotificationType.Chedpp)
-            .WithHasPartTwo(true)
             .WithStatus(ImportNotificationStatus.Amend)
             .Build();
         var decisionContext = new DecisionContext(
@@ -1042,7 +1034,6 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     ],
                     CommodityChecks = commodityChecks.ToArray(),
-                    HasPartTwo = true,
                 },
             ],
             [

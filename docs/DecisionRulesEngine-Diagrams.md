@@ -121,45 +121,39 @@
 └────────────────────────┬────────────────────────────────────┘
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  4. MissingPartTwoDecisionRule                              │
-│     ├─ Part Two missing? → X00                             │
-│     └─ Part Two exists → Continue                           │
-└────────────────────────┬────────────────────────────────────┘
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│  5. TerminalStatusDecisionRule                              │
+│  4. TerminalStatusDecisionRule                              │
 │     ├─ Cancelled/Replaced/Deleted/Split? → X00             │
 │     └─ Other status → Continue                              │
 └────────────────────────┬────────────────────────────────────┘
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  6. AmendDecisionRule                                       │
+│  5. AmendDecisionRule                                       │
 │     ├─ Amend + no previous decision? → X00                 │
 │     ├─ Amend + previous decision? → Previous decision      │
 │     └─ Not Amend → Continue                                 │
 └────────────────────────┬────────────────────────────────────┘
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  7. InspectionRequiredDecisionRule                          │
+│  6. InspectionRequiredDecisionRule                          │
 │     ├─ Submitted? → H01                                    │
 │     ├─ InProgress? → H02                                   │
 │     └─ Other → Continue                                     │
 └────────────────────────┬────────────────────────────────────┘
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  8. CvedaDecisionRule                                       │
+│  7. CvedaDecisionRule                                       │
 │     ├─ Not Acceptable? → N01-N07                           │
 │     ├─ Acceptable? → C02                                   │
 │     └─ Unknown → X00                                        │
 └────────────────────────┬────────────────────────────────────┘
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  9. CommodityCodeValidationRule                             │
+│  8. CommodityCodeValidationRule                             │
 │     └─ Log warnings if commodity code issues                │
 └────────────────────────┬────────────────────────────────────┘
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  10. CommodityWeightOrQuantityValidationRule                │
+│  9. CommodityWeightOrQuantityValidationRule                │
 │      └─ Log warnings if weight/quantity issues              │
 └────────────────────────┬────────────────────────────────────┘
                          ▼

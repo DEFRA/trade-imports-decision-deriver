@@ -26,7 +26,6 @@ public class WrongChedTypeDecisionRuleTests
             .Create()
             .WithId("Test")
             .WithImportNotificationType(ImportNotificationType.Chedpp)
-            .WithHasPartTwo(false)
             .Build();
         var c = new DecisionEngineContext(
             new DecisionContext([notification], []),
@@ -67,7 +66,6 @@ public class WrongChedTypeDecisionRuleTests
             .Create()
             .WithId("Test")
             .WithImportNotificationType(ImportNotificationType.Cveda)
-            .WithHasPartTwo(false)
             .Build();
         var c = new DecisionEngineContext(
             new DecisionContext([notification], []),

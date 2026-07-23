@@ -182,7 +182,7 @@ public class CommodityCodeDecisionRuleTests
     }
 
     [Fact]
-    public void Execute_WhenResultCodeIsReleaseOrHold_AndNoMatchingCommodities_AndRuleForCountryIsDisabled_AndDryRunMode_ReturnsNextResult()
+    public void Execute_WhenResultCodeIsReleaseOrHold_AndNoMatchingCommodities_AndRuleForEUIsDisabled_AndDryRunMode_ReturnsNextResult()
     {
         // Arrange
         var notification = DecisionImportPreNotificationBuilder
@@ -207,6 +207,53 @@ public class CommodityCodeDecisionRuleTests
             new CustomsDeclarationWrapper(
                 "mrn",
                 new CustomsDeclaration() { ClearanceRequest = new ClearanceRequest() { DispatchCountryCode = "BE" } }
+            ),
+            new Commodity() { TaricCommodityCode = "12345", ItemNumber = 1 },
+            new CheckCode() { Value = "H221" },
+            new ImportDocument()
+        )
+        {
+            Logger = _mockLogger,
+        };
+
+        // Simulate that the next result is a "Release" or "Hold"
+        var result = new DecisionEngineResult(DecisionCode.C02, nameof(CommodityCodeDecisionRule));
+        _mockNext.Invoke(Arg.Any<DecisionEngineContext>()).Returns(result);
+
+        // Act
+        var returnResult = _rule.Execute(c, _mockNext);
+
+        // Assert
+        returnResult.Should().Be(result);
+        _mockNext.Received(1).Invoke(Arg.Any<DecisionEngineContext>());
+    }
+
+    [Fact]
+    public void Execute_WhenResultCodeIsReleaseOrHold_AndNoMatchingCommodities_AndRuleForRoWIsDisabled_AndDryRunMode_ReturnsNextResult()
+    {
+        // Arrange
+        var notification = DecisionImportPreNotificationBuilder
+            .Create()
+            .WithId("Test")
+            .AddCommodity(c => c.WithCommodityCode("321"))
+            .Build();
+
+        var c = new DecisionEngineContext(
+            new DecisionContext([notification], []),
+            new DecisionRulesOptions()
+            {
+                Cheds = new Dictionary<string, DecisionRulesPerChedOptions>()
+                {
+                    {
+                        "CVEDA",
+                        new DecisionRulesPerChedOptions() { DisabledForRoW = [nameof(CommodityCodeDecisionRule)] }
+                    },
+                },
+            },
+            notification,
+            new CustomsDeclarationWrapper(
+                "mrn",
+                new CustomsDeclaration() { ClearanceRequest = new ClearanceRequest() { DispatchCountryCode = "TT" } }
             ),
             new Commodity() { TaricCommodityCode = "12345", ItemNumber = 1 },
             new CheckCode() { Value = "H221" },

@@ -27,12 +27,13 @@ public class WrongChedTypeDecisionRuleTests
             .WithImportNotificationType(ImportNotificationType.Chedpp)
             .Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -66,12 +67,13 @@ public class WrongChedTypeDecisionRuleTests
             .WithImportNotificationType(ImportNotificationType.Cveda)
             .Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,

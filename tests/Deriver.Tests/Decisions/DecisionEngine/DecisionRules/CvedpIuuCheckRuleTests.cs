@@ -20,12 +20,13 @@ public class CvedpIuuCheckRuleTests
     {
         var notification = DecisionImportPreNotificationBuilder.Create().WithId("Test").Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H219" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -55,12 +56,13 @@ public class CvedpIuuCheckRuleTests
             .WithIuuOption(iuuOption)
             .Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = CheckCode.IuuCheckCode },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -84,12 +86,13 @@ public class CvedpIuuCheckRuleTests
             .WithIuuCheckRequired(false)
             .Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = CheckCode.IuuCheckCode },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,

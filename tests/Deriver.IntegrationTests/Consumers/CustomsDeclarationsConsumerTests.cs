@@ -92,6 +92,16 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output, WireMock
         );
 
         mappingBuilder.Given(m =>
+            m.WithRequest(req =>
+                    req.UsingGet().WithPath($"/customs-declarations/{customsDeclaration.ResourceId}/traces-cheds")
+                )
+                .WithResponse(rsp =>
+                    rsp.WithBody(JsonSerializer.Serialize(new TracesChedsResponse([])))
+                        .WithStatusCode(HttpStatusCode.OK)
+                )
+        );
+
+        mappingBuilder.Given(m =>
             m.WithRequest(req => req.UsingPut().WithPath(createPath))
                 .WithResponse(rsp => rsp.WithStatusCode(HttpStatusCode.Created))
         );
@@ -161,6 +171,16 @@ public class CustomsDeclarationsConsumerTests(ITestOutputHelper output, WireMock
                 )
                 .WithResponse(rsp =>
                     rsp.WithBody(JsonSerializer.Serialize(new ImportPreNotificationsResponse([importNotification])))
+                        .WithStatusCode(HttpStatusCode.OK)
+                )
+        );
+
+        mappingBuilder.Given(m =>
+            m.WithRequest(req =>
+                    req.UsingGet().WithPath($"/customs-declarations/{customsDeclaration.ResourceId}/traces-cheds")
+                )
+                .WithResponse(rsp =>
+                    rsp.WithBody(JsonSerializer.Serialize(new TracesChedsResponse([])))
                         .WithStatusCode(HttpStatusCode.OK)
                 )
         );

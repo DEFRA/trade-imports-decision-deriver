@@ -12,6 +12,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
@@ -82,6 +83,12 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<CommodityQuantityCheckDecisionRule>();
         services.AddSingleton<UnknownChedTypeDecisionRule>();
 
+        services.AddSingleton<TracesTerminalStatusDecisionRule>();
+        services.AddSingleton<TracesCvedpDecisionRule>();
+        services.AddSingleton<TracesCedDecisionRule>();
+        services.AddSingleton<TracesChedppDecisionRule>();
+        services.AddSingleton<TracesCvedaDecisionRule>();
+
         // Order of interceptors is important here
         services.AddTraceContextInterceptor();
         services.AddConsumerMetrics(MetricNames.MeterName);
@@ -95,6 +102,7 @@ public static class ServiceCollectionExtensions
             services.AddSlimMessageBus(mbb =>
             {
                 var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");
+                var tracesChedsQueueName = configuration.GetValue<string>("TRACES_CHED_EVENTS_QUEUE_NAME");
                 var consumersPerHost = configuration.GetValue<int>("CONSUMERS_PER_HOST");
 
                 mbb.AddCompressedJsonSerializer()
@@ -110,6 +118,9 @@ public static class ServiceCollectionExtensions
                     )
                     .Consume<ResourceEvent<ImportPreNotificationEvent>>(x =>
                         x.WithConsumer<ImportPreNotificationConsumer>().Queue(queueName).Instances(consumersPerHost)
+                    )
+                    .Consume<ResourceEvent<TracesChedEvent>>(x =>
+                        x.WithConsumer<TracesChedConsumer>().Queue(tracesChedsQueueName).Instances(consumersPerHost)
                     );
             });
         }

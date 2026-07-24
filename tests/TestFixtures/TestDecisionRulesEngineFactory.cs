@@ -1,6 +1,7 @@
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Defra.TradeImportsDecisionDeriver.TestFixtures;
@@ -22,6 +23,11 @@ public class TestDecisionRulesEngineFactory : IDecisionRulesEngineFactory
         .AddSingleton<CommodityCodeDecisionRule>()
         .AddSingleton<CommodityQuantityCheckDecisionRule>()
         .AddSingleton<UnknownChedTypeDecisionRule>()
+        .AddSingleton<TracesTerminalStatusDecisionRule>()
+        .AddSingleton<TracesCvedpDecisionRule>()
+        .AddSingleton<TracesCedDecisionRule>()
+        .AddSingleton<TracesChedppDecisionRule>()
+        .AddSingleton<TracesCvedaDecisionRule>()
         .AddOptions()
         .Configure<DecisionRulesOptions>(c =>
         {
@@ -30,9 +36,9 @@ public class TestDecisionRulesEngineFactory : IDecisionRulesEngineFactory
         .AddLogging()
         .BuildServiceProvider();
 
-    public DecisionRulesEngine Get(string? notificationType)
+    public DecisionRulesEngine Get(string source, string? notificationType)
     {
-        return new DecisionRulesEngineFactory(sp).Get(notificationType);
+        return new DecisionRulesEngineFactory(sp).Get(source, notificationType);
     }
 
     public static CommodityQuantityCheckDecisionRuleOptions CreateCommodityQuantityCheckDecisionRuleOptions()

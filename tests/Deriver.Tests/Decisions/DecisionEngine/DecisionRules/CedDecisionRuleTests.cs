@@ -34,12 +34,13 @@ public class CedDecisionRuleTests
             .Build();
 
         var context = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -79,12 +80,13 @@ public class CedDecisionRuleTests
         var notification = notificationBuilder.Build();
 
         var context = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -106,12 +108,13 @@ public class CedDecisionRuleTests
         // Arrange
         var notification = DecisionImportPreNotificationBuilder.Create().WithId("Test").Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -146,12 +149,13 @@ public class CedDecisionRuleTests
         var notification = notificationBuilder.Build();
 
         var context = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,

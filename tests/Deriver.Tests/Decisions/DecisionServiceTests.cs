@@ -960,6 +960,9 @@ public class DecisionServiceTests(ITestOutputHelper output)
         var decisionResult = decisionService.Process(decisionContext);
 
         decisionResult.Should().NotBeNull();
+        decisionResult.Count.Should().Be(1);
+        decisionResult[0].Decision.Items.Length.Should().Be(1);
+        decisionResult[0].Decision.Items[0].Checks[0].DecisionCode.Should().Be("H01");
     }
 
     [Fact]
@@ -1019,6 +1022,9 @@ public class DecisionServiceTests(ITestOutputHelper output)
         var decisionResult = decisionService.Process(decisionContext);
 
         decisionResult.Should().NotBeNull();
+        decisionResult.Count.Should().Be(1);
+        decisionResult[0].Decision.Items.Length.Should().Be(1);
+        decisionResult[0].Decision.Items[0].Checks[0].DecisionCode.Should().Be("C07");
     }
 
     private static DecisionContext CreateChedppDecisionContext(

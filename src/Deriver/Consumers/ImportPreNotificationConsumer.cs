@@ -3,12 +3,9 @@ using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
-using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Comparers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
-using SlimMessageBus;
-using Trade.Gateway.Api.Contract.Certificate;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 
@@ -18,6 +15,8 @@ public class ImportPreNotificationConsumer(
     IDecisionService decisionService
 ) : ChedConsumer<ImportPreNotificationEvent>(apiClient, logger)
 {
+    private readonly Lock _notificationsLock = new();
+
     public override async Task OnHandle(
         ResourceEvent<ImportPreNotificationEvent> message,
         CancellationToken cancellationToken
@@ -96,7 +95,10 @@ public class ImportPreNotificationConsumer(
                         .Select(x => x.ImportPreNotification)
                 )
                 {
-                    notifications.Add(notificationResponse);
+                    lock (_notificationsLock)
+                    {
+                        notifications.Add(notificationResponse);
+                    }
 
                     if (message.ResourceId == notificationResponse.ReferenceNumber)
                     {

@@ -16,6 +16,8 @@ public class TracesChedConsumer(
     IDecisionService decisionService
 ) : ChedConsumer<TracesChedEvent>(apiClient, logger)
 {
+    private readonly Lock _notificationsLock = new();
+
     public override async Task OnHandle(ResourceEvent<TracesChedEvent> message, CancellationToken cancellationToken)
     {
         logger.LogInformation(
@@ -87,7 +89,10 @@ public class TracesChedConsumer(
                         .Select(x => x.ImportPreNotification)
                 )
                 {
-                    notifications.Add(notificationResponse);
+                    lock (_notificationsLock)
+                    {
+                        notifications.Add(notificationResponse);
+                    }
                 }
             }
         );

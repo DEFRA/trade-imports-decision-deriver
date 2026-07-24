@@ -12,6 +12,8 @@ public abstract class ChedConsumer<TEvent>(ITradeImportsDataApiClient apiClient,
     : IConsumer<ResourceEvent<TEvent>>,
         IConsumerWithContext
 {
+    private readonly Lock _lock = new();
+
     protected ITradeImportsDataApiClient ApiClient { get; } = apiClient;
 
     public abstract Task OnHandle(ResourceEvent<TEvent> message, CancellationToken cancellationToken);
@@ -36,7 +38,10 @@ public abstract class ChedConsumer<TEvent>(ITradeImportsDataApiClient apiClient,
                         .Select(x => x.Ched)
                 )
                 {
-                    cheds.Add(chedResponse);
+                    lock (_lock)
+                    {
+                        cheds.Add(chedResponse);
+                    }
                 }
             }
         );

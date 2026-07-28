@@ -1,10 +1,12 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions.DecisionEngine.DecisionRules;
@@ -27,6 +29,7 @@ public class AmendDecisionRuleTests
             .Build();
         var c = new DecisionEngineContext(
             new DecisionContext([notification], []),
+            new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
@@ -57,6 +60,7 @@ public class AmendDecisionRuleTests
             .Build();
         var c = new DecisionEngineContext(
             new DecisionContext([notification], []),
+            new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
@@ -88,6 +92,7 @@ public class AmendDecisionRuleTests
             .Build();
         var c = new DecisionEngineContext(
             new DecisionContext([notification], []),
+            new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
@@ -119,6 +124,7 @@ public class AmendDecisionRuleTests
             .Build();
         var c = new DecisionEngineContext(
             new DecisionContext([notification], []),
+            new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
@@ -151,6 +157,7 @@ public class AmendDecisionRuleTests
             .Build();
         var c = new DecisionEngineContext(
             new DecisionContext([notification], []),
+            new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
@@ -182,6 +189,7 @@ public class AmendDecisionRuleTests
             .Build();
         var c = new DecisionEngineContext(
             new DecisionContext([notification], []),
+            new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),

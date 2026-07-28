@@ -1,4 +1,5 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
@@ -22,6 +23,7 @@ public class UnknownCheckCodeDecisionRuleTests
 
         var context = new DecisionEngineContext(
             new DecisionContext([notification], []),
+            new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
@@ -53,6 +55,7 @@ public class UnknownCheckCodeDecisionRuleTests
 
         var context = new DecisionEngineContext(
             new DecisionContext([notification], []),
+            new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),

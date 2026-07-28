@@ -29,12 +29,13 @@ public class CommodityCodeDecisionRuleTests
             .Build();
 
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity() { TaricCommodityCode = "12345", ItemNumber = 1 },
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = _mockLogger,
@@ -63,12 +64,13 @@ public class CommodityCodeDecisionRuleTests
             .Build();
 
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity() { TaricCommodityCode = "12345", ItemNumber = 1 },
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = _mockLogger,
@@ -109,12 +111,13 @@ public class CommodityCodeDecisionRuleTests
             .Build();
 
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity() { TaricCommodityCode = "12345", ItemNumber = 1 },
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = _mockLogger,
@@ -153,12 +156,13 @@ public class CommodityCodeDecisionRuleTests
             .Build();
 
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity() { TaricCommodityCode = "12345", ItemNumber = 1 },
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = _mockLogger,

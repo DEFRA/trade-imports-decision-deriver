@@ -36,6 +36,10 @@ public class ClearanceRequestConsumerTests
             .GetImportPreNotificationsByMrn(createdEvent.ResourceId, Arg.Any<CancellationToken>())
             .Returns(new ImportPreNotificationsResponse([]));
 
+        apiClient
+            .GetTracesChedsByMrn(createdEvent.ResourceId, Arg.Any<CancellationToken>())
+            .Returns(new TracesChedsResponse([]));
+
         decisionServicev2
             .Process(Arg.Any<DecisionContext>())
             .Returns([new ValueTuple<string, ClearanceDecision>("mrn", new ClearanceDecision() { Items = [] })]);
@@ -44,7 +48,7 @@ public class ClearanceRequestConsumerTests
         await consumer.OnHandle(createdEvent, CancellationToken.None);
 
         // ASSERT
-        apiClient.ReceivedCalls().Count().Should().Be(3);
+        apiClient.ReceivedCalls().Count().Should().Be(4);
     }
 
     [Fact]
@@ -120,6 +124,10 @@ public class ClearanceRequestConsumerTests
             .GetImportPreNotificationsByMrn(createdEvent.ResourceId, Arg.Any<CancellationToken>())
             .Returns(new ImportPreNotificationsResponse([]));
 
+        apiClient
+            .GetTracesChedsByMrn(createdEvent.ResourceId, Arg.Any<CancellationToken>())
+            .Returns(new TracesChedsResponse([]));
+
         decisionServicev2
             .Process(Arg.Any<DecisionContext>())
             .Returns([new ValueTuple<string, ClearanceDecision>("mrn", customsDeclaration.ClearanceDecision)]);
@@ -128,7 +136,7 @@ public class ClearanceRequestConsumerTests
         await consumer.OnHandle(createdEvent, CancellationToken.None);
 
         // ASSERT
-        apiClient.ReceivedCalls().Count().Should().Be(2);
+        apiClient.ReceivedCalls().Count().Should().Be(3);
     }
 
     [Fact]
@@ -186,6 +194,10 @@ public class ClearanceRequestConsumerTests
             .GetImportPreNotificationsByMrn(createdEvent.ResourceId, Arg.Any<CancellationToken>())
             .Returns(new ImportPreNotificationsResponse([]));
 
+        apiClient
+            .GetTracesChedsByMrn(createdEvent.ResourceId, Arg.Any<CancellationToken>())
+            .Returns(new TracesChedsResponse([]));
+
         decisionServicev2
             .Process(Arg.Any<DecisionContext>())
             .Returns(
@@ -199,6 +211,6 @@ public class ClearanceRequestConsumerTests
         await consumer.OnHandle(createdEvent, CancellationToken.None);
 
         // ASSERT
-        apiClient.ReceivedCalls().Count().Should().Be(3);
+        apiClient.ReceivedCalls().Count().Should().Be(4);
     }
 }

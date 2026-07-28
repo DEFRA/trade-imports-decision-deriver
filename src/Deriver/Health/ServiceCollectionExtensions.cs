@@ -20,6 +20,15 @@ public static class ServiceCollectionExtensions
                 timeout: TimeSpan.FromSeconds(10),
                 tags: [WebApplicationExtensions.Extended]
             )
+            .AddSqs(
+                configuration,
+                "Traces Cheds events SQS queue",
+                _ =>
+                    configuration.GetValue<string>("TRACES_CHED_EVENTS_QUEUE_NAME")
+                    ?? throw new InvalidOperationException("Missing TRACES_CHED_EVENTS_QUEUE_NAME"),
+                timeout: TimeSpan.FromSeconds(10),
+                tags: [WebApplicationExtensions.Extended]
+            )
             .AddDataApi(
                 sp => sp.GetRequiredService<IOptions<DataApiOptions>>().Value,
                 tags: [WebApplicationExtensions.Extended],

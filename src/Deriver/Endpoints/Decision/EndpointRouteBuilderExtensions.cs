@@ -124,7 +124,8 @@ public static class EndpointRouteBuilderExtensions
                         ClearanceRequest = clearanceRequest.ClearanceRequest,
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionResult = decisionService.Process(decisionContext).FirstOrDefault();

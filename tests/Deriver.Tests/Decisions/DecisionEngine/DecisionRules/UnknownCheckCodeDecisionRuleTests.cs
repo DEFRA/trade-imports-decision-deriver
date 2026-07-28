@@ -21,11 +21,12 @@ public class UnknownCheckCodeDecisionRuleTests
         var notification = DecisionImportPreNotificationBuilder.Create().WithId("Test").Build();
 
         var context = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "UNKNOWN" },
+            null,
             null
         )
         {
@@ -52,11 +53,12 @@ public class UnknownCheckCodeDecisionRuleTests
         var notification = DecisionImportPreNotificationBuilder.Create().WithId("Test").Build();
 
         var context = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H999" },
+            null,
             null
         )
         {

@@ -4,6 +4,6 @@ public sealed class TracesCedDecisionRule : IDecisionRule
 {
     public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
-        return new DecisionEngineResult(DecisionCode.C07, nameof(CedDecisionRule));
+        return new DecisionEngineResult(DecisionCode.H01, nameof(CedDecisionRule));
     }
 }

@@ -46,6 +46,6 @@ public class TracesCvedaDecisionRuleTests
         );
 
         // Assert using FluentAssertions
-        result.Code.Should().Be(DecisionCode.C07);
+        result.Code.Should().Be(DecisionCode.H01);
     }
 }

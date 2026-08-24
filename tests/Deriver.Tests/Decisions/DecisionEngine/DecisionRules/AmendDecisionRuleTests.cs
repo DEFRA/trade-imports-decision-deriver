@@ -93,7 +93,8 @@ public class AmendDecisionRuleTests
             .WithInspectionRequired(InspectionRequired.Inconclusive)
             .Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
+            new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),

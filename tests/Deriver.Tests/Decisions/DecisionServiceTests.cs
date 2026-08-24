@@ -1027,7 +1027,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
 
         var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act

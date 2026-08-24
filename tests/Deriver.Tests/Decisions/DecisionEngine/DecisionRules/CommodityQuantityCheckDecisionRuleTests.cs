@@ -86,13 +86,14 @@ public class CommodityQuantityCheckDecisionRuleTests
             );
 
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], [customsDeclaration]),
+            new DecisionContext([notification], [customsDeclaration], []),
             ruleOptions,
             notification,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
             new CheckCode() { Value = "H222" },
-            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0]
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0],
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -188,13 +189,14 @@ public class CommodityQuantityCheckDecisionRuleTests
             );
 
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], [customsDeclaration]),
+            new DecisionContext([notification], [customsDeclaration], []),
             ruleOptions,
             notification,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
-            new CheckCode() { Value = "H221" },
-            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0]
+            new CheckCode() { Value = "H222" },
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0],
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -241,13 +243,14 @@ public class CommodityQuantityCheckDecisionRuleTests
         _mockNext(Arg.Any<DecisionEngineContext>()).Returns(result);
 
         var c = new DecisionEngineContext(
-            new DecisionContext([], []),
+            new DecisionContext([], [], []),
             ruleOptions,
             null!,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
-            new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new CheckCode() { Value = "H222" },
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -343,13 +346,14 @@ public class CommodityQuantityCheckDecisionRuleTests
         _mockNext(Arg.Any<DecisionEngineContext>()).Returns(result);
 
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], [customsDeclaration]),
+            new DecisionContext([notification], [customsDeclaration], []),
             ruleOptions,
             notification!,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
             new CheckCode() { Value = "H222" },
-            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0]
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0],
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -509,7 +513,7 @@ public class CommodityQuantityCheckDecisionRuleTests
                     [
                         new CommodityQuantityCheckDecisionRuleComparisonEntry
                         {
-                            CheckCode = "H221",
+                            CheckCode = "H222",
                             ComparisonType = QuantityComparisonType.Weight,
                         },
                     ],
@@ -671,13 +675,14 @@ public class CommodityQuantityCheckDecisionRuleTests
         );
 
         return new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             rulesOptions,
             notification!,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!,
             new CheckCode() { Value = "H222" },
-            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0]
+            customsDeclaration.CustomsDeclaration.ClearanceRequest?.Commodities![0]!.Documents![0],
+            null!
         )
         {
             Logger = NullLogger.Instance,

@@ -9,6 +9,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Trade.Gateway.Api.Contract.Certificate;
 using Xunit.Abstractions;
 using ClearanceDecisionBuilder = Defra.TradeImportsDecisionDeriver.Deriver.Decisions.ClearanceDecisionBuilder;
 
@@ -42,7 +43,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -85,7 +87,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -134,7 +137,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -219,7 +223,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -346,7 +351,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -578,7 +584,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -670,7 +677,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -765,7 +773,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -873,7 +882,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var sut = new DecisionService(
@@ -949,7 +959,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
 
         var decisionService = new DecisionService(
@@ -961,6 +972,71 @@ public class DecisionServiceTests(ITestOutputHelper output)
         var decisionResult = decisionService.Process(decisionContext);
 
         decisionResult.Should().NotBeNull();
+        decisionResult.Count.Should().Be(1);
+        decisionResult[0].Decision.Items.Length.Should().Be(1);
+        decisionResult[0].Decision.Items[0].Checks[0].DecisionCode.Should().Be("H01");
+    }
+
+    [Fact]
+    public void When_processing_traces_chedpp_in_valid_state_should_be_release()
+    {
+        var ched = new DefraUNVTDCHEDProfile()
+        {
+            SpecifiedConsignment = new Consignment(),
+            ExchangedDocument = new ExchangedDocument()
+            {
+                Identifier = "CHEDPP.GB.2025.1234567",
+                NotificationStatusCode = ImportNotificationStatus.Validated,
+            },
+        };
+        var decisionContext = new DecisionContext(
+            [],
+            [
+                new CustomsDeclarationWrapper(
+                    "25GB99999999999021",
+                    new CustomsDeclaration()
+                    {
+                        ClearanceRequest = new ClearanceRequest
+                        {
+                            Commodities =
+                            [
+                                new Commodity
+                                {
+                                    ItemNumber = 1,
+                                    TaricCommodityCode = "0207119000",
+                                    NetMass = 56,
+                                    Documents =
+                                    [
+                                        new ImportDocument()
+                                        {
+                                            DocumentCode = "N851",
+                                            DocumentReference = new ImportDocumentReference("CHEDPP.GB.2025.1234567"),
+                                            DocumentStatus = "JE",
+                                            DocumentControl = "P",
+                                        },
+                                    ],
+                                    Checks = [new CommodityCheck { CheckCode = "H219", DepartmentCode = "PHSI" }],
+                                },
+                            ],
+                        },
+                    }
+                ),
+            ],
+            [ched]
+        );
+
+        var decisionService = new DecisionService(
+            new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
+            new CheckProcessor(new TestDecisionRulesEngineFactory())
+        );
+
+        // Act
+        var decisionResult = decisionService.Process(decisionContext);
+
+        decisionResult.Should().NotBeNull();
+        decisionResult.Count.Should().Be(1);
+        decisionResult[0].Decision.Items.Length.Should().Be(1);
+        decisionResult[0].Decision.Items[0].Checks[0].DecisionCode.Should().Be("H01");
     }
 
     private static DecisionContext CreateChedppDecisionContext(
@@ -1071,7 +1147,8 @@ public class DecisionServiceTests(ITestOutputHelper output)
                         },
                     }
                 ),
-            ]
+            ],
+            []
         );
     }
 }

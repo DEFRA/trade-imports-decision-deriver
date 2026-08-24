@@ -41,15 +41,16 @@ public static class ImportPreNotificationExtensions
 
         var commodities = notification.PartOne?.Commodities;
 
-        var complementParameters = new Dictionary<int, ComplementParameterSets>();
+        var complementParameters = new Dictionary<string, ComplementParameterSets>();
         var complementRiskAssessments = new Dictionary<string, CommodityRiskResult>();
 
         if (commodities?.ComplementParameterSets != null)
         {
             foreach (var commoditiesCommodityComplement in commodities.ComplementParameterSets)
             {
-                complementParameters[commoditiesCommodityComplement.ComplementId!.Value] =
-                    commoditiesCommodityComplement;
+                complementParameters[
+                    $"{commoditiesCommodityComplement.ComplementId}_{commoditiesCommodityComplement.SpeciesId}"
+                ] = commoditiesCommodityComplement;
             }
         }
 
@@ -75,7 +76,7 @@ public static class ImportPreNotificationExtensions
 
     private static DecisionCommodityComplement CreateDecisionCommodityComplement(
         CommodityComplements commodityComplement,
-        Dictionary<int, ComplementParameterSets> complementParameters,
+        Dictionary<string, ComplementParameterSets> complementParameters,
         Dictionary<string, CommodityRiskResult> complementRiskAssessments
     )
     {
@@ -85,7 +86,12 @@ public static class ImportPreNotificationExtensions
             CommodityCode = commodityComplement.CommodityId,
         };
 
-        if (!complementParameters.TryGetValue(commodityComplement.ComplementId!.Value, out var parameters))
+        if (
+            !complementParameters.TryGetValue(
+                $"{commodityComplement.ComplementId}_{commodityComplement.SpeciesId}",
+                out var parameters
+            )
+        )
         {
             return decisionCommodityComplement;
         }

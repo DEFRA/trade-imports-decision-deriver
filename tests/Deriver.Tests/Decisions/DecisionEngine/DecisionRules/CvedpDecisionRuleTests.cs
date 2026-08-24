@@ -37,13 +37,14 @@ public class CvedpDecisionRuleTests
             .Build();
 
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -74,13 +75,14 @@ public class CvedpDecisionRuleTests
             .WithNotAcceptableAction(action)
             .Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -107,13 +109,14 @@ public class CvedpDecisionRuleTests
             .WithNotAcceptableReasons(["Reason1", "Reason2"])
             .Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -138,13 +141,13 @@ public class CvedpDecisionRuleTests
             .WithInspectionRequired("Other")
             .Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
-            new DecisionRulesOptions(),
+            new DecisionContext([notification], [], []),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -169,13 +172,14 @@ public class CvedpDecisionRuleTests
             .WithStatus(importNotificationStatus)
             .Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,

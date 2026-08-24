@@ -8,6 +8,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using SlimMessageBus;
+using Trade.Gateway.Api.Contract.Certificate;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 
@@ -58,11 +59,18 @@ public class ClearanceRequestConsumer(
             cancellationToken
         );
 
+        var chedReponse = await apiClient.GetTracesChedsByMrn(message.ResourceId, cancellationToken);
+
         var preNotifications = notificationResponse
             .ImportPreNotifications.Select(x => x.ImportPreNotification)
             .ToList();
 
-        var result = RunDecisionService(message, preNotifications, clearanceRequest);
+        var result = RunDecisionService(
+            message,
+            preNotifications,
+            clearanceRequest,
+            chedReponse.Cheds.Select(x => x.Ched).ToList()
+        );
 
         if (clearanceRequest == null || !clearanceRequest.ClearanceDecision.IsSameAs(result))
         {
@@ -90,7 +98,8 @@ public class ClearanceRequestConsumer(
     private ClearanceDecision? RunDecisionService(
         ResourceEvent<CustomsDeclarationEvent> message,
         List<ImportPreNotification> preNotifications,
-        CustomsDeclarationResponse? clearanceRequest
+        CustomsDeclarationResponse? clearanceRequest,
+        List<DefraUNVTDCHEDProfile> cheds
     )
     {
         var decisionImportPreNotifications = preNotifications.Select(x => x.ToDecisionImportPreNotification()).ToList();
@@ -105,7 +114,7 @@ public class ClearanceRequestConsumer(
                 }
             ),
         ];
-        var context = new DecisionContext(decisionImportPreNotifications, cds.ToList());
+        var context = new DecisionContext(decisionImportPreNotifications, cds.ToList(), cheds);
 
         var newResults = decisionService.Process(context);
         return newResults[0].Decision;

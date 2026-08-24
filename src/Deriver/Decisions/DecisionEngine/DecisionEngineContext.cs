@@ -1,6 +1,7 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
+using Trade.Gateway.Api.Contract.Certificate;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 
@@ -11,7 +12,8 @@ public sealed record DecisionEngineContext(
     CustomsDeclarationWrapper ClearanceRequest,
     Commodity Commodity,
     CheckCode CheckCode,
-    ImportDocument? ImportDocument
+    ImportDocument? ImportDocument,
+    DefraUNVTDCHEDProfile? Ched
 )
 {
     public ILogger Logger { get; set; } = null!;

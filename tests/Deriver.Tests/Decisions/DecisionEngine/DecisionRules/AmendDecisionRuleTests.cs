@@ -28,13 +28,14 @@ public class AmendDecisionRuleTests
             .WithStatus(ImportNotificationStatus.Submitted)
             .Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null!
         )
         {
             Logger = NullLogger.Instance,
@@ -59,13 +60,14 @@ public class AmendDecisionRuleTests
             .WithInspectionRequired(InspectionRequired.NotRequired)
             .Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -92,12 +94,12 @@ public class AmendDecisionRuleTests
             .Build();
         var c = new DecisionEngineContext(
             new DecisionContext([notification], []),
-            new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -123,13 +125,14 @@ public class AmendDecisionRuleTests
             .WithInspectionRequired(InspectionRequired.Required)
             .Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -156,13 +159,14 @@ public class AmendDecisionRuleTests
             .AddCommodity(c => c.WithHmiDecision(Constants.Required))
             .Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -188,13 +192,14 @@ public class AmendDecisionRuleTests
             .WithInspectionRequired("Other")
             .Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,

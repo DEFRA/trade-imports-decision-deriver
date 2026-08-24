@@ -26,13 +26,14 @@ public class OrphanCheckCodeDecisionRuleTests
             .WithInspectionRequired("Other")
             .Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H221" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -54,7 +55,7 @@ public class OrphanCheckCodeDecisionRuleTests
     {
         var notification = DecisionImportPreNotificationBuilder.Create().WithId("Test").Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
@@ -65,6 +66,7 @@ public class OrphanCheckCodeDecisionRuleTests
                     : [new CommodityCheck { CheckCode = "H220" }],
             },
             new CheckCode() { Value = "H220" },
+            null,
             null
         )
         {
@@ -99,12 +101,13 @@ public class OrphanCheckCodeDecisionRuleTests
             .WithInspectionRequired("Other")
             .Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = checkCodeValue },
+            null,
             null
         )
         {

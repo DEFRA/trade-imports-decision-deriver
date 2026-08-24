@@ -22,13 +22,14 @@ public class UnlinkedNotificationDecisionRuleTests
     {
         // Arrange
         var c = new DecisionEngineContext(
-            new DecisionContext([], []),
+            new DecisionContext([], [], []),
             new DecisionRulesOptions(),
             null!,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H21" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,
@@ -58,13 +59,14 @@ public class UnlinkedNotificationDecisionRuleTests
         // Arrange
         var notification = DecisionImportPreNotificationBuilder.Create().WithId("Test").Build();
         var c = new DecisionEngineContext(
-            new DecisionContext([notification], []),
+            new DecisionContext([notification], [], []),
             new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
             new CheckCode() { Value = "H21" },
-            new ImportDocument()
+            new ImportDocument(),
+            null
         )
         {
             Logger = NullLogger.Instance,

@@ -1,40 +1,43 @@
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
-using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
 using NSubstitute;
 using SlimMessageBus.Host;
+using Trade.Gateway.Api.Contract.Certificate;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Consumers;
 
-public class ImportPreNotificationConsumerTests
+public class TracesChedConsumerTests
 {
     [Fact]
     public async Task GivenACreatedEvent_AndCustomsDeclarationsNotExists_ThenDecisionShouldNotBeCreated()
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var consumer = new ImportPreNotificationConsumer(
-            NullLogger<ImportPreNotificationConsumer>.Instance,
+        var consumer = new TracesChedConsumer(
+            NullLogger<TracesChedConsumer>.Instance,
             apiClient,
             new DecisionService(
                 new ClearanceDecisionBuilder(new CorrelationIdGenerator()),
-                new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
+                new CheckProcessor(new TestDecisionRulesEngineFactory())
             )
         )
         {
             Context = new ConsumerContext(),
         };
 
-        var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
+        var createdEvent = TracesChedFixtures.TracesChedCreatedFixture();
         apiClient
             .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
+            .Returns(new CustomsDeclarationsResponse([]));
+
+        apiClient
+            .GetCustomsDeclarationsByTracesChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
             .Returns(new CustomsDeclarationsResponse([]));
 
         // ACT
@@ -49,24 +52,32 @@ public class ImportPreNotificationConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionServicev2 = Substitute.For<IDecisionService>();
-        var consumer = new ImportPreNotificationConsumer(
-            NullLogger<ImportPreNotificationConsumer>.Instance,
-            apiClient,
-            decisionServicev2
-        );
+        var decisionService = Substitute.For<IDecisionService>();
+        var consumer = new TracesChedConsumer(NullLogger<TracesChedConsumer>.Instance, apiClient, decisionService);
 
-        var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
+        var createdEvent = TracesChedFixtures.TracesChedCreatedFixture();
 
         var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
         customsDeclaration = customsDeclaration with { Finalisation = null };
         apiClient
-            .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
+            .GetCustomsDeclarationsByTracesChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
             .Returns(new CustomsDeclarationsResponse([customsDeclaration]));
 
         apiClient
             .GetTracesChedsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
-            .Returns(new TracesChedsResponse([]));
+            .Returns(
+                new TracesChedsResponse([
+                    new TracesChedResponse(
+                        new DefraUNVTDCHEDProfile()
+                        {
+                            ExchangedDocument = new ExchangedDocument() { Identifier = "Test" },
+                            SpecifiedConsignment = new Consignment(),
+                        },
+                        DateTime.Now,
+                        DateTime.Now
+                    ),
+                ])
+            );
 
         apiClient
             .GetImportPreNotificationsByMrn(customsDeclaration.MovementReferenceNumber, Arg.Any<CancellationToken>())
@@ -80,7 +91,7 @@ public class ImportPreNotificationConsumerTests
                 ])
             );
 
-        decisionServicev2
+        decisionService
             .Process(Arg.Any<DecisionContext>())
             .Returns([new ValueTuple<string, ClearanceDecision>("mrn", customsDeclaration.ClearanceDecision!)]);
 
@@ -96,19 +107,15 @@ public class ImportPreNotificationConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionServicev2 = Substitute.For<IDecisionService>();
-        var consumer = new ImportPreNotificationConsumer(
-            NullLogger<ImportPreNotificationConsumer>.Instance,
-            apiClient,
-            decisionServicev2
-        );
+        var decisionService = Substitute.For<IDecisionService>();
+        var consumer = new TracesChedConsumer(NullLogger<TracesChedConsumer>.Instance, apiClient, decisionService);
 
-        var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
+        var createdEvent = TracesChedFixtures.TracesChedCreatedFixture();
 
         var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
         customsDeclaration = customsDeclaration with { Finalisation = null };
         apiClient
-            .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
+            .GetCustomsDeclarationsByTracesChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
             .Returns(new CustomsDeclarationsResponse([customsDeclaration]));
 
         apiClient
@@ -127,7 +134,7 @@ public class ImportPreNotificationConsumerTests
                 ])
             );
 
-        decisionServicev2
+        decisionService
             .Process(Arg.Any<DecisionContext>())
             .Returns([new ValueTuple<string, ClearanceDecision>("mrn", customsDeclaration.ClearanceDecision!)]);
 
@@ -143,14 +150,10 @@ public class ImportPreNotificationConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionServicev2 = Substitute.For<IDecisionService>();
-        var consumer = new ImportPreNotificationConsumer(
-            NullLogger<ImportPreNotificationConsumer>.Instance,
-            apiClient,
-            decisionServicev2
-        );
+        var decisionService = Substitute.For<IDecisionService>();
+        var consumer = new TracesChedConsumer(NullLogger<TracesChedConsumer>.Instance, apiClient, decisionService);
 
-        var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
+        var createdEvent = TracesChedFixtures.TracesChedCreatedFixture();
 
         var notification = ImportPreNotificationFixtures.ImportPreNotificationFixture("test");
 
@@ -218,7 +221,7 @@ public class ImportPreNotificationConsumerTests
             .Returns(new TracesChedsResponse([]));
 
         apiClient
-            .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
+            .GetCustomsDeclarationsByTracesChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
             .Returns(new CustomsDeclarationsResponse([customsDeclaration]));
 
         apiClient
@@ -229,7 +232,7 @@ public class ImportPreNotificationConsumerTests
                 ])
             );
 
-        decisionServicev2
+        decisionService
             .Process(Arg.Any<DecisionContext>())
             .Returns([
                 new ValueTuple<string, ClearanceDecision>(
@@ -250,19 +253,15 @@ public class ImportPreNotificationConsumerTests
     {
         // ARRANGE
         var apiClient = Substitute.For<ITradeImportsDataApiClient>();
-        var decisionServicev2 = Substitute.For<IDecisionService>();
-        var consumer = new ImportPreNotificationConsumer(
-            NullLogger<ImportPreNotificationConsumer>.Instance,
-            apiClient,
-            decisionServicev2
-        );
+        var decisionService = Substitute.For<IDecisionService>();
+        var consumer = new TracesChedConsumer(NullLogger<TracesChedConsumer>.Instance, apiClient, decisionService);
 
-        var createdEvent = ImportPreNotificationFixtures.ImportPreNotificationCreatedFixture();
+        var createdEvent = TracesChedFixtures.TracesChedCreatedFixture();
 
         var customsDeclaration = CustomsDeclarationResponseFixtures.CustomsDeclarationResponseFixture();
 
         apiClient
-            .GetCustomsDeclarationsByChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
+            .GetCustomsDeclarationsByTracesChedId(createdEvent.ResourceId, Arg.Any<CancellationToken>())
             .Returns(new CustomsDeclarationsResponse([customsDeclaration]));
 
         // ACT

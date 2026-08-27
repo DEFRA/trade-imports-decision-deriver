@@ -1,11 +1,13 @@
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Consumers;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Utils.CorrelationId;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 using SlimMessageBus.Host;
 
@@ -23,7 +25,7 @@ public class ImportPreNotificationConsumerTests
             apiClient,
             new DecisionService(
                 new ClearanceDecisionBuilder(new CorrelationIdGenerator()),
-                new CheckProcessor(new TestDecisionRulesEngineFactory())
+                new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
             )
         )
         {

@@ -1,4 +1,5 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Trade.Gateway.Api.Contract.Certificate;
 
@@ -6,6 +7,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 
 public sealed record DecisionEngineContext(
     DecisionContext DecisionContext,
+    DecisionRulesOptions DecisionRulesOptions,
     DecisionImportPreNotification Notification,
     CustomsDeclarationWrapper ClearanceRequest,
     Commodity Commodity,

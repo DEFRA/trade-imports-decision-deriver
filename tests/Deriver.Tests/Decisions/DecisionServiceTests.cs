@@ -1,10 +1,13 @@
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
+using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.Processors;
 using Defra.TradeImportsDecisionDeriver.Deriver.Matching;
 using Defra.TradeImportsDecisionDeriver.TestFixtures;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 using Trade.Gateway.Api.Contract.Certificate;
 using Xunit.Abstractions;
@@ -46,7 +49,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
 
         var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -90,7 +93,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
 
         var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -140,7 +143,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
 
         var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         var decisionResult = decisionService.Process(decisionContext);
@@ -226,7 +229,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
 
         var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -354,7 +357,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
 
         var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -473,7 +476,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
 
         var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -587,7 +590,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
 
         var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -680,7 +683,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
 
         var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -776,7 +779,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
 
         var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act
@@ -885,7 +888,16 @@ public class DecisionServiceTests(ITestOutputHelper output)
 
         var sut = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(
+                new TestDecisionRulesEngineFactory(),
+                Options.Create(
+                    new DecisionRulesOptions()
+                    {
+                        CommodityQuantityCheckDecisionRule =
+                            TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+                    }
+                )
+            )
         );
 
         // Act
@@ -953,10 +965,10 @@ public class DecisionServiceTests(ITestOutputHelper output)
 
         var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
-        // Act
+        // Act -c
         var decisionResult = decisionService.Process(decisionContext);
 
         decisionResult.Should().NotBeNull();
@@ -1015,7 +1027,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
 
         var decisionService = new DecisionService(
             new ClearanceDecisionBuilder(new TestCorrelationIdGenerator("TEST")),
-            new CheckProcessor(new TestDecisionRulesEngineFactory())
+            new CheckProcessor(new TestDecisionRulesEngineFactory(), Options.Create(new DecisionRulesOptions()))
         );
 
         // Act

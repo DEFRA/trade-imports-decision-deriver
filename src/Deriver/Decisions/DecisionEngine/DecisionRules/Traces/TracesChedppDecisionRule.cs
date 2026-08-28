@@ -4,6 +4,17 @@ public sealed class TracesChedppDecisionRule : IDecisionRule
 {
     public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
-        return new DecisionEngineResult(DecisionCode.H01, nameof(ChedppDecisionRule));
+        return context.Ched?.ExchangedDocument.NotificationStatusCode switch
+        {
+            TracesNotificationStatus.Validated => new DecisionEngineResult(
+                DecisionCode.C03,
+                nameof(TracesChedppDecisionRule)
+            ),
+            _ => new DecisionEngineResult(
+                DecisionCode.H01,
+                nameof(TracesChedppDecisionRule),
+                DecisionInternalFurtherDetail.E99
+            ),
+        };
     }
 }

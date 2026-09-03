@@ -11,12 +11,14 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions.DecisionEngi
 
 public class TracesCedDecisionRuleTests
 {
-    [Fact]
-    public void Execute_Test()
+    [Theory]
+    [InlineData(TracesNotificationStatus.Validated, DecisionCode.C03)]
+    [InlineData("7000", DecisionCode.H01)]
+    public void Execute_Test(string status, DecisionCode expected)
     {
         var ched = new DefraUNVTDCHEDProfile()
         {
-            ExchangedDocument = new ExchangedDocument() { NotificationStatusCode = "VALIDATED", Identifier = "test" },
+            ExchangedDocument = new ExchangedDocument() { NotificationStatusCode = status, Identifier = "test" },
             SpecifiedConsignment = new Consignment(),
         };
         var context = new DecisionEngineContext(
@@ -29,11 +31,7 @@ public class TracesCedDecisionRuleTests
             new ImportDocument(),
             new DefraUNVTDCHEDProfile()
             {
-                ExchangedDocument = new ExchangedDocument()
-                {
-                    NotificationStatusCode = "VALIDATED",
-                    Identifier = "test",
-                },
+                ExchangedDocument = new ExchangedDocument() { NotificationStatusCode = status, Identifier = "test" },
                 SpecifiedConsignment = new Consignment(),
             }
         )
@@ -48,6 +46,6 @@ public class TracesCedDecisionRuleTests
         );
 
         // Assert using FluentAssertions
-        result.Code.Should().Be(DecisionCode.H01);
+        result.Code.Should().Be(expected);
     }
 }

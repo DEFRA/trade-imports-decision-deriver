@@ -71,3 +71,14 @@ public static class InspectionRequired
     public const string Inconclusive = "Inconclusive";
     public const string NotRequired = "Not required";
 }
+
+public static class TracesNotificationStatus
+{
+    public const string Submitted = "1";
+    public const string Validated = "70";
+    public const string InProgress = "42";
+    public const string Replaced = "44";
+    public const string Cancelled = "64";
+    public const string Deleted = "55";
+    public const string SplitConsignment = "68";
+}

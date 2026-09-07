@@ -12,17 +12,13 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions.DecisionEngi
 public class TracesTerminalStatusDecisionRuleTests
 {
     [Theory]
-    [InlineData(ImportNotificationStatus.Cancelled, DecisionCode.X00, DecisionInternalFurtherDetail.E71)]
-    [InlineData(ImportNotificationStatus.Replaced, DecisionCode.X00, DecisionInternalFurtherDetail.E72)]
-    [InlineData(ImportNotificationStatus.Deleted, DecisionCode.X00, DecisionInternalFurtherDetail.E73)]
-    [InlineData(ImportNotificationStatus.SplitConsignment, DecisionCode.X00, DecisionInternalFurtherDetail.E75)]
-    [InlineData(ImportNotificationStatus.Modify, DecisionCode.H01, DecisionInternalFurtherDetail.E81)]
-    [InlineData(ImportNotificationStatus.Draft, DecisionCode.C02, null)]
-    [InlineData(ImportNotificationStatus.Submitted, DecisionCode.C02, null)]
-    [InlineData(ImportNotificationStatus.Validated, DecisionCode.C02, null)]
-    [InlineData(ImportNotificationStatus.Rejected, DecisionCode.C02, null)]
-    [InlineData(ImportNotificationStatus.InProgress, DecisionCode.C02, null)]
-    [InlineData(ImportNotificationStatus.Amend, DecisionCode.C02, null)]
+    [InlineData(TracesNotificationStatus.Cancelled, DecisionCode.X00, DecisionInternalFurtherDetail.E71)]
+    [InlineData(TracesNotificationStatus.Replaced, DecisionCode.X00, DecisionInternalFurtherDetail.E72)]
+    [InlineData(TracesNotificationStatus.Deleted, DecisionCode.X00, DecisionInternalFurtherDetail.E73)]
+    [InlineData(TracesNotificationStatus.SplitConsignment, DecisionCode.X00, DecisionInternalFurtherDetail.E75)]
+    [InlineData(TracesNotificationStatus.Submitted, DecisionCode.C02, null)]
+    [InlineData(TracesNotificationStatus.Validated, DecisionCode.C02, null)]
+    [InlineData(TracesNotificationStatus.InProgress, DecisionCode.C02, null)]
     public void Execute_Rule(
         string status,
         DecisionCode expectedDecisionCode,

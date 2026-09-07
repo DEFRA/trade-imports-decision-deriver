@@ -59,4 +59,5 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 EXPOSE 8085
+USER app
 ENTRYPOINT ["dotnet", "Defra.TradeImportsDecisionDeriver.Deriver.dll"]

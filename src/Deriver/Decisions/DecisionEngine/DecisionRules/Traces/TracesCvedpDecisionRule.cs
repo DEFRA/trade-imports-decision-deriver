@@ -6,10 +6,7 @@ public sealed class TracesCvedpDecisionRule : IDecisionRule
     {
         return context.Ched?.ExchangedDocument.NotificationStatusCode switch
         {
-            TracesNotificationStatus.Validated => new DecisionEngineResult(
-                DecisionCode.C03,
-                nameof(TracesCvedpDecisionRule)
-            ),
+            TracesNotificationStatus.Validated => next(context),
             _ => new DecisionEngineResult(
                 DecisionCode.H01,
                 nameof(TracesCvedpDecisionRule),

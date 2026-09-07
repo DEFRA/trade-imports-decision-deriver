@@ -5,6 +5,7 @@ using Defra.TradeImports.SMB.Metrics;
 using Defra.TradeImports.SMB.SQSSNS;
 using Defra.TradeImports.SMB.Tracing;
 using Defra.TradeImports.SQS.Endpoints;
+using Defra.TradeImports.Tracing;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.Events;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
@@ -21,12 +22,31 @@ using Microsoft.Extensions.Options;
 using Polly;
 using SlimMessageBus.Host;
 using SlimMessageBus.Host.AmazonSQS;
+using TradeImportsQuantityMgmt.Client.Extensions;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 
 [ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtensions
 {
+    public static IServiceCollection AddQuantityManagementHttpClient(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
+    {
+        services
+            .AddQuantityManagementClients(configuration)
+            .WithSts()
+            .WithLogging()
+            .WithTracing(sp =>
+            {
+                var traceContextAccessor = sp.GetRequiredService<ITraceContextAccessor>();
+                return traceContextAccessor.Context?.TraceId ?? Guid.CreateVersion7().ToString("N");
+            });
+
+        return services;
+    }
+
     public static IServiceCollection AddDataApiHttpClient(this IServiceCollection services)
     {
         var resilienceOptions = new HttpStandardResilienceOptions { Retry = { UseJitter = true } };

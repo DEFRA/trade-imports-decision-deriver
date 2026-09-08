@@ -27,7 +27,7 @@ public class QuantityManagementHealthCheck(IQuantityManagementClient quantityMan
         {
             return new HealthCheckResult(
                 context.Registration.FailureStatus,
-                exception: new Exception($"Failed to connect to Traces Gateway", ex)
+                exception: new Exception($"Failed to connect to Quantity Management", ex)
             );
         }
     }

@@ -36,7 +36,6 @@ public static class ServiceCollectionExtensions
     {
         services
             .AddQuantityManagementClients(configuration)
-            .WithSts()
             .WithLogging()
             .WithTracing(sp =>
             {

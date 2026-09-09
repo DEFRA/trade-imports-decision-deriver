@@ -33,8 +33,6 @@ public class TestDecisionRulesEngineFactory : IDecisionRulesEngineFactory
         .AddSingleton<TracesCedDecisionRule>()
         .AddSingleton<TracesChedppDecisionRule>()
         .AddSingleton<TracesCvedaDecisionRule>()
-        .AddSingleton<TracesCommodityCodeDecisionRule>()
-        .AddSingleton<TracesCommodityQuantityCheckDecisionRule>()
         .AddSingleton<TracesReservationDecisionRule>()
         .AddSingleton(CreateQuantityManagementClient())
         .AddOptions()

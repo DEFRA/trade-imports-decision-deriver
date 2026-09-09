@@ -61,8 +61,6 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         var rules = new List<IDecisionRule>
         {
             AddRule<TracesReservationDecisionRule>(),
-            AddRule<TracesCommodityQuantityCheckDecisionRule>(),
-            AddRule<TracesCommodityCodeDecisionRule>(),
             AddRule<TracesTerminalStatusDecisionRule>(),
             AddRule<TracesCvedaDecisionRule>(),
         };
@@ -80,8 +78,6 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         var rules = new List<IDecisionRule>
         {
             AddRule<TracesReservationDecisionRule>(),
-            AddRule<TracesCommodityQuantityCheckDecisionRule>(),
-            AddRule<TracesCommodityCodeDecisionRule>(),
             AddRule<TracesTerminalStatusDecisionRule>(),
             AddRule<TracesCvedpDecisionRule>(),
         };
@@ -99,8 +95,6 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         var rules = new List<IDecisionRule>
         {
             AddRule<TracesReservationDecisionRule>(),
-            AddRule<TracesCommodityQuantityCheckDecisionRule>(),
-            AddRule<TracesCommodityCodeDecisionRule>(),
             AddRule<TracesTerminalStatusDecisionRule>(),
             AddRule<TracesChedppDecisionRule>(),
         };
@@ -118,8 +112,6 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         var rules = new List<IDecisionRule>
         {
             AddRule<TracesReservationDecisionRule>(),
-            AddRule<TracesCommodityQuantityCheckDecisionRule>(),
-            AddRule<TracesCommodityCodeDecisionRule>(),
             AddRule<TracesTerminalStatusDecisionRule>(),
             AddRule<TracesCedDecisionRule>(),
         };

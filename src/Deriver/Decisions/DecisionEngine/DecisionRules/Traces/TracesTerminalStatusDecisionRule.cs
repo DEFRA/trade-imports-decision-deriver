@@ -4,7 +4,7 @@ public sealed class TracesTerminalStatusDecisionRule : TerminalStatusDecisionRul
 {
     public override DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
-        return context.Ched?.ExchangedDocument.NotificationStatusCode switch
+        return context.Ched?.ExchangedDocument.DocumentStatusCode switch
         {
             TracesNotificationStatus.Cancelled => new DecisionEngineResult(
                 DecisionCode.X00,

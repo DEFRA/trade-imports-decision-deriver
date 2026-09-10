@@ -40,6 +40,7 @@ services:
       PORT: 8080
       DataApi__BaseAddress: "http://wiremock"
       DataApi__Password: "secret"
+      QuantityManagementClient__BaseUrl: "http://wiremock"
       SQS_Endpoint: http://localstack:4566
       AWS_EMF_ENVIRONMENT: Local
       AWS__ServiceURL: http://localstack:4566

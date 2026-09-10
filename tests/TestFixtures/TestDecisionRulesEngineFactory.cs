@@ -1,8 +1,13 @@
+using System.Net;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces;
 using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
+using Refit;
+using TradeImportsQuantityMgmt.Client.Clients;
+using TradeImportsQuantityMgmt.Contract;
 
 namespace Defra.TradeImportsDecisionDeriver.TestFixtures;
 
@@ -28,6 +33,8 @@ public class TestDecisionRulesEngineFactory : IDecisionRulesEngineFactory
         .AddSingleton<TracesCedDecisionRule>()
         .AddSingleton<TracesChedppDecisionRule>()
         .AddSingleton<TracesCvedaDecisionRule>()
+        .AddSingleton<TracesReservationDecisionRule>()
+        .AddSingleton(CreateQuantityManagementClient())
         .AddOptions()
         .Configure<DecisionRulesOptions>(c =>
         {
@@ -79,5 +86,28 @@ public class TestDecisionRulesEngineFactory : IDecisionRulesEngineFactory
                 },
             },
         };
+    }
+
+    private static IQuantityManagementClient CreateQuantityManagementClient()
+    {
+        var client = Substitute.For<IQuantityManagementClient>();
+
+        client
+            .PutChedReservation(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<ChedReservationRequest>(),
+                Arg.Any<CancellationToken>()
+            )
+            .Returns(
+                new ApiResponse<ChedDeclarationReservation>(
+                    new HttpResponseMessage(HttpStatusCode.OK),
+                    new ChedDeclarationReservation { Reserved = [], Consumed = [] },
+                    null!,
+                    null!
+                )
+            );
+
+        return client;
     }
 }

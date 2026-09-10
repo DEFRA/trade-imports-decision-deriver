@@ -42,7 +42,7 @@ public class TracesCvedpDecisionRuleTests
         // Act
         var result = new TracesCvedpDecisionRule().Execute(
             context,
-            engineContext => new DecisionEngineResult(DecisionCode.C02, "Test")
+            engineContext => new DecisionEngineResult(DecisionCode.C03, "Test")
         );
 
         // Assert using FluentAssertions

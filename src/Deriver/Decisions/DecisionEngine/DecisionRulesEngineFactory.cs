@@ -60,6 +60,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
     {
         var rules = new List<IDecisionRule>
         {
+            AddRule<TracesReservationDecisionRule>(),
             AddRule<TracesTerminalStatusDecisionRule>(),
             AddRule<TracesCvedaDecisionRule>(),
         };
@@ -76,6 +77,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
     {
         var rules = new List<IDecisionRule>
         {
+            AddRule<TracesReservationDecisionRule>(),
             AddRule<TracesTerminalStatusDecisionRule>(),
             AddRule<TracesCvedpDecisionRule>(),
         };
@@ -92,6 +94,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
     {
         var rules = new List<IDecisionRule>
         {
+            AddRule<TracesReservationDecisionRule>(),
             AddRule<TracesTerminalStatusDecisionRule>(),
             AddRule<TracesChedppDecisionRule>(),
         };
@@ -108,6 +111,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
     {
         var rules = new List<IDecisionRule>
         {
+            AddRule<TracesReservationDecisionRule>(),
             AddRule<TracesTerminalStatusDecisionRule>(),
             AddRule<TracesCedDecisionRule>(),
         };

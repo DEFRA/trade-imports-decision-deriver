@@ -8,7 +8,7 @@ public sealed class TracesCvedpDecisionRule : IDecisionRule
         {
             TracesNotificationStatus.Validated => new DecisionEngineResult(
                 DecisionCode.C03,
-                nameof(TracesCvedpDecisionRule)
+                nameof(TracesChedppDecisionRule)
             ),
             _ => new DecisionEngineResult(
                 DecisionCode.H01,

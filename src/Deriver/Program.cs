@@ -54,6 +54,7 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
     builder.Services.AddHealth(builder.Configuration);
     builder.Services.AddProcessorConfiguration(builder.Configuration);
     builder.Services.AddDataApiHttpClient();
+    builder.Services.AddQuantityManagementHttpClient(builder.Configuration);
     builder.Services.AddConsumers(builder.Configuration);
 
     builder.Services.AddAuthenticationAuthorization();

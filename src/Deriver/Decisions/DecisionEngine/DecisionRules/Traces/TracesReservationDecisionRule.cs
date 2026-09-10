@@ -15,10 +15,21 @@ public sealed class TracesReservationDecisionRule(
     {
         var result = next(context);
 
-        if (!result.Code.IsReleaseOrHold() || context.Level3Succeeded != true)
+        if (!result.Code.IsReleaseOrHold())
         {
+            context.Logger.LogInformation(
+                "Skipping reservation for {Ched} : {Mrn}",
+                context.Ched?.ExchangedDocument.Identifier,
+                context.ClearanceRequest.MovementReferenceNumber
+            );
             return result;
         }
+
+        context.Logger.LogInformation(
+            "Running reservation for {Ched} : {Mrn}",
+            context.Ched?.ExchangedDocument.Identifier,
+            context.ClearanceRequest.MovementReferenceNumber
+        );
 
         var request = new ChedReservationRequest { Items = BuildReservationItems(context) };
 
@@ -35,7 +46,7 @@ public sealed class TracesReservationDecisionRule(
 
         if (response.IsSuccessful)
             return new DecisionEngineResult(DecisionCode.C03, nameof(TracesReservationDecisionRule));
-        switch (options.Value.Level3Mode)
+        switch (options.Value.Level4Mode)
         {
             case RuleMode.Live:
                 return new DecisionEngineResult(

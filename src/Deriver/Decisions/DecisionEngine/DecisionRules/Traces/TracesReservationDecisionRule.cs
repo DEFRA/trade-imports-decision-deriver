@@ -15,7 +15,7 @@ public sealed class TracesReservationDecisionRule(
     {
         var result = next(context);
 
-        if (!result.Code.IsReleaseOrHold())
+        if (!result.Code.IsRelease() || context.Level3Succeeded != true)
         {
             context.Logger.LogInformation(
                 "Skipping reservation for {Ched} : {Mrn}",

@@ -21,4 +21,19 @@ public static class DecisionCodeExtensions
             _ => false,
         };
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsRelease(this DecisionCode decisionCode)
+    {
+        return decisionCode switch
+        {
+            DecisionCode.C02
+            or DecisionCode.C03
+            or DecisionCode.C05
+            or DecisionCode.C06
+            or DecisionCode.C07
+            or DecisionCode.C08 => true,
+            _ => false,
+        };
+    }
 }

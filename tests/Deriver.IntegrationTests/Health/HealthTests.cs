@@ -41,6 +41,14 @@ public class HealthTests(WireMockClient wireMockClient)
                     rsp.WithStatusCode(HttpStatusCode.OK);
                 })
         );
+
+        getMappingBuilder.Given(m =>
+            m.WithRequest(req => req.UsingGet().WithPath("/health"))
+                .WithResponse(rsp =>
+                {
+                    rsp.WithStatusCode(HttpStatusCode.OK);
+                })
+        );
         var getMappingBuilderResult = await getMappingBuilder.BuildAndPostAsync();
         Assert.Null(getMappingBuilderResult.Error);
 

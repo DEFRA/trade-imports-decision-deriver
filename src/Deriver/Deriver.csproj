@@ -15,6 +15,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Defra.Trade.Imports.Quantity.Management.Client" Version="0.1.0-pr-3.19" />
     <PackageReference Include="Defra.TradeImports.Api.Auth" Version="0.2.0" />
     <PackageReference Include="Defra.TradeImports.EmfExporter" Version="0.2.0" />
     <PackageReference Include="Defra.TradeImports.SMB.CompressedSerializer" Version="0.2.0" />

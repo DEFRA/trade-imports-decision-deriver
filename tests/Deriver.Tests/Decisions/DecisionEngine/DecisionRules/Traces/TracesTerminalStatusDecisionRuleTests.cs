@@ -28,7 +28,7 @@ public class TracesTerminalStatusDecisionRuleTests
         // Arrange
         var ched = new DefraUNVTDCHEDProfile()
         {
-            ExchangedDocument = new ExchangedDocument() { NotificationStatusCode = status, Identifier = "test" },
+            ExchangedDocument = new ExchangedDocument() { DocumentStatusCode = status, Identifier = "test" },
             SpecifiedConsignment = new Consignment(),
         };
         var context = new DecisionEngineContext(
@@ -41,7 +41,7 @@ public class TracesTerminalStatusDecisionRuleTests
             new ImportDocument(),
             new DefraUNVTDCHEDProfile()
             {
-                ExchangedDocument = new ExchangedDocument() { NotificationStatusCode = status, Identifier = "test" },
+                ExchangedDocument = new ExchangedDocument() { DocumentStatusCode = status, Identifier = "test" },
                 SpecifiedConsignment = new Consignment(),
             }
         )

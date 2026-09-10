@@ -17,6 +17,8 @@ public sealed class DecisionRulesOptions
 
     public RuleMode Level3Mode { get; set; } = RuleMode.DryRun;
 
+    public RuleMode Level4Mode { get; set; } = RuleMode.DryRun;
+
     public CommodityQuantityCheckDecisionRuleOptions CommodityQuantityCheckDecisionRule { get; set; } = new();
 }
 

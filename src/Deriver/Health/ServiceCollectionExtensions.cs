@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Microsoft.Extensions.Options;
+using TradeImportsQuantityMgmt.Client.Clients;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Health;
 
@@ -31,6 +32,11 @@ public static class ServiceCollectionExtensions
             )
             .AddDataApi(
                 sp => sp.GetRequiredService<IOptions<DataApiOptions>>().Value,
+                tags: [WebApplicationExtensions.Extended],
+                timeout: TimeSpan.FromSeconds(10)
+            )
+            .AddQuantityManagement(
+                sp => sp.GetRequiredService<IQuantityManagementClient>(),
                 tags: [WebApplicationExtensions.Extended],
                 timeout: TimeSpan.FromSeconds(10)
             );

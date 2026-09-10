@@ -18,7 +18,7 @@ public class TracesChedppDecisionRuleTests
     {
         var ched = new DefraUNVTDCHEDProfile()
         {
-            ExchangedDocument = new ExchangedDocument() { NotificationStatusCode = status, Identifier = "test" },
+            ExchangedDocument = new ExchangedDocument() { DocumentStatusCode = status, Identifier = "test" },
             SpecifiedConsignment = new Consignment(),
         };
         var context = new DecisionEngineContext(
@@ -31,7 +31,7 @@ public class TracesChedppDecisionRuleTests
             new ImportDocument(),
             new DefraUNVTDCHEDProfile()
             {
-                ExchangedDocument = new ExchangedDocument() { NotificationStatusCode = status, Identifier = "test" },
+                ExchangedDocument = new ExchangedDocument() { DocumentStatusCode = status, Identifier = "test" },
                 SpecifiedConsignment = new Consignment(),
             }
         )
@@ -42,7 +42,7 @@ public class TracesChedppDecisionRuleTests
         // Act
         var result = new TracesChedppDecisionRule().Execute(
             context,
-            engineContext => new DecisionEngineResult(DecisionCode.C02, "Test")
+            engineContext => new DecisionEngineResult(DecisionCode.C03, "Test")
         );
 
         // Assert using FluentAssertions

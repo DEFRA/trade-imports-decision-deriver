@@ -4,11 +4,11 @@ public sealed class TracesCvedaDecisionRule : IDecisionRule
 {
     public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
-        return context.Ched?.ExchangedDocument.NotificationStatusCode switch
+        return context.Ched?.ExchangedDocument.DocumentStatusCode switch
         {
             TracesNotificationStatus.Validated => new DecisionEngineResult(
                 DecisionCode.C03,
-                nameof(TracesCvedaDecisionRule)
+                nameof(TracesChedppDecisionRule)
             ),
             _ => new DecisionEngineResult(
                 DecisionCode.H01,

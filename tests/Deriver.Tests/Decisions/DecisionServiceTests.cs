@@ -986,7 +986,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
             ExchangedDocument = new ExchangedDocument()
             {
                 Identifier = "CHEDPP.GB.2025.1234567",
-                NotificationStatusCode = ImportNotificationStatus.Validated,
+                DocumentStatusCode = TracesNotificationStatus.Validated,
             },
         };
         var decisionContext = new DecisionContext(
@@ -1036,7 +1036,7 @@ public class DecisionServiceTests(ITestOutputHelper output)
         decisionResult.Should().NotBeNull();
         decisionResult.Count.Should().Be(1);
         decisionResult[0].Decision.Items.Length.Should().Be(1);
-        decisionResult[0].Decision.Items[0].Checks[0].DecisionCode.Should().Be("H01");
+        decisionResult[0].Decision.Items[0].Checks[0].DecisionCode.Should().Be("C03");
     }
 
     private static DecisionContext CreateChedppDecisionContext(

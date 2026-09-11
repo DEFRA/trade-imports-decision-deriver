@@ -60,6 +60,17 @@ public class PostTests
 
         mappingBuilder.Given(m =>
             m.WithRequest(req =>
+                    req.UsingGet()
+                        .WithPath($"/customs-declarations/{customsDeclaration.MovementReferenceNumber}/traces-cheds")
+                )
+                .WithResponse(rsp =>
+                    rsp.WithBody(JsonSerializer.Serialize(new TracesChedsResponse([])))
+                        .WithStatusCode(HttpStatusCode.OK)
+                )
+        );
+
+        mappingBuilder.Given(m =>
+            m.WithRequest(req =>
                     req.UsingPut().WithPath($"/customs-declarations/{customsDeclaration.MovementReferenceNumber}")
                 )
                 .WithResponse(rsp => rsp.WithStatusCode(HttpStatusCode.OK))

@@ -346,11 +346,11 @@ public class TracesReservationDecisionRuleTests
         capturedRequest.Request.Items.Should().Contain(i => i.GoodsItemNumber == 2 && i.NetWeightQuantity == 20);
     }
 
-    private TracesReservationDecisionRule CreateRule(RuleMode level3Mode = RuleMode.DryRun)
+    private TracesReservationDecisionRule CreateRule(RuleMode level4Mode = RuleMode.DryRun)
     {
         return new TracesReservationDecisionRule(
             _quantityManagementClient,
-            Options.Create(new DecisionRulesOptions() { Level3Mode = level3Mode })
+            Options.Create(new DecisionRulesOptions() { Level4Mode = level4Mode })
         );
     }
 

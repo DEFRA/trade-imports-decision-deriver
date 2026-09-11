@@ -4,6 +4,8 @@ public sealed class TracesCvedaDecisionRule : IDecisionRule
 {
     public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
+        // temp until level 2 and 3 are implemented
+        context.Level3Succeeded = true;
         return context.Ched?.ExchangedDocument.DocumentStatusCode switch
         {
             TracesNotificationStatus.Validated => new DecisionEngineResult(

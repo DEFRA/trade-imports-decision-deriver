@@ -30,9 +30,7 @@ public sealed class TracesCommodityQuantityCheckDecisionRule : CommodityQuantity
                     .ApplicableClassification?.Select(classification => classification.ClassCode?.Value)
                     .FirstOrDefault(value => !string.IsNullOrEmpty(value)),
                 ConvertWeightToKgm(tradeLineItem.NetWeight),
-                tradeLineItem
-                    .PhysicalReferencedLogisticsPackage?.Where(package => package.ItemQuantity.HasValue)
-                    .Sum(package => (decimal?)package.ItemQuantity)
+                ParseDecimal(tradeLineItem.NetVolume?.Value)
             ));
     }
 

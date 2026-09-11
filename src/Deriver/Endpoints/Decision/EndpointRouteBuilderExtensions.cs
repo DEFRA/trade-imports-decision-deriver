@@ -127,7 +127,7 @@ public static class EndpointRouteBuilderExtensions
                     }
                 ),
             ],
-            chedReponse is null ? [] : chedReponse.Cheds.Select(x => x.Ched).ToList()
+            chedReponse?.Cheds is null ? [] : chedReponse.Cheds.Select(x => x.Ched).ToList()
         );
 
         var decisionResult = decisionService.Process(decisionContext).FirstOrDefault();

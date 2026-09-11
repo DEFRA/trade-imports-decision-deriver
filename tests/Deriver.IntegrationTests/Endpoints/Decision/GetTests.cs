@@ -56,6 +56,17 @@ public class GetTests
                 )
         );
 
+        mappingBuilder.Given(m =>
+            m.WithRequest(req =>
+                    req.UsingGet()
+                        .WithPath($"/customs-declarations/{customsDeclaration.MovementReferenceNumber}/traces-cheds")
+                )
+                .WithResponse(rsp =>
+                    rsp.WithBody(JsonSerializer.Serialize(new ImportPreNotificationsResponse([])))
+                        .WithStatusCode(HttpStatusCode.OK)
+                )
+        );
+
         var getMappingBuilderResult = await mappingBuilder.BuildAndPostAsync();
         Assert.Null(getMappingBuilderResult.Error);
 

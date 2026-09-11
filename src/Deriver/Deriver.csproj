@@ -15,14 +15,14 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Defra.Trade.Imports.Quantity.Management.Client" Version="0.1.0-pr-3.19" />
+    <PackageReference Include="Defra.Trade.Imports.Quantity.Management.Client" Version="0.1.0" />
     <PackageReference Include="Defra.TradeImports.Api.Auth" Version="0.2.0" />
     <PackageReference Include="Defra.TradeImports.EmfExporter" Version="0.2.0" />
     <PackageReference Include="Defra.TradeImports.SMB.CompressedSerializer" Version="0.2.0" />
     <PackageReference Include="Defra.TradeImports.SMB.Metrics" Version="0.2.1" />
     <PackageReference Include="Defra.TradeImports.SMB.SQSSNS" Version="0.2.0" />
     <PackageReference Include="Defra.TradeImports.SMB.Tracing" Version="0.2.0" />
-    <PackageReference Include="Defra.TradeImportsDataApi.Api.Client" Version="0.47.0" />
+    <PackageReference Include="Defra.TradeImportsDataApi.Api.Client" Version="0.48.0" />
     <PackageReference Include="Defra.TradeImports.SQS.Endpoints" Version="0.1.3" />
     <PackageReference Include="Elastic.CommonSchema.Serilog" Version="9.0.0" />
     <PackageReference Include="Elastic.Serilog.Enrichers.Web" Version="9.0.0" />
@@ -33,13 +33,13 @@
     <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.1" />
     <PackageReference Include="SlimMessageBus" Version="3.0.0" />
-    <PackageReference Include="SlimMessageBus.Host.AmazonSQS" Version="3.4.0" />
-    <PackageReference Include="SlimMessageBus.Host.Serialization.SystemTextJson" Version="3.4.0" />
+    <PackageReference Include="SlimMessageBus.Host.AmazonSQS" Version="3.5.0" />
+    <PackageReference Include="SlimMessageBus.Host.Serialization.SystemTextJson" Version="3.5.0" />
     <PackageReference Include="Amazon.CloudWatch.EMF" Version="2.2.0" />
-    <PackageReference Include="AWSSDK.Core" Version="4.0.100.2" />
-    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.100.2" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="4.0.100.2" />
-    <PackageReference Include="AWSSDK.SQS" Version="4.0.100.2" />
+    <PackageReference Include="AWSSDK.Core" Version="4.0.102.5" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.101.3" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="4.0.100.13" />
+    <PackageReference Include="AWSSDK.SQS" Version="4.0.100.13" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Properties\.env.local">

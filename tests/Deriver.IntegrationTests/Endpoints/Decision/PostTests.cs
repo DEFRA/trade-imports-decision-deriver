@@ -64,7 +64,7 @@ public class PostTests
                         .WithPath($"/customs-declarations/{customsDeclaration.MovementReferenceNumber}/traces-cheds")
                 )
                 .WithResponse(rsp =>
-                    rsp.WithBody(JsonSerializer.Serialize(new ImportPreNotificationsResponse([])))
+                    rsp.WithBody(JsonSerializer.Serialize(new TracesChedsResponse([])))
                         .WithStatusCode(HttpStatusCode.OK)
                 )
         );

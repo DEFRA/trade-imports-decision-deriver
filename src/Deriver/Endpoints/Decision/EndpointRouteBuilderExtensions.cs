@@ -109,6 +109,8 @@ public static class EndpointRouteBuilderExtensions
 
         var notificationResponse = await apiClient.GetImportPreNotificationsByMrn(mrn, cancellationToken);
 
+        var chedReponse = await apiClient.GetTracesChedsByMrn(mrn, cancellationToken);
+
         var preNotifications = notificationResponse
             .ImportPreNotifications.Select(x => x.ImportPreNotification)
             .ToList();
@@ -125,7 +127,7 @@ public static class EndpointRouteBuilderExtensions
                     }
                 ),
             ],
-            []
+            chedReponse is null ? [] : chedReponse.Cheds.Select(x => x.Ched).ToList()
         );
 
         var decisionResult = decisionService.Process(decisionContext).FirstOrDefault();

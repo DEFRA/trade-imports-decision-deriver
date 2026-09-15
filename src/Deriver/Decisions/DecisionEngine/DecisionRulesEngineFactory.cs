@@ -47,6 +47,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
                         : CreateEngineForCed(k),
                     _ => new DecisionRulesEngine(
                         "Unknown",
+                        "Unknown",
                         new List<IDecisionRule> { AddRule<UnknownChedTypeDecisionRule>() },
                         _logger,
                         _options
@@ -68,6 +69,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
+            "Traces",
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -87,6 +89,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
+            "Traces",
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -106,6 +109,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
+            "Traces",
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -125,6 +129,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
+            "Traces",
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -148,6 +153,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
+            "Ipaffs",
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -172,6 +178,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
+            "Ipaffs",
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -194,6 +201,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
+            "Ipaffs",
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -217,6 +225,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
+            "Ipaffs",
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),

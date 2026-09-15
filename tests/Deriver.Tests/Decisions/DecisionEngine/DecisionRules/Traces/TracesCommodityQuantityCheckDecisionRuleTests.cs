@@ -31,9 +31,12 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         // Arrange
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = ruleMode,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Traces = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = ruleMode,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new TracesCommodityQuantityCheckDecisionRule();
 
@@ -134,9 +137,12 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         // Arrange
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = ruleMode,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Traces = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = ruleMode,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new TracesCommodityQuantityCheckDecisionRule();
 
@@ -224,9 +230,12 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         // Arrange
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = RuleMode.DryRun,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Traces = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new TracesCommodityQuantityCheckDecisionRule();
 
@@ -265,9 +274,12 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         // Arrange
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = RuleMode.DryRun,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Traces = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new TracesCommodityQuantityCheckDecisionRule();
 
@@ -303,9 +315,12 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         // Arrange
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = RuleMode.DryRun,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Traces = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new TracesCommodityQuantityCheckDecisionRule();
 
@@ -391,9 +406,12 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         // Arrange: chedWeightInUnit converts to >= 4kg, but the raw (unconverted) number would not
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = RuleMode.Live,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Traces = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = RuleMode.Live,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new TracesCommodityQuantityCheckDecisionRule();
 
@@ -463,9 +481,12 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         // Arrange
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = RuleMode.Live,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Traces = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = RuleMode.Live,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new TracesCommodityQuantityCheckDecisionRule();
 

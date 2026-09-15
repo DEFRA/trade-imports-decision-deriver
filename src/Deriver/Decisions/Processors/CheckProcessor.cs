@@ -302,6 +302,7 @@ public class CheckProcessor(
     private DecisionEngineResult RunEngine(string source, CheckCode checkCode, DecisionEngineContext context)
     {
         var decisionEngine = decisionRulesEngineFactory.Get(source, checkCode.GetImportNotificationType());
+        context.Source = source;
         return decisionEngine.Run(context);
     }
 

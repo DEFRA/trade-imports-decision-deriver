@@ -100,7 +100,7 @@ public class CommodityQuantityCheckDecisionRuleTests
         )
         {
             Logger = NullLogger.Instance,
-            Source = "Ipaffs",
+            Source = Constants.ChedSource.Ipaffs,
         };
 
         // Act
@@ -207,7 +207,7 @@ public class CommodityQuantityCheckDecisionRuleTests
         )
         {
             Logger = NullLogger.Instance,
-            Source = "Ipaffs",
+            Source = Constants.ChedSource.Ipaffs,
         };
 
         // Act
@@ -371,7 +371,7 @@ public class CommodityQuantityCheckDecisionRuleTests
         )
         {
             Logger = NullLogger.Instance,
-            Source = "Ipaffs",
+            Source = Constants.ChedSource.Ipaffs,
         };
 
         // Act
@@ -725,7 +725,7 @@ public class CommodityQuantityCheckDecisionRuleTests
         )
         {
             Logger = NullLogger.Instance,
-            Source = "Ipaffs",
+            Source = Constants.ChedSource.Ipaffs,
         };
     }
 }

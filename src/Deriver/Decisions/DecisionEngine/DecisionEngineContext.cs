@@ -24,5 +24,5 @@ public sealed record DecisionEngineContext(
     public bool? Level3Succeeded { get; set; }
 
     public DecisionRulesSourceOptions GetDecisionRulesSourceOptions() =>
-        Source == "Ipaffs" ? DecisionRulesOptions.Ipaffs : DecisionRulesOptions.Traces;
+        Source == Constants.ChedSource.Ipaffs ? DecisionRulesOptions.Ipaffs : DecisionRulesOptions.Traces;
 }

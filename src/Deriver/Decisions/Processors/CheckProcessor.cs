@@ -190,7 +190,7 @@ public class CheckProcessor(
                 null
             );
 
-            var result = RunEngine("IPAFFS", checkCode, resolverContext);
+            var result = RunEngine(Constants.ChedSource.Ipaffs, checkCode, resolverContext);
             output.Add(
                 new CheckDecisionResult(
                     notification,
@@ -256,7 +256,7 @@ public class CheckProcessor(
                 ched
             );
 
-            var result = RunEngine("TRACES", checkCode, resolverContext);
+            var result = RunEngine(Constants.ChedSource.Traces, checkCode, resolverContext);
             output.Add(
                 new CheckDecisionResult(
                     null,

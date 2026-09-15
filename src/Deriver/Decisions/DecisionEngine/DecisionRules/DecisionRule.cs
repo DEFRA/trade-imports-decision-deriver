@@ -33,7 +33,7 @@ public abstract class DecisionRule : IDecisionRule
         DecisionRulesOptions? options
     )
     {
-        var sourceOptions = source == "Ipaffs" ? options?.Ipaffs : options?.Traces;
+        var sourceOptions = source == Constants.ChedSource.Ipaffs ? options?.Ipaffs : options?.Traces;
         if (sourceOptions?.Cheds != null && sourceOptions.Cheds.TryGetValue(chedType ?? string.Empty, out var perChed))
         {
             return perChed?.DisabledForEu ?? Enumerable.Empty<string>();
@@ -48,7 +48,7 @@ public abstract class DecisionRule : IDecisionRule
         DecisionRulesOptions? options
     )
     {
-        var sourceOptions = source == "Ipaffs" ? options?.Ipaffs : options?.Traces;
+        var sourceOptions = source == Constants.ChedSource.Ipaffs ? options?.Ipaffs : options?.Traces;
         if (sourceOptions?.Cheds != null && sourceOptions.Cheds.TryGetValue(chedType ?? string.Empty, out var perChed))
         {
             return perChed?.DisabledForRoW ?? Enumerable.Empty<string>();

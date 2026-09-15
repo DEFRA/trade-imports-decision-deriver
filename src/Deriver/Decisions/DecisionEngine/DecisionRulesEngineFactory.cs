@@ -33,16 +33,16 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             {
                 return notificationType switch
                 {
-                    ImportNotificationType.Cveda => source == "TRACES"
+                    ImportNotificationType.Cveda => source == Constants.ChedSource.Traces
                         ? CreateEngineForTracesCveda(k)
                         : CreateEngineForCveda(k),
-                    ImportNotificationType.Cvedp => source == "TRACES"
+                    ImportNotificationType.Cvedp => source == Constants.ChedSource.Traces
                         ? CreateEngineForTracesCvedp(k)
                         : CreateEngineForCvedp(k),
-                    ImportNotificationType.Chedpp => source == "TRACES"
+                    ImportNotificationType.Chedpp => source == Constants.ChedSource.Traces
                         ? CreateEngineForTracesChedpp(k)
                         : CreateEngineForChedpp(k),
-                    ImportNotificationType.Ced => source == "TRACES"
+                    ImportNotificationType.Ced => source == Constants.ChedSource.Traces
                         ? CreateEngineForTracesCed(k)
                         : CreateEngineForCed(k),
                     _ => new DecisionRulesEngine(
@@ -69,7 +69,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
-            "Traces",
+            Constants.ChedSource.Traces,
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -89,7 +89,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
-            "Traces",
+            Constants.ChedSource.Traces,
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -109,7 +109,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
-            "Traces",
+            Constants.ChedSource.Traces,
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -129,7 +129,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
-            "Traces",
+            Constants.ChedSource.Traces,
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -153,7 +153,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
-            "Ipaffs",
+            Constants.ChedSource.Ipaffs,
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -178,7 +178,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
-            "Ipaffs",
+            Constants.ChedSource.Ipaffs,
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -201,7 +201,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
-            "Ipaffs",
+            Constants.ChedSource.Ipaffs,
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -225,7 +225,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
-            "Ipaffs",
+            Constants.ChedSource.Ipaffs,
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),

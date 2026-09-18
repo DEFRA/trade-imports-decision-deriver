@@ -25,7 +25,7 @@ public sealed class TracesCommodityCodeDecisionRule(IOptions<DecisionRulesOption
 
         if (context.Level2Succeeded == false)
         {
-            switch (options.Value.Level2Mode)
+            switch (options.Value.Traces.Level2Mode)
             {
                 case RuleMode.DryRun:
                     result.AddResult(

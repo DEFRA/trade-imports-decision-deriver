@@ -64,7 +64,7 @@ public abstract class CommodityQuantityCheckRuleBase : DecisionRule
                     : DecisionInternalFurtherDetail.E31,
             };
 
-            var liveResult = ApplyLevel3Result(result, detail, context.DecisionRulesOptions.Level3Mode);
+            var liveResult = ApplyLevel3Result(result, detail, context.GetDecisionRulesSourceOptions().Level3Mode);
 
             if (liveResult != null)
             {
@@ -96,7 +96,7 @@ public abstract class CommodityQuantityCheckRuleBase : DecisionRule
                             commodity,
                             mrnCommodities,
                             chedCommodities,
-                            context.DecisionRulesOptions.QuantityManagementCheckNetMassTolerance,
+                            context.GetDecisionRulesSourceOptions().QuantityManagementCheckNetMassTolerance,
                             context.Logger
                         ),
                         QuantityComparisonType.Weight
@@ -145,11 +145,12 @@ public abstract class CommodityQuantityCheckRuleBase : DecisionRule
         var checkCode = context.CheckCode.Value;
 
         var rule = context
-            .DecisionRulesOptions.CommodityQuantityCheckDecisionRule.ComparisonEntries.Select(rule => new
+            .GetDecisionRulesSourceOptions()
+            .CommodityQuantityCheckDecisionRule.ComparisonEntries.Select(rule => new
             {
                 Rule = rule,
                 Score = CalculateScore(
-                    context.DecisionRulesOptions.CommodityQuantityCheckDecisionRule.Scoring,
+                    context.GetDecisionRulesSourceOptions().CommodityQuantityCheckDecisionRule.Scoring,
                     rule,
                     chedType,
                     checkCode,

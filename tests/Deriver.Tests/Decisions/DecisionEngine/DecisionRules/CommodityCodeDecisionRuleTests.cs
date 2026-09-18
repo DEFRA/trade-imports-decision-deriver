@@ -105,7 +105,11 @@ public class CommodityCodeDecisionRuleTests
     public void Execute_WhenResultCodeIsReleaseOrHold_AndNoMatchingCommodities_AndLiveMode_ReturnsResult()
     {
         // Arrange
-        _rule = new(Options.Create(new DecisionRulesOptions() { Level2Mode = RuleMode.Live }));
+        _rule = new(
+            Options.Create(
+                new DecisionRulesOptions() { Ipaffs = new DecisionRulesSourceOptions() { Level2Mode = RuleMode.Live } }
+            )
+        );
         var notification = DecisionImportPreNotificationBuilder
             .Create()
             .WithId("Test")
@@ -199,11 +203,14 @@ public class CommodityCodeDecisionRuleTests
             new DecisionContext([notification], [], []),
             new DecisionRulesOptions()
             {
-                Cheds = new Dictionary<string, DecisionRulesPerChedOptions>()
+                Ipaffs = new DecisionRulesSourceOptions()
                 {
+                    Cheds = new Dictionary<string, DecisionRulesPerChedOptions>()
                     {
-                        "CVEDA",
-                        new DecisionRulesPerChedOptions() { DisabledForEu = [nameof(CommodityCodeDecisionRule)] }
+                        {
+                            "CVEDA",
+                            new DecisionRulesPerChedOptions() { DisabledForEu = [nameof(CommodityCodeDecisionRule)] }
+                        },
                     },
                 },
             },
@@ -247,11 +254,14 @@ public class CommodityCodeDecisionRuleTests
             new DecisionContext([notification], [], []),
             new DecisionRulesOptions()
             {
-                Cheds = new Dictionary<string, DecisionRulesPerChedOptions>()
+                Ipaffs = new DecisionRulesSourceOptions()
                 {
+                    Cheds = new Dictionary<string, DecisionRulesPerChedOptions>()
                     {
-                        "CVEDA",
-                        new DecisionRulesPerChedOptions() { DisabledForRoW = [nameof(CommodityCodeDecisionRule)] }
+                        {
+                            "CVEDA",
+                            new DecisionRulesPerChedOptions() { DisabledForRoW = [nameof(CommodityCodeDecisionRule)] }
+                        },
                     },
                 },
             },

@@ -27,11 +27,11 @@ public sealed class TracesTerminalStatusDecisionRule : TerminalStatusDecisionRul
                 DecisionInternalFurtherDetail.E75
             ),
             TracesNotificationStatus.InProgress => new DecisionEngineResult(
-                DecisionCode.H01,
+                DecisionCode.H02,
                 nameof(TracesTerminalStatusDecisionRule)
             ),
             TracesNotificationStatus.Submitted => new DecisionEngineResult(
-                DecisionCode.H01,
+                DecisionCode.H02,
                 nameof(TracesTerminalStatusDecisionRule)
             ),
             _ => next(context),

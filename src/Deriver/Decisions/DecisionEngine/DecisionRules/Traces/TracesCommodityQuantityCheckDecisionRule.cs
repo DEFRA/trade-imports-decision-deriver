@@ -31,13 +31,13 @@ public sealed class TracesCommodityQuantityCheckDecisionRule : CommodityQuantity
                     .ApplicableClassification?.Select(classification => classification.ClassCode?.Value)
                     .FirstOrDefault(value => !string.IsNullOrEmpty(value)),
                 ConvertWeightToKgm(tradeLineItem.NetWeight),
-                ParseDecimal(tradeLineItem.NetVolume?.Value)
+                ParseDecimal(tradeLineItem.NetVolume?.Content)
             ));
     }
 
     private static decimal? ConvertWeightToKgm(UneceWeightMeasure? weight)
     {
-        var value = ParseDecimal(weight?.Value);
+        var value = ParseDecimal(weight?.Content);
 
         if (value == null)
         {

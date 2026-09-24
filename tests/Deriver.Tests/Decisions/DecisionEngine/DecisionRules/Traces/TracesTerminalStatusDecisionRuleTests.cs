@@ -16,9 +16,9 @@ public class TracesTerminalStatusDecisionRuleTests
     [InlineData(TracesNotificationStatus.Replaced, DecisionCode.X00, DecisionInternalFurtherDetail.E72)]
     [InlineData(TracesNotificationStatus.Deleted, DecisionCode.X00, DecisionInternalFurtherDetail.E73)]
     [InlineData(TracesNotificationStatus.SplitConsignment, DecisionCode.X00, DecisionInternalFurtherDetail.E75)]
-    [InlineData(TracesNotificationStatus.Submitted, DecisionCode.C02, null)]
+    [InlineData(TracesNotificationStatus.Submitted, DecisionCode.H02, null)]
+    [InlineData(TracesNotificationStatus.InProgress, DecisionCode.H02, null)]
     [InlineData(TracesNotificationStatus.Validated, DecisionCode.C02, null)]
-    [InlineData(TracesNotificationStatus.InProgress, DecisionCode.C02, null)]
     public void Execute_Rule(
         string status,
         DecisionCode expectedDecisionCode,

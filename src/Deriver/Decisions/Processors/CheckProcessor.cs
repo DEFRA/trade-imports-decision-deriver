@@ -247,7 +247,7 @@ public class CheckProcessor(
         {
             var resolverContext = new DecisionEngineContext(
                 context,
-                null!,
+                decisionRulesOptions.Value,
                 null!,
                 clearanceRequest,
                 commodity,

@@ -611,7 +611,7 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
                             ? null
                             : new UneceWeightMeasure()
                             {
-                                Value = netWeight.Value.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                                Content = netWeight.Value.ToString(System.Globalization.CultureInfo.InvariantCulture),
                                 UnitCode = netWeightUnitCode,
                             },
                     NetVolume =
@@ -619,7 +619,9 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
                             ? null
                             : new UneceMeasure()
                             {
-                                Value = itemQuantity.Value.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                                Content = itemQuantity.Value.ToString(
+                                    System.Globalization.CultureInfo.InvariantCulture
+                                ),
                             },
                     PhysicalReferencedLogisticsPackage =
                         itemQuantity == null ? null : [new LogisticsPackage() { ItemQuantity = itemQuantity }],

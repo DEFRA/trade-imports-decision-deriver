@@ -40,7 +40,7 @@ public class TestDecisionRulesEngineFactory : IDecisionRulesEngineFactory
         .AddOptions()
         .Configure<DecisionRulesOptions>(c =>
         {
-            c.CommodityQuantityCheckDecisionRule = CreateCommodityQuantityCheckDecisionRuleOptions();
+            c.Ipaffs.CommodityQuantityCheckDecisionRule = CreateCommodityQuantityCheckDecisionRuleOptions();
         })
         .AddLogging()
         .BuildServiceProvider();

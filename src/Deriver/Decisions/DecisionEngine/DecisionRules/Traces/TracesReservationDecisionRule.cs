@@ -36,7 +36,7 @@ public sealed class TracesReservationDecisionRule(
             context.ClearanceRequest.MovementReferenceNumber
         );
 
-        var request = new ChedReservationRequest {  Items = BuildReservationItems(context) };
+        var request = new ChedReservationRequest { Items = BuildReservationItems(context) };
 
         // usage of .GetAwaiter().GetResult(); is temp until we can refactor the decision engine to be async
         var response = quantityManagementClient
@@ -62,9 +62,9 @@ public sealed class TracesReservationDecisionRule(
 
             switch (problem?.Reason)
             {
-                case ReservationFailureReason.CnCodesMismatch: 
-                internalCode = DecisionInternalFurtherDetail.E41;
-                break;
+                case ReservationFailureReason.CnCodesMismatch:
+                    internalCode = DecisionInternalFurtherDetail.E41;
+                    break;
                 case ReservationFailureReason.InappropriateStatus:
                     internalCode = DecisionInternalFurtherDetail.E42;
                     break;
@@ -85,8 +85,7 @@ public sealed class TracesReservationDecisionRule(
                     break;
             }
         }
-        
-        
+
         switch (options.Value.Level4Mode)
         {
             case RuleMode.Live:

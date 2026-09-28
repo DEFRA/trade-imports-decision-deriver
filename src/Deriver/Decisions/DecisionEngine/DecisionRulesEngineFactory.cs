@@ -34,17 +34,17 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
                 return notificationType switch
                 {
                     ImportNotificationType.Cveda => source == Constants.ChedSource.Traces
-                        ? CreateEngineForTracesCveda(k)
-                        : CreateEngineForCveda(k),
+                        ? CreateEngineForTracesCveda(notificationType)
+                        : CreateEngineForCveda(notificationType),
                     ImportNotificationType.Cvedp => source == Constants.ChedSource.Traces
-                        ? CreateEngineForTracesCvedp(k)
-                        : CreateEngineForCvedp(k),
+                        ? CreateEngineForTracesCvedp(notificationType)
+                        : CreateEngineForCvedp(notificationType),
                     ImportNotificationType.Chedpp => source == Constants.ChedSource.Traces
-                        ? CreateEngineForTracesChedpp(k)
-                        : CreateEngineForChedpp(k),
+                        ? CreateEngineForTracesChedpp(notificationType)
+                        : CreateEngineForChedpp(notificationType),
                     ImportNotificationType.Ced => source == Constants.ChedSource.Traces
-                        ? CreateEngineForTracesCed(k)
-                        : CreateEngineForCed(k),
+                        ? CreateEngineForTracesCed(notificationType)
+                        : CreateEngineForCed(notificationType),
                     _ => new DecisionRulesEngine(
                         "Unknown",
                         "Unknown",

@@ -86,7 +86,7 @@ public sealed class TracesReservationDecisionRule(
             }
         }
 
-        switch (options.Value.Level4Mode)
+        switch (options.Value.Traces.Level4Mode)
         {
             case RuleMode.Live:
                 return new DecisionEngineResult(

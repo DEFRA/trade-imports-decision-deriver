@@ -97,7 +97,11 @@ public class TracesCommodityCodeDecisionRuleTests
     public void Execute_WhenResultCodeIsReleaseOrHold_AndNoMatchingCommodities_AndLiveMode_ReturnsResult()
     {
         // Arrange
-        _rule = new(Options.Create(new DecisionRulesOptions() { Level2Mode = RuleMode.Live }));
+        _rule = new(
+            Options.Create(
+                new DecisionRulesOptions() { Traces = new DecisionRulesSourceOptions() { Level2Mode = RuleMode.Live } }
+            )
+        );
         var ched = CreateChed("321");
 
         var c = new DecisionEngineContext(
@@ -223,11 +227,17 @@ public class TracesCommodityCodeDecisionRuleTests
             new DecisionContext([], [], [ched]),
             new DecisionRulesOptions()
             {
-                Cheds = new Dictionary<string, DecisionRulesPerChedOptions>()
+                Traces = new DecisionRulesSourceOptions()
                 {
+                    Cheds = new Dictionary<string, DecisionRulesPerChedOptions>()
                     {
-                        "CVEDA",
-                        new DecisionRulesPerChedOptions() { DisabledForEu = [nameof(TracesCommodityCodeDecisionRule)] }
+                        {
+                            "CVEDA",
+                            new DecisionRulesPerChedOptions()
+                            {
+                                DisabledForEu = [nameof(TracesCommodityCodeDecisionRule)],
+                            }
+                        },
                     },
                 },
             },
@@ -267,11 +277,17 @@ public class TracesCommodityCodeDecisionRuleTests
             new DecisionContext([], [], [ched]),
             new DecisionRulesOptions()
             {
-                Cheds = new Dictionary<string, DecisionRulesPerChedOptions>()
+                Traces = new DecisionRulesSourceOptions()
                 {
+                    Cheds = new Dictionary<string, DecisionRulesPerChedOptions>()
                     {
-                        "CVEDA",
-                        new DecisionRulesPerChedOptions() { DisabledForRoW = [nameof(TracesCommodityCodeDecisionRule)] }
+                        {
+                            "CVEDA",
+                            new DecisionRulesPerChedOptions()
+                            {
+                                DisabledForRoW = [nameof(TracesCommodityCodeDecisionRule)],
+                            }
+                        },
                     },
                 },
             },

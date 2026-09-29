@@ -26,7 +26,7 @@ public sealed class CommodityCodeDecisionRule(IOptions<DecisionRulesOptions> opt
 
         if (commodities.Count == 0)
         {
-            switch (options.Value.Level2Mode)
+            switch (options.Value.Ipaffs.Level2Mode)
             {
                 case RuleMode.DryRun:
                     result.AddResult(

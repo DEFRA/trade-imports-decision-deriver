@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 
 public sealed class DecisionRulesEngine(
+    string source,
     string chedType,
     IReadOnlyList<IDecisionRule> rules,
     ILogger<DecisionRulesEngine> logger,
@@ -12,7 +13,7 @@ public sealed class DecisionRulesEngine(
 {
     private readonly DecisionRuleDelegate _pipeline = BuildRules(
         rules,
-        GetDisabledRulesForChed(chedType, _options.CurrentValue)
+        GetDisabledRulesForChed(source, chedType, _options.CurrentValue)
     );
 
     public DecisionEngineResult Run(DecisionEngineContext context)
@@ -55,9 +56,14 @@ public sealed class DecisionRulesEngine(
         return pipeline;
     }
 
-    private static HashSet<string> GetDisabledRulesForChed(string chedType, DecisionRulesOptions? options)
+    private static HashSet<string> GetDisabledRulesForChed(
+        string source,
+        string chedType,
+        DecisionRulesOptions? options
+    )
     {
-        if (options?.Cheds != null && options.Cheds.TryGetValue(chedType ?? string.Empty, out var perChed))
+        var sourceOptions = source == Constants.ChedSource.Ipaffs ? options?.Ipaffs : options?.Traces;
+        if (sourceOptions?.Cheds != null && sourceOptions.Cheds.TryGetValue(chedType ?? string.Empty, out var perChed))
         {
             return new HashSet<string>(
                 perChed?.DisabledRules ?? Array.Empty<string>(),

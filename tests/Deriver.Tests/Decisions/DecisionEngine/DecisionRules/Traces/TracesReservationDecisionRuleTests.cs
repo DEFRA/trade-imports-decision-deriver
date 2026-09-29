@@ -350,7 +350,9 @@ public class TracesReservationDecisionRuleTests
     {
         return new TracesReservationDecisionRule(
             _quantityManagementClient,
-            Options.Create(new DecisionRulesOptions() { Level4Mode = level4Mode })
+            Options.Create(
+                new DecisionRulesOptions() { Traces = new DecisionRulesSourceOptions() { Level4Mode = level4Mode } }
+            )
         );
     }
 

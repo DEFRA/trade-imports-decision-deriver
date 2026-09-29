@@ -8,6 +8,14 @@ public sealed class DecisionRulesOptions
 {
     public const string SectionName = "DecisionRules";
 
+    public DecisionRulesSourceOptions Ipaffs { get; set; } = new();
+
+    public DecisionRulesSourceOptions Traces { get; set; } = new();
+}
+
+[ExcludeFromCodeCoverage]
+public sealed class DecisionRulesSourceOptions
+{
     // Map of CHED type (e.g. "CHEDA", "CHEDP", ...) -> rules config for that CHED
     public Dictionary<string, DecisionRulesPerChedOptions> Cheds { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 

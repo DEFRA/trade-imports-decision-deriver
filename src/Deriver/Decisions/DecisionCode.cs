@@ -28,6 +28,14 @@ public enum DecisionInternalFurtherDetail
     E20, // Level 2
     E30, // Level 3 - Net mass
     E31, // Level 3 - Supplementary units
+    E40, // Level 4 - Reservation unknown error
+    E41, // Level 4 - Reservation CN codes mismatch
+    E42, // Level 4 - Reservation Inappropriate status
+    E43, // Level 4 - Quantities Insufficient
+    E44, // Level 4 - Reservation Write-off for this MRN and PCA Document ID exists
+    E45, // Level 4 - Reservation Line Numbers Mismatch
+    E46, // Level 4 - Reservation Measurement unit mismatch
+    E47, // Level 4 - Reservation Quantities cannot be validated
     E70, // No Match
     E71, // Cancelled
     E72, // Replaced

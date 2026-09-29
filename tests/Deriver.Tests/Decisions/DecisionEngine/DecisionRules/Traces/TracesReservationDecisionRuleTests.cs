@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
@@ -107,7 +108,7 @@ public class TracesReservationDecisionRuleTests
                 new DecisionEngineResult(
                     DecisionCode.X00,
                     nameof(TracesReservationDecisionRule),
-                    DecisionInternalFurtherDetail.E99,
+                    DecisionInternalFurtherDetail.E40,
                     DecisionResultMode.Active,
                     DecisionRuleLevel.Level4
                 )
@@ -131,11 +132,88 @@ public class TracesReservationDecisionRuleTests
                 new DecisionEngineResult(
                     DecisionCode.X00,
                     nameof(TracesReservationDecisionRule),
-                    DecisionInternalFurtherDetail.E99,
+                    DecisionInternalFurtherDetail.E40,
                     DecisionResultMode.Passive,
                     DecisionRuleLevel.Level4
                 )
             );
+    }
+
+    [Theory]
+    [InlineData("CnCodesMismatch", DecisionInternalFurtherDetail.E41)]
+    [InlineData("InappropriateStatus", DecisionInternalFurtherDetail.E42)]
+    [InlineData("QuantitiesInsufficient", DecisionInternalFurtherDetail.E43)]
+    [InlineData("WriteOffExists", DecisionInternalFurtherDetail.E44)]
+    [InlineData("LineNumbersMismatch", DecisionInternalFurtherDetail.E45)]
+    [InlineData("MeasurementUnitMismatch", DecisionInternalFurtherDetail.E46)]
+    [InlineData("QuantitiesCannotBeValidated", DecisionInternalFurtherDetail.E47)]
+    public async Task Execute_WhenReservationFailsWithReasonAndLevel4ModeIsLive_ReturnsActiveX00WithMappedCode(
+        string reason,
+        DecisionInternalFurtherDetail expected
+    )
+    {
+        StubNext(DecisionCode.C02);
+        var context = CreateContext();
+        await StubProblemResponse($$"""{"reason":"{{reason}}"}""");
+
+        var result = CreateRule(RuleMode.Live).Execute(context, _mockNext);
+
+        result
+            .Should()
+            .Be(
+                new DecisionEngineResult(
+                    DecisionCode.X00,
+                    nameof(TracesReservationDecisionRule),
+                    expected,
+                    DecisionResultMode.Active,
+                    DecisionRuleLevel.Level4
+                )
+            );
+    }
+
+    [Theory]
+    [InlineData("CnCodesMismatch", DecisionInternalFurtherDetail.E41)]
+    [InlineData("QuantitiesCannotBeValidated", DecisionInternalFurtherDetail.E47)]
+    public async Task Execute_WhenReservationFailsWithReasonAndLevel4ModeIsDryRun_AddsPassiveResultWithMappedCode(
+        string reason,
+        DecisionInternalFurtherDetail expected
+    )
+    {
+        var nextResult = StubNext(DecisionCode.C02);
+        var context = CreateContext();
+        await StubProblemResponse($$"""{"reason":"{{reason}}"}""");
+
+        var result = CreateRule(RuleMode.DryRun).Execute(context, _mockNext);
+
+        result.Should().BeSameAs(nextResult);
+        result.Code.Should().Be(DecisionCode.C02);
+        result
+            .PassiveResults?[0].Should()
+            .Be(
+                new DecisionEngineResult(
+                    DecisionCode.X00,
+                    nameof(TracesReservationDecisionRule),
+                    expected,
+                    DecisionResultMode.Passive,
+                    DecisionRuleLevel.Level4
+                )
+            );
+    }
+
+    [Theory]
+    [InlineData("""{"reason":"LicenceHolderMismatch"}""")]
+    [InlineData("{}")]
+    [InlineData("")]
+    [InlineData("<html>Bad Gateway</html>")]
+    public async Task Execute_WhenReservationFailsWithUnmappedOrMissingReason_ReturnsE40(string body)
+    {
+        StubNext(DecisionCode.C02);
+        var context = CreateContext();
+        await StubProblemResponse(body);
+
+        var result = CreateRule(RuleMode.Live).Execute(context, _mockNext);
+
+        result.FurtherDetail.Should().Be(DecisionInternalFurtherDetail.E40);
     }
 
     [Fact]
@@ -375,6 +453,30 @@ public class TracesReservationDecisionRuleTests
             .Returns(
                 new ApiResponse<ChedDeclarationReservation>(new HttpResponseMessage(statusCode), content!, null!, null!)
             );
+    }
+
+    private async Task StubProblemResponse(string body)
+    {
+        var settings = new RefitSettings();
+        var responseMessage = new HttpResponseMessage(HttpStatusCode.BadRequest)
+        {
+            Content = new StringContent(body, Encoding.UTF8, "application/problem+json"),
+        };
+        var error = await ApiException.Create(
+            new HttpRequestMessage(HttpMethod.Put, "http://localhost/reservation"),
+            HttpMethod.Put,
+            responseMessage,
+            settings
+        );
+
+        _quantityManagementClient
+            .PutChedReservation(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<ChedReservationRequest>(),
+                Arg.Any<CancellationToken>()
+            )
+            .Returns(new ApiResponse<ChedDeclarationReservation>(responseMessage, null!, settings, error));
     }
 
     private CapturedRequest StubResponseAndCapture(HttpStatusCode statusCode)

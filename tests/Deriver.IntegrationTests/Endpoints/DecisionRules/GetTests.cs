@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Http.Headers;
 using System.Text.Json;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using FluentAssertions;
@@ -8,21 +7,7 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.IntegrationTests.Endpoints.D
 
 public class GetTests
 {
-    private static HttpClient CreateHttpClient(bool withAuthentication = true)
-    {
-        var client = new HttpClient { BaseAddress = new Uri("http://localhost:8080") };
-
-        if (withAuthentication)
-        {
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                "Basic",
-                // See compose.yml for username, password and scope configuration
-                Convert.ToBase64String("IntegrationTests:integration-tests-pwd"u8.ToArray())
-            );
-        }
-
-        return client;
-    }
+    private static HttpClient CreateHttpClient() => new() { BaseAddress = new Uri("http://localhost:8080") };
 
     [Fact]
     public async Task Get_ShouldReturnCamelCaseDecisionRulesOptions()

@@ -11,6 +11,13 @@ public static class Endpoints
         public static string Post(string mrn) => $"{Root}/{mrn}";
     }
 
+    public static class DecisionRules
+    {
+        private const string Root = "/decision-rules";
+
+        public static string Options() => $"{Root}/options";
+    }
+
     public static class Admin
     {
         private const string Root = "/admin";

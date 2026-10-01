@@ -1,4 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Amazon.SQS;
 using Defra.TradeImports.SMB.CompressedSerializer;
 using Defra.TradeImports.SMB.Metrics;
@@ -146,6 +148,21 @@ public static class ServiceCollectionExtensions
                     );
             });
         }
+
+        return services;
+    }
+
+    /// <summary>
+    /// Configures JSON serialization for all minimal API endpoints: camelCase property
+    /// names and enums written as strings. Dictionary keys are left untouched.
+    /// </summary>
+    public static IServiceCollection AddJsonSerialization(this IServiceCollection services)
+    {
+        services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
 
         return services;
     }

@@ -11,7 +11,7 @@ public static class EndpointRouteBuilderExtensions
     {
         const string groupName = "DecisionRules";
 
-        app.MapGet("decision-rules/options", Get)
+        app.MapGet("admin/config/decision-rules", Get)
             .WithName("GetDecisionRulesOptions")
             .WithTags(groupName)
             .WithSummary("Get DecisionRulesOptions")

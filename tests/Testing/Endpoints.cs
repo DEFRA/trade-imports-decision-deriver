@@ -13,9 +13,9 @@ public static class Endpoints
 
     public static class DecisionRules
     {
-        private const string Root = "/decision-rules";
+        private const string Root = "/admin/config/decision-rules";
 
-        public static string Options() => $"{Root}/options";
+        public static string Options() => Root;
     }
 
     public static class Admin

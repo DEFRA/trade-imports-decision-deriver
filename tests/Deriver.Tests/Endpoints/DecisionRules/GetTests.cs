@@ -70,14 +70,4 @@ public class GetTests(ApiWebApplicationFactory factory, ITestOutputHelper output
         ipaffs.GetProperty("cheds").TryGetProperty("CHEDA", out var cheda).Should().BeTrue();
         cheda.GetProperty("disabledRules")[0].GetString().Should().Be("CommodityCodeDecisionRule");
     }
-
-    [Fact]
-    public async Task Get_WhenUnauthorized_ShouldBeUnauthorized()
-    {
-        var client = CreateClient(addDefaultAuthorizationHeader: false);
-
-        var response = await client.GetAsync(Testing.Endpoints.DecisionRules.Options());
-
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-    }
 }

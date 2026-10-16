@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
@@ -16,8 +17,6 @@ public class TracesChedConsumer(
     IDecisionService decisionService
 ) : ChedConsumer<TracesChedEvent>(apiClient, logger)
 {
-    private readonly Lock _notificationsLock = new();
-
     public override async Task OnHandle(ResourceEvent<TracesChedEvent> message, CancellationToken cancellationToken)
     {
         logger.LogInformation(
@@ -71,7 +70,7 @@ public class TracesChedConsumer(
 
     private async Task<List<DecisionImportPreNotification>> GetNotifications(string[] mrns)
     {
-        var notifications = new List<ImportPreNotification>();
+        var notifications = new ConcurrentBag<ImportPreNotification>();
 
         await Parallel.ForEachAsync(
             mrns,
@@ -80,23 +79,17 @@ public class TracesChedConsumer(
                 var apiResponse = await ApiClient.GetImportPreNotificationsByMrn(mrn, cancellationToken);
 
                 foreach (
-                    var notificationResponse in apiResponse
-                        .ImportPreNotifications.Where(notificationResponse =>
-                            !notifications.Exists(x =>
-                                x.ReferenceNumber == notificationResponse.ImportPreNotification.ReferenceNumber
-                            )
-                        )
-                        .Select(x => x.ImportPreNotification)
+                    var notificationResponse in apiResponse.ImportPreNotifications.Select(x => x.ImportPreNotification)
                 )
                 {
-                    lock (_notificationsLock)
-                    {
-                        notifications.Add(notificationResponse);
-                    }
+                    notifications.Add(notificationResponse);
                 }
             }
         );
 
-        return notifications.Select(x => x.ToDecisionImportPreNotification()).ToList();
+        return notifications
+            .DistinctBy(x => x.ReferenceNumber)
+            .Select(x => x.ToDecisionImportPreNotification())
+            .ToList();
     }
 }

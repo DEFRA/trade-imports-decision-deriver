@@ -105,6 +105,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<UnknownChedTypeDecisionRule>();
 
         services.AddSingleton<TracesTerminalStatusDecisionRule>();
+        services.AddSingleton<TracesCvedpIuuCheckRule>();
         services.AddSingleton<TracesCvedpDecisionRule>();
         services.AddSingleton<TracesCedDecisionRule>();
         services.AddSingleton<TracesChedppDecisionRule>();

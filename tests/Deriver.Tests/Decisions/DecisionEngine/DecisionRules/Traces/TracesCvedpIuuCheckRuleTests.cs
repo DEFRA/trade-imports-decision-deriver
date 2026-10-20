@@ -16,6 +16,7 @@ public class TracesCvedpIuuCheckRuleTests
 {
     private const string IuuDocumentCode = "C673";
     private const string IuuReference = "GBIUU12345";
+    private const string SecondIuuReference = "GBIUU67890";
 
     private readonly ITradeImportsDataApiClient _apiClient = Substitute.For<ITradeImportsDataApiClient>();
     private readonly TracesCvedpIuuCheckRule _rule;
@@ -114,18 +115,69 @@ public class TracesCvedpIuuCheckRuleTests
         _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionEngineContext>());
     }
 
-    private static Commodity CreateIuuCommodity() =>
+    // ---------- Multiple IUU certificates, the worst decision is used ----------
+    [Theory]
+    [InlineData(ControlAuthorityIuuOption.IUUOK, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08, null)]
+    [InlineData(ControlAuthorityIuuOption.IUUNA, ControlAuthorityIuuOption.IUUOK, DecisionCode.C08, null)]
+    [InlineData(ControlAuthorityIuuOption.IUUOK, "Unknown", DecisionCode.H02, DecisionInternalFurtherDetail.E93)]
+    [InlineData(ControlAuthorityIuuOption.IUUOK, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00, null)]
+    [InlineData(ControlAuthorityIuuOption.IUUOK, null, DecisionCode.X00, DecisionInternalFurtherDetail.E76)]
+    public void Execute_WhenMultipleIuuCertificates_ReturnsWorstDecision(
+        string firstIuuOption,
+        string? secondIuuOption,
+        DecisionCode expectedCode,
+        DecisionInternalFurtherDetail? expectedDetail
+    )
+    {
+        var c = CreateContext(
+            new CheckCode() { Value = CheckCode.IuuCheckCode },
+            CreateIuuCommodity(IuuReference, SecondIuuReference)
+        );
+
+        _apiClient
+            .GetIuuNotification(IuuReference, Arg.Any<CancellationToken>())
+            .Returns(CreateIuuNotificationResponse(IuuReference, firstIuuOption));
+
+        if (secondIuuOption != null)
+        {
+            _apiClient
+                .GetIuuNotification(SecondIuuReference, Arg.Any<CancellationToken>())
+                .Returns(CreateIuuNotificationResponse(SecondIuuReference, secondIuuOption));
+        }
+
+        var result = _rule.Execute(c, _mockNext);
+
+        result
+            .Should()
+            .BeEquivalentTo(new DecisionEngineResult(expectedCode, nameof(TracesCvedpIuuCheckRule), expectedDetail));
+        _apiClient.Received(1).GetIuuNotification(IuuReference, Arg.Any<CancellationToken>());
+        _apiClient.Received(1).GetIuuNotification(SecondIuuReference, Arg.Any<CancellationToken>());
+    }
+
+    private static Commodity CreateIuuCommodity(params string[] iuuReferences) =>
         new()
         {
-            Documents =
-            [
-                new ImportDocument
+            Documents = (iuuReferences.Length == 0 ? [IuuReference] : iuuReferences)
+                .Select(reference => new ImportDocument
                 {
                     DocumentCode = IuuDocumentCode,
-                    DocumentReference = new ImportDocumentReference(IuuReference),
-                },
-            ],
+                    DocumentReference = new ImportDocumentReference(reference),
+                })
+                .ToArray(),
         };
+
+    private static IuuNotificationResponse CreateIuuNotificationResponse(string reference, string iuuOption) =>
+        new(
+            new IuuNotification
+            {
+                Reference = reference,
+                IuuOption = iuuOption,
+                LastUpdated = DateTime.UtcNow,
+            },
+            DateTime.UtcNow,
+            DateTime.UtcNow,
+            "etag"
+        );
 
     private static DecisionEngineContext CreateContext(CheckCode checkCode, Commodity commodity)
     {

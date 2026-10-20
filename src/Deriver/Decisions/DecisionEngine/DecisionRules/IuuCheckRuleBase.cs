@@ -1,5 +1,4 @@
 using Defra.TradeImportsDataApi.Api.Client;
-using Defra.TradeImportsDataApi.Domain.Iuu;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
@@ -20,11 +19,7 @@ public abstract class IuuCheckRuleBase(ITradeImportsDataApiClient apiClient) : I
             return new DecisionEngineResult(DecisionCode.X00, GetType().Name, DecisionInternalFurtherDetail.E76);
         }
 
-        var iuuNotification = GetIuuNotification(iuuReferences);
-
-        return iuuNotification != null
-            ? MakeDecisionFromIuuOption(iuuNotification.IuuOption)
-            : new DecisionEngineResult(DecisionCode.X00, GetType().Name, DecisionInternalFurtherDetail.E76);
+        return iuuReferences.Select(MakeDecisionForIuuReference).OrderByDescending(x => x.Code).First();
     }
 
     protected DecisionEngineResult MakeDecisionFromIuuOption(string? iuuOption) =>
@@ -36,19 +31,13 @@ public abstract class IuuCheckRuleBase(ITradeImportsDataApiClient apiClient) : I
             _ => new DecisionEngineResult(DecisionCode.H02, GetType().Name, DecisionInternalFurtherDetail.E93),
         };
 
-    private IuuNotification? GetIuuNotification(List<string> iuuReferences)
+    private DecisionEngineResult MakeDecisionForIuuReference(string iuuReference)
     {
-        foreach (var reference in iuuReferences)
-        {
-            // usage of .GetAwaiter().GetResult(); is temp until we can refactor the decision engine to be async
-            var response = apiClient.GetIuuNotification(reference, CancellationToken.None).GetAwaiter().GetResult();
+        // usage of .GetAwaiter().GetResult(); is temp until we can refactor the decision engine to be async
+        var response = apiClient.GetIuuNotification(iuuReference, CancellationToken.None).GetAwaiter().GetResult();
 
-            if (response?.IuuNotification != null)
-            {
-                return response.IuuNotification;
-            }
-        }
-
-        return null;
+        return response?.IuuNotification != null
+            ? MakeDecisionFromIuuOption(response.IuuNotification.IuuOption)
+            : new DecisionEngineResult(DecisionCode.X00, GetType().Name, DecisionInternalFurtherDetail.E76);
     }
 }

@@ -261,9 +261,9 @@ switch (notification.Status)
 **Type**: Decision  
 **Returns** (only for the IUU check code `H224`, otherwise continues to the next rule):
 - If the notification has IUU info (`IuuCheckRequired == true` and `IuuOption` set), its `IuuOption` is used
-- Otherwise the IUU certificate is loaded from the Data API using the commodity's IUU document reference:
+- Otherwise an IUU certificate is loaded from the Data API for each of the commodity's IUU document references, a decision is made for each, and the worst decision is used:
   - `X00` / `E76` if the commodity has no valid IUU document reference
-  - `X00` / `E76` if no IUU certificate is found
+  - `X00` / `E76` for a reference whose IUU certificate is not found
 - `IuuOption` mapping: `IUUOK` → `C07`, `IUUNotCompliant` → `X00`, `IUUNA` → `C08`, anything else → `H02` / `E93`
 
 #### `TracesCvedpIuuCheckRule`
@@ -271,8 +271,8 @@ switch (notification.Status)
 **Type**: Decision  
 **Returns** (only for the IUU check code `H224`, otherwise continues to the next rule):
 - `X00` / `E76` if the commodity has no valid IUU document reference
-- `X00` / `E76` if no IUU certificate is found
-- Otherwise the certificate's `IuuOption`, mapped as for `CvedpIuuCheckRule`
+- `X00` / `E76` for a reference whose IUU certificate is not found
+- Otherwise the worst decision across all IUU certificates (one per IUU document reference), each mapped as for `CvedpIuuCheckRule`
 
 #### `CvedpDecisionRule`
 **Purpose**: Applies CVEDP-specific business logic  

@@ -269,6 +269,31 @@ public class TracesReservationDecisionRuleTests
         item.NetWeightUnitOfMeasure.Should().Be(UniversalUnitOfMeasureType.KGM);
     }
 
+    [Theory]
+    [InlineData("KGM", null, UniversalUnitOfMeasureType.KGM)]
+    [InlineData("KGM", "H87", UniversalUnitOfMeasureType.KGM)]
+    [InlineData(null, "H87", UniversalUnitOfMeasureType.H87)]
+    [InlineData(null, "h87", UniversalUnitOfMeasureType.H87)]
+    [InlineData("GRM", null, UniversalUnitOfMeasureType.GRM)]
+    [InlineData(null, "UNKNOWN", UniversalUnitOfMeasureType.KGM)]
+    [InlineData(null, null, UniversalUnitOfMeasureType.KGM)]
+    public void Execute_SetsUnitOfMeasureFromTradeLineItemUnitCodes(
+        string? netWeightUnitCode,
+        string? netVolumeUnitCode,
+        UniversalUnitOfMeasureType expected
+    )
+    {
+        StubNext(DecisionCode.C02);
+        var context = CreateContext(netWeightUnitCode: netWeightUnitCode, netVolumeUnitCode: netVolumeUnitCode);
+        var capturedRequest = StubResponseAndCapture(HttpStatusCode.OK);
+
+        CreateRule().Execute(context, _mockNext);
+
+        capturedRequest.Request.Should().NotBeNull();
+        var item = capturedRequest.Request!.Items.Should().ContainSingle().Subject;
+        item.NetWeightUnitOfMeasure.Should().Be(expected);
+    }
+
     [Fact]
     public void Execute_WhenNoWeightOrSupplementaryUnits_ExcludesItem()
     {
@@ -511,10 +536,19 @@ public class TracesReservationDecisionRuleTests
         string taricCommodityCode = "0207146000",
         string documentReference = "1234567",
         bool includeConsignmentItem = true,
-        bool? level3Succeeded = true
+        bool? level3Succeeded = true,
+        string? netWeightUnitCode = null,
+        string? netVolumeUnitCode = null
     )
     {
         const string chedIdentifier = "CHEDP.GB.2025.1234567";
+
+        var netWeight =
+            netWeightUnitCode == null
+                ? null
+                : new UneceWeightMeasure() { Content = "100", UnitCode = netWeightUnitCode };
+        var netVolume =
+            netVolumeUnitCode == null ? null : new UneceMeasure() { Content = "100", UnitCode = netVolumeUnitCode };
 
         var ched = new DefraUNVTDCHEDProfile()
         {
@@ -538,6 +572,8 @@ public class TracesReservationDecisionRuleTests
                                             ClassCode = new CodedValue { Value = "0207146000" },
                                         },
                                     ],
+                                    NetWeight = netWeight,
+                                    NetVolume = netVolume,
                                 },
                             ],
                         },

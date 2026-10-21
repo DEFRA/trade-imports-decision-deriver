@@ -3,6 +3,7 @@ using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Microsoft.Extensions.Options;
 using Refit;
+using Trade.Gateway.Api.Contract.Certificate;
 using Trade.Gateway.Api.Contract.Customs;
 using TradeImportsQuantityMgmt.Client.Clients;
 using TradeImportsQuantityMgmt.Contract;
@@ -163,11 +164,20 @@ public sealed class TracesReservationDecisionRule(
                     CertificateLineNumber = tradeLineItem.SequenceNumeric,
                     ClassCode = classCode,
                     NetWeightQuantity = netWeight,
-                    NetWeightUnitOfMeasure = UniversalUnitOfMeasureType.KGM,
+                    NetWeightUnitOfMeasure = GetUnitOfMeasure(tradeLineItem),
                 }
             );
         }
 
         return items.ToArray();
+    }
+
+    private static UniversalUnitOfMeasureType GetUnitOfMeasure(TradeLineItem tradeLineItem)
+    {
+        var unitCode = tradeLineItem.NetWeight?.UnitCode ?? tradeLineItem.NetVolume?.UnitCode;
+
+        return Enum.TryParse<UniversalUnitOfMeasureType>(unitCode, ignoreCase: true, out var unitOfMeasure)
+            ? unitOfMeasure
+            : UniversalUnitOfMeasureType.KGM;
     }
 }

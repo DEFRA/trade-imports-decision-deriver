@@ -272,12 +272,9 @@ public class TracesReservationDecisionRuleTests
     [Theory]
     [InlineData("KGM", null, UniversalUnitOfMeasureType.KGM)]
     [InlineData("KGM", "H87", UniversalUnitOfMeasureType.KGM)]
-    [InlineData(null, "H87", UniversalUnitOfMeasureType.H87)]
-    [InlineData(null, "h87", UniversalUnitOfMeasureType.H87)]
     [InlineData("GRM", null, UniversalUnitOfMeasureType.GRM)]
-    [InlineData(null, "UNKNOWN", UniversalUnitOfMeasureType.KGM)]
     [InlineData(null, null, UniversalUnitOfMeasureType.KGM)]
-    public void Execute_SetsUnitOfMeasureFromTradeLineItemUnitCodes(
+    public void Execute_WhenTradeLineItemUsesNetWeight_SetsNetWeightFields(
         string? netWeightUnitCode,
         string? netVolumeUnitCode,
         UniversalUnitOfMeasureType expected
@@ -291,7 +288,33 @@ public class TracesReservationDecisionRuleTests
 
         capturedRequest.Request.Should().NotBeNull();
         var item = capturedRequest.Request!.Items.Should().ContainSingle().Subject;
+        item.NetWeightQuantity.Should().Be(100);
         item.NetWeightUnitOfMeasure.Should().Be(expected);
+        item.NetVolumeQuantity.Should().BeNull();
+        item.NetVolumeUnitOfMeasure.Should().BeNull();
+    }
+
+    [Theory]
+    [InlineData("H87", UniversalUnitOfMeasureType.H87)]
+    [InlineData("h87", UniversalUnitOfMeasureType.H87)]
+    [InlineData("UNKNOWN", UniversalUnitOfMeasureType.KGM)]
+    public void Execute_WhenTradeLineItemUsesNetVolume_SetsNetVolumeFields(
+        string netVolumeUnitCode,
+        UniversalUnitOfMeasureType expected
+    )
+    {
+        StubNext(DecisionCode.C02);
+        var context = CreateContext(netVolumeUnitCode: netVolumeUnitCode);
+        var capturedRequest = StubResponseAndCapture(HttpStatusCode.OK);
+
+        CreateRule().Execute(context, _mockNext);
+
+        capturedRequest.Request.Should().NotBeNull();
+        var item = capturedRequest.Request!.Items.Should().ContainSingle().Subject;
+        item.NetVolumeQuantity.Should().Be(100);
+        item.NetVolumeUnitOfMeasure.Should().Be(expected);
+        item.NetWeightQuantity.Should().BeNull();
+        item.NetWeightUnitOfMeasure.Should().BeNull();
     }
 
     [Fact]

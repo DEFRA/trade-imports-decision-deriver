@@ -157,14 +157,22 @@ public sealed class TracesReservationDecisionRule(
                 continue;
             }
 
+            var useNetVolume = tradeLineItem.NetWeight == null && tradeLineItem.NetVolume != null;
+
             items.Add(
                 new ReservationCommodityItem
                 {
                     GoodsItemNumber = matchedCommodity.ItemNumber,
                     CertificateLineNumber = tradeLineItem.SequenceNumeric,
                     ClassCode = classCode,
-                    NetWeightQuantity = netWeight,
-                    NetWeightUnitOfMeasure = GetUnitOfMeasure(tradeLineItem),
+                    NetWeightQuantity = useNetVolume ? null : netWeight,
+                    NetWeightUnitOfMeasure = useNetVolume
+                        ? null
+                        : ParseUnitOfMeasure(tradeLineItem.NetWeight?.UnitCode),
+                    NetVolumeQuantity = useNetVolume ? netWeight : null,
+                    NetVolumeUnitOfMeasure = useNetVolume
+                        ? ParseUnitOfMeasure(tradeLineItem.NetVolume?.UnitCode)
+                        : null,
                 }
             );
         }
@@ -172,12 +180,8 @@ public sealed class TracesReservationDecisionRule(
         return items.ToArray();
     }
 
-    private static UniversalUnitOfMeasureType GetUnitOfMeasure(TradeLineItem tradeLineItem)
-    {
-        var unitCode = tradeLineItem.NetWeight?.UnitCode ?? tradeLineItem.NetVolume?.UnitCode;
-
-        return Enum.TryParse<UniversalUnitOfMeasureType>(unitCode, ignoreCase: true, out var unitOfMeasure)
+    private static UniversalUnitOfMeasureType ParseUnitOfMeasure(string? unitCode) =>
+        Enum.TryParse<UniversalUnitOfMeasureType>(unitCode, ignoreCase: true, out var unitOfMeasure)
             ? unitOfMeasure
             : UniversalUnitOfMeasureType.KGM;
-    }
 }

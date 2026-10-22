@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Microsoft.Extensions.Options;
@@ -157,27 +158,31 @@ public sealed class TracesReservationDecisionRule(
                 continue;
             }
 
-            var useNetVolume = tradeLineItem.NetWeight == null && tradeLineItem.NetVolume != null;
-
-            items.Add(
-                new ReservationCommodityItem
-                {
-                    GoodsItemNumber = matchedCommodity.ItemNumber,
-                    CertificateLineNumber = tradeLineItem.SequenceNumeric,
-                    ClassCode = classCode,
-                    NetWeightQuantity = useNetVolume ? null : netWeight,
-                    NetWeightUnitOfMeasure = useNetVolume
-                        ? null
-                        : ParseUnitOfMeasure(tradeLineItem.NetWeight?.UnitCode),
-                    NetVolumeQuantity = useNetVolume ? netWeight : null,
-                    NetVolumeUnitOfMeasure = useNetVolume
-                        ? ParseUnitOfMeasure(tradeLineItem.NetVolume?.UnitCode)
-                        : null,
-                }
-            );
+            items.Add(CreateReservationItem(tradeLineItem, matchedCommodity, classCode, netWeight));
         }
 
         return items.ToArray();
+    }
+
+    private static ReservationCommodityItem CreateReservationItem(
+        TradeLineItem tradeLineItem,
+        Commodity matchedCommodity,
+        string classCode,
+        decimal? quantity
+    )
+    {
+        var useNetVolume = tradeLineItem.NetWeight == null && tradeLineItem.NetVolume != null;
+
+        return new ReservationCommodityItem
+        {
+            GoodsItemNumber = matchedCommodity.ItemNumber,
+            CertificateLineNumber = tradeLineItem.SequenceNumeric,
+            ClassCode = classCode,
+            NetWeightQuantity = useNetVolume ? null : quantity,
+            NetWeightUnitOfMeasure = useNetVolume ? null : ParseUnitOfMeasure(tradeLineItem.NetWeight?.UnitCode),
+            NetVolumeQuantity = useNetVolume ? quantity : null,
+            NetVolumeUnitOfMeasure = useNetVolume ? ParseUnitOfMeasure(tradeLineItem.NetVolume?.UnitCode) : null,
+        };
     }
 
     private static UniversalUnitOfMeasureType ParseUnitOfMeasure(string? unitCode) =>

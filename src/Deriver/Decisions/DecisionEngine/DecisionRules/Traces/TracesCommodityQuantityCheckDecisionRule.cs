@@ -15,7 +15,8 @@ public sealed class TracesCommodityQuantityCheckDecisionRule : CommodityQuantity
         ["DTN"] = 100m,
     };
 
-    protected override string? GetChedType(DecisionEngineContext context) => context.Ched?.Type;
+    protected override string? GetChedType(DecisionEngineContext context) =>
+        context.Ched?.ExchangedDocument.Identifier.Split(".").FirstOrDefault();
 
     protected override void OnCompleted(DecisionEngineContext context) => context.Level3Succeeded = true;
 

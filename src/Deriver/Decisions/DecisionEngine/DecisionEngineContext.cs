@@ -16,9 +16,13 @@ public sealed record DecisionEngineContext(
     DefraUNVTDCHEDProfile? Ched
 )
 {
+    public string? Source { get; set; }
     public ILogger Logger { get; set; } = null!;
 
     public bool? Level2Succeeded { get; set; }
 
     public bool? Level3Succeeded { get; set; }
+
+    public DecisionRulesSourceOptions GetDecisionRulesSourceOptions() =>
+        Source == Constants.ChedSource.Ipaffs ? DecisionRulesOptions.Ipaffs : DecisionRulesOptions.Traces;
 }

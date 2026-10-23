@@ -3,6 +3,12 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 public static class Constants
 {
     public const string Required = "REQUIRED";
+
+    public static class ChedSource
+    {
+        public const string Ipaffs = "IPAFFS";
+        public const string Traces = "TRACES";
+    }
 }
 
 public static class CommodityRiskResultPhsiDecision

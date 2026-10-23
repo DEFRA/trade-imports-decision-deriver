@@ -1,0 +1,110 @@
+﻿{
+  ipaffs: {
+    quantityManagementCheckNetMassTolerance: 0.04,
+    level2Mode: DryRun,
+    level3Mode: DryRun,
+    level4Mode: DryRun,
+    commodityQuantityCheckDecisionRule: {
+      scoring: {
+        commodityWeight: 100,
+        checkCodeWeight: 10,
+        chedTypeWeight: 1
+      },
+      comparisonEntries: [
+        {
+          chedType: null,
+          checkCode: null,
+          commodityCode: null,
+          comparisonType: Weight,
+          useFallback: true
+        },
+        {
+          chedType: CHEDA,
+          checkCode: H221,
+          commodityCode: null,
+          comparisonType: Quantity,
+          useFallback: true
+        },
+        {
+          chedType: CHEDA,
+          checkCode: H221,
+          commodityCode: 0106410000,
+          comparisonType: Weight,
+          useFallback: false
+        },
+        {
+          chedType: CHEDA,
+          checkCode: H221,
+          commodityCode: 0106900010,
+          comparisonType: Weight,
+          useFallback: false
+        }
+      ]
+    }
+  },
+  traces: {
+    cheds: {
+      CED: {
+        disabledRules: [
+          TracesReservationDecisionRule
+        ]
+      },
+      CHEDPP: {
+        disabledRules: [
+          TracesReservationDecisionRule
+        ]
+      },
+      CVEDA: {
+        disabledRules: [
+          TracesReservationDecisionRule
+        ]
+      },
+      CVEDP: {
+        disabledRules: [
+          TracesReservationDecisionRule
+        ]
+      }
+    },
+    quantityManagementCheckNetMassTolerance: 0.04,
+    level2Mode: DryRun,
+    level3Mode: DryRun,
+    level4Mode: DryRun,
+    commodityQuantityCheckDecisionRule: {
+      scoring: {
+        commodityWeight: 100,
+        checkCodeWeight: 10,
+        chedTypeWeight: 1
+      },
+      comparisonEntries: [
+        {
+          chedType: null,
+          checkCode: null,
+          commodityCode: null,
+          comparisonType: Weight,
+          useFallback: true
+        },
+        {
+          chedType: CHEDA,
+          checkCode: H221,
+          commodityCode: null,
+          comparisonType: Quantity,
+          useFallback: true
+        },
+        {
+          chedType: CHEDA,
+          checkCode: H221,
+          commodityCode: 0106410000,
+          comparisonType: Weight,
+          useFallback: false
+        },
+        {
+          chedType: CHEDA,
+          checkCode: H221,
+          commodityCode: 0106900010,
+          comparisonType: Weight,
+          useFallback: false
+        }
+      ]
+    }
+  }
+}

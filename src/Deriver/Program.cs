@@ -3,6 +3,7 @@ using Defra.TradeImports.EmfExporter;
 using Defra.TradeImports.SQS.Endpoints.Endpoints;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Endpoints.Decision;
+using Defra.TradeImportsDecisionDeriver.Deriver.Endpoints.DecisionRules;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Health;
 using Defra.TradeImportsDecisionDeriver.Deriver.Metrics;
@@ -51,6 +52,7 @@ static void ConfigureWebApplication(WebApplicationBuilder builder, string[] args
 
     builder.ConfigureLoggingAndTracing(integrationTest);
     builder.Services.AddProblemDetails();
+    builder.Services.AddJsonSerialization();
     builder.Services.AddHealth(builder.Configuration);
     builder.Services.AddProcessorConfiguration(builder.Configuration);
     builder.Services.AddDataApiHttpClient();
@@ -71,6 +73,7 @@ static WebApplication BuildWebApplication(WebApplicationBuilder builder)
     app.UseAuthorization();
     app.MapHealth();
     app.MapDecisionEndpoints();
+    app.MapDecisionRulesEndpoints();
     app.MapDeadLetterQueueEndpoints(
         awsSqsOptions.Value.ResourceEventsQueueName,
         awsSqsOptions.Value.ResourceEventsDeadLetterQueueName,

@@ -35,9 +35,13 @@ public class EndpointTestBase : IClassFixture<ApiWebApplicationFactory>
     protected virtual void ConfigureTestServices(IServiceCollection services)
     {
         services.Configure<DecisionRulesOptions>(c =>
-            c.CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions()
-        );
+        {
+            c.Ipaffs.CommodityQuantityCheckDecisionRule =
+                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions();
+
+            c.Traces.CommodityQuantityCheckDecisionRule =
+                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions();
+        });
     }
 
     protected HttpClient CreateClient(bool addDefaultAuthorizationHeader = true, TestUser testUser = TestUser.ReadWrite)

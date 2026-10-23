@@ -26,6 +26,14 @@ public sealed class TracesTerminalStatusDecisionRule : TerminalStatusDecisionRul
                 nameof(TracesTerminalStatusDecisionRule),
                 DecisionInternalFurtherDetail.E75
             ),
+            TracesNotificationStatus.InProgress => new DecisionEngineResult(
+                DecisionCode.H02,
+                nameof(TracesTerminalStatusDecisionRule)
+            ),
+            TracesNotificationStatus.Submitted => new DecisionEngineResult(
+                DecisionCode.H02,
+                nameof(TracesTerminalStatusDecisionRule)
+            ),
             _ => next(context),
         };
     }

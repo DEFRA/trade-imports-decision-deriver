@@ -1,8 +1,10 @@
 using System.Text.Json;
+using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Microsoft.Extensions.Options;
 using Refit;
+using Trade.Gateway.Api.Contract.Certificate;
 using Trade.Gateway.Api.Contract.Customs;
 using TradeImportsQuantityMgmt.Client.Clients;
 using TradeImportsQuantityMgmt.Contract;
@@ -156,18 +158,35 @@ public sealed class TracesReservationDecisionRule(
                 continue;
             }
 
-            items.Add(
-                new ReservationCommodityItem
-                {
-                    GoodsItemNumber = matchedCommodity.ItemNumber,
-                    CertificateLineNumber = tradeLineItem.SequenceNumeric,
-                    ClassCode = classCode,
-                    NetWeightQuantity = netWeight,
-                    NetWeightUnitOfMeasure = UniversalUnitOfMeasureType.KGM,
-                }
-            );
+            items.Add(CreateReservationItem(tradeLineItem, matchedCommodity, classCode, netWeight));
         }
 
         return items.ToArray();
     }
+
+    private static ReservationCommodityItem CreateReservationItem(
+        TradeLineItem tradeLineItem,
+        Commodity matchedCommodity,
+        string classCode,
+        decimal? quantity
+    )
+    {
+        var useNetVolume = tradeLineItem.NetWeight == null && tradeLineItem.NetVolume != null;
+
+        return new ReservationCommodityItem
+        {
+            GoodsItemNumber = matchedCommodity.ItemNumber,
+            CertificateLineNumber = tradeLineItem.SequenceNumeric,
+            ClassCode = classCode,
+            NetWeightQuantity = useNetVolume ? null : quantity,
+            NetWeightUnitOfMeasure = useNetVolume ? null : ParseUnitOfMeasure(tradeLineItem.NetWeight?.UnitCode),
+            NetVolumeQuantity = useNetVolume ? quantity : null,
+            NetVolumeUnitOfMeasure = useNetVolume ? ParseUnitOfMeasure(tradeLineItem.NetVolume?.UnitCode) : null,
+        };
+    }
+
+    private static UniversalUnitOfMeasureType ParseUnitOfMeasure(string? unitCode) =>
+        Enum.TryParse<UniversalUnitOfMeasureType>(unitCode, ignoreCase: true, out var unitOfMeasure)
+            ? unitOfMeasure
+            : UniversalUnitOfMeasureType.KGM;
 }

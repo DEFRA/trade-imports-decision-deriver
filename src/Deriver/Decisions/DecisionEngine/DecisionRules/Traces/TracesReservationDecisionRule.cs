@@ -151,14 +151,24 @@ public sealed class TracesReservationDecisionRule(
                 && mrn.Documents?.Any(document => document.DocumentReference?.Value == chedDocumentIdentifier) == true
             );
 
-            var netWeight = matchedCommodity?.NetMass ?? matchedCommodity?.SupplementaryUnits;
-
-            if (matchedCommodity == null || netWeight == null)
+            if (matchedCommodity == null)
             {
                 continue;
             }
 
-            items.Add(CreateReservationItem(tradeLineItem, matchedCommodity, classCode, netWeight));
+            var useNetVolume = UsesNetVolume(tradeLineItem);
+
+            // Net volume is a count (e.g. H87 pieces) so must come from supplementary units, never net mass
+            var quantity = useNetVolume
+                ? matchedCommodity.SupplementaryUnits
+                : matchedCommodity.NetMass ?? matchedCommodity.SupplementaryUnits;
+
+            if (quantity == null)
+            {
+                continue;
+            }
+
+            items.Add(CreateReservationItem(tradeLineItem, matchedCommodity, classCode, quantity, useNetVolume));
         }
 
         return items.ToArray();
@@ -168,22 +178,24 @@ public sealed class TracesReservationDecisionRule(
         TradeLineItem tradeLineItem,
         Commodity matchedCommodity,
         string classCode,
-        decimal? quantity
+        decimal? quantity,
+        bool useNetVolume
     )
     {
-        var useNetVolume = tradeLineItem.NetWeight == null && tradeLineItem.NetVolume != null;
-
         return new ReservationCommodityItem
         {
             GoodsItemNumber = matchedCommodity.ItemNumber,
             CertificateLineNumber = tradeLineItem.SequenceNumeric,
             ClassCode = classCode,
             NetWeightQuantity = useNetVolume ? null : quantity,
-            NetWeightUnitOfMeasure = useNetVolume ? null : ParseUnitOfMeasure(tradeLineItem.NetWeight?.UnitCode),
+            NetWeightUnitOfMeasure = useNetVolume ? null : UniversalUnitOfMeasureType.KGM,
             NetVolumeQuantity = useNetVolume ? quantity : null,
             NetVolumeUnitOfMeasure = useNetVolume ? ParseUnitOfMeasure(tradeLineItem.NetVolume?.UnitCode) : null,
         };
     }
+
+    private static bool UsesNetVolume(TradeLineItem tradeLineItem) =>
+        tradeLineItem.NetWeight == null && tradeLineItem.NetVolume != null;
 
     private static UniversalUnitOfMeasureType ParseUnitOfMeasure(string? unitCode) =>
         Enum.TryParse<UniversalUnitOfMeasureType>(unitCode, ignoreCase: true, out var unitOfMeasure)

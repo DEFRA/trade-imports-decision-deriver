@@ -272,7 +272,7 @@ public class TracesReservationDecisionRuleTests
     [Theory]
     [InlineData("KGM", null, UniversalUnitOfMeasureType.KGM)]
     [InlineData("KGM", "H87", UniversalUnitOfMeasureType.KGM)]
-    [InlineData("GRM", null, UniversalUnitOfMeasureType.GRM)]
+    [InlineData("GRM", null, UniversalUnitOfMeasureType.KGM)]
     [InlineData(null, null, UniversalUnitOfMeasureType.KGM)]
     public void Execute_WhenTradeLineItemUsesNetWeight_SetsNetWeightFields(
         string? netWeightUnitCode,
@@ -304,17 +304,45 @@ public class TracesReservationDecisionRuleTests
     )
     {
         StubNext(DecisionCode.C02);
-        var context = CreateContext(netVolumeUnitCode: netVolumeUnitCode);
+        var context = CreateContext(supplementaryUnits: 25, netVolumeUnitCode: netVolumeUnitCode);
         var capturedRequest = StubResponseAndCapture(HttpStatusCode.OK);
 
         CreateRule().Execute(context, _mockNext);
 
         capturedRequest.Request.Should().NotBeNull();
         var item = capturedRequest.Request!.Items.Should().ContainSingle().Subject;
-        item.NetVolumeQuantity.Should().Be(100);
+        item.NetVolumeQuantity.Should().Be(25);
         item.NetVolumeUnitOfMeasure.Should().Be(expected);
         item.NetWeightQuantity.Should().BeNull();
         item.NetWeightUnitOfMeasure.Should().BeNull();
+    }
+
+    [Fact]
+    public void Execute_WhenTradeLineItemUsesNetVolume_TakesQuantityFromSupplementaryUnitsNotNetMass()
+    {
+        StubNext(DecisionCode.C02);
+        var context = CreateContext(netMass: 75, supplementaryUnits: 25, netVolumeUnitCode: "H87");
+        var capturedRequest = StubResponseAndCapture(HttpStatusCode.OK);
+
+        CreateRule().Execute(context, _mockNext);
+
+        capturedRequest.Request.Should().NotBeNull();
+        var item = capturedRequest.Request!.Items.Should().ContainSingle().Subject;
+        item.NetVolumeQuantity.Should().Be(25);
+        item.NetVolumeUnitOfMeasure.Should().Be(UniversalUnitOfMeasureType.H87);
+    }
+
+    [Fact]
+    public void Execute_WhenTradeLineItemUsesNetVolumeAndNoSupplementaryUnits_ExcludesItem()
+    {
+        StubNext(DecisionCode.C02);
+        var context = CreateContext(netMass: 75, supplementaryUnits: null, netVolumeUnitCode: "H87");
+        var capturedRequest = StubResponseAndCapture(HttpStatusCode.OK);
+
+        CreateRule().Execute(context, _mockNext);
+
+        capturedRequest.Request.Should().NotBeNull();
+        capturedRequest.Request!.Items.Should().BeEmpty();
     }
 
     [Fact]

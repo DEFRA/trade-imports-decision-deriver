@@ -893,8 +893,17 @@ public class DecisionServiceTests(ITestOutputHelper output)
                 Options.Create(
                     new DecisionRulesOptions()
                     {
-                        CommodityQuantityCheckDecisionRule =
-                            TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+                        Ipaffs = new DecisionRulesSourceOptions()
+                        {
+                            CommodityQuantityCheckDecisionRule =
+                                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+                        },
+
+                        Traces = new DecisionRulesSourceOptions()
+                        {
+                            CommodityQuantityCheckDecisionRule =
+                                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+                        },
                     }
                 )
             )

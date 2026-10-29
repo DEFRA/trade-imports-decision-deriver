@@ -36,9 +36,12 @@ public class CommodityQuantityCheckDecisionRuleTests
         // Arrange
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = ruleMode,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Ipaffs = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = ruleMode,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new CommodityQuantityCheckDecisionRule();
         var notification = DecisionImportPreNotificationBuilder
@@ -97,6 +100,7 @@ public class CommodityQuantityCheckDecisionRuleTests
         )
         {
             Logger = NullLogger.Instance,
+            Source = Constants.ChedSource.Ipaffs,
         };
 
         // Act
@@ -139,9 +143,12 @@ public class CommodityQuantityCheckDecisionRuleTests
         // Arrange
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = ruleMode,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Ipaffs = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = ruleMode,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new CommodityQuantityCheckDecisionRule();
         var notification = DecisionImportPreNotificationBuilder
@@ -200,6 +207,7 @@ public class CommodityQuantityCheckDecisionRuleTests
         )
         {
             Logger = NullLogger.Instance,
+            Source = Constants.ChedSource.Ipaffs,
         };
 
         // Act
@@ -229,9 +237,12 @@ public class CommodityQuantityCheckDecisionRuleTests
         // Arrange
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = RuleMode.DryRun,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Ipaffs = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new CommodityQuantityCheckDecisionRule();
 
@@ -269,9 +280,12 @@ public class CommodityQuantityCheckDecisionRuleTests
         // Arrange
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = RuleMode.DryRun,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Ipaffs = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new CommodityQuantityCheckDecisionRule();
 
@@ -357,6 +371,7 @@ public class CommodityQuantityCheckDecisionRuleTests
         )
         {
             Logger = NullLogger.Instance,
+            Source = Constants.ChedSource.Ipaffs,
         };
 
         // Act
@@ -373,17 +388,20 @@ public class CommodityQuantityCheckDecisionRuleTests
         var ruleOptions = Options.Create(
             new DecisionRulesOptions()
             {
-                Level3Mode = RuleMode.DryRun,
-                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                Ipaffs = new DecisionRulesSourceOptions()
                 {
-                    ComparisonEntries =
-                    [
-                        new CommodityQuantityCheckDecisionRuleComparisonEntry
-                        {
-                            ComparisonType = QuantityComparisonType.Weight,
-                            UseFallback = false,
-                        },
-                    ],
+                    Level3Mode = RuleMode.DryRun,
+                    CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                    {
+                        ComparisonEntries =
+                        [
+                            new CommodityQuantityCheckDecisionRuleComparisonEntry
+                            {
+                                ComparisonType = QuantityComparisonType.Weight,
+                                UseFallback = false,
+                            },
+                        ],
+                    },
                 },
             }
         );
@@ -414,17 +432,20 @@ public class CommodityQuantityCheckDecisionRuleTests
         var ruleOptions = Options.Create(
             new DecisionRulesOptions()
             {
-                Level3Mode = RuleMode.DryRun,
-                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                Ipaffs = new DecisionRulesSourceOptions()
                 {
-                    ComparisonEntries =
-                    [
-                        new CommodityQuantityCheckDecisionRuleComparisonEntry
-                        {
-                            ComparisonType = QuantityComparisonType.Weight,
-                            UseFallback = true,
-                        },
-                    ],
+                    Level3Mode = RuleMode.DryRun,
+                    CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                    {
+                        ComparisonEntries =
+                        [
+                            new CommodityQuantityCheckDecisionRuleComparisonEntry
+                            {
+                                ComparisonType = QuantityComparisonType.Weight,
+                                UseFallback = true,
+                            },
+                        ],
+                    },
                 },
             }
         );
@@ -447,17 +468,20 @@ public class CommodityQuantityCheckDecisionRuleTests
         var ruleOptions = Options.Create(
             new DecisionRulesOptions()
             {
-                Level3Mode = RuleMode.DryRun,
-                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                Ipaffs = new DecisionRulesSourceOptions()
                 {
-                    ComparisonEntries =
-                    [
-                        new CommodityQuantityCheckDecisionRuleComparisonEntry
-                        {
-                            ComparisonType = (QuantityComparisonType)999,
-                            UseFallback = false,
-                        },
-                    ],
+                    Level3Mode = RuleMode.DryRun,
+                    CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                    {
+                        ComparisonEntries =
+                        [
+                            new CommodityQuantityCheckDecisionRuleComparisonEntry
+                            {
+                                ComparisonType = (QuantityComparisonType)999,
+                                UseFallback = false,
+                            },
+                        ],
+                    },
                 },
             }
         );
@@ -477,17 +501,20 @@ public class CommodityQuantityCheckDecisionRuleTests
         var ruleOptions = Options.Create(
             new DecisionRulesOptions()
             {
-                Level3Mode = RuleMode.DryRun,
-                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                Ipaffs = new DecisionRulesSourceOptions()
                 {
-                    ComparisonEntries =
-                    [
-                        new CommodityQuantityCheckDecisionRuleComparisonEntry
-                        {
-                            ChedType = "CHEDP",
-                            ComparisonType = QuantityComparisonType.Weight,
-                        },
-                    ],
+                    Level3Mode = RuleMode.DryRun,
+                    CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                    {
+                        ComparisonEntries =
+                        [
+                            new CommodityQuantityCheckDecisionRuleComparisonEntry
+                            {
+                                ChedType = "CHEDP",
+                                ComparisonType = QuantityComparisonType.Weight,
+                            },
+                        ],
+                    },
                 },
             }
         );
@@ -506,17 +533,20 @@ public class CommodityQuantityCheckDecisionRuleTests
         var ruleOptions = Options.Create(
             new DecisionRulesOptions()
             {
-                Level3Mode = RuleMode.DryRun,
-                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                Ipaffs = new DecisionRulesSourceOptions()
                 {
-                    ComparisonEntries =
-                    [
-                        new CommodityQuantityCheckDecisionRuleComparisonEntry
-                        {
-                            CheckCode = "H222",
-                            ComparisonType = QuantityComparisonType.Weight,
-                        },
-                    ],
+                    Level3Mode = RuleMode.DryRun,
+                    CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                    {
+                        ComparisonEntries =
+                        [
+                            new CommodityQuantityCheckDecisionRuleComparisonEntry
+                            {
+                                CheckCode = "H222",
+                                ComparisonType = QuantityComparisonType.Weight,
+                            },
+                        ],
+                    },
                 },
             }
         );
@@ -534,14 +564,17 @@ public class CommodityQuantityCheckDecisionRuleTests
         var rule = new CommodityQuantityCheckDecisionRule();
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = RuleMode.DryRun,
-            CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+            Ipaffs = new DecisionRulesSourceOptions()
             {
-                ComparisonEntries =
-                [
-                    new CommodityQuantityCheckDecisionRuleComparisonEntry { CommodityCode = "N853" },
-                    new CommodityQuantityCheckDecisionRuleComparisonEntry(),
-                ],
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                {
+                    ComparisonEntries =
+                    [
+                        new CommodityQuantityCheckDecisionRuleComparisonEntry { CommodityCode = "N853" },
+                        new CommodityQuantityCheckDecisionRuleComparisonEntry(),
+                    ],
+                },
             },
         };
 
@@ -557,13 +590,16 @@ public class CommodityQuantityCheckDecisionRuleTests
     {
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = RuleMode.DryRun,
-            CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+            Ipaffs = new DecisionRulesSourceOptions()
             {
-                ComparisonEntries =
-                [
-                    new CommodityQuantityCheckDecisionRuleComparisonEntry { CommodityCode = "0207146000" },
-                ],
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                {
+                    ComparisonEntries =
+                    [
+                        new CommodityQuantityCheckDecisionRuleComparisonEntry { CommodityCode = "0207146000" },
+                    ],
+                },
             },
         };
 
@@ -580,14 +616,17 @@ public class CommodityQuantityCheckDecisionRuleTests
     {
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = RuleMode.DryRun,
-            CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+            Ipaffs = new DecisionRulesSourceOptions()
             {
-                ComparisonEntries =
-                [
-                    new CommodityQuantityCheckDecisionRuleComparisonEntry { CommodityCode = "0201" },
-                    new CommodityQuantityCheckDecisionRuleComparisonEntry(),
-                ],
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule = new CommodityQuantityCheckDecisionRuleOptions()
+                {
+                    ComparisonEntries =
+                    [
+                        new CommodityQuantityCheckDecisionRuleComparisonEntry { CommodityCode = "0201" },
+                        new CommodityQuantityCheckDecisionRuleComparisonEntry(),
+                    ],
+                },
             },
         };
         var rule = new CommodityQuantityCheckDecisionRule();
@@ -686,6 +725,7 @@ public class CommodityQuantityCheckDecisionRuleTests
         )
         {
             Logger = NullLogger.Instance,
+            Source = Constants.ChedSource.Ipaffs,
         };
     }
 }

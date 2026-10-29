@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
@@ -107,7 +108,7 @@ public class TracesReservationDecisionRuleTests
                 new DecisionEngineResult(
                     DecisionCode.X00,
                     nameof(TracesReservationDecisionRule),
-                    DecisionInternalFurtherDetail.E99,
+                    DecisionInternalFurtherDetail.E40,
                     DecisionResultMode.Active,
                     DecisionRuleLevel.Level4
                 )
@@ -131,11 +132,88 @@ public class TracesReservationDecisionRuleTests
                 new DecisionEngineResult(
                     DecisionCode.X00,
                     nameof(TracesReservationDecisionRule),
-                    DecisionInternalFurtherDetail.E99,
+                    DecisionInternalFurtherDetail.E40,
                     DecisionResultMode.Passive,
                     DecisionRuleLevel.Level4
                 )
             );
+    }
+
+    [Theory]
+    [InlineData("CnCodesMismatch", DecisionInternalFurtherDetail.E41)]
+    [InlineData("InappropriateStatus", DecisionInternalFurtherDetail.E42)]
+    [InlineData("QuantitiesInsufficient", DecisionInternalFurtherDetail.E43)]
+    [InlineData("WriteOffExists", DecisionInternalFurtherDetail.E44)]
+    [InlineData("LineNumbersMismatch", DecisionInternalFurtherDetail.E45)]
+    [InlineData("MeasurementUnitMismatch", DecisionInternalFurtherDetail.E46)]
+    [InlineData("QuantitiesCannotBeValidated", DecisionInternalFurtherDetail.E47)]
+    public async Task Execute_WhenReservationFailsWithReasonAndLevel4ModeIsLive_ReturnsActiveX00WithMappedCode(
+        string reason,
+        DecisionInternalFurtherDetail expected
+    )
+    {
+        StubNext(DecisionCode.C02);
+        var context = CreateContext();
+        await StubProblemResponse($$"""{"reason":"{{reason}}"}""");
+
+        var result = CreateRule(RuleMode.Live).Execute(context, _mockNext);
+
+        result
+            .Should()
+            .Be(
+                new DecisionEngineResult(
+                    DecisionCode.X00,
+                    nameof(TracesReservationDecisionRule),
+                    expected,
+                    DecisionResultMode.Active,
+                    DecisionRuleLevel.Level4
+                )
+            );
+    }
+
+    [Theory]
+    [InlineData("CnCodesMismatch", DecisionInternalFurtherDetail.E41)]
+    [InlineData("QuantitiesCannotBeValidated", DecisionInternalFurtherDetail.E47)]
+    public async Task Execute_WhenReservationFailsWithReasonAndLevel4ModeIsDryRun_AddsPassiveResultWithMappedCode(
+        string reason,
+        DecisionInternalFurtherDetail expected
+    )
+    {
+        var nextResult = StubNext(DecisionCode.C02);
+        var context = CreateContext();
+        await StubProblemResponse($$"""{"reason":"{{reason}}"}""");
+
+        var result = CreateRule(RuleMode.DryRun).Execute(context, _mockNext);
+
+        result.Should().BeSameAs(nextResult);
+        result.Code.Should().Be(DecisionCode.C02);
+        result
+            .PassiveResults?[0].Should()
+            .Be(
+                new DecisionEngineResult(
+                    DecisionCode.X00,
+                    nameof(TracesReservationDecisionRule),
+                    expected,
+                    DecisionResultMode.Passive,
+                    DecisionRuleLevel.Level4
+                )
+            );
+    }
+
+    [Theory]
+    [InlineData("""{"reason":"LicenceHolderMismatch"}""")]
+    [InlineData("{}")]
+    [InlineData("")]
+    [InlineData("<html>Bad Gateway</html>")]
+    public async Task Execute_WhenReservationFailsWithUnmappedOrMissingReason_ReturnsE40(string body)
+    {
+        StubNext(DecisionCode.C02);
+        var context = CreateContext();
+        await StubProblemResponse(body);
+
+        var result = CreateRule(RuleMode.Live).Execute(context, _mockNext);
+
+        result.FurtherDetail.Should().Be(DecisionInternalFurtherDetail.E40);
     }
 
     [Fact]
@@ -189,6 +267,54 @@ public class TracesReservationDecisionRuleTests
         var item = capturedRequest.Request!.Items.Should().ContainSingle().Subject;
         item.NetWeightQuantity.Should().Be(42);
         item.NetWeightUnitOfMeasure.Should().Be(UniversalUnitOfMeasureType.KGM);
+    }
+
+    [Theory]
+    [InlineData("KGM", null, UniversalUnitOfMeasureType.KGM)]
+    [InlineData("KGM", "H87", UniversalUnitOfMeasureType.KGM)]
+    [InlineData("GRM", null, UniversalUnitOfMeasureType.GRM)]
+    [InlineData(null, null, UniversalUnitOfMeasureType.KGM)]
+    public void Execute_WhenTradeLineItemUsesNetWeight_SetsNetWeightFields(
+        string? netWeightUnitCode,
+        string? netVolumeUnitCode,
+        UniversalUnitOfMeasureType expected
+    )
+    {
+        StubNext(DecisionCode.C02);
+        var context = CreateContext(netWeightUnitCode: netWeightUnitCode, netVolumeUnitCode: netVolumeUnitCode);
+        var capturedRequest = StubResponseAndCapture(HttpStatusCode.OK);
+
+        CreateRule().Execute(context, _mockNext);
+
+        capturedRequest.Request.Should().NotBeNull();
+        var item = capturedRequest.Request!.Items.Should().ContainSingle().Subject;
+        item.NetWeightQuantity.Should().Be(100);
+        item.NetWeightUnitOfMeasure.Should().Be(expected);
+        item.NetVolumeQuantity.Should().BeNull();
+        item.NetVolumeUnitOfMeasure.Should().BeNull();
+    }
+
+    [Theory]
+    [InlineData("H87", UniversalUnitOfMeasureType.H87)]
+    [InlineData("h87", UniversalUnitOfMeasureType.H87)]
+    [InlineData("UNKNOWN", UniversalUnitOfMeasureType.KGM)]
+    public void Execute_WhenTradeLineItemUsesNetVolume_SetsNetVolumeFields(
+        string netVolumeUnitCode,
+        UniversalUnitOfMeasureType expected
+    )
+    {
+        StubNext(DecisionCode.C02);
+        var context = CreateContext(netVolumeUnitCode: netVolumeUnitCode);
+        var capturedRequest = StubResponseAndCapture(HttpStatusCode.OK);
+
+        CreateRule().Execute(context, _mockNext);
+
+        capturedRequest.Request.Should().NotBeNull();
+        var item = capturedRequest.Request!.Items.Should().ContainSingle().Subject;
+        item.NetVolumeQuantity.Should().Be(100);
+        item.NetVolumeUnitOfMeasure.Should().Be(expected);
+        item.NetWeightQuantity.Should().BeNull();
+        item.NetWeightUnitOfMeasure.Should().BeNull();
     }
 
     [Fact]
@@ -350,7 +476,9 @@ public class TracesReservationDecisionRuleTests
     {
         return new TracesReservationDecisionRule(
             _quantityManagementClient,
-            Options.Create(new DecisionRulesOptions() { Level4Mode = level4Mode })
+            Options.Create(
+                new DecisionRulesOptions() { Traces = new DecisionRulesSourceOptions() { Level4Mode = level4Mode } }
+            )
         );
     }
 
@@ -373,6 +501,30 @@ public class TracesReservationDecisionRuleTests
             .Returns(
                 new ApiResponse<ChedDeclarationReservation>(new HttpResponseMessage(statusCode), content!, null!, null!)
             );
+    }
+
+    private async Task StubProblemResponse(string body)
+    {
+        var settings = new RefitSettings();
+        var responseMessage = new HttpResponseMessage(HttpStatusCode.BadRequest)
+        {
+            Content = new StringContent(body, Encoding.UTF8, "application/problem+json"),
+        };
+        var error = await ApiException.Create(
+            new HttpRequestMessage(HttpMethod.Put, "http://localhost/reservation"),
+            HttpMethod.Put,
+            responseMessage,
+            settings
+        );
+
+        _quantityManagementClient
+            .PutChedReservation(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<ChedReservationRequest>(),
+                Arg.Any<CancellationToken>()
+            )
+            .Returns(new ApiResponse<ChedDeclarationReservation>(responseMessage, null!, settings, error));
     }
 
     private CapturedRequest StubResponseAndCapture(HttpStatusCode statusCode)
@@ -407,10 +559,19 @@ public class TracesReservationDecisionRuleTests
         string taricCommodityCode = "0207146000",
         string documentReference = "1234567",
         bool includeConsignmentItem = true,
-        bool? level3Succeeded = true
+        bool? level3Succeeded = true,
+        string? netWeightUnitCode = null,
+        string? netVolumeUnitCode = null
     )
     {
         const string chedIdentifier = "CHEDP.GB.2025.1234567";
+
+        var netWeight =
+            netWeightUnitCode == null
+                ? null
+                : new UneceWeightMeasure() { Content = "100", UnitCode = netWeightUnitCode };
+        var netVolume =
+            netVolumeUnitCode == null ? null : new UneceMeasure() { Content = "100", UnitCode = netVolumeUnitCode };
 
         var ched = new DefraUNVTDCHEDProfile()
         {
@@ -434,6 +595,8 @@ public class TracesReservationDecisionRuleTests
                                             ClassCode = new CodedValue { Value = "0207146000" },
                                         },
                                     ],
+                                    NetWeight = netWeight,
+                                    NetVolume = netVolume,
                                 },
                             ],
                         },

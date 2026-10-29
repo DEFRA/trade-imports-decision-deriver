@@ -31,13 +31,16 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         // Arrange
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = ruleMode,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Traces = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = ruleMode,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new TracesCommodityQuantityCheckDecisionRule();
 
-        var ched = CreateChed("123", netWeight: chedWeight, netWeightUnitCode: "KGM");
+        var ched = CreateChed("123", netWeight: chedWeight, netWeightUnitCode: "KGM", chedId: "CHEDP.IX.2026.12345678");
 
         var customsDeclaration = new CustomsDeclarationWrapper(
             "mrn",
@@ -87,6 +90,7 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         {
             Logger = NullLogger.Instance,
             Level2Succeeded = true,
+            Source = Constants.ChedSource.Traces,
         };
 
         // Act
@@ -134,9 +138,12 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         // Arrange
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = ruleMode,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Traces = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = ruleMode,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new TracesCommodityQuantityCheckDecisionRule();
 
@@ -190,6 +197,7 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         {
             Logger = NullLogger.Instance,
             Level2Succeeded = true,
+            Source = Constants.ChedSource.Traces,
         };
 
         // Act
@@ -224,9 +232,12 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         // Arrange
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = RuleMode.DryRun,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Traces = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new TracesCommodityQuantityCheckDecisionRule();
 
@@ -249,6 +260,7 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         )
         {
             Logger = NullLogger.Instance,
+            Source = Constants.ChedSource.Traces,
         };
 
         // Act
@@ -265,9 +277,12 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         // Arrange
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = RuleMode.DryRun,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Traces = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new TracesCommodityQuantityCheckDecisionRule();
 
@@ -287,6 +302,7 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         {
             Logger = NullLogger.Instance,
             Level2Succeeded = false,
+            Source = Constants.ChedSource.Traces,
         };
 
         // Act
@@ -303,9 +319,12 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         // Arrange
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = RuleMode.DryRun,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Traces = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = RuleMode.DryRun,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new TracesCommodityQuantityCheckDecisionRule();
 
@@ -369,6 +388,7 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         {
             Logger = NullLogger.Instance,
             Level2Succeeded = true,
+            Source = Constants.ChedSource.Traces,
         };
 
         // Act
@@ -391,13 +411,21 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         // Arrange: chedWeightInUnit converts to >= 4kg, but the raw (unconverted) number would not
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = RuleMode.Live,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Traces = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = RuleMode.Live,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new TracesCommodityQuantityCheckDecisionRule();
 
-        var ched = CreateChed("123", netWeight: chedWeightInUnit, netWeightUnitCode: unitCode);
+        var ched = CreateChed(
+            "123",
+            netWeight: chedWeightInUnit,
+            netWeightUnitCode: unitCode,
+            chedId: "CHEDP.IX.2026.12345678"
+        );
 
         var customsDeclaration = new CustomsDeclarationWrapper(
             "mrn",
@@ -463,13 +491,16 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         // Arrange
         var ruleOptions = new DecisionRulesOptions()
         {
-            Level3Mode = RuleMode.Live,
-            CommodityQuantityCheckDecisionRule =
-                TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            Traces = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = RuleMode.Live,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
         };
         var rule = new TracesCommodityQuantityCheckDecisionRule();
 
-        var ched = CreateChed("123", netWeight: 999999, netWeightUnitCode: "UNKNOWN");
+        var ched = CreateChed("123", netWeight: 999999, netWeightUnitCode: "UNKNOWN", chedId: "CHEDP.IX.2026.12345678");
 
         var customsDeclaration = new CustomsDeclarationWrapper(
             "mrn",
@@ -519,6 +550,7 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         {
             Logger = NullLogger.Instance,
             Level2Succeeded = true,
+            Source = Constants.ChedSource.Traces,
         };
 
         // Act
@@ -540,12 +572,13 @@ public class TracesCommodityQuantityCheckDecisionRuleTests
         string commodityCode,
         decimal? netWeight = null,
         string? netWeightUnitCode = null,
-        int? itemQuantity = null
+        int? itemQuantity = null,
+        string chedId = "CHEDA.IX.2026.12345678"
     )
     {
         return new DefraUNVTDCHEDProfile()
         {
-            ExchangedDocument = new ExchangedDocument() { Identifier = "test" },
+            ExchangedDocument = new ExchangedDocument() { Identifier = chedId },
             SpecifiedConsignment = new Consignment()
             {
                 IncludedConsignmentItem =

@@ -33,19 +33,20 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             {
                 return notificationType switch
                 {
-                    ImportNotificationType.Cveda => source == "TRACES"
-                        ? CreateEngineForTracesCveda(k)
-                        : CreateEngineForCveda(k),
-                    ImportNotificationType.Cvedp => source == "TRACES"
-                        ? CreateEngineForTracesCvedp(k)
-                        : CreateEngineForCvedp(k),
-                    ImportNotificationType.Chedpp => source == "TRACES"
-                        ? CreateEngineForTracesChedpp(k)
-                        : CreateEngineForChedpp(k),
-                    ImportNotificationType.Ced => source == "TRACES"
-                        ? CreateEngineForTracesCed(k)
-                        : CreateEngineForCed(k),
+                    ImportNotificationType.Cveda => source == Constants.ChedSource.Traces
+                        ? CreateEngineForTracesCveda(notificationType)
+                        : CreateEngineForCveda(notificationType),
+                    ImportNotificationType.Cvedp => source == Constants.ChedSource.Traces
+                        ? CreateEngineForTracesCvedp(notificationType)
+                        : CreateEngineForCvedp(notificationType),
+                    ImportNotificationType.Chedpp => source == Constants.ChedSource.Traces
+                        ? CreateEngineForTracesChedpp(notificationType)
+                        : CreateEngineForChedpp(notificationType),
+                    ImportNotificationType.Ced => source == Constants.ChedSource.Traces
+                        ? CreateEngineForTracesCed(notificationType)
+                        : CreateEngineForCed(notificationType),
                     _ => new DecisionRulesEngine(
+                        "Unknown",
                         "Unknown",
                         new List<IDecisionRule> { AddRule<UnknownChedTypeDecisionRule>() },
                         _logger,
@@ -68,6 +69,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
+            Constants.ChedSource.Traces,
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -87,6 +89,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
+            Constants.ChedSource.Traces,
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -106,6 +109,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
+            Constants.ChedSource.Traces,
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -125,6 +129,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
+            Constants.ChedSource.Traces,
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -148,6 +153,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
+            Constants.ChedSource.Ipaffs,
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -172,6 +178,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
+            Constants.ChedSource.Ipaffs,
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -194,6 +201,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
+            Constants.ChedSource.Ipaffs,
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),
@@ -217,6 +225,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
         };
 
         return new DecisionRulesEngine(
+            Constants.ChedSource.Ipaffs,
             chedType,
             rules,
             serviceProvider.GetRequiredService<ILogger<DecisionRulesEngine>>(),

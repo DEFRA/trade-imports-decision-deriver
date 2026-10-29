@@ -1,8 +1,15 @@
+using System.Text.Json;
+using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Microsoft.Extensions.Options;
+using Refit;
+using Trade.Gateway.Api.Contract.Certificate;
+using Trade.Gateway.Api.Contract.Customs;
 using TradeImportsQuantityMgmt.Client.Clients;
 using TradeImportsQuantityMgmt.Contract;
+using ChedReservationRequest = TradeImportsQuantityMgmt.Contract.ChedReservationRequest;
+using ReservationCommodityItem = TradeImportsQuantityMgmt.Contract.ReservationCommodityItem;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces;
 
@@ -46,13 +53,48 @@ public sealed class TracesReservationDecisionRule(
 
         if (response.IsSuccessful)
             return new DecisionEngineResult(DecisionCode.C03, nameof(TracesReservationDecisionRule));
-        switch (options.Value.Level4Mode)
+
+        var internalCode = DecisionInternalFurtherDetail.E40;
+        if (response.Error is ApiException apiEx)
+        {
+            // Deserialize with default (case-sensitive) options rather than apiEx.GetContentAsAsync: Refit's
+            // default options are case-insensitive, so "reason" binds to the read-only Reason property and is
+            // dropped instead of landing in Extensions, which is where Reason reads it from.
+            var problem = TryReadProblemDetails(apiEx.Content);
+
+            switch (problem?.Reason)
+            {
+                case ReservationFailureReason.CnCodesMismatch:
+                    internalCode = DecisionInternalFurtherDetail.E41;
+                    break;
+                case ReservationFailureReason.InappropriateStatus:
+                    internalCode = DecisionInternalFurtherDetail.E42;
+                    break;
+                case ReservationFailureReason.QuantitiesInsufficient:
+                    internalCode = DecisionInternalFurtherDetail.E43;
+                    break;
+                case ReservationFailureReason.WriteOffExists:
+                    internalCode = DecisionInternalFurtherDetail.E44;
+                    break;
+                case ReservationFailureReason.LineNumbersMismatch:
+                    internalCode = DecisionInternalFurtherDetail.E45;
+                    break;
+                case ReservationFailureReason.MeasurementUnitMismatch:
+                    internalCode = DecisionInternalFurtherDetail.E46;
+                    break;
+                case ReservationFailureReason.QuantitiesCannotBeValidated:
+                    internalCode = DecisionInternalFurtherDetail.E47;
+                    break;
+            }
+        }
+
+        switch (options.Value.Traces.Level4Mode)
         {
             case RuleMode.Live:
                 return new DecisionEngineResult(
                     DecisionCode.X00,
                     nameof(TracesReservationDecisionRule),
-                    DecisionInternalFurtherDetail.E99,
+                    internalCode,
                     DecisionResultMode.Active,
                     DecisionRuleLevel.Level4
                 );
@@ -61,12 +103,27 @@ public sealed class TracesReservationDecisionRule(
                     new DecisionEngineResult(
                         DecisionCode.X00,
                         nameof(TracesReservationDecisionRule),
-                        DecisionInternalFurtherDetail.E99,
+                        internalCode,
                         DecisionResultMode.Passive,
                         DecisionRuleLevel.Level4
                     )
                 );
                 return result;
+        }
+    }
+
+    private static ChedReservationProblemDetails? TryReadProblemDetails(string? content)
+    {
+        if (string.IsNullOrEmpty(content))
+            return null;
+
+        try
+        {
+            return JsonSerializer.Deserialize<ChedReservationProblemDetails>(content);
+        }
+        catch (JsonException)
+        {
+            return null;
         }
     }
 
@@ -101,18 +158,35 @@ public sealed class TracesReservationDecisionRule(
                 continue;
             }
 
-            items.Add(
-                new ReservationCommodityItem
-                {
-                    GoodsItemNumber = matchedCommodity.ItemNumber,
-                    CertificateLineNumber = tradeLineItem.SequenceNumeric,
-                    ClassCode = classCode,
-                    NetWeightQuantity = netWeight,
-                    NetWeightUnitOfMeasure = UniversalUnitOfMeasureType.KGM,
-                }
-            );
+            items.Add(CreateReservationItem(tradeLineItem, matchedCommodity, classCode, netWeight));
         }
 
         return items.ToArray();
     }
+
+    private static ReservationCommodityItem CreateReservationItem(
+        TradeLineItem tradeLineItem,
+        Commodity matchedCommodity,
+        string classCode,
+        decimal? quantity
+    )
+    {
+        var useNetVolume = tradeLineItem.NetWeight == null && tradeLineItem.NetVolume != null;
+
+        return new ReservationCommodityItem
+        {
+            GoodsItemNumber = matchedCommodity.ItemNumber,
+            CertificateLineNumber = tradeLineItem.SequenceNumeric,
+            ClassCode = classCode,
+            NetWeightQuantity = useNetVolume ? null : quantity,
+            NetWeightUnitOfMeasure = useNetVolume ? null : ParseUnitOfMeasure(tradeLineItem.NetWeight?.UnitCode),
+            NetVolumeQuantity = useNetVolume ? quantity : null,
+            NetVolumeUnitOfMeasure = useNetVolume ? ParseUnitOfMeasure(tradeLineItem.NetVolume?.UnitCode) : null,
+        };
+    }
+
+    private static UniversalUnitOfMeasureType ParseUnitOfMeasure(string? unitCode) =>
+        Enum.TryParse<UniversalUnitOfMeasureType>(unitCode, ignoreCase: true, out var unitOfMeasure)
+            ? unitOfMeasure
+            : UniversalUnitOfMeasureType.KGM;
 }

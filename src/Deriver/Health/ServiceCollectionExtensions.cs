@@ -30,6 +30,15 @@ public static class ServiceCollectionExtensions
                 timeout: TimeSpan.FromSeconds(10),
                 tags: [WebApplicationExtensions.Extended]
             )
+            .AddSqs(
+                configuration,
+                "IUU certification events SQS queue",
+                _ =>
+                    configuration.GetValue<string>("IUU_CERTIFICATION_EVENTS_QUEUE_NAME")
+                    ?? throw new InvalidOperationException("Missing IUU_CERTIFICATION_EVENTS_QUEUE_NAME"),
+                timeout: TimeSpan.FromSeconds(10),
+                tags: [WebApplicationExtensions.Extended]
+            )
             .AddDataApi(
                 sp => sp.GetRequiredService<IOptions<DataApiOptions>>().Value,
                 tags: [WebApplicationExtensions.Extended],

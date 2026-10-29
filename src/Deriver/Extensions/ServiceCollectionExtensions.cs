@@ -127,6 +127,7 @@ public static class ServiceCollectionExtensions
             {
                 var queueName = configuration.GetValue<string>("DATA_EVENTS_QUEUE_NAME");
                 var tracesChedsQueueName = configuration.GetValue<string>("TRACES_CHED_EVENTS_QUEUE_NAME");
+                var iuuCertificationsQueueName = configuration.GetValue<string>("IUU_CERTIFICATION_EVENTS_QUEUE_NAME");
                 var consumersPerHost = configuration.GetValue<int>("CONSUMERS_PER_HOST");
 
                 mbb.AddCompressedJsonSerializer()
@@ -145,6 +146,11 @@ public static class ServiceCollectionExtensions
                     )
                     .Consume<ResourceEvent<TracesChedEvent>>(x =>
                         x.WithConsumer<TracesChedConsumer>().Queue(tracesChedsQueueName).Instances(consumersPerHost)
+                    )
+                    .Consume<ResourceEvent<IuuNotificationEvent>>(x =>
+                        x.WithConsumer<IuuCertificationConsumer>()
+                            .Queue(iuuCertificationsQueueName)
+                            .Instances(consumersPerHost)
                     );
             });
         }

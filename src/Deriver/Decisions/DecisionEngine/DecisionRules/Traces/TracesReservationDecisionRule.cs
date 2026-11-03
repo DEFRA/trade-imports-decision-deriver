@@ -1,8 +1,10 @@
 using System.Text.Json;
+using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Extensions;
 using Microsoft.Extensions.Options;
 using Refit;
+using Trade.Gateway.Api.Contract.Certificate;
 using Trade.Gateway.Api.Contract.Customs;
 using TradeImportsQuantityMgmt.Client.Clients;
 using TradeImportsQuantityMgmt.Contract;
@@ -149,25 +151,54 @@ public sealed class TracesReservationDecisionRule(
                 && mrn.Documents?.Any(document => document.DocumentReference?.Value == chedDocumentIdentifier) == true
             );
 
-            var netWeight = matchedCommodity?.NetMass ?? matchedCommodity?.SupplementaryUnits;
-
-            if (matchedCommodity == null || netWeight == null)
+            if (matchedCommodity == null)
             {
                 continue;
             }
 
-            items.Add(
-                new ReservationCommodityItem
-                {
-                    GoodsItemNumber = matchedCommodity.ItemNumber,
-                    CertificateLineNumber = tradeLineItem.SequenceNumeric,
-                    ClassCode = classCode,
-                    NetWeightQuantity = netWeight,
-                    NetWeightUnitOfMeasure = UniversalUnitOfMeasureType.KGM,
-                }
-            );
+            var useNetVolume = UsesNetVolume(tradeLineItem);
+
+            // Net volume is a count (e.g. H87 pieces) so must come from supplementary units, never net mass
+            var quantity = useNetVolume
+                ? matchedCommodity.SupplementaryUnits
+                : matchedCommodity.NetMass ?? matchedCommodity.SupplementaryUnits;
+
+            if (quantity == null)
+            {
+                continue;
+            }
+
+            items.Add(CreateReservationItem(tradeLineItem, matchedCommodity, classCode, quantity, useNetVolume));
         }
 
         return items.ToArray();
     }
+
+    private static ReservationCommodityItem CreateReservationItem(
+        TradeLineItem tradeLineItem,
+        Commodity matchedCommodity,
+        string classCode,
+        decimal? quantity,
+        bool useNetVolume
+    )
+    {
+        return new ReservationCommodityItem
+        {
+            GoodsItemNumber = matchedCommodity.ItemNumber,
+            CertificateLineNumber = tradeLineItem.SequenceNumeric,
+            ClassCode = classCode,
+            NetWeightQuantity = useNetVolume ? null : quantity,
+            NetWeightUnitOfMeasure = useNetVolume ? null : UniversalUnitOfMeasureType.KGM,
+            NetVolumeQuantity = useNetVolume ? quantity : null,
+            NetVolumeUnitOfMeasure = useNetVolume ? ParseUnitOfMeasure(tradeLineItem.NetVolume?.UnitCode) : null,
+        };
+    }
+
+    private static bool UsesNetVolume(TradeLineItem tradeLineItem) =>
+        tradeLineItem.NetWeight == null && tradeLineItem.NetVolume != null;
+
+    private static UniversalUnitOfMeasureType ParseUnitOfMeasure(string? unitCode) =>
+        Enum.TryParse<UniversalUnitOfMeasureType>(unitCode, ignoreCase: true, out var unitOfMeasure)
+            ? unitOfMeasure
+            : UniversalUnitOfMeasureType.KGM;
 }

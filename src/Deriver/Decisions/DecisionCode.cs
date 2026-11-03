@@ -42,6 +42,7 @@ public enum DecisionInternalFurtherDetail
     E73, // Deleted
     E74, // Partially Rejected
     E75, // Split Consignment
+    E76, // IUU - No valid IUU document reference or IUU certificate not found
     E80, // Amend
     E81, // Modify
     E82, // Orphan Check code for GMS (Has check codes H220 and H219)

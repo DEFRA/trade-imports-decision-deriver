@@ -19,7 +19,7 @@
 | # | Rule | Type | Returns |
 |---|------|------|---------|
 | 1-7 | Same as CVEDA | | |
-| 8 | `CvedpIuuCheckRule` | Decision | E03 if IUU Option B, else continue |
+| 8 | `CvedpIuuCheckRule` | Decision | H224 only: uses notification IUU option if `IuuCheckRequired` and `IuuOption` set, else loads IUU certificate (X00/E76 if no valid IUU doc ref or not found) |
 | 9 | `CvedpDecisionRule` | Decision | C02, N01-N07, or X00 (terminal) |
 | 10 | `CommodityCodeValidationRule` | Post-process | Logs warnings, returns result from next |
 | 11 | `CommodityWeightOrQuantityValidationRule` | Post-process | Logs warnings, returns result from next |

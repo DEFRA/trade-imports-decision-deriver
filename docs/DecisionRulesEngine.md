@@ -259,17 +259,20 @@ switch (notification.Status)
 #### `CvedpIuuCheckRule`
 **Purpose**: Checks for IUU (Illegal, Unreported, Unregulated) fishing violations  
 **Type**: Decision  
-**Returns**:
-- `E03` if IUU check fails (goods for transit/export)
-- Continues to next rule if IUU check passes
+**Returns** (only for the IUU check code `H224`, otherwise continues to the next rule):
+- If the notification has IUU info (`IuuCheckRequired == true` and `IuuOption` set), its `IuuOption` is used
+- Otherwise an IUU certificate is loaded from the Data API for each of the commodity's IUU document references, a decision is made for each, and the worst decision is used:
+  - `X00` / `E76` if the commodity has no valid IUU document reference
+  - `X00` / `E76` for a reference whose IUU certificate is not found
+- `IuuOption` mapping: `IUUOK` → `C07`, `IUUNotCompliant` → `X00`, `IUUNA` → `C08`, anything else → `H02` / `E93`
 
-**Logic**:
-```csharp
-if (notification.PartTwo?.ControlAuthority?.IuuOption == ControlAuthorityIuuOption.IuuOptionB)
-    return new DecisionResolutionResult(DecisionCode.E03);
-
-return next(context);
-```
+#### `TracesCvedpIuuCheckRule`
+**Purpose**: IUU check for TRACES CVEDP; does not look at the CHED, only the IUU certificate  
+**Type**: Decision  
+**Returns** (only for the IUU check code `H224`, otherwise continues to the next rule):
+- `X00` / `E76` if the commodity has no valid IUU document reference
+- `X00` / `E76` for a reference whose IUU certificate is not found
+- Otherwise the worst decision across all IUU certificates (one per IUU document reference), each mapped as for `CvedpIuuCheckRule`
 
 #### `CvedpDecisionRule`
 **Purpose**: Applies CVEDP-specific business logic  

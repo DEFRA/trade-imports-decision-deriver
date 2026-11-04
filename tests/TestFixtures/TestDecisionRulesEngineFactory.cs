@@ -1,4 +1,5 @@
 using System.Net;
+using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
@@ -29,6 +30,7 @@ public class TestDecisionRulesEngineFactory : IDecisionRulesEngineFactory
         .AddSingleton<CommodityQuantityCheckDecisionRule>()
         .AddSingleton<UnknownChedTypeDecisionRule>()
         .AddSingleton<TracesTerminalStatusDecisionRule>()
+        .AddSingleton<TracesCvedpIuuCheckRule>()
         .AddSingleton<TracesCvedpDecisionRule>()
         .AddSingleton<TracesCedDecisionRule>()
         .AddSingleton<TracesChedppDecisionRule>()
@@ -37,6 +39,7 @@ public class TestDecisionRulesEngineFactory : IDecisionRulesEngineFactory
         .AddSingleton<TracesCommodityQuantityCheckDecisionRule>()
         .AddSingleton<TracesCommodityCodeDecisionRule>()
         .AddSingleton(CreateQuantityManagementClient())
+        .AddSingleton(Substitute.For<ITradeImportsDataApiClient>())
         .AddOptions()
         .Configure<DecisionRulesOptions>(c =>
         {

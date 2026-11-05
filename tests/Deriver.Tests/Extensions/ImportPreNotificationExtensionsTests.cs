@@ -46,4 +46,61 @@ public class ImportPreNotificationExtensionsTests
         decisionNotification.Commodities[1].Weight.Should().Be(892.724M);
         decisionNotification.Commodities[2].Weight.Should().Be(1800);
     }
+
+    [Theory]
+    [InlineData("CVEDA", 25, null)]
+    [InlineData("CVEDP", 3, 7)]
+    [InlineData("CHEDPP", 3, 7)]
+    [InlineData("CED", 3, 7)]
+    public void When_ComplementParameter_Has_Quantities_Then_Cheda_Should_Use_NumberAnimal_And_Others_NumberPackage(
+        string importNotificationType,
+        int? expectedFirstQuantity,
+        int? expectedSecondQuantity
+    )
+    {
+        var json = $$"""
+            {
+              "importPreNotification": {
+                "referenceNumber": "CHEDA.GB.2026.1234567",
+                "importNotificationType": "{{importNotificationType}}",
+                "partOne": {
+                  "commodities": {
+                    "commodityComplements": [
+                      { "commodityId": "0102", "complementId": 1, "speciesId": "111" },
+                      { "commodityId": "0103", "complementId": 2, "speciesId": "222" }
+                    ],
+                    "complementParameterSets": [
+                      {
+                        "uniqueComplementId": "a",
+                        "complementId": 1,
+                        "speciesId": "111",
+                        "keyDataPair": [
+                          { "key": "number_package", "data": "3" },
+                          { "key": "number_animal", "data": "25" }
+                        ]
+                      },
+                      {
+                        "uniqueComplementId": "b",
+                        "complementId": 2,
+                        "speciesId": "222",
+                        "keyDataPair": [
+                          { "key": "number_package", "data": "7" }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+            """;
+        var notification = JsonSerializer.Deserialize<ImportPreNotificationResponse>(
+            json,
+            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+        );
+
+        var decisionNotification = notification!.ImportPreNotification.ToDecisionImportPreNotification();
+
+        decisionNotification.Commodities[0].Quantity.Should().Be(expectedFirstQuantity);
+        decisionNotification.Commodities[1].Quantity.Should().Be(expectedSecondQuantity);
+    }
 }

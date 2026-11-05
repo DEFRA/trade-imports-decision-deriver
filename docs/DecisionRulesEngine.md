@@ -260,11 +260,11 @@ switch (notification.Status)
 **Purpose**: Checks for IUU (Illegal, Unreported, Unregulated) fishing violations  
 **Type**: Decision  
 **Returns** (only for the IUU check code `H224`, otherwise continues to the next rule):
-- If the notification has IUU info (`IuuCheckRequired == true` and `IuuOption` set), its `IuuOption` is used
+- If the notification has an `IuuOption`, it is used
 - Otherwise an IUU certificate is loaded from the Data API for each of the commodity's IUU document references, a decision is made for each, and the worst decision is used:
   - `X00` / `E76` if the commodity has no valid IUU document reference
   - `X00` / `E76` for a reference whose IUU certificate is not found
-- `IuuOption` mapping: `IUUOK` → `C07`, `IUUNotCompliant` → `X00`, `IUUNA` → `C08`, anything else → `H02` / `E93`
+- `IuuOption` mapping: `IUUOK` → `C07`, `IUUNotCompliant` → `N07`, `IUUNA` → `C08`, anything else → `H02` / `E93`
 
 #### `TracesCvedpIuuCheckRule`
 **Purpose**: IUU check for TRACES CVEDP; does not look at the CHED, only the IUU certificate  

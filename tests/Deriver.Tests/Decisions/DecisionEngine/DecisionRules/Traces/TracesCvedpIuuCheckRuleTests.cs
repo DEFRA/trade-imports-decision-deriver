@@ -60,7 +60,7 @@ public class TracesCvedpIuuCheckRuleTests
 
     [Theory]
     [InlineData(ControlAuthorityIuuOption.IUUOK, DecisionCode.C07)]
-    [InlineData(ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00)]
+    [InlineData(ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.N07)]
     [InlineData(ControlAuthorityIuuOption.IUUNA, DecisionCode.C08)]
     [InlineData(null, DecisionCode.H02, DecisionInternalFurtherDetail.E93)]
     public void Execute_WhenIuuCertificateFound_ReturnsDecisionFromCertificate(
@@ -120,7 +120,7 @@ public class TracesCvedpIuuCheckRuleTests
     [InlineData(ControlAuthorityIuuOption.IUUOK, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08, null)]
     [InlineData(ControlAuthorityIuuOption.IUUNA, ControlAuthorityIuuOption.IUUOK, DecisionCode.C08, null)]
     [InlineData(ControlAuthorityIuuOption.IUUOK, "Unknown", DecisionCode.H02, DecisionInternalFurtherDetail.E93)]
-    [InlineData(ControlAuthorityIuuOption.IUUOK, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00, null)]
+    [InlineData(ControlAuthorityIuuOption.IUUOK, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.N07, null)]
     [InlineData(ControlAuthorityIuuOption.IUUOK, null, DecisionCode.X00, DecisionInternalFurtherDetail.E76)]
     public void Execute_WhenMultipleIuuCertificates_ReturnsWorstDecision(
         string firstIuuOption,

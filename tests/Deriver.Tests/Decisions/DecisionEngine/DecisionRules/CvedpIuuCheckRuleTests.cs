@@ -1,6 +1,4 @@
-using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
-using Defra.TradeImportsDataApi.Domain.Iuu;
 using Defra.TradeImportsDecisionDeriver.Deriver.Configuration;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine;
@@ -14,25 +12,15 @@ namespace Defra.TradeImportsDecisionDeriver.Deriver.Tests.Decisions.DecisionEngi
 
 public class CvedpIuuCheckRuleTests
 {
-    private const string IuuDocumentCode = "C673";
-    private const string IuuReference = "GBIUU12345";
-    private const string SecondIuuReference = "GBIUU67890";
-
-    private readonly ITradeImportsDataApiClient _apiClient = Substitute.For<ITradeImportsDataApiClient>();
-    private readonly CvedpIuuCheckRule _rule;
+    private readonly CvedpIuuCheckRule _rule = new();
     private readonly DecisionRuleDelegate _mockNext = Substitute.For<DecisionRuleDelegate>();
-
-    public CvedpIuuCheckRuleTests()
-    {
-        _rule = new CvedpIuuCheckRule(_apiClient);
-    }
 
     // ---------- Non-IUU checks call next ----------
     [Fact]
     public void Execute_WhenCheckCodeIsNotIuu_CallsNextDelegate()
     {
         var notification = DecisionImportPreNotificationBuilder.Create().WithId("Test").Build();
-        var c = CreateContext(notification, new CheckCode() { Value = "H219" }, CreateIuuCommodity());
+        var c = CreateContext(notification, new CheckCode() { Value = "H219" });
 
         _rule.Execute(c, _mockNext);
 
@@ -42,10 +30,10 @@ public class CvedpIuuCheckRuleTests
     // ---------- IuuOption on the notification ----------
     [Theory]
     [InlineData(ControlAuthorityIuuOption.IUUOK, DecisionCode.C07)]
-    [InlineData(ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.N07)]
+    [InlineData(ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00)]
     [InlineData(ControlAuthorityIuuOption.IUUNA, DecisionCode.C08)]
     [InlineData("Unknown", DecisionCode.H02, DecisionInternalFurtherDetail.E93)]
-    public void Execute_WhenNotificationHasIuuOption_UsesNotificationAndDoesNotLoadCertificate(
+    public void Execute_WhenNotificationHasIuuOption_ReturnsDecisionFromIuuOption(
         string iuuOption,
         DecisionCode expectedCode,
         DecisionInternalFurtherDetail? expectedDetail = null
@@ -56,14 +44,30 @@ public class CvedpIuuCheckRuleTests
             .WithId("Test")
             .WithIuuOption(iuuOption)
             .Build();
-        var c = CreateContext(notification, new CheckCode() { Value = CheckCode.IuuCheckCode }, CreateIuuCommodity());
+        var c = CreateContext(notification, new CheckCode() { Value = CheckCode.IuuCheckCode });
 
         var result = _rule.Execute(c, _mockNext);
 
         result
             .Should()
             .BeEquivalentTo(new DecisionEngineResult(expectedCode, nameof(CvedpIuuCheckRule), expectedDetail));
-        _apiClient.DidNotReceiveWithAnyArgs().GetIuuNotification(default!, default);
+        _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionEngineContext>());
+    }
+
+    // ---------- No IuuOption on the notification ----------
+    [Fact]
+    public void Execute_WhenNotificationHasNoIuuOption_ReturnsH02_E93()
+    {
+        var notification = DecisionImportPreNotificationBuilder.Create().WithId("Test").Build();
+        var c = CreateContext(notification, new CheckCode() { Value = CheckCode.IuuCheckCode });
+
+        var result = _rule.Execute(c, _mockNext);
+
+        result
+            .Should()
+            .BeEquivalentTo(
+                new DecisionEngineResult(DecisionCode.H02, nameof(CvedpIuuCheckRule), DecisionInternalFurtherDetail.E93)
+            );
         _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionEngineContext>());
     }
 
@@ -75,9 +79,9 @@ public class CvedpIuuCheckRuleTests
     [InlineData(true, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08)]
     [InlineData(false, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08)]
     [InlineData(null, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08)]
-    [InlineData(true, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.N07)]
-    [InlineData(false, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.N07)]
-    [InlineData(null, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.N07)]
+    [InlineData(true, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00)]
+    [InlineData(false, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00)]
+    [InlineData(null, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00)]
     public void Execute_WhenNotificationHasIuuOption_IgnoresIuuCheckRequired(
         bool? iuuCheckRequired,
         string iuuOption,
@@ -90,176 +94,23 @@ public class CvedpIuuCheckRuleTests
             .WithIuuCheckRequired(iuuCheckRequired)
             .WithIuuOption(iuuOption)
             .Build();
-        var c = CreateContext(notification, new CheckCode() { Value = CheckCode.IuuCheckCode }, new Commodity());
+        var c = CreateContext(notification, new CheckCode() { Value = CheckCode.IuuCheckCode });
 
         var result = _rule.Execute(c, _mockNext);
 
         result.Should().BeEquivalentTo(new DecisionEngineResult(expectedCode, nameof(CvedpIuuCheckRule)));
-        _apiClient.DidNotReceiveWithAnyArgs().GetIuuNotification(default!, default);
     }
-
-    // ---------- No IuuOption on the notification, IUU certificate is loaded ----------
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    [InlineData(null)]
-    public void Execute_WhenNotificationHasNoIuuOption_UsesIuuCertificate(bool? iuuCheckRequired)
-    {
-        var notification = DecisionImportPreNotificationBuilder
-            .Create()
-            .WithId("Test")
-            .WithIuuCheckRequired(iuuCheckRequired)
-            .Build();
-        var c = CreateContext(notification, new CheckCode() { Value = CheckCode.IuuCheckCode }, CreateIuuCommodity());
-
-        _apiClient
-            .GetIuuNotification(IuuReference, Arg.Any<CancellationToken>())
-            .Returns(CreateIuuNotificationResponse(IuuReference, ControlAuthorityIuuOption.IUUOK));
-
-        var result = _rule.Execute(c, _mockNext);
-
-        result.Should().BeEquivalentTo(new DecisionEngineResult(DecisionCode.C07, nameof(CvedpIuuCheckRule)));
-        _apiClient.Received(1).GetIuuNotification(IuuReference, Arg.Any<CancellationToken>());
-    }
-
-    // ---------- No IuuOption on the notification, no valid IUU document reference ----------
-    [Fact]
-    public void Execute_WhenNoIuuOption_AndNoValidIuuDocumentReference_ReturnsX00_E76()
-    {
-        var notification = DecisionImportPreNotificationBuilder.Create().WithId("Test").Build();
-        var c = CreateContext(notification, new CheckCode() { Value = CheckCode.IuuCheckCode }, new Commodity());
-
-        var result = _rule.Execute(c, _mockNext);
-
-        result
-            .Should()
-            .BeEquivalentTo(
-                new DecisionEngineResult(DecisionCode.X00, nameof(CvedpIuuCheckRule), DecisionInternalFurtherDetail.E76)
-            );
-        _apiClient.DidNotReceiveWithAnyArgs().GetIuuNotification(default!, default);
-    }
-
-    // ---------- No IuuOption on the notification, IUU certificate found ----------
-    [Theory]
-    [InlineData(ControlAuthorityIuuOption.IUUOK, DecisionCode.C07)]
-    [InlineData(ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.N07)]
-    [InlineData(ControlAuthorityIuuOption.IUUNA, DecisionCode.C08)]
-    [InlineData(null, DecisionCode.H02, DecisionInternalFurtherDetail.E93)]
-    public void Execute_WhenNoIuuOption_AndIuuCertificateFound_ReturnsDecisionFromCertificate(
-        string? iuuOption,
-        DecisionCode expectedCode,
-        DecisionInternalFurtherDetail? expectedDetail = null
-    )
-    {
-        var notification = DecisionImportPreNotificationBuilder.Create().WithId("Test").Build();
-        var c = CreateContext(notification, new CheckCode() { Value = CheckCode.IuuCheckCode }, CreateIuuCommodity());
-
-        _apiClient
-            .GetIuuNotification(IuuReference, Arg.Any<CancellationToken>())
-            .Returns(CreateIuuNotificationResponse(IuuReference, iuuOption!));
-
-        var result = _rule.Execute(c, _mockNext);
-
-        result
-            .Should()
-            .BeEquivalentTo(new DecisionEngineResult(expectedCode, nameof(CvedpIuuCheckRule), expectedDetail));
-        _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionEngineContext>());
-    }
-
-    // ---------- No IuuOption on the notification, IUU certificate not found ----------
-    [Fact]
-    public void Execute_WhenNoIuuOption_AndIuuCertificateNotFound_ReturnsX00_E76()
-    {
-        var notification = DecisionImportPreNotificationBuilder.Create().WithId("Test").Build();
-        var c = CreateContext(notification, new CheckCode() { Value = CheckCode.IuuCheckCode }, CreateIuuCommodity());
-
-        var result = _rule.Execute(c, _mockNext);
-
-        result
-            .Should()
-            .BeEquivalentTo(
-                new DecisionEngineResult(DecisionCode.X00, nameof(CvedpIuuCheckRule), DecisionInternalFurtherDetail.E76)
-            );
-        _apiClient.Received(1).GetIuuNotification(IuuReference, Arg.Any<CancellationToken>());
-        _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionEngineContext>());
-    }
-
-    // ---------- Multiple IUU certificates, the worst decision is used ----------
-    [Theory]
-    [InlineData(ControlAuthorityIuuOption.IUUOK, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08, null)]
-    [InlineData(ControlAuthorityIuuOption.IUUNA, ControlAuthorityIuuOption.IUUOK, DecisionCode.C08, null)]
-    [InlineData(ControlAuthorityIuuOption.IUUOK, "Unknown", DecisionCode.H02, DecisionInternalFurtherDetail.E93)]
-    [InlineData(ControlAuthorityIuuOption.IUUOK, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.N07, null)]
-    [InlineData(ControlAuthorityIuuOption.IUUOK, null, DecisionCode.X00, DecisionInternalFurtherDetail.E76)]
-    public void Execute_WhenMultipleIuuCertificates_ReturnsWorstDecision(
-        string firstIuuOption,
-        string? secondIuuOption,
-        DecisionCode expectedCode,
-        DecisionInternalFurtherDetail? expectedDetail
-    )
-    {
-        var c = CreateContext(
-            DecisionImportPreNotificationBuilder.Create().WithId("Test").Build(),
-            new CheckCode() { Value = CheckCode.IuuCheckCode },
-            CreateIuuCommodity(IuuReference, SecondIuuReference)
-        );
-
-        _apiClient
-            .GetIuuNotification(IuuReference, Arg.Any<CancellationToken>())
-            .Returns(CreateIuuNotificationResponse(IuuReference, firstIuuOption));
-
-        if (secondIuuOption != null)
-        {
-            _apiClient
-                .GetIuuNotification(SecondIuuReference, Arg.Any<CancellationToken>())
-                .Returns(CreateIuuNotificationResponse(SecondIuuReference, secondIuuOption));
-        }
-
-        var result = _rule.Execute(c, _mockNext);
-
-        result
-            .Should()
-            .BeEquivalentTo(new DecisionEngineResult(expectedCode, nameof(CvedpIuuCheckRule), expectedDetail));
-        _apiClient.Received(1).GetIuuNotification(IuuReference, Arg.Any<CancellationToken>());
-        _apiClient.Received(1).GetIuuNotification(SecondIuuReference, Arg.Any<CancellationToken>());
-    }
-
-    private static Commodity CreateIuuCommodity(params string[] iuuReferences) =>
-        new()
-        {
-            Documents = (iuuReferences.Length == 0 ? [IuuReference] : iuuReferences)
-                .Select(reference => new ImportDocument
-                {
-                    DocumentCode = IuuDocumentCode,
-                    DocumentReference = new ImportDocumentReference(reference),
-                })
-                .ToArray(),
-        };
-
-    private static IuuNotificationResponse CreateIuuNotificationResponse(string reference, string iuuOption) =>
-        new(
-            new IuuNotification
-            {
-                Reference = reference,
-                IuuOption = iuuOption,
-                LastUpdated = DateTime.UtcNow,
-            },
-            DateTime.UtcNow,
-            DateTime.UtcNow,
-            "etag"
-        );
 
     private static DecisionEngineContext CreateContext(
         DecisionImportPreNotification notification,
-        CheckCode checkCode,
-        Commodity commodity
+        CheckCode checkCode
     ) =>
         new(
             new DecisionContext([notification], [], []),
             new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
-            commodity,
+            new Commodity(),
             checkCode,
             new ImportDocument(),
             null

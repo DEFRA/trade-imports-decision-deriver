@@ -1,10 +1,8 @@
-using Defra.TradeImportsDataApi.Api.Client;
-
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules;
 
-public sealed class CvedpIuuCheckRule(ITradeImportsDataApiClient apiClient) : IuuCheckRuleBase(apiClient)
+public sealed class CvedpIuuCheckRule : IDecisionRule
 {
-    public override DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
+    public DecisionEngineResult Execute(DecisionEngineContext context, DecisionRuleDelegate next)
     {
         if (!context.CheckCode.IsIuu())
         {
@@ -13,6 +11,25 @@ public sealed class CvedpIuuCheckRule(ITradeImportsDataApiClient apiClient) : Iu
 
         var iuuOption = context.Notification.IuuOption;
 
-        return iuuOption is not null ? MakeDecisionFromIuuOption(iuuOption) : MakeDecisionFromIuuCertificate(context);
+        return iuuOption switch
+        {
+            ControlAuthorityIuuOption.IUUOK => new DecisionEngineResult(
+                DecisionCode.C07,
+                nameof(CvedpIuuCheckRule)
+            ),
+            ControlAuthorityIuuOption.IUUNotCompliant => new DecisionEngineResult(
+                DecisionCode.X00,
+                nameof(CvedpIuuCheckRule)
+            ),
+            ControlAuthorityIuuOption.IUUNA => new DecisionEngineResult(
+                DecisionCode.C08,
+                nameof(CvedpIuuCheckRule)
+            ),
+            _ => new DecisionEngineResult(
+                DecisionCode.H02,
+                nameof(CvedpIuuCheckRule),
+                DecisionInternalFurtherDetail.E93
+            ),
+        };
     }
 }

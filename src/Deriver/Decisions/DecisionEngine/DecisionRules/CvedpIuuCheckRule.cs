@@ -13,18 +13,12 @@ public sealed class CvedpIuuCheckRule : IDecisionRule
 
         return iuuOption switch
         {
-            ControlAuthorityIuuOption.IUUOK => new DecisionEngineResult(
-                DecisionCode.C07,
-                nameof(CvedpIuuCheckRule)
-            ),
+            ControlAuthorityIuuOption.IUUOK => new DecisionEngineResult(DecisionCode.C07, nameof(CvedpIuuCheckRule)),
             ControlAuthorityIuuOption.IUUNotCompliant => new DecisionEngineResult(
                 DecisionCode.X00,
                 nameof(CvedpIuuCheckRule)
             ),
-            ControlAuthorityIuuOption.IUUNA => new DecisionEngineResult(
-                DecisionCode.C08,
-                nameof(CvedpIuuCheckRule)
-            ),
+            ControlAuthorityIuuOption.IUUNA => new DecisionEngineResult(DecisionCode.C08, nameof(CvedpIuuCheckRule)),
             _ => new DecisionEngineResult(
                 DecisionCode.H02,
                 nameof(CvedpIuuCheckRule),

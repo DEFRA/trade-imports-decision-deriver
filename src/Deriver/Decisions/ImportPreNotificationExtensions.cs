@@ -1,4 +1,5 @@
 using Defra.TradeImportsDataApi.Domain.Ipaffs;
+using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
@@ -67,7 +68,12 @@ public static class ImportPreNotificationExtensions
 
         decisionNotification.Commodities = commodities
             .CommodityComplements.Select(commodityComplement =>
-                CreateDecisionCommodityComplement(commodityComplement, complementParameters, complementRiskAssessments)
+                CreateDecisionCommodityComplement(
+                    commodityComplement,
+                    complementParameters,
+                    complementRiskAssessments,
+                    notification.ImportNotificationType
+                )
             )
             .ToArray();
 
@@ -77,7 +83,8 @@ public static class ImportPreNotificationExtensions
     private static DecisionCommodityComplement CreateDecisionCommodityComplement(
         CommodityComplements commodityComplement,
         Dictionary<string, ComplementParameterSets> complementParameters,
-        Dictionary<string, CommodityRiskResult> complementRiskAssessments
+        Dictionary<string, CommodityRiskResult> complementRiskAssessments,
+        string? importNotificationType
     )
     {
         var decisionCommodityComplement = new DecisionCommodityComplement
@@ -103,8 +110,11 @@ public static class ImportPreNotificationExtensions
                 .Select(x => decimal.TryParse(x.Data, out var v) ? v : (decimal?)null)
                 .FirstOrDefault();
 
+            var quantityKey =
+                importNotificationType == ImportNotificationType.Cveda ? "number_animal" : "number_package";
+
             decisionCommodityComplement.Quantity = parameters
-                .KeyDataPairs.Where(x => x.Key == "number_package")
+                .KeyDataPairs.Where(x => x.Key == quantityKey)
                 .Select(x => int.TryParse(x.Data, out var v) ? v : (int?)null)
                 .FirstOrDefault();
         }

@@ -26,7 +26,7 @@ public abstract class IuuCheckRuleBase(ITradeImportsDataApiClient apiClient) : I
         iuuOption switch
         {
             ControlAuthorityIuuOption.IUUOK => new DecisionEngineResult(DecisionCode.C07, GetType().Name),
-            ControlAuthorityIuuOption.IUUNotCompliant => new DecisionEngineResult(DecisionCode.X00, GetType().Name),
+            ControlAuthorityIuuOption.IUUNotCompliant => new DecisionEngineResult(DecisionCode.N07, GetType().Name),
             ControlAuthorityIuuOption.IUUNA => new DecisionEngineResult(DecisionCode.C08, GetType().Name),
             _ => new DecisionEngineResult(DecisionCode.H02, GetType().Name, DecisionInternalFurtherDetail.E93),
         };

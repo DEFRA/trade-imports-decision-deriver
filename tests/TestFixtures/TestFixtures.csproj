@@ -16,6 +16,8 @@
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.18.1" />
     <PackageReference Include="NSubstitute" Version="6.2.0" />
+    <!-- Pin transitive dependency (via Microsoft.AspNetCore.Http 2.3.9) to fix GHSA-6527-9fp8-r4x6 -->
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.3.14" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Deriver\Deriver.csproj" />

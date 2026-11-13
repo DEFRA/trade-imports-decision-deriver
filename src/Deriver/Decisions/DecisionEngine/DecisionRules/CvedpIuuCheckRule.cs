@@ -11,12 +11,8 @@ public sealed class CvedpIuuCheckRule(ITradeImportsDataApiClient apiClient) : Iu
             return next(context);
         }
 
-        var notification = context.Notification;
-        if (notification is { IuuCheckRequired: true, IuuOption: not null })
-        {
-            return MakeDecisionFromIuuOption(notification.IuuOption);
-        }
+        var iuuOption = context.Notification.IuuOption;
 
-        return MakeDecisionFromIuuCertificate(context);
+        return iuuOption is not null ? MakeDecisionFromIuuOption(iuuOption) : MakeDecisionFromIuuCertificate(context);
     }
 }

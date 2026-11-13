@@ -30,7 +30,7 @@ public class CvedpIuuCheckRuleTests
     // ---------- IuuOption on the notification ----------
     [Theory]
     [InlineData(ControlAuthorityIuuOption.IUUOK, DecisionCode.C07)]
-    [InlineData(ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.N07)]
+    [InlineData(ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00)]
     [InlineData(ControlAuthorityIuuOption.IUUNA, DecisionCode.C08)]
     [InlineData("Unknown", DecisionCode.H02, DecisionInternalFurtherDetail.E93)]
     public void Execute_WhenNotificationHasIuuOption_ReturnsDecisionFromIuuOption(

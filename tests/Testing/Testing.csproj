@@ -23,6 +23,8 @@
     <PackageReference Include="WireMock.Net.FluentAssertions" Version="2.15.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="NSubstitute" Version="6.2.0" />
+    <!-- Pin transitive dependency (via Microsoft.AspNetCore.Http 2.3.9) to fix GHSA-6527-9fp8-r4x6 -->
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.3.14" />
     <PackageReference Include="Verify.Xunit" Version="31.12.5" />
   </ItemGroup>
   <ItemGroup>

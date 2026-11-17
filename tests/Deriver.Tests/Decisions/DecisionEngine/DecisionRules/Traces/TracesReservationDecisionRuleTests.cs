@@ -500,6 +500,36 @@ public class TracesReservationDecisionRuleTests
         capturedRequest.Request.Items.Should().Contain(i => i.GoodsItemNumber == 2 && i.NetWeightQuantity == 20);
     }
 
+    [Fact]
+    public void Execute_WhenDeclarationItemsShareChedLineAndCommodityCode_ReservesEveryItem()
+    {
+        StubNext(DecisionCode.C02);
+        var context = CreateContext();
+        var clearanceRequest = context.ClearanceRequest.CustomsDeclaration.ClearanceRequest!;
+        var firstItem = context.Commodity;
+        clearanceRequest.Commodities =
+        [
+            firstItem,
+            new Commodity()
+            {
+                ItemNumber = 2,
+                TaricCommodityCode = firstItem.TaricCommodityCode,
+                NetMass = 50,
+                Documents = firstItem.Documents,
+            },
+        ];
+
+        var capturedRequest = StubResponseAndCapture(HttpStatusCode.OK);
+
+        CreateRule().Execute(context, _mockNext);
+
+        capturedRequest.Request.Should().NotBeNull();
+        capturedRequest.Request!.Items.Select(item => item.GoodsItemNumber).Should().BeEquivalentTo([1, 2]);
+        capturedRequest
+            .Request.Items.Should()
+            .ContainSingle(item => item.GoodsItemNumber == 2 && item.NetWeightQuantity == 50);
+    }
+
     private TracesReservationDecisionRule CreateRule(RuleMode level4Mode = RuleMode.DryRun)
     {
         return new TracesReservationDecisionRule(

@@ -130,7 +130,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<TracesCommodityCodeDecisionRule>(),
             AddRule<TracesWrongChedTypeDecisionRule>(),
             AddRule<TracesTerminalStatusDecisionRule>(),
-            AddRule<TracesCedDecisionRule>()
+            AddRule<TracesCedDecisionRule>(),
         };
 
         return new DecisionRulesEngine(

@@ -16,8 +16,4 @@ public sealed class TracesWrongChedTypeDecisionRule : IDecisionRule
 
         return next(context);
     }
-
-    
 }
-
-

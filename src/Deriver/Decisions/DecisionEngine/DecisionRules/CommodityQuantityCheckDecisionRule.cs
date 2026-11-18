@@ -7,12 +7,12 @@ public sealed class CommodityQuantityCheckDecisionRule : CommodityQuantityCheckR
 
     protected override IEnumerable<ChedQuantityCommodity> GetChedCommodities(DecisionEngineContext context)
     {
-        return context
-            .DecisionContext.Notifications.SelectMany(notification => notification.Commodities)
-            .Select(commodity => new ChedQuantityCommodity(
-                commodity.CommodityCode,
-                commodity.Weight,
-                commodity.Quantity
-            ));
+        // Only the CHED this item references: every notification on the MRN is in the DecisionContext, and
+        // summing them would let one CHED's weight/quantity cover items declared against another
+        return context.Notification.Commodities.Select(commodity => new ChedQuantityCommodity(
+            commodity.CommodityCode,
+            commodity.Weight,
+            commodity.Quantity
+        ));
     }
 }

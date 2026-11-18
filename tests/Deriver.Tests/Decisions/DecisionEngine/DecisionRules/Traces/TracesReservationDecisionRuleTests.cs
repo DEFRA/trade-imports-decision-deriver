@@ -500,6 +500,175 @@ public class TracesReservationDecisionRuleTests
         capturedRequest.Request.Items.Should().Contain(i => i.GoodsItemNumber == 2 && i.NetWeightQuantity == 20);
     }
 
+    [Fact]
+    public void Execute_WhenDeclarationItemsShareChedLineAndCommodityCode_ReservesEveryItem()
+    {
+        StubNext(DecisionCode.C02);
+        var context = CreateContext();
+        var clearanceRequest = context.ClearanceRequest.CustomsDeclaration.ClearanceRequest!;
+        var firstItem = context.Commodity;
+        clearanceRequest.Commodities =
+        [
+            firstItem,
+            new Commodity()
+            {
+                ItemNumber = 2,
+                TaricCommodityCode = firstItem.TaricCommodityCode,
+                NetMass = 50,
+                Documents = firstItem.Documents,
+            },
+        ];
+
+        var capturedRequest = StubResponseAndCapture(HttpStatusCode.OK);
+
+        CreateRule().Execute(context, _mockNext);
+
+        capturedRequest.Request.Should().NotBeNull();
+        capturedRequest.Request!.Items.Select(item => item.GoodsItemNumber).Should().BeEquivalentTo([1, 2]);
+        capturedRequest
+            .Request.Items.Should()
+            .ContainSingle(item => item.GoodsItemNumber == 1 && item.NetWeightQuantity == 100);
+        capturedRequest
+            .Request.Items.Should()
+            .ContainSingle(item => item.GoodsItemNumber == 2 && item.NetWeightQuantity == 50);
+        capturedRequest
+            .Request.Items.Should()
+            .AllSatisfy(item =>
+            {
+                item.CertificateLineNumber.Should().Be(1);
+                item.ClassCode.Should().Be("0207146000");
+            });
+    }
+
+    [Fact]
+    public void Execute_WhenSharedCommodityCodeItemHasNoQuantity_StillReservesTheRemainingItems()
+    {
+        // A quantity-less item must only skip itself, not the rest of the items on the CHED line
+        StubNext(DecisionCode.C02);
+        var context = CreateContext();
+        var firstItem = context.Commodity;
+        SetCommodities(
+            context,
+            firstItem,
+            CreateMatchingCommodity(firstItem, itemNumber: 2, netMass: null),
+            CreateMatchingCommodity(firstItem, itemNumber: 3, netMass: 30)
+        );
+        var capturedRequest = StubResponseAndCapture(HttpStatusCode.OK);
+
+        CreateRule().Execute(context, _mockNext);
+
+        capturedRequest.Request.Should().NotBeNull();
+        capturedRequest.Request!.Items.Select(item => item.GoodsItemNumber).Should().BeEquivalentTo([1, 3]);
+    }
+
+    [Fact]
+    public void Execute_WhenSharedCommodityCodeItemReferencesAnotherChed_ReservesOnlyItemsForThisChed()
+    {
+        StubNext(DecisionCode.C02);
+        var context = CreateContext();
+        var firstItem = context.Commodity;
+        var otherChedItem = CreateMatchingCommodity(firstItem, itemNumber: 2, netMass: 50);
+        otherChedItem.Documents =
+        [
+            new ImportDocument() { DocumentCode = "C640", DocumentReference = new ImportDocumentReference("7654321") },
+        ];
+        SetCommodities(
+            context,
+            firstItem,
+            otherChedItem,
+            CreateMatchingCommodity(firstItem, itemNumber: 3, netMass: 30)
+        );
+        var capturedRequest = StubResponseAndCapture(HttpStatusCode.OK);
+
+        CreateRule().Execute(context, _mockNext);
+
+        capturedRequest.Request.Should().NotBeNull();
+        capturedRequest.Request!.Items.Select(item => item.GoodsItemNumber).Should().BeEquivalentTo([1, 3]);
+    }
+
+    [Fact]
+    public void Execute_WhenSharedCommodityCodeItemsUseNetVolume_ReservesEveryItemFromSupplementaryUnits()
+    {
+        StubNext(DecisionCode.C02);
+        var context = CreateContext(netMass: 75, supplementaryUnits: 25, netVolumeUnitCode: "H87");
+        var firstItem = context.Commodity;
+        var secondItem = CreateMatchingCommodity(firstItem, itemNumber: 2, netMass: 40);
+        secondItem.SupplementaryUnits = 10;
+        SetCommodities(context, firstItem, secondItem);
+        var capturedRequest = StubResponseAndCapture(HttpStatusCode.OK);
+
+        CreateRule().Execute(context, _mockNext);
+
+        capturedRequest.Request.Should().NotBeNull();
+        capturedRequest.Request!.Items.Should().HaveCount(2);
+        capturedRequest
+            .Request.Items.Should()
+            .ContainSingle(item => item.GoodsItemNumber == 1 && item.NetVolumeQuantity == 25);
+        capturedRequest
+            .Request.Items.Should()
+            .ContainSingle(item => item.GoodsItemNumber == 2 && item.NetVolumeQuantity == 10);
+        capturedRequest
+            .Request.Items.Should()
+            .AllSatisfy(item =>
+            {
+                item.NetVolumeUnitOfMeasure.Should().Be(UniversalUnitOfMeasureType.H87);
+                item.NetWeightQuantity.Should().BeNull();
+            });
+    }
+
+    [Fact]
+    public void Execute_WhenChedHasMultipleLinesAndSomeItemsShareACommodityCode_ReservesEachItemAgainstItsLine()
+    {
+        StubNext(DecisionCode.C02);
+        var context = CreateContext(
+            additionalTradeLineItems:
+            [
+                new TradeLineItem()
+                {
+                    SequenceNumeric = 2,
+                    ApplicableClassification =
+                    [
+                        new ApplicableClassification() { ClassCode = new CodedValue { Value = "0202" } },
+                    ],
+                },
+            ]
+        );
+        var firstItem = context.Commodity;
+        var otherLineItem = CreateMatchingCommodity(firstItem, itemNumber: 3, netMass: 30);
+        otherLineItem.TaricCommodityCode = "0202020000";
+        SetCommodities(
+            context,
+            firstItem,
+            CreateMatchingCommodity(firstItem, itemNumber: 2, netMass: 50),
+            otherLineItem
+        );
+        var capturedRequest = StubResponseAndCapture(HttpStatusCode.OK);
+
+        CreateRule().Execute(context, _mockNext);
+
+        capturedRequest.Request.Should().NotBeNull();
+        capturedRequest
+            .Request!.Items.Select(item => (item.GoodsItemNumber, item.CertificateLineNumber))
+            .Should()
+            .BeEquivalentTo([(1, 1), (2, 1), (3, 2)]);
+    }
+
+    private static void SetCommodities(DecisionEngineContext context, params Commodity[] commodities)
+    {
+        context.ClearanceRequest.CustomsDeclaration.ClearanceRequest!.Commodities = commodities;
+    }
+
+    private static Commodity CreateMatchingCommodity(Commodity template, int itemNumber, decimal? netMass)
+    {
+        return new Commodity()
+        {
+            ItemNumber = itemNumber,
+            TaricCommodityCode = template.TaricCommodityCode,
+            NetMass = netMass,
+            Documents = template.Documents,
+        };
+    }
+
     private TracesReservationDecisionRule CreateRule(RuleMode level4Mode = RuleMode.DryRun)
     {
         return new TracesReservationDecisionRule(
@@ -589,7 +758,8 @@ public class TracesReservationDecisionRuleTests
         bool includeConsignmentItem = true,
         bool? level3Succeeded = true,
         string? netWeightUnitCode = null,
-        string? netVolumeUnitCode = null
+        string? netVolumeUnitCode = null,
+        TradeLineItem[]? additionalTradeLineItems = null
     )
     {
         const string chedIdentifier = "CHEDP.GB.2025.1234567";
@@ -626,6 +796,7 @@ public class TracesReservationDecisionRuleTests
                                     NetWeight = netWeight,
                                     NetVolume = netVolume,
                                 },
+                                .. additionalTradeLineItems ?? [],
                             ],
                         },
                     ]

@@ -15,6 +15,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Defra.Trade.Gateway.Api.Contract" Version="0.10.0" />
     <PackageReference Include="Defra.Trade.Imports.Quantity.Management.Client" Version="0.2.0" />
     <PackageReference Include="Defra.TradeImports.Api.Auth" Version="0.2.0" />
     <PackageReference Include="Defra.TradeImports.EmfExporter" Version="0.2.0" />

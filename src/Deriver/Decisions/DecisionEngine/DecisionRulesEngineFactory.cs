@@ -85,6 +85,7 @@ public sealed class DecisionRulesEngineFactory(IServiceProvider serviceProvider)
             AddRule<TracesCommodityQuantityCheckDecisionRule>(),
             AddRule<TracesCommodityCodeDecisionRule>(),
             AddRule<TracesTerminalStatusDecisionRule>(),
+            AddRule<TracesCvedpIuuCheckRule>(),
             AddRule<TracesCvedpDecisionRule>(),
         };
 

@@ -9,33 +9,20 @@ public sealed class CvedpIuuCheckRule : IDecisionRule
             return next(context);
         }
 
-        var notification = context.Notification;
-        return (notification.IuuCheckRequired == true) switch
+        var iuuOption = context.Notification.IuuOption;
+
+        return iuuOption switch
         {
-            true => notification.IuuOption switch
-            {
-                ControlAuthorityIuuOption.IUUOK => new DecisionEngineResult(
-                    DecisionCode.C07,
-                    nameof(CvedpIuuCheckRule)
-                ),
-                ControlAuthorityIuuOption.IUUNotCompliant => new DecisionEngineResult(
-                    DecisionCode.X00,
-                    nameof(CvedpIuuCheckRule)
-                ),
-                ControlAuthorityIuuOption.IUUNA => new DecisionEngineResult(
-                    DecisionCode.C08,
-                    nameof(CvedpIuuCheckRule)
-                ),
-                _ => new DecisionEngineResult(
-                    DecisionCode.H02,
-                    nameof(CvedpIuuCheckRule),
-                    DecisionInternalFurtherDetail.E93
-                ),
-            },
-            false => new DecisionEngineResult(
+            ControlAuthorityIuuOption.IUUOK => new DecisionEngineResult(DecisionCode.C07, nameof(CvedpIuuCheckRule)),
+            ControlAuthorityIuuOption.IUUNotCompliant => new DecisionEngineResult(
+                DecisionCode.X00,
+                nameof(CvedpIuuCheckRule)
+            ),
+            ControlAuthorityIuuOption.IUUNA => new DecisionEngineResult(DecisionCode.C08, nameof(CvedpIuuCheckRule)),
+            _ => new DecisionEngineResult(
                 DecisionCode.H02,
                 nameof(CvedpIuuCheckRule),
-                DecisionInternalFurtherDetail.E94
+                DecisionInternalFurtherDetail.E93
             ),
         };
     }

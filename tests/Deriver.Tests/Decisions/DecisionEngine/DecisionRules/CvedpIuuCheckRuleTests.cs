@@ -20,33 +20,21 @@ public class CvedpIuuCheckRuleTests
     public void Execute_WhenCheckCodeIsNotIuu_CallsNextDelegate()
     {
         var notification = DecisionImportPreNotificationBuilder.Create().WithId("Test").Build();
-        var c = new DecisionEngineContext(
-            new DecisionContext([notification], [], []),
-            new DecisionRulesOptions(),
-            notification,
-            new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
-            new Commodity(),
-            new CheckCode() { Value = "H219" },
-            new ImportDocument(),
-            null
-        )
-        {
-            Logger = NullLogger.Instance,
-        };
+        var c = CreateContext(notification, new CheckCode() { Value = "H219" });
 
         _rule.Execute(c, _mockNext);
 
         _mockNext.Received(1).Invoke(Arg.Any<DecisionEngineContext>());
     }
 
-    // ---------- IUU checks with IuuCheckRequired = true ----------
+    // ---------- IuuOption on the notification ----------
     [Theory]
     [InlineData(ControlAuthorityIuuOption.IUUOK, DecisionCode.C07)]
     [InlineData(ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00)]
     [InlineData(ControlAuthorityIuuOption.IUUNA, DecisionCode.C08)]
-    [InlineData(null, DecisionCode.H02, DecisionInternalFurtherDetail.E93)]
-    public void Execute_WhenCheckCodeIsIuu_AndIuuCheckRequiredIsTrue_ReturnsExpectedDecision(
-        string? iuuOption,
+    [InlineData("Unknown", DecisionCode.H02, DecisionInternalFurtherDetail.E93)]
+    public void Execute_WhenNotificationHasIuuOption_ReturnsDecisionFromIuuOption(
+        string iuuOption,
         DecisionCode expectedCode,
         DecisionInternalFurtherDetail? expectedDetail = null
     )
@@ -54,63 +42,80 @@ public class CvedpIuuCheckRuleTests
         var notification = DecisionImportPreNotificationBuilder
             .Create()
             .WithId("Test")
-            .WithIuuCheckRequired(true)
             .WithIuuOption(iuuOption)
             .Build();
-        var c = new DecisionEngineContext(
-            new DecisionContext([notification], [], []),
-            new DecisionRulesOptions(),
-            notification,
-            new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
-            new Commodity(),
-            new CheckCode() { Value = CheckCode.IuuCheckCode },
-            new ImportDocument(),
-            null
-        )
-        {
-            Logger = NullLogger.Instance,
-        };
-
-        var expectedResult = new DecisionEngineResult(expectedCode, nameof(CvedpIuuCheckRule), expectedDetail);
+        var c = CreateContext(notification, new CheckCode() { Value = CheckCode.IuuCheckCode });
 
         var result = _rule.Execute(c, _mockNext);
 
-        result.Should().BeEquivalentTo(expectedResult);
+        result
+            .Should()
+            .BeEquivalentTo(new DecisionEngineResult(expectedCode, nameof(CvedpIuuCheckRule), expectedDetail));
         _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionEngineContext>());
     }
 
-    // ---------- IUU check with IuuCheckRequired = false ----------
+    // ---------- No IuuOption on the notification ----------
     [Fact]
-    public void Execute_WhenCheckCodeIsIuu_AndIuuCheckRequiredIsFalse_ReturnsH02_E94()
+    public void Execute_WhenNotificationHasNoIuuOption_ReturnsH02_E93()
+    {
+        var notification = DecisionImportPreNotificationBuilder.Create().WithId("Test").Build();
+        var c = CreateContext(notification, new CheckCode() { Value = CheckCode.IuuCheckCode });
+
+        var result = _rule.Execute(c, _mockNext);
+
+        result
+            .Should()
+            .BeEquivalentTo(
+                new DecisionEngineResult(DecisionCode.H02, nameof(CvedpIuuCheckRule), DecisionInternalFurtherDetail.E93)
+            );
+        _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionEngineContext>());
+    }
+
+    // ---------- IuuCheckRequired does not affect the decision ----------
+    [Theory]
+    [InlineData(true, ControlAuthorityIuuOption.IUUOK, DecisionCode.C07)]
+    [InlineData(false, ControlAuthorityIuuOption.IUUOK, DecisionCode.C07)]
+    [InlineData(null, ControlAuthorityIuuOption.IUUOK, DecisionCode.C07)]
+    [InlineData(true, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08)]
+    [InlineData(false, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08)]
+    [InlineData(null, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08)]
+    [InlineData(true, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00)]
+    [InlineData(false, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00)]
+    [InlineData(null, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00)]
+    public void Execute_WhenNotificationHasIuuOption_IgnoresIuuCheckRequired(
+        bool? iuuCheckRequired,
+        string iuuOption,
+        DecisionCode expectedCode
+    )
     {
         var notification = DecisionImportPreNotificationBuilder
             .Create()
             .WithId("Test")
-            .WithIuuCheckRequired(false)
+            .WithIuuCheckRequired(iuuCheckRequired)
+            .WithIuuOption(iuuOption)
             .Build();
-        var c = new DecisionEngineContext(
+        var c = CreateContext(notification, new CheckCode() { Value = CheckCode.IuuCheckCode });
+
+        var result = _rule.Execute(c, _mockNext);
+
+        result.Should().BeEquivalentTo(new DecisionEngineResult(expectedCode, nameof(CvedpIuuCheckRule)));
+    }
+
+    private static DecisionEngineContext CreateContext(
+        DecisionImportPreNotification notification,
+        CheckCode checkCode
+    ) =>
+        new(
             new DecisionContext([notification], [], []),
             new DecisionRulesOptions(),
             notification,
             new CustomsDeclarationWrapper("mrn", new CustomsDeclaration()),
             new Commodity(),
-            new CheckCode() { Value = CheckCode.IuuCheckCode },
+            checkCode,
             new ImportDocument(),
             null
         )
         {
             Logger = NullLogger.Instance,
         };
-
-        var expectedResult = new DecisionEngineResult(
-            DecisionCode.H02,
-            nameof(CvedpIuuCheckRule),
-            DecisionInternalFurtherDetail.E94
-        );
-
-        var result = _rule.Execute(c, _mockNext);
-
-        result.Should().BeEquivalentTo(expectedResult);
-        _mockNext.DidNotReceiveWithAnyArgs().Invoke(Arg.Any<DecisionEngineContext>());
-    }
 }

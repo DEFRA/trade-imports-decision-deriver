@@ -169,8 +169,11 @@
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
 │  8. CvedpIuuCheckRule                                       │
-│     ├─ IUU Option B? → E03 (Transit/Export)               │
-│     └─ No IUU issue → Continue                              │
+│     ├─ Not H224? → Continue                                 │
+│     ├─ IuuOption IUUOK → C07                                │
+│     ├─ IuuOption IUUNA → C08                                │
+│     ├─ IuuOption IUUNotCompliant → X00                      │
+│     └─ Not set / other → H02 / E93                          │
 └────────────────────────┬────────────────────────────────────┘
                          ▼
 ┌─────────────────────────────────────────────────────────────┐

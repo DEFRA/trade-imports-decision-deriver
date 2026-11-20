@@ -381,6 +381,115 @@ public class CommodityQuantityCheckDecisionRuleTests
         returnedResult.Should().BeEquivalentTo(result);
     }
 
+    [Theory]
+    [InlineData(0, DecisionCode.X00, DecisionInternalFurtherDetail.E30)]
+    [InlineData(1, DecisionCode.X00, DecisionInternalFurtherDetail.E30)]
+    [InlineData(2, DecisionCode.C02, null)]
+    public void Execute_WhenMrnItemsShareCommodityCodeAcrossMultipleCheds_ComparesWeightAgainstOwnChedOnly(
+        int commodityIndex,
+        DecisionCode expectedDecisionCode,
+        DecisionInternalFurtherDetail? expectedFurtherDetail
+    )
+    {
+        // Arrange
+        // Items 1 & 2 reference CHED 1000015 (9,130 + 15,870 = 25,000kg against 19,620kg) so must fail.
+        // Item 4 references CHED 1000016 (100kg against 19,620kg) so must pass. CHED 1000016's weight
+        // must not be added to CHED 1000015's to cover items 1 & 2.
+        var ruleOptions = new DecisionRulesOptions()
+        {
+            Ipaffs = new DecisionRulesSourceOptions()
+            {
+                Level3Mode = RuleMode.Live,
+                CommodityQuantityCheckDecisionRule =
+                    TestDecisionRulesEngineFactory.CreateCommodityQuantityCheckDecisionRuleOptions(),
+            },
+        };
+        var rule = new CommodityQuantityCheckDecisionRule();
+
+        var firstNotification = DecisionImportPreNotificationBuilder
+            .Create()
+            .WithId("1000015")
+            .WithStatus(ImportNotificationStatus.Validated)
+            .WithInspectionRequired("Other")
+            .AddCommodity(c => c.WithWeight(19620).WithCommodityCode("020714"))
+            .Build();
+        var secondNotification = DecisionImportPreNotificationBuilder
+            .Create()
+            .WithId("1000016")
+            .WithStatus(ImportNotificationStatus.Validated)
+            .WithInspectionRequired("Other")
+            .AddCommodity(c => c.WithWeight(19620).WithCommodityCode("020714"))
+            .Build();
+
+        var customsDeclaration = new CustomsDeclarationWrapper(
+            "mrn",
+            new CustomsDeclaration()
+            {
+                ClearanceRequest = new ClearanceRequest()
+                {
+                    Commodities =
+                    [
+                        CreateCommodity(itemNumber: 1, netMass: 9130, documentReference: "1000015"),
+                        CreateCommodity(itemNumber: 2, netMass: 15870, documentReference: "1000015"),
+                        CreateCommodity(itemNumber: 4, netMass: 100, documentReference: "1000016"),
+                    ],
+                },
+            }
+        );
+
+        _mockNext(Arg.Any<DecisionEngineContext>())
+            .Returns(
+                new DecisionEngineResult(
+                    DecisionCode.C02,
+                    nameof(CommodityQuantityCheckDecisionRule),
+                    Level: DecisionRuleLevel.Level3
+                )
+            );
+
+        var commodity = customsDeclaration.CustomsDeclaration.ClearanceRequest!.Commodities![commodityIndex];
+        var notification = commodity.Documents![0].DocumentReference!.Value.EndsWith("1000015")
+            ? firstNotification
+            : secondNotification;
+
+        var c = new DecisionEngineContext(
+            new DecisionContext([firstNotification, secondNotification], [customsDeclaration], []),
+            ruleOptions,
+            notification,
+            customsDeclaration,
+            commodity,
+            new CheckCode() { Value = "H222" },
+            commodity.Documents[0],
+            null
+        )
+        {
+            Logger = NullLogger.Instance,
+            Source = Constants.ChedSource.Ipaffs,
+        };
+
+        // Act
+        var returnedResult = rule.Execute(c, _mockNext);
+
+        // Assert
+        returnedResult.Code.Should().Be(expectedDecisionCode);
+        returnedResult.FurtherDetail.Should().Be(expectedFurtherDetail);
+    }
+
+    private static Commodity CreateCommodity(int itemNumber, decimal netMass, string documentReference) =>
+        new()
+        {
+            ItemNumber = itemNumber,
+            NetMass = netMass,
+            TaricCommodityCode = "0207146000",
+            Documents =
+            [
+                new ImportDocument()
+                {
+                    DocumentReference = new ImportDocumentReference(documentReference),
+                    DocumentCode = "C640",
+                },
+            ],
+        };
+
     [Fact]
     public void Execute_ShouldNotFallback_WhenUseFallbackIsFalse()
     {

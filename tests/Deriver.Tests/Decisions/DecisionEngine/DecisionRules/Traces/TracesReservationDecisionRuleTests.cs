@@ -81,6 +81,51 @@ public class TracesReservationDecisionRuleTests
             );
     }
 
+    [Theory]
+    [InlineData(DecisionCode.C07)]
+    [InlineData(DecisionCode.C08)]
+    public void Execute_WhenCheckCodeIsIuu_ReturnsNextResultWithoutReserving(DecisionCode iuuReleaseCode)
+    {
+        // The IUU check (H224) is a document check, not a quantity one, so it must never place a reservation
+        // even when it releases and level 3 succeeded - the H222 check for the same item does that
+        var nextResult = StubNext(iuuReleaseCode);
+        var context = CreateContext(checkCode: CheckCode.IuuCheckCode);
+
+        var result = CreateRule(RuleMode.Live).Execute(context, _mockNext);
+
+        result.Should().BeSameAs(nextResult);
+        result.Code.Should().Be(iuuReleaseCode);
+        result.PassiveResults.Should().BeNullOrEmpty();
+        _quantityManagementClient
+            .DidNotReceive()
+            .PutChedReservation(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<ChedReservationRequest>(),
+                Arg.Any<CancellationToken>()
+            );
+    }
+
+    [Fact]
+    public void Execute_WhenCheckCodeIsNotIuu_Reserves()
+    {
+        StubNext(DecisionCode.C02);
+        var context = CreateContext(checkCode: "H222");
+        StubResponse(HttpStatusCode.OK, new ChedDeclarationReservation { Reserved = [], Consumed = [] });
+
+        var result = CreateRule().Execute(context, _mockNext);
+
+        result.Code.Should().Be(DecisionCode.C03);
+        _quantityManagementClient
+            .Received(1)
+            .PutChedReservation(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<ChedReservationRequest>(),
+                Arg.Any<CancellationToken>()
+            );
+    }
+
     [Fact]
     public void Execute_WhenReservationSucceeds_ReturnsC03()
     {
@@ -589,7 +634,8 @@ public class TracesReservationDecisionRuleTests
         bool includeConsignmentItem = true,
         bool? level3Succeeded = true,
         string? netWeightUnitCode = null,
-        string? netVolumeUnitCode = null
+        string? netVolumeUnitCode = null,
+        string checkCode = "H222"
     )
     {
         const string chedIdentifier = "CHEDP.GB.2025.1234567";
@@ -673,7 +719,7 @@ public class TracesReservationDecisionRuleTests
             null!,
             customsDeclaration,
             customsDeclaration.CustomsDeclaration.ClearanceRequest!.Commodities![0],
-            new CheckCode() { Value = "H222" },
+            new CheckCode() { Value = checkCode },
             document,
             ched
         )

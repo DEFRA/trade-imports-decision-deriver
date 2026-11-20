@@ -22,7 +22,7 @@ public sealed class TracesReservationDecisionRule(
     {
         var result = next(context);
 
-        if (!result.Code.IsRelease() || context.Level3Succeeded != true)
+        if (!result.Code.IsRelease() || context.Level3Succeeded != true || context.CheckCode.IsIuu())
         {
             context.Logger.LogInformation(
                 "Skipping reservation for {Ched} : {Mrn}",

@@ -19,7 +19,7 @@
 | # | Rule | Type | Returns |
 |---|------|------|---------|
 | 1-7 | Same as CVEDA | | |
-| 8 | `CvedpIuuCheckRule` | Decision | H224 only: decides from notification `IuuOption` (`IUUOK` → C07, `IUUNA` → C08, `IUUNotCompliant` → X00, not set/other → H02/E93) |
+| 8 | `CvedpIuuCheckRule` | Decision | H224 only: decides from notification `IuuOption` (`IUUOK` → C07, `IUUNA` → C08, `IUUNotCompliant` → N07, not set/other → H02/E93) |
 | 9 | `CvedpDecisionRule` | Decision | C02, N01-N07, or X00 (terminal) |
 | 10 | `CommodityCodeValidationRule` | Post-process | Logs warnings, returns result from next |
 | 11 | `CommodityWeightOrQuantityValidationRule` | Post-process | Logs warnings, returns result from next |
@@ -175,7 +175,7 @@ Applies to the IUU check code `H224` only; other check codes continue to the nex
 |------------|---------------|---------|
 | **IUUOK** | C07 | IUU compliant |
 | **IUUNA** | C08 | IUU not applicable |
-| **IUUNotCompliant** | X00 | IUU not compliant |
+| **IUUNotCompliant** | N07 | IUU not compliant |
 | **Not set / Other** | H02 / E93 | IUU awaiting decision |
 
 ## Inspection Required Logic

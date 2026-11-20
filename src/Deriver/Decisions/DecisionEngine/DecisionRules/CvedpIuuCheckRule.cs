@@ -15,7 +15,7 @@ public sealed class CvedpIuuCheckRule : IDecisionRule
         {
             ControlAuthorityIuuOption.IUUOK => new DecisionEngineResult(DecisionCode.C07, nameof(CvedpIuuCheckRule)),
             ControlAuthorityIuuOption.IUUNotCompliant => new DecisionEngineResult(
-                DecisionCode.X00,
+                DecisionCode.N07,
                 nameof(CvedpIuuCheckRule)
             ),
             ControlAuthorityIuuOption.IUUNA => new DecisionEngineResult(DecisionCode.C08, nameof(CvedpIuuCheckRule)),

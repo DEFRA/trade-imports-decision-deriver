@@ -172,7 +172,7 @@
 │     ├─ Not H224? → Continue                                 │
 │     ├─ IuuOption IUUOK → C07                                │
 │     ├─ IuuOption IUUNA → C08                                │
-│     ├─ IuuOption IUUNotCompliant → X00                      │
+│     ├─ IuuOption IUUNotCompliant → N07                      │
 │     └─ Not set / other → H02 / E93                          │
 └────────────────────────┬────────────────────────────────────┘
                          ▼

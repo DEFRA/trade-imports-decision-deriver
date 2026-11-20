@@ -261,7 +261,7 @@ switch (notification.Status)
 **Type**: Decision  
 **Returns** (only for the IUU check code `H224`, otherwise continues to the next rule):
 - Decides from the notification's `IuuOption` only; no IUU certificate is loaded
-- `IuuOption` mapping: `IUUOK` → `C07`, `IUUNotCompliant` → `X00`, `IUUNA` → `C08`, not set or anything else → `H02` / `E93`
+- `IuuOption` mapping: `IUUOK` → `C07`, `IUUNotCompliant` → `N07`, `IUUNA` → `C08`, not set or anything else → `H02` / `E93`
 - `IuuCheckRequired` does not affect the decision
 
 #### `TracesCvedpIuuCheckRule`

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Defra.TradeImportsDataApi.Api.Client;
 using Defra.TradeImportsDataApi.Domain.CustomsDeclaration;
 using Defra.TradeImportsDataApi.Domain.Events;
@@ -12,15 +13,13 @@ public abstract class ChedConsumer<TEvent>(ITradeImportsDataApiClient apiClient,
     : IConsumer<ResourceEvent<TEvent>>,
         IConsumerWithContext
 {
-    private readonly Lock _lock = new();
-
     protected ITradeImportsDataApiClient ApiClient { get; } = apiClient;
 
     public abstract Task OnHandle(ResourceEvent<TEvent> message, CancellationToken cancellationToken);
 
     protected async Task<List<DefraUNVTDCHEDProfile>> GetTracesCheds(string[] mrns)
     {
-        var cheds = new List<DefraUNVTDCHEDProfile>();
+        var cheds = new ConcurrentBag<DefraUNVTDCHEDProfile>();
 
         await Parallel.ForEachAsync(
             mrns,
@@ -28,25 +27,14 @@ public abstract class ChedConsumer<TEvent>(ITradeImportsDataApiClient apiClient,
             {
                 var apiResponse = await ApiClient.GetTracesChedsByMrn(mrn, cancellationToken);
 
-                foreach (
-                    var chedResponse in apiResponse
-                        .Cheds.Where(notificationResponse =>
-                            !cheds.Exists(x =>
-                                x.ExchangedDocument.Identifier == notificationResponse.Ched.ExchangedDocument.Identifier
-                            )
-                        )
-                        .Select(x => x.Ched)
-                )
+                foreach (var ched in apiResponse.Cheds.Select(x => x.Ched))
                 {
-                    lock (_lock)
-                    {
-                        cheds.Add(chedResponse);
-                    }
+                    cheds.Add(ched);
                 }
             }
         );
 
-        return cheds;
+        return cheds.DistinctBy(x => x.ExchangedDocument.Identifier).ToList();
     }
 
     protected async Task ProcessDecisionResult(

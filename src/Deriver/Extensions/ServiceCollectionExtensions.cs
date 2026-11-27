@@ -113,6 +113,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<TracesReservationDecisionRule>();
         services.AddSingleton<TracesCommodityQuantityCheckDecisionRule>();
         services.AddSingleton<TracesCommodityCodeDecisionRule>();
+        services.AddSingleton<TracesWrongChedTypeDecisionRule>();
 
         // Order of interceptors is important here
         services.AddTraceContextInterceptor();

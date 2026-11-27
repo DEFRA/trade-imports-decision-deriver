@@ -38,6 +38,7 @@ public class TestDecisionRulesEngineFactory : IDecisionRulesEngineFactory
         .AddSingleton<TracesReservationDecisionRule>()
         .AddSingleton<TracesCommodityQuantityCheckDecisionRule>()
         .AddSingleton<TracesCommodityCodeDecisionRule>()
+        .AddSingleton<TracesWrongChedTypeDecisionRule>()
         .AddSingleton(CreateQuantityManagementClient())
         .AddSingleton(Substitute.For<ITradeImportsDataApiClient>())
         .AddOptions()

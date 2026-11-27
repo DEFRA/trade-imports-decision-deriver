@@ -1,4 +1,5 @@
 using Defra.TradeImportsDataApi.Domain.Ipaffs.Constants;
+using Defra.TradeImportsDecisionDeriver.Deriver.Decisions.DecisionEngine.DecisionRules.Traces;
 
 namespace Defra.TradeImportsDecisionDeriver.Deriver.Decisions;
 
@@ -17,6 +18,19 @@ public class CheckCode
             "H223" => ImportNotificationType.Ced,
             "H222" or "H224" => ImportNotificationType.Cvedp,
             "H219" or "H218" or "H220" => ImportNotificationType.Chedpp,
+            _ => null,
+        };
+    }
+
+    public string? GetTracesChedType()
+    {
+        // This is the mapping from https://eaflood.atlassian.net/wiki/spaces/ALVS/pages/5400920093/DocumentCode+CheckCode+Mapping
+        return Value switch
+        {
+            "H221" => TracesChedType.Cveda,
+            "H223" => TracesChedType.Ced,
+            "H222" or "H224" => TracesChedType.Cvedp,
+            "H219" or "H218" or "H220" => TracesChedType.Chedpp,
             _ => null,
         };
     }

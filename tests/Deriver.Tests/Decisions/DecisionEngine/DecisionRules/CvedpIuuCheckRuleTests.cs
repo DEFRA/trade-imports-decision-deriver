@@ -30,7 +30,7 @@ public class CvedpIuuCheckRuleTests
     // ---------- IuuOption on the notification ----------
     [Theory]
     [InlineData(ControlAuthorityIuuOption.IUUOK, DecisionCode.C07)]
-    [InlineData(ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00)]
+    [InlineData(ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.N07)]
     [InlineData(ControlAuthorityIuuOption.IUUNA, DecisionCode.C08)]
     [InlineData("Unknown", DecisionCode.H02, DecisionInternalFurtherDetail.E93)]
     public void Execute_WhenNotificationHasIuuOption_ReturnsDecisionFromIuuOption(
@@ -79,9 +79,9 @@ public class CvedpIuuCheckRuleTests
     [InlineData(true, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08)]
     [InlineData(false, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08)]
     [InlineData(null, ControlAuthorityIuuOption.IUUNA, DecisionCode.C08)]
-    [InlineData(true, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00)]
-    [InlineData(false, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00)]
-    [InlineData(null, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.X00)]
+    [InlineData(true, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.N07)]
+    [InlineData(false, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.N07)]
+    [InlineData(null, ControlAuthorityIuuOption.IUUNotCompliant, DecisionCode.N07)]
     public void Execute_WhenNotificationHasIuuOption_IgnoresIuuCheckRequired(
         bool? iuuCheckRequired,
         string iuuOption,

@@ -146,29 +146,29 @@ public sealed class TracesReservationDecisionRule(
                 continue;
             }
 
-            var matchedCommodity = mrnCommodities.FirstOrDefault(mrn =>
+            // Every declaration item for this CHED line is reserved, not just the first, as several
+            // declaration items can share a commodity code against a single CHED trade line
+            var matchedCommodities = mrnCommodities.Where(mrn =>
                 mrn.TaricCommodityCode?.StartsWith(classCode, StringComparison.OrdinalIgnoreCase) == true
                 && mrn.Documents?.Any(document => document.DocumentReference?.Value == chedDocumentIdentifier) == true
             );
 
-            if (matchedCommodity == null)
-            {
-                continue;
-            }
-
             var useNetVolume = UsesNetVolume(tradeLineItem);
 
-            // Net volume is a count (e.g. H87 pieces) so must come from supplementary units, never net mass
-            var quantity = useNetVolume
-                ? matchedCommodity.SupplementaryUnits
-                : matchedCommodity.NetMass ?? matchedCommodity.SupplementaryUnits;
-
-            if (quantity == null)
+            foreach (var matchedCommodity in matchedCommodities)
             {
-                continue;
-            }
+                // Net volume is a count (e.g. H87 pieces) so must come from supplementary units, never net mass
+                var quantity = useNetVolume
+                    ? matchedCommodity.SupplementaryUnits
+                    : matchedCommodity.NetMass ?? matchedCommodity.SupplementaryUnits;
 
-            items.Add(CreateReservationItem(tradeLineItem, matchedCommodity, classCode, quantity, useNetVolume));
+                if (quantity == null)
+                {
+                    continue;
+                }
+
+                items.Add(CreateReservationItem(tradeLineItem, matchedCommodity, classCode, quantity, useNetVolume));
+            }
         }
 
         return items.ToArray();
